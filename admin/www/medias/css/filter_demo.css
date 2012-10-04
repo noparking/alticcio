@@ -1,0 +1,72 @@
+@CHARSET "UTF-8";
+
+#main {
+	width: 100%;
+}
+
+
+
+div.filter-pager {
+	display: inline;
+	font-size:11px;
+	padding:3px 5px;
+}
+div.filter-pager input {
+	font-size:11px;
+}
+div.filter-buttons {
+	display: inline;
+}
+
+
+div.filter-actions {
+	background-color:#dee9f5;
+	font-size:11px;
+	margin:5px 0 0 0;
+	padding:3px 5px;
+	color:#666;
+}
+div.filter-actions a {
+	color:#0080C6;
+}
+#table_pager thead th a {
+	color:#333;
+	font-size:12px;
+}
+#table_pager thead td {
+	background-color:#f7f7f7;
+}
+#table_pager thead td input, 
+#table_pager thead td select	 {
+	border:1px solid #CCC;
+	font-size:11px;
+	padding:2px;
+	margin:0 auto;
+}
+
+
+.filter-element {
+	width: 90%;
+	white-space: nowrap;
+}
+.filter-between {
+	width: 3em;
+}
+
+
+
+
+
+.filter-sorted-column-asc {
+	background-image: url(../images/sort-asc.png);
+	background-position: right;
+	background-repeat: no-repeat;
+	padding-right: 15px;
+}
+
+.filter-sorted-column-desc {
+	background-image: url(../images/sort-desc.png);
+	background-position: right;
+	background-repeat: no-repeat;
+	padding-right: 15px;
+}

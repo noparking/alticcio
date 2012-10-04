@@ -1,0 +1,52 @@
+body {
+	background-color: #bbbbbb;
+	text-align: center;
+}
+
+li.flag, li.color {
+	list-style-type: none;
+	display: inline-block;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	padding: 0;
+}
+
+li.flag {
+	height: 41px;
+	border: 3px solid transparent;
+}
+
+img {
+	background: url(background.png) repeat;
+}
+
+#flag {
+	display: inline-block;
+	width: 600px;
+	height: 400px;
+	margin: 10px;
+}
+ #flag h1 {
+	 margin-top: 150px;
+}
+
+.colors {
+	display: none;
+	border: 1px solid #555555;
+	background-color: #bbbbbb;
+	padding: 10px 0 0 10px;
+	margin: 0;
+	width: 200px;
+}
+
+.color {
+	width: 30px;
+	height: 20px;
+	border: 3px solid transparent;
+
+}
+
+.color.selected-color, .flag.selected-flag {
+	border: 3px solid #555555;
+}
+

@@ -1,0 +1,300 @@
+<?php
+
+class API_Admin {
+	
+	private $table_prefix;
+
+	public function __construct($table_prefix = "") {
+		$this->table_prefix = $table_prefix;
+	}
+
+	private function table($name) {
+		return $this->table_prefix.$name;
+	}
+
+	private function generate_key() {
+		return md5(uniqid("", true));
+	}
+
+	public function add_key($params = array()) {
+		foreach (array('name', 'table_name', 'table_id_name', 'id_table', 'language', 'key', 'domain') as $attr) {
+			$$attr = isset($params[$attr]) ? $params[$attr] : "";
+		}
+		if (!isset($params['key'])) {
+			$key = $this->generate_key();
+		}
+		$q = <<<SQL
+INSERT INTO {$this->table('keys')} (`key`, `name`, `table_name`, `table_id_name`, `id_table`, `language`, `date_creation`, `active`, `domain`)
+VALUES ('$key', '$name', '$table_name', '$table_id_name', '$id_table', '$language', {$_SERVER['REQUEST_TIME']}, TRUE, '$domain')
+SQL;
+		mysql_query($q);
+
+		return mysql_insert_id();
+	}
+
+	public function update_key($key_id, $params = array()) {
+		$set = array();
+		$fields = array(
+			'key',
+			'name',
+			'table_name',
+			'table_id_name',
+			'id_table',
+			'language',
+			'active',
+			'ip',
+			'domain',
+			'emails',
+		);
+		if (isset($params['domain'])) {
+			$params['ip'] = "";
+		}
+		foreach ($fields as $attr) {
+			if (isset($params[$attr])) {
+				$set[] = "`$attr` = '{$params[$attr]}'";
+			}
+		}
+		$q = "UPDATE {$this->table('keys')} SET ".implode(",", $set)." WHERE `id` = '$key_id'";
+		mysql_query($q);
+
+		return $key_id;
+	}
+
+	public function change_key($key_id) {
+		$new_key = $this->generate_key();
+		$q = <<<SQL
+UPDATE {$this->table('keys')} SET `key` = '$new_key', `date_creation` = {$_SERVER['REQUEST_TIME']} WHERE `id` = '$key_id';
+SQL;
+		mysql_query($q);
+
+		return $new_key;
+	}
+
+	public function disable_key($key_id) {
+		$q = <<<SQL
+UPDATE {$this->table('keys')} SET active = FALSE WHERE `id` = $key_id
+SQL;
+		mysql_query($q);
+	}
+
+	public function enable_key($key_id) {
+		$q = <<<SQL
+UPDATE {$this->table('keys')} SET active = TRUE WHERE `id` = $key_id
+SQL;
+		mysql_query($q);
+	}
+
+	public function delete_key($key_id) {
+		$q = <<<SQL
+DELETE FROM {$this->table('keys')} WHERE `id` = '$key_id';
+SQL;
+		mysql_query($q);
+
+		foreach (array('keys_roles', 'keys_rules', 'logs') as $table) {
+			$q = <<<SQL
+DELETE FROM {$this->table($table)} WHERE `id_key` = '$key_id';
+SQL;
+			mysql_query($q);
+		}
+	}
+
+	public function key_data($key_id) {
+		$q = <<<SQL
+SELECT * FROM {$this->table('keys')} WHERE `id` = '$key_id'
+SQL;
+		$res = mysql_query($q);
+		$row = mysql_fetch_assoc($res);
+	
+		return $row;
+	}
+
+	public function keys() {
+		$q = <<<SQL
+SELECT * FROM {$this->table('keys')} ORDER BY name ASC 
+SQL;
+		$res = mysql_query($q);
+		$keys = array();
+		while ($row = mysql_fetch_assoc($res)) {
+			$keys[$row['id']] = $row;
+		}
+		return $keys;
+	}
+
+	public function add_key_rule($key_id, $method, $uri, $type) {
+		$q = <<<SQL
+INSERT INTO {$this->table('keys_rules')} (`method`, `uri`, `type`, `id_key`)
+VALUES ('$method', '$uri', '$type', $key_id)
+SQL;
+		mysql_query($q);
+
+		return mysql_insert_id();
+	}
+
+	public function delete_key_rule($id) {
+		$q = <<<SQL
+SELECT id_key FROM {$this->table('keys_rules')} WHERE id = $id
+SQL;
+		$res = mysql_query($q);
+		$row = mysql_fetch_assoc($res);
+		$id_key = $row['id_key'];
+		$q = <<<SQL
+DELETE FROM {$this->table('keys_rules')} WHERE id = $id
+SQL;
+		mysql_query($q);
+
+		return $id_key;
+	}
+
+	public function key_rules($key_id) {
+		$q = <<<SQL
+SELECT * FROM {$this->table('keys_rules')} WHERE id_key = $key_id ORDER BY method ASC, uri ASC
+SQL;
+		$res = mysql_query($q);
+		$rules = array();
+		while ($row = mysql_fetch_assoc($res)) {
+			$rules[$row['id']] = $row;
+		}
+		return $rules;
+	}
+
+	public function key_roles($key_id) {
+		$q = <<<SQL
+SELECT * FROM {$this->table('roles')} AS r
+INNER JOIN {$this->table('keys_roles')} AS kr ON kr.id_role = r.id 
+WHERE kr.id_key = $key_id
+SQL;
+		$res = mysql_query($q);
+		$roles = array();
+		while ($row = mysql_fetch_assoc($res)) {
+			$roles[$row['id']] = $row['name'];
+		}
+		return $roles;
+	}
+
+	public function add_role($name) {
+		$q = <<<SQL
+SELECT id FROM {$this->table('roles')} WHERE `name` = '$name'
+SQL;
+		$res = mysql_query($q);
+		if ($row = mysql_fetch_assoc($res)) {
+			return $row['id'];
+		}
+		else {
+			$q = <<<SQL
+INSERT INTO {$this->table('roles')} (`name`) VALUES ('$name');
+SQL;
+			mysql_query($q);
+			return mysql_insert_id();
+		}
+	}
+
+	public function delete_role($role_id) {
+		$q = <<<SQL
+DELETE FROM {$this->table('roles')} WHERE id = $role_id;
+SQL;
+		mysql_query($q);
+
+		foreach (array('keys_roles', 'roles_rules') as $table) {
+			$q = <<<SQL
+DELETE FROM {$this->table($table)} WHERE `id_role` = '$role_id';
+SQL;
+			mysql_query($q);
+		}
+	}
+
+	public function roles() {
+		$roles = array();
+		$q = <<<SQL
+SELECT id, name FROM {$this->table('roles')} ORDER BY name ASC
+SQL;
+		$res = mysql_query($q);
+		while ($row = mysql_fetch_assoc($res)) {
+			$roles[$row['id']] = $row['name'];
+		}
+
+		return $roles;
+	}
+
+	public function assign_role($key_id, $role_id) {
+		$q = <<<SQL
+SELECT * FROM {$this->table('keys_roles')} WHERE id_key = $key_id AND id_role = $role_id
+SQL;
+		$res = mysql_query($q);
+		if (!mysql_fetch_assoc($res)) {
+			$q = <<<SQL
+INSERT INTO {$this->table('keys_roles')} (id_key, id_role) VALUES ($key_id, $role_id)
+SQL;
+			mysql_query($q);
+		}
+	}
+
+	public function unassign_role($key_id, $role_id) {
+		$q = <<<SQL
+DELETE FROM {$this->table('keys_roles')} WHERE id_key = '$key_id' AND id_role = '$role_id'
+SQL;
+		mysql_query($q);
+	}
+
+	public function role_rules($role_id) {
+		$q = <<<SQL
+SELECT id, method, uri, type
+FROM {$this->table('roles_rules')} 
+WHERE id_role = $role_id 
+ORDER BY method ASC, uri ASC
+SQL;
+		$res = mysql_query($q);
+		$rules = array();
+		while ($row = mysql_fetch_assoc($res)) {
+			$rules[] = $row;
+		}
+		return $rules;
+	}
+
+	public function add_role_rule($role_id, $method, $uri, $type) {
+		$roles_ids = array_keys($this->roles());
+		if (in_array($role_id, $roles_ids)) {
+			$q = <<<SQL
+INSERT INTO {$this->table('roles_rules')} (`method`, `uri`, `type`, `id_role`)
+VALUES ('$method', '$uri', '$type', $role_id)
+SQL;
+			mysql_query($q);
+
+			return mysql_insert_id();
+		}
+		else {
+			return null;
+		}
+	}
+
+	public function delete_role_rule($id) {
+		$q = <<<SQL
+SELECT id_role FROM {$this->table('roles_rules')} WHERE id = $id
+SQL;
+		$res = mysql_query($q);
+		$row = mysql_fetch_assoc($res);
+		$id_role = $row['id_role'];
+		$q = <<<SQL
+DELETE FROM {$this->table('roles_rules')} WHERE id = $id
+SQL;
+		mysql_query($q);
+
+		return $id_role;
+	}
+
+	public function watch($params = array()) {
+		$q = <<<SQL
+SELECT k.key, l.method, l.uri, l.status, l.date FROM {$this->table('logs')} AS l
+INNER JOIN {$this->table('keys')} as k ON k.id = l.id_key
+ORDER BY l.id
+SQL;
+		$res = mysql_query($q);
+		
+		$logs = array();
+		while ($row = mysql_fetch_assoc($res)) {
+			$logs[] = $row;
+		}
+
+		return $logs;
+	}
+}
+

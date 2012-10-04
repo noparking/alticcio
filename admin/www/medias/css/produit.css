@@ -1,0 +1,33 @@
+fieldset.produit-section.hidden {
+	display: none;
+}
+
+li.produit-section-item {
+	cursor: pointer;
+}
+
+li.produit-section-item.selected {
+	font-weight: bold;
+}
+
+img.produit-image {
+	width: 80px;
+	height: 60px;
+}
+
+.dragged {
+	background-color: #0081C5;
+}
+
+.drag-handle {
+	background-image: url(../images/sort.png);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+input.little-text {
+	width: 60px;
+}
+.lien_photomail a {
+	color:#666;
+}

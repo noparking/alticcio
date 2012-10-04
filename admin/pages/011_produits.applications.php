@@ -1,0 +1,285 @@
+<?php
+
+$menu->current('main/products/applications');
+
+$config->core_include("produit/application", "outils/form", "outils/mysql");
+$config->core_include("outils/phrase", "outils/langue");
+$config->core_include("outils/filter", "outils/pager");
+
+$page->javascript[] = $config->core_media("jquery.min.js");
+$page->javascript[] = $config->core_media("jquery.tablednd.js");
+$page->javascript[] = $config->media("produit.js");
+
+$page->jsvars[] = array(
+	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
+	"dico" => $dico->export(array(
+		'ConfirmerSuppression',	
+	)),
+);
+
+$page->css[] = $config->media("produit.css");
+
+$sql = new Mysql($config->db());
+
+$langue = new Langue($sql);
+$id_langue = $langue->id($config->get("langue"));
+
+$phrase = new Phrase($sql);
+
+$application = new Application($sql, $phrase, $id_langue);
+
+$pager_applications = new Pager($sql, array(20, 30, 50, 100, 200));
+$filter_applications = new Filter($pager_applications, array(
+	'id' => array(
+		'title' => 'ID',
+		'type' => 'between',
+		'order' => 'DESC',
+		'field' => 'a.id',
+	),
+	'phrase' => array(
+		'title' => $dico->t('Nom'),
+		'type' => 'contain',
+		'field' => 'p.phrase',
+	),
+), array(), "filter_applications");
+
+$action = $url2->get('action');
+if ($id = $url2->get('id')) {
+	$application->load($id);
+}
+
+$form = new Form(array(
+	'id' => "form-edit-application-$id",
+	'class' => "form-edit",
+	'actions' => array("save", "delete", "cancel"),
+));
+
+$pager_attributs = new Pager($sql, array(10, 30, 50, 100, 200), "pager_application_attributs");
+$filter_attributs = new Filter($pager_attributs, array(
+	'id' => array(
+		'title' => 'ID',
+		'type' => 'between',
+		'order' => 'DESC',
+		'field' => 'a.id',
+	),
+	'phrase_nom' => array(
+		'title' => $dico->t('Nom'),
+		'type' => 'contain',
+		'field' => 'p.phrase',
+	),
+	'classement' => array(
+		'title' => $dico->t('Classement'),
+		'type' => 'between',
+		'field' => 'aa.classement',
+		'form' => array(
+			'name' => "attributs[%id%][classement]",
+			'method' => 'input',
+			'type' => 'text',
+			'template' => '#{field}',
+			'class' => "input-text-numeric",
+		),
+	),
+	'fiche_technique' => array(
+		'title' => $dico->t('FicheTechnique'),
+		'type' => 'select',
+		'options' => array(0 => $dico->t("Non"), 1 => $dico->t("Oui")),
+		'field' => 'aa.fiche_technique',
+		'form' => array(
+			'name' => "attributs[%id%][fiche_technique]",
+			'method' => 'input',
+			'type' => 'checkbox',
+			'template' => '#{field}',
+		),
+	),
+	'pictos_vente' => array(
+		'title' => $dico->t('PictosVente'),
+		'type' => 'select',
+		'options' => array(0 => $dico->t("Non"), 1 => $dico->t("Oui")),
+		'field' => 'aa.pictos_vente',
+		'form' => array(
+			'name' => "attributs[%id%][pictos_vente]",
+			'method' => 'input',
+			'type' => 'checkbox',
+			'template' => '#{field}',
+		),
+	),
+	'top' => array(
+		'title' => $dico->t('Top'),
+		'type' => 'select',
+		'options' => array(0 => $dico->t("Non"), 1 => $dico->t("Oui")),
+		'field' => 'aa.top',
+		'form' => array(
+			'name' => "attributs[%id%][top]",
+			'method' => 'input',
+			'type' => 'checkbox',
+			'template' => '#{field}',
+		),
+	),
+	'comparatif' => array(
+		'title' => $dico->t('Comparatif'),
+		'type' => 'select',
+		'options' => array(0 => $dico->t("Non"), 1 => $dico->t("Oui")),
+		'field' => 'aa.comparatif',
+		'form' => array(
+			'name' => "attributs[%id%][comparatif]",
+			'method' => 'input',
+			'type' => 'checkbox',
+			'template' => '#{field}',
+		),
+	),
+	'filtre' => array(
+		'title' => $dico->t('Filtre'),
+		'type' => 'select',
+		'options' => array(0 => $dico->t("Non"), 1 => $dico->t("Oui")),
+		'field' => 'aa.filtre',
+		'form' => array(
+			'name' => "attributs[%id%][filtre]",
+			'method' => 'input',
+			'type' => 'checkbox',
+			'template' => '#{field}',
+		),
+	),
+), $application->attributs(), "filter_applications_attributs", true);
+	
+
+$section = "presentation";
+if ($form->value('section')) {
+	$section = $form->value('section');
+}
+$traduction = $form->value("lang");
+
+$messages = array();
+
+if ($form->is_submitted()) {
+	$data = $form->escape_values();
+	switch ($form->action()) {
+		case "translate":
+		case "filter":
+			break;
+		case "reset":
+			$form->reset();
+			$traduction = null;
+			break;
+		case "delete":
+			$application->delete($data);
+			$form->reset();
+			$url2->redirect("current", array('action' => "", 'id' => ""));
+			break;
+		default :
+			if ($action == "edit" or $action == "create") {
+				if (isset($data['attributs'])) {
+					$filter_selected = $filter_attributs->selected();
+					foreach ($data['attributs'] as $element_id => $element) {
+						if (!in_array($element_id, $filter_selected)) {
+							unset($data['attributs'][$element_id]);
+						}
+					}
+				}
+				$id = $application->save($data);
+				$form->reset();
+				if ($action != "edit") {
+					$url2->redirect("current", array('action' => "edit", 'id' => $id));
+				}
+				$application->load($id);
+			}
+			break;
+	}
+}
+
+if ($form->changed()) {
+	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
+}
+else {
+	$filter_attributs->select($application->attributs());
+}
+
+if ($action == 'edit') {
+	$form->default_values['application'] = $application->values;
+	$form->default_values['phrases'] = $phrase->get($application->phrases());
+	$form->default_values['attributs'] = $application->all_attributs();
+}
+else {
+	$page->javascript[] = $config->core_media("filter-edit.js");
+}
+
+$form_start = $form->form_start();
+
+$form->template = $page->inc("snippets/produits-form-template");
+
+$template_inline = <<<HTML
+#{label} : #{field} #{description}
+HTML;
+
+// variable $displayed_lang définie dans ce snippet
+$main = $page->inc("snippets/translate");
+
+$main .= $page->inc("snippets/messages");
+
+$hidden = array('presentation' => "");
+
+if ($action == "create" or $action == "edit") {
+	$buttons[] = $page->l($dico->t('Retour'), $url2->make("current", array('action' => "", 'id' => "")));
+}
+$buttons[] = $page->l($dico->t('NouvelleApplication'), $url2->make("current", array('action' => "create", 'id' => "")));
+
+if ($action == "create" or $action == "edit") {
+	$sections = array(
+		'presentation' => $dico->t('Presentation'),
+		'attributs' => $dico->t('Attributs'),
+	);
+	// variable $hidden mise à jour dans ce snippet
+	$left = $page->inc("snippets/produits-sections");
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "produit-section-presentation"))}
+{$form->input(array('name' => "application[phrase_nom]", 'type' => "hidden"))}
+{$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+{$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
+{$dico->t('CochezAttributs')}
+HTML;
+
+	$pager = $pager_attributs;
+	$filter = $filter_attributs;
+	$application->all_attributs($filter);
+	$main .= $page->inc("snippets/filter-form");
+	foreach ($filter->selected() as $selected_attribut) {
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][classement]", 'forced_default' => true));
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][fiche_technique]", 'forced_default' => true));
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][pictos_vente]", 'forced_default' => true));
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][top]", 'forced_default' => true));
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][comparatif]", 'forced_default' => true));
+		$main .= $form->hidden(array('name' => "attributs[$selected_attribut][filtre]", 'forced_default' => true));
+	}
+	$main .= <<<HTML
+{$form->fieldset_end()}
+HTML;
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer')));
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));
+}
+
+if ($action == "edit") {
+	$main .= <<<HTML
+{$form->input(array('type' => "hidden", 'name' => "application[id]"))}
+{$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
+HTML;
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer')));
+}
+
+switch($action) {
+	case "create" :
+		$titre_page = $dico->t('CreerNouvelleApplication');
+		break;
+	case "edit" :
+		$titre_page = $dico->t('EditerApplication')." # ID : ".$id;
+		break;
+	default :
+		$titre_page = $dico->t('ListeOfApplications');
+		$filter = $filter_applications;
+		$pager = $pager_applications;
+		$application->liste($filter);
+		$main = $page->inc("snippets/filter");
+		break;
+}
+
+$form_end = $form->form_end();
+

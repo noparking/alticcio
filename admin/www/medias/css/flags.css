@@ -1,0 +1,33 @@
+.aside_flags {
+	margin:10px;
+	border:1px solid #CCC;
+}
+.aside_flags ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+.aside_flags ul li {
+	background-color:#EDEDED;
+	margin:1px 0 0 0;
+	padding:5px 10px;
+}
+.aside_flags ul li a {
+	color:#0080C6;
+}
+.contenu_flags {}
+#resistance_flags {
+	width:90%;
+	margin:20px 0;
+}
+#resistance_flags th {
+	font-size:11px;
+	text-align:center;
+}
+#resistance_flags th strong {}
+#resistance_flags td {
+	font-size:11px;
+}
+.aligner_centre {
+	text-align:center;
+}

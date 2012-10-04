@@ -1,0 +1,32 @@
+textarea.htmleditor {
+	width: 678px;
+	height: 339px;
+}
+ul.dteditor-ctl {
+	padding: 0;
+	margin: 0 0 5px 0;
+	background-image:url('../images/fond-dteditor.jpg');
+	border:1px solid #B2C8CE;;
+}
+ul.dteditor-ctl button {
+	margin:3px 0;
+	font-size:10px;
+}
+ul.dteditor-ctl li {
+	display: inline;
+	padding: 0 5px;
+}
+#main fieldset.dteditor-zone {
+		margin:0;
+	}
+#main fieldset .dteditor-zone fieldset {
+		margin:0;
+		border:1px solid #B2C8CE;
+}
+#main fieldset .dteditor-zone fieldset td {
+	border:0;
+}
+#main fieldset .dteditor-zone legend {
+	background-color:#B8C7CC;
+	font-weight:normal;
+}

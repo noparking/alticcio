@@ -1,0 +1,49 @@
+CLASSE Page DE GESTION DES PAGES ET TEMPLATES
+
+Création d'un objet Page
+------------------------
+
+Le constructeur d'un objet Page s'appelle sans paramètres :
+$page = new Page();
+
+
+Gestion des templates
+---------------------
+
+On définit le template que l'on veut utiliser avec la méthode template($mon_template).
+Le paramètre $mon_template est le nom du template que l'on veut utiliser (nom du fichier de template sans l'extension .php)
+La méthode get_template() renvoie le path vers le template que l'on utilise (dans le répertoire "templates").
+Par exemple, si on appelle la méthode template("default"), get_template() retournera "templates/default.php";
+
+
+Gestion des pages
+-----------------
+
+La méthode get_page($num) retourne le path pour accèder à une page. Elle prend en argument le numéro de la page.
+Par exemple, si le dossier "pages" contient les fichiers :
+- 01_page_un.php
+- 02_page_deux.php
+- 03_page_trois.php
+la méthode get_page(2) renverra "pages/02_page_deux.php"
+
+
+Construction des pages
+----------------------
+
+La classe Page contient un certain nombre de méthodes permettant de construire des éléments d'une pages.
+
+l($text, $path, $title = '', $target = '')
+Renvoie un lien html (balise <a>)
+$text est le texte du lien
+$path est l'url du lien (attribut href)
+$title est l'attribut $title du lien (optionnel)
+$target est l'attribut $target du lien (optionnel)
+
+L'attribut public javascript est un tableau contenant la liste des fichiers javascripts devant être inclus sur la page.
+La méthode javascript() permet d'afficher toutes les balises <script> correspondantes.
+
+L'attribut my_javascript est un tableau contenant tous les javascripts inlines de la pages.
+La méthode my_javascript() permet d'afficher les balises <script> contenant leur code.
+
+L'attribut public css est un tableau contenant la liste des fichiers css devant être inclus sur la page.
+La méthode css() permet d'afficher toutes les balises <link> correspondantes.

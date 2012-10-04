@@ -1,0 +1,28 @@
+CLASSE Mysql DE GESTION DES BASES DE DONNEES MySQL
+
+Création d'un objet Mysql
+-------------------------
+
+$sql = new Mysql(array(
+	'server' => "serveur",
+	'user' => "utilisateur",
+	'password' => "motdepasse",
+	'database' => "basededonnee",
+));
+
+Si 'server' n'est pas renseigné, la valeur par défaut est "localhost".
+Si 'user' n'est pas renseigné, la valeur par défaut est "root".
+Si 'password' n'est pas renseigné, la valeur par défaut est "".
+
+Le charset est mis en utf8 et la base de donnée est sélectionnée à la construction de l'objet.
+
+
+Méthodes de la classe Mysql
+---------------------------
+
+query($q) : execute une requête. Renvoile résultat de mysql_query()
+
+fetch($result) : extrait un élément du résultat de la requête. Renvoie false après le dernier élément.
+
+insert_id() : renvoie le dernier id auto_increment inséré en base.
+

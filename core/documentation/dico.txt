@@ -1,0 +1,66 @@
+CLASSE Dico DE GESTION DES DICTIONNAIRES
+
+Création d'un objet Dico :
+--------------------------
+
+On crée un objet de classe Form de la façon suivante :
+
+$dico = new Dico($language[, $default_language]);
+
+$language est la langue utilisée.
+$default_language est la langue par défaut (fr_FR par défault).
+
+
+Fichiers de traduction :
+------------------------
+
+Les fichiers de traductions doivent se trouver dans un répertoire commun.
+Ils sont nommés avec le code la langue et l'extention .php (ex: fr_FR.php).
+
+Un fichier de traduction peut contenir deux sortes de données :
+- Des termes, éléments de la langue (phrases, mots) déclarés dans le tableau $t. Ce sont forcément des strings.
+- Des données, éléments dépendants de la langue (url, fichiers images) déclarés dans le tableau $d. Ce peut-être tout type de données (strings, arrays...)
+
+Pour les tableaux $t et $d, les clé sont des mots clés. Les valeurs dépendent de la langue du fichier de traduction.
+
+
+Ajouter un fichier de traduction :
+----------------------------------
+
+La méthode principale pour ajouter un fichier de traduction est la méthode add($dir).
+$dir est le répertoire contenant les fichiers de traduction.
+En fonction de la langue et de la langue par défaut, les fichiers de traductions sont inclus s'il existent et les termes et données qu'ils contiennent sont ajoutés au dictionnaire.
+
+On peut ajouter directement un fichier de traduction avec la méthode addfile($file).
+$file est le fichier de traduction à inclure.
+
+
+Faire référence à un terme du dictionnaire :
+--------------------------------------------
+
+On fait référence à un terme du dictionnaire avec la méthode t($term).
+$term peut-être soit la clé référençant le terme, soit le terme complet dans la langue par défaut.
+Cette méthode renvoie le terme dans la langue utilisée.
+Si le terme n'et pas trouvé dans la langue utilisé, elle revoie le terme dans la langue par défaut.
+Si le terme n'est pas trouvé dans la langue par défault, elle renvoie $term.
+
+Un système de template permet de repérer les termes présent dans le dictionnaire de la langue par défaut mais pas dans le dictionnaire de la langue utilisé, ainsi que les termes complètement introuvable.
+Par défaut, les termes trouvé dans la langue par défaut mais pas dans la langue utilisée sont encapsulés dans un span de classe CSS "default-term".
+Les termes introuvables même dans la langue par défaut sont encapsulés dans un span de classe CSS "untranslated-term".
+Celà permet de repérer facilement à l'affichage les mots absents d'un dictionnaire.
+
+Les templates peuvent être redéfinis. Leurs valeurs par défaut sont :
+$template_untranslated = '<span class="untranslated-term">#{term}</span>';
+$template_default = '<span class="default-term">#{term}</span>';
+$template_normal = '#{term}';
+Il s'agit d'attributs publics de la classe Dico.
+
+
+Faire référence à une donnée du dictionnaire :
+----------------------------------------------
+
+On fait référence à une donnée du dictionnaire avec la méthode d($data).
+$data est la clé du tableau $d faisant référence à la donnée dans le fichier de traduction.
+Cette méthode renvoie la donnée correspondant à la langue utilisée.
+Si la donnée n'est pas trouvée dans la langue utilisée, elle revoie la donnée dans la langue par défaut.
+Si la donnée n'est pas trouvé dans la langue par défault, elle renvoie null.

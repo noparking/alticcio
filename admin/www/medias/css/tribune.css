@@ -1,0 +1,9 @@
+@media print {
+	.new-page {
+		page-break-before: always;
+	}
+	@page {
+		size: landscape;
+	}
+}
+

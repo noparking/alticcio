@@ -1,0 +1,2 @@
+<?php
+ define('CSIMCACHE_DIR','csimcache/'); define('CSIMCACHE_HTTP_DIR','csimcache/'); define('DEFAULT_ERR_LOCALE','en'); define('DEFAULT_GFORMAT','auto'); define('USE_CACHE',false); define('READ_CACHE',true); define('USE_IMAGE_ERROR_HANDLER',true); define('CATCH_PHPERRMSG',true); define('INSTALL_PHP_ERR_HANDLER',false); define('ERR_DEPRECATED',true); define('USE_LIBRARY_IMAGETTFBBOX',true); define('CACHE_FILE_GROUP','www'); define('CACHE_FILE_MOD',0664); ?>

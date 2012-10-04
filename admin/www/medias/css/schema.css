@@ -1,0 +1,151 @@
+.liens_schemas {
+	margin:15px;
+	padding:0;
+	list-style-type:none;
+}
+.liens_schemas li {
+	display:inline;
+	padding:2px 15px;
+}
+.liens_schemas li a {
+	color:#666;
+	text-decoration:none;
+}
+.liens_schemas li a:hover {
+	text-decoration:underline;
+}
+
+.spacer {
+	clear:both;
+	margin:0;
+	padding:0;
+}
+.lien_retour {
+	width:90px;
+	background-color:#333;
+	padding:5px;
+	text-align:center;
+	font-family:Verdana, Arial;
+	text-transform:uppercase;
+	font-size:12px;
+	color:#FFF;
+}
+.lien_retour a {
+	color:#FFF;
+	text-decoration:none;
+}
+.lien_retour a:hover {
+	text-decoration:underline;
+}
+
+.schema_menu {
+	margin:15px 20px 30px 20px;
+	padding:10px 0;
+	list-style-type:none;
+	width:960px;
+	font-family:Verdana, Arial;
+	font-size:11px;
+}
+.tables_base {
+	float:left;
+	width:200px;
+	margin:10px;
+	padding:0;
+	list-style-position:inside;
+	list-style-type:none;
+}
+.tables_base li {
+	padding:2px;
+}
+.tables_base li a {
+	color:#C00;
+	text-decoration:underline;
+}
+.tables_base li a:hover {
+	background-color:#000;
+	color:#FFF;
+	text-decoration:none;
+}
+
+
+
+.schema_base {
+	font-family:Verdana, Arial;
+	font-size:10px;
+	margin: 20px;
+	padding:0;
+	border:0;
+	width:350px;
+	float:left;
+}
+.schema_base dt {
+	margin:0;
+	padding:3px;
+	border-bottom:3px solid #666;
+	text-align:left;
+	font-weight:bold;
+	font-size:11px;
+}
+.schema_base dt span {
+	padding: 0 15px 0 0;
+	font-size:9px;
+	text-transform:uppercase;
+}
+.schema_base dt span a {
+	color:#999;
+	text-decoration:none;
+}
+.schema_base dd {
+	margin:0 0 10px 0;
+	padding:3px;
+}
+.schema_base dd table {
+	border:0;
+	width:100%;
+}
+.schema_base dd th {
+	display:none;
+}
+.schema_base dd td {
+	padding:2px;
+	border-bottom:1px solid #CCC;
+}
+.schema_base dd td a {
+	color:#C00;
+}
+
+.area_export {
+	width:600px;
+	height:500px;
+	border:1px solid #CCC;
+	padding:10px;
+	font-family:Verdana, Arial;
+	font-size:11px;
+	color:#666;
+}
+
+a:target {
+	background-color: red;
+	color: white;
+}
+
+/* -------------------------------------------------------------------------- */
+@media print {
+  	/* style sheet for print goes here */
+  	.schema_base {
+	font-family:Verdana, Arial;
+	font-size:10pt;
+	margin: 0,2cm;
+	padding:0;
+	border:0;
+	}
+	.schema_menu {
+	display:none;
+	}
+	.tables_base {
+	display:none;
+	}
+	.lien_retour {
+	display:none;
+	}
+}

@@ -1,0 +1,190 @@
+/* CSS */
+
+/* --------------------   balises globales */
+body {
+	font-family: Helvetica, Arial, sans serif;
+	font-size:11px;
+	color:#333;
+}
+#container {
+	width:760px;
+	margin:0 auto;
+	padding:0;
+}
+
+
+/* --------------------   header de la page */
+header, section {
+	display:block;
+	clear:both;
+}
+#boutons {
+	padding:5px 0 10px 0;
+	border-bottom:1px solid #CCC;	
+}
+#boutons ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;	
+}
+#boutons ul li {
+	display:inline;
+	background-color:#666;
+	padding:5px 10px;
+	margin:0 15px 0 0;	
+}
+#boutons ul li a {
+	color:#FFF;
+	text-decoration:none;
+}
+#boutons ul li a:hover {
+	color:#000;
+}
+#logo {
+	float:left;
+	width:200px;
+	margin:15px 0 50px 0;
+}
+#titre {
+	float:left;
+	width:550px;
+	margin:0;
+	padding:0;
+}
+#titre h1 {
+	font-size:24px;
+	margin:15px 0 0 0;
+	padding:0;
+}
+#titre h2 {
+	font-size:14px;
+	margin:0 0 0 0;
+	padding:0;
+}
+
+
+/* --------------------   Section des notes  */
+#notation {
+	clear:both;
+	margin:0;
+	padding:0;
+}
+#notation div#details {
+	float:left;
+	width:460px;
+}
+#notation div#global {
+	float:right;
+	width:280px;
+}
+#notation div#details dl {
+	float:left;
+	width:100px;
+	height:100px;
+	margin:5px;
+	border:1px solid #EDEDED;
+}
+#notation div#details dl.red, #notation div#global dl.red, #legend ul li.red {
+	border:1px solid #fb9e9e;
+	border-bottom:5px solid red;
+}
+#notation div#details dl.orange, #notation div#global dl.orange, #legend ul li.orange {
+	border:1px solid #f4d297;
+	border-bottom:5px solid orange;
+}
+#notation div#details dl.green, #notation div#global dl.green, #legend ul li.green {
+	border:1px solid #d9f0b0;
+	border-bottom:5px solid green;
+}
+#notation div#details dt {
+	margin:10px 0;
+	text-align:center;
+	font-size:13px;
+}
+#notation div#details dd {
+	margin:10px 0 0 0;
+	padding:0; 
+	text-align:center;
+	font-size:14px;
+}
+#notation div#details dd strong {
+	font-size:34px;
+}
+#notation div#global dl {
+	margin:5px;
+	height:210px;
+	border:1px solid #EDEDED;
+}
+#notation div#global dt {
+	margin:15px 0;
+	text-align:center;
+	font-size:18px;
+}
+#notation div#global dd {
+	margin:30px 0 0 0;
+	padding:0; 
+	text-align:center;
+	font-size:24px;
+}
+#notation div#global dd strong {
+	font-size:86px;
+}
+
+
+/* --------------------   Section legende et bas de page */
+#notebaspage {
+	clear:both;
+	margin:30px 0 10px 5px;
+	padding:0;
+	font-size:10px;
+	color:#666;
+}
+#legend {
+	clear:both;
+	padding:20px 0 20px 0;
+}
+#legend ul {
+	list-style-type:none;
+	margin:0;
+	padding:5px;
+	border-top:1px solid #CCC;
+}
+#legend ul li {
+	display:inline;
+	float:left;
+	width:300px;
+	margin:5px 20px 0 0;
+	padding:5px;
+}
+#legend ul li.red, #legend ul li.orange, #legend ul li.green {
+	width:100px;
+}
+
+
+/* --------------------   Section des commentaires */
+#commentaires {
+	margin:0;
+	padding:40px 0 0 0;
+	clear:both;
+}
+#commentaires dl {
+	float:left;
+	width:200px;
+	margin:5px 30px 15px 0;
+}
+#commentaires dt {
+	margin:5px 0;
+	font-weight:bold;
+}
+#commentaires dd {
+	margin:5px 0;
+	font-style:italic;
+}
+
+
+/* -------------------- la feuille de style pour l'impression */
+@media print {
+	#boutons {
+		display:none;
+	}
+}

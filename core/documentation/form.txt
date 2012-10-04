@@ -1,0 +1,211 @@
+CLASSE Form DE GESTION DES FORMULAIRES
+
+Création d'un objet Form :
+--------------------------
+
+On crée un objet de classe Form de la façon suivante :
+
+$form = new Form($params);
+
+où $params est un tableau associatifs dont les clés peuvent être les suivantes :
+id	(pour déterminer l'id du formulaire)
+class	(pour déterminer la classe CSS du formulaire)
+action	(action du formulaire, page courante par défaut)
+method	(méthode du formulaire, POST par défaut)
+enctype	(enctype du formulaire, vide par défaut)
+required	(pour déterminer quels sont les champs obligatoires)
+confirm	(pour déterminer quels sont les champs qui doivent être saisis deux fois pour confirmation)
+validate	(pour déterminer quel sont les champs qui nécessite un validation particulière)
+on_validation	(pour effectuer des validations supplémentaires)
+actions (les actions possibles du formulaire)
+steps (nombre d'étapes du formulaire, pour les formulaires multisteps)
+captcha (pour déterminer quels champs sont des réponses à des captchas)
+files (pour déterminer quels champs sont de type file)
+
+
+Affichage d'un formulaire :
+---------------------------
+
+Diverse méthodes publiques permettent d'afficher des éléments du formulaire. (Par "afficher" on entend plutôt "renvoyer le code HTML de l'élément. Il n'y a pas de print.)
+
+form_start()	Affiche le début du formulaire
+
+form_end() Affiche la fin du formulaire
+
+fieldset_start($legend)	Ouvre un fieldset
+$legend est le nom affiché du fieldset.
+
+fieldset_end	Ferme un fieldset
+
+input($params)	Affiche un élément de type input
+$params est un tableau associatif dont les clés peuvent être les suivantes :
+- type	Le type de l'input ('hidden', 'password', 'submit'... par défaut, 'text')
+- name	Le nom de l'élément
+- checked	Mettre à true pour que l'attribut checked soit positionné
+- value	La valeur par défaut du champ
+
+textarea($params) Affiche une zone de saisie de texte de type texarea
+$params est un tableau associatif dont les clés peuvent être les suivantes :
+- name	Le nom de l'élément
+- value	La valeur par défaut de la zone de texte
+
+select($params) Affiche un champs de type select
+$params est un tableau associatif dont les clés peuvent être les suivantes :
+- name	Le nom de l'élément
+- value	La valeur sélectionnée par défaut
+- options	Tableau associatif contenant la liste des valeurs (clés) et leurs intitulés (valeurs)
+
+radios($params)	Affiche un ensemble de boutons radios
+$params est un tableau associatif dont les clés peuvent être les suivantes :
+- name	Le nom de l'élément
+- value	La valeur sélectionnée par défaut
+- options	Tableau associatif contenant la liste des valeurs (clés) et leurs intitulés (valeurs)
+
+captcha($params) Affiche un captcha
+$params est un tableau associatif dont les clés peuvent être les suivantes :
+- name Le nom de l'élément
+- answerfield Le nom de l'élément pour donner la réponse au captcha
+- img L'URL de l'image du captcha
+- answer La réponse au captcha
+
+Pour tous les éléments, on peut définir un attribut 'label' et un attribut 'description'.
+Pour tous les éléments, il est possible de déterminer les attributs 'id' et 'class', mais des valeurs par défaut sont attribuées en fonction de l'id et de la classe définis pour le formulaire.
+
+
+Id et classes CSS du formulaire et de ses champs :
+--------------------------------------------------
+
+Dans les paramètres du constructeur de l'objet Form, il est possible de définir l'id et la classe du formulaire.
+Exemple :
+$form = new Form(array(
+	'id' => "my_form_id",
+	'class' => "my_form_class",
+}
+Par défaut, l'id et la classe du formulaire est "form". L'élement HTML <form> aura cet id et cette classe.
+L'id et la classe donnés au form déterminent l'id et la classe par défaut des éléments du formulaire.
+Supposons que l'id du form soit 'formid'. Par défaut, les éléments du formulaire ont l'id 'formid-name' où 'name' est le nom de l'élément. Cette valeur d'id peut être écrasée si l'attribut id est précisé lors de l'affichage de l'élément.
+Supposons que la classe du form soit 'formclass'. Les éléments de type input auront la classe 'formclass-input' et la classe 'formclass-input-type' où type est le type de l'input (text, submit, password...). Les textareas auront la classe 'formclass-textarea', les selects la classe 'formclass-select' et les radios la classe 'formclass-radios'
+Si l'attribut 'class' est précisé lors de l'affichage de l'élément, cet dernière classe s'ajoute aux classes par défaut de l'élément.
+
+
+Valeur des champs :
+-------------------
+
+La valeur par défaut des champs du formulaire est déterminée par l'attribut 'value' passé en paramètre. Toutefois, si le formulaire à été soumis, les champs gardent la valeur à laquelle ils ont été renseignés. Il faut appeler la méthode reset pour réinitialiser les champs à leurs valeurs par défaut.
+À la place de l'attribut value, on peut utiliser forced_value qui sera toujours prise en compte en temps que valeur initiale du champ, même si le formulaire a déjà été soumis avec une autre valeur.
+
+
+Soumission du formulaire :
+--------------------------
+
+Pour savoir si le formulaire a été soumis, on peut appeler la méthode is_submitted().
+La méthode action() permet de savoir quelle action à été faite.
+Les actions sont déclarées dans le constructeur. A la clé "actions" on fait correspondre un tableau de toutes les actions possibles.
+Les actions correspondent à des boutons submit dont les attributs "name" reprennent les actions déclarées dans le constructeur.
+Lorsqu'on a validé avec "Entrée", l'action est "default". Si le javascript est désactivé, l'action associée à "Entrée" correspond au premier submit présent sur le formulaire.
+
+
+Validation du formulaire :
+--------------------------
+
+La validation du formulaire se fait grace à la méthode validate().
+Plusieurs vérifications sont faites. Si l'une d'elle échoue, la méthode validate() renvoie false. Sinon, elle renvoie true.
+Après avoir appelé la méthode validate(), il est possible d'appeler la méthode is_valid($field) qui prend en paramètre le nom d'un champ et qui renvoie true si le champ est valide, false sinon.
+
+Validation des champs obligatoires :
+Dans les paramètres du constructeur on associe à la clé "required" un tableau contenant la liste des noms des champs obligatoires.
+Ces champs doivent être renseignés pour valider le formulaire.
+Les champs obligatoires sont marqués d'un "*". Il est possible de redéfinir le marqueur de champs obligatoires en affectant l'attribut public "required_mark".
+
+Validation des champs à confirmer :
+Dans les paramètres du constructeur, on associe à la clé "confirm" un tableau associatif contenant la liste des paires de champs devant être renseignés à l'identique pour valider le formulaire.
+Exemple :
+$form = new Form(array(
+	'confirm' => array('email' => 'email2'),
+));
+Ici, les champs 'email' et 'email2' doivent être renseignés avec les mêmes valeurs pour valider le formulaire.
+
+Validation spécifiques des champs :
+Dans les paramètres du constructeur, on associe à la clé "validate" un tableau associatif dont les clés sont les noms des champs à valider et les valeur des tableaux dont le premier élément et le nom de la fonction de validation et les autre éléments les arguments passés à la fonctions.
+Exemple :
+$form = new Form(array(
+	'validate' => array(
+		'email' => array("validate_email"),
+		'motdepasse' => array("validate_length", 6, 8),
+	),
+));
+Ici, on vérifie que le champ email est une adresse email valide et que le champ mot de passe a une longueur comprise entre 6 et 8 caractères.
+Les fonctions de validation peuvent être :
+validate_email	Vérifie que le champ est une adresse email valide
+validate_length Vérifie que le champ a une valeur comprise entre une valeur min et une valeur max passée en paramètre.
+validate_max_length Vérifie que le champ ne dépasse pas une valeur maximum passée en paramètre.
+validate_min_length	Vérifie que le champ fait au moins le nombre de caractère passé en paramètre.
+D'autres fonctions pourront être ajoutées.
+
+Validation supplémentaire :
+Il est possible d'appeler des fonctions personnelles à la validation du formulaire. On définit pour celà la clé 'on_validation' dans les paramètres du constructeur et on lui associe un tableau contenant la liste des fonctions à appeler. L'objet form sera passé en paramètre de chaque fonction.
+On peut regarder les valeurs du formulaire grace à la méthode values() de l'objet form qui renvoie un tableau associatif.
+On peut appeler la méthode value($name) pour obtenir la valeur d'un champ en particulier.
+
+
+Erreurs et champs invalides :
+-----------------------------
+
+Lors de la validation du formulaire, des erreurs peuvent survenir. Les champs qui n'ont pas été validés ont alors la classe CSS "invalid".
+Pour chaque champ invalide, une erreur est ajoutée. Les messages d'erreurs sont contenus dans un tableau renvoyé par la méthode "errors()"
+Il est possible d'invalider des champs spécifiques avec la méthode 'invalid_field' qui prend en paramètre le ou les champs à invalider.
+Il est possible d'ajouter une erreur avec la methode "error()" qui prend en paramètre le message d'erreur, et eventuellement le champ causant l'erreur.
+Les messages d'erreur sont définis dans les attributs publics suivants :
+error_message_required
+error_message_confim
+error_message_validate
+Ces message peuvent être redéfinis par l'utilisateur. La chaine "#{name}" sera remplacée par le nom de l'élément.
+
+Il est possible de personnaliser les messages d'erreur pour chaque champ.
+Il faut pour celà affecter l'attribut public "fields_error_messages" qui est un tableau associatif dont les clés sont les noms des champs.
+Les valeurs sont des tableaux associatifs dont les clé sont les contraintes ("required", "confirm", "validate_email"...) et les valeurs les messages d'erreur. 
+
+Ex:
+$form->fields_error_messages = array(
+	'confirmation' => array(
+		'required' => "Veuillez confirmer que vous voulez recevoir notre catalogue",
+	),
+	'email' => array(
+		'validate_email' => "Entrez un mail au format aze@aze.xv",
+	),
+);
+
+Template des éléments :
+-----------------------
+
+Par défaut, les champs sont affichés de la façons suivante : Le label du champ, suivi du champ, suivi de sa description. Il est possible de redéfinir le template des champs. On affecte pour cela l'attribut public 'template'. Les chaînes "#{label}", "#{field}" et "#{description}" seront remplacées par les valeurs correspondantes ("#{field}" représente le code HTML correspondant au champ de saisi).
+Mais il est également possible de passer un attribut "template" en paramètre à chaque champ pour utiliser un template particulier.
+
+
+Formulaires Multi-steps :
+-------------------------
+
+Pour un formulaire par étapes, il faut, dans le constructeur, indiquer le nombre d'étape, associé à la clé "steps".
+La méthode next() permet de passer à l'étape suivante. Elle renvoie false s'il n'y a pas d'étape suivante.
+La méthode previous() permet de revenir à l'étape précédente. Elle renvoie false s'il n'y a pas d'étape précédente.
+La méthode step() renvoie le numéro de l'étape.
+La méthode reset_step() permet de réinitialiser les champs de l'étape à leur valeur par défaut.
+On affiche l'ensemble du formulaire, dans l'ordre des étapes, chaque sous formulaire correspondant à une étape étant placé entre un form_start() et un form_end().
+Il faut faire le traitement du formulaire (appels aux méthodes next() ou previous()) avant l'affichage de celui-ci.
+
+
+Captcha :
+---------
+
+Dans le constructeur de l'objet form, à la clé 'captcha' on fait correspondre un tableau associatif dont les clé sont les noms des champs captcha et les valeur les noms des champs réponse.
+Le champ de type captcha affiche une image et un champs caché contenant la réponse au captcha codée en sha1.
+Si answerfield est précisé, l'image du captcha sera insérée dans un label pour ce champ.
+Pour forcer la valeur du champ texte à revenir à vide si on reste sur le form, on utilise forced_value => ""
+Lors de la validation du formulaire, on vérifie que le champ réponse lié au captcha est égal à la réponse.
+
+
+Champs de type file :
+---------------------
+
+Pour les champs de type file, on utilise la méthode input avec 'type'=>"file".
+Cependant, les champs de type file doivent être déclarés dans un tableau associé à la clé "files" du constructeur.

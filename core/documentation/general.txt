@@ -1,0 +1,95 @@
+FONCTIONNEMENT GÉNÉRAL
+----------------------
+
+Les mécanismes suivants ont lieu grâce au module rewrite d'Apache :
+- Si la ressource correspondant à l'URL existe (fichier css, javascript), le fichier est servi normalement.
+- Si elle n'existe pas, on rewrite l'URL vers index.php.
+
+Le fichier index.php est donc le coeur du mécanisme de construction d'une page.
+Voici dans l'ordre et en résumé ce qu'il effectue :
+- Démarrage de la session
+- Headers éventuels (charset, etc.)
+- Inclusion du fichier config.php situé à la racine du site. Après quoi la variable globale $config est définie.
+- Inclusion des fichiers des classes pricipales du core (url, dico, page)
+- Extension de la classe Url avec définition de la méthode build pour construire les URLs.
+- Instanciation de la classe dérivée de Url et paramétrage (base_url, elements)
+- Détermination de la langue.
+- Instanciation de la class Dico et inclusion des fichiers de traduction.
+- Instanciation de la classe Page.
+- Inclusion de la page (qui va définir un certain nombres de variables contenant du code HTML, et éventuellement un template spécifique)
+- Inclusion du template (qui définit la variable $html_page qui aggrège les différentes variables contenant les éléments HTML)
+- Affichage de $html_page
+
+
+CONFIGURATION
+-------------
+
+La configuration est gérée par les fichiers suivant :
+- Le fichier config.php situé à la racine, qui gère la configuration au niveau global et de façon centrale.
+- Le fichier config.inc.php qui contient le mécanisme d'inclusion des fichiers de config propres aux sites.
+- Les fichiers config.php situés dans les sous répertoires du répertoire "sites" et qui contient les paramètres de config propres aux sites (dev, prod, local...)
+- Le fichier de la classe Config.
+
+Mécanisme :
+Le fichier index.php inclue le fichier config.php situé à la racine.
+Ce fichier commence par inclure à son tour le fichier config.inc.php.
+config.inc.php va sélectionner le bon fichier de configuration situé dans les sous répertoires du répertoire "sites".
+Les sous répertoires du répertoire "sites" on un nom en relation avec l'URL de base du site concerné (système à la Drupal)
+On peut ainsi gérer en parallèle une config pour les version de dev, de prod, ou local d'un sites.
+Les sous répertoires de "sites" ont des noms du type localhost.~toto.monsite, monsite.com.repertoire, etc.
+On se base sur la partie invariable de l'URL du site en remplaçant les "/" par des "."
+Typiquement, les fichiers de config contenus dans les sous répertoires de "sites" définissent des variables globale comme :
+- $base_url (répertoire sur le serveur ou est situé le site, "/" si à la racine)
+- $core_path (chemin vers le répertoire du core)
+- $db_server (serveur de base de donnée)
+- $db_user (utilisateur base de donnée)
+- $db_password (mot de passe base de donnée)
+- $db_database (serveur de base de donnée)
+Pour les paramètres de base de données, on peut aussi centraliser les configs dans le fichier config.php à la racine et ne définir dans les fichiers de config propres aux site qu'un variable $db qui prendra les valeurs "local", "prod", "dev"...
+On inclue ensuite le fichier de la classe Config situé dans le core (grâce à $core_path) et on instancie cette classe.
+Le constructeur de la classe Config récupère toutes les variable globales de configuration et les enregistre dans l'objet;
+
+Voir la doc de la classe Config.
+
+
+GESTION DES URLS
+----------------
+
+Les URLs sont gérées par la classe Url dans les outils du core.
+Elle permet de configurer les URLs du site (quels sont les éléments constitutifs d'une URL), de les analyser (récupération de ces éléments) et de les construires.
+La méthode elements() permet de définir les éléments constitutifs de l'url.
+Par exemple, si les urls sont de la forme : http://monsite.com/{page}/{action}/{id}, on écrira :
+$url->elements('page', 'action', 'id')
+Par la suite, si on est sur la page http://monsite.com/user/edit/42, on pourra récupérer les éléments constitutifs de l'URL de la façons suivante :
+$url->get('page'); # user
+$url->get('action'); # edit
+$url->get('id'); # 42
+
+La classe Url est une classe abstraite contenant une méthode abstraite build().
+Il faut dont étendre cette classe et définir la méthode build.
+La méthode build renvoie un tableau associatif dont les clés sont les éléments de l'url et les valeurs, leurs valeurs respectives.
+Par exemple, pour l'URL de l'exemple précédent, build renverra array('page' => "user", 'action' => "edit", 'id' => 42)
+Les urls sont construites avec la méthode make. Les paramètres passés à make seront passés à build, et make construit la string de l'URL en fonction de ce que renvoie build.
+
+
+PAGES ET TEMPLATES
+------------------
+
+Les pages et les templates sont gérés par la classe Page. Cette classe gère la construction et l'affichage des pages HTML.
+Les pages sont stockées dans le répertoire "pages" du site, les templatesd sont dans le répertoire "template".
+Les pages définissent un certain nombres d'éléments HTML dans des variables qui seront ensuites mis en page par le template.
+La méthode get_page($num) permet d'inclure la bonne page. Elle retourne le path pour accèder à la page. Elle prend en argument le numéro de la page.
+Par exemple, si le dossier "pages" contient les fichiers :
+- 01_page_un.php
+- 02_page_deux.php
+- 03_page_trois.php
+la méthode get_page(2) renverra "pages/02_page_deux.php"
+
+La méthode get_template() renvoie le path pour inclure le template.
+Le template est défini par la méthode template($nom) qui peut être apelée soit dans index.php (template par défaut) soit dans les différentes pages (template spécifique).
+Par exemple, si on a appelé la méthode template("default"), la méthode get_template() renverra "templates/default.php"
+
+Les fichiers de pages et de templates étant inclus par index.php, les variables globales définies dans index.php ($page, $config, $url, $user...) sont utilisables dans ces fichiers.
+De même toutes les variables définies dans les pages seront disponibles dans le fichier de template.
+Les pages définissent donc les bouts de code HTML formant les éléments de la page. Le template rassemble ensuite ces éléments et construit la page HTML qu'il stocke dans la variable $html_page.
+La variable $html_page est ensuite affichée.

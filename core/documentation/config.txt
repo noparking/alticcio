@@ -1,0 +1,44 @@
+CLASSE Config DE GESTION DES CONFIGURATIONS
+
+Création d'un objet Config
+--------------------------
+
+Le constructeur ne prend pas de paramètres.
+$config = new Config()
+Si la variable globale $config est un tableau au moment de la création de l'objet, ses éléments sont enregistrées dans l'attribut vars de l'objet lors de sa construction.
+
+Différents éléments peuvent être définis dans la variable globale $config :
+'base_url'	: url de base du site. Si le site est dans un répertoire du genre www.domaine.com/monsite, $base_url = "/monsite/". Si le site est à la racine, on indique $base_url = "/".
+'core_path' : chemin vers fichiers du core.
+'core_url' : url de base du core (pour les médias paratgés par exemple)
+'db_server' : serveur de la base de donnée.
+'db_user' : utilisateur de la base de donnée.
+'db_password' : password de la base de donnée.
+'db_database' : nom de la base de donnée utilisée.
+
+
+Méthodes de la classe Config
+----------------------------
+
+base_url() : renvoie la valeur de l'attribut base_url
+
+core_include($composant_1, $composant_2, ...) : inclut des composants du core.
+Ex : core_include("outils/form", "extranet/user") inclut les fichiers form.php et user.php situés respectivement dans les répertoires "outils" et "extranet" du core.
+
+core_path() : renvoie le chemin vers le fichiers du core.
+
+core_media($file, $type = null) : renvoie le chemins vers un fichier medias du core.
+Le type (images, css, js) est déduit de l'extention du fichier passé en paramètre mais peut-être passé explicitement en deuxième paramètre.
+
+media($file, $type = null) : renvoie le chemin ver un fichier media du site.
+Le type (images, css, js) est déduit de l'extention du fichier passé en paramètre mais peut-être passé explicitement en deuxième paramètre.
+
+set($var, $value) : définit une variable de configuration
+$var est le nom de la variable.
+$value est la valeur de la variable.
+
+get($var) : renvoie la valeur d'une variable de configuration définie avec set()
+$var est le nom de la variable.
+
+db() : renvoie les paramètres de la base de donnée sous la forme d'un tableau associatif :
+array('server' => ..., 'user' => ..., 'password' => ..., 'database' => ...);

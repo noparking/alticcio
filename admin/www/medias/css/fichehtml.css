@@ -1,0 +1,48 @@
+@media print {
+	#fiche-top {
+  		display:none;
+  	}
+}
+
+#fiche-top {
+	background-color:#FFF9E9;
+	padding:10px 0;
+	margin:0 0 10px 0;
+}
+#fiche-top ul { 
+	display:inline;
+	margin:0;
+	padding:0;
+	text-align:left;
+	list-style-position:inside;
+	list-style-type:none;
+}
+#fiche-top li {
+	display:inline;
+	margin:0 3px;
+	padding:3px 5px;
+	font-weight:bold;
+	background-image:url('../images/fond-buttons.jpg');
+	background-repeat:repeat-x;
+	background-position:center left;
+	border:1px solid #FFF;
+	font-size:11px;
+	color:#FFF;
+}
+#fiche-top li a {
+	text-decoration:none;
+	color:#FFF;
+}
+#fiche-top li a:hover {
+	color:#000;
+}
+#fiche-top li input {
+	background:none;
+	border:0;
+	font-weight:bold;
+	color:#FFF;
+	font-size:11px;
+}
+#fiche-top li input:hover {
+	color:#000;
+}

@@ -1,0 +1,35 @@
+<html>
+
+<head>
+	<title>Test de boutique Handisport par Doublet</title>
+	<link href="http://api.doublet.pro/medias/css/catalogue.css" rel="stylesheet" type="text/css" media="all" />
+</head>
+
+<body>
+
+<!-- Code à copier : la balise div avec les liens vers les fichiers JS -->
+<div id="boutique-doublet"></div>
+
+<script src="http://api.doublet.pro/medias/js/jquery.min.js" language="JavaScript" type="text/javascript"></script>
+<script src="http://api.doublet.pro/medias/js/jquery.colorbox-min.js" language="JavaScript" type="text/javascript"></script>
+<script src="http://api.doublet.pro/widgets/catalogue.js" language="JavaScript" type="text/javascript"></script>
+
+<script language="JavaScript" type="text/javascript">
+$("#boutique-doublet").doubletWidgetCatalogue({
+	'title' : "La boutique Doublet Handisport",
+	'slogan' : "Effectuez vos achats sur la boutique Doublet Handisport",
+	'api' : "http://api.doublet.pro",
+	'key' : "54c1561f206d521a71a41bc2c7e97765",
+	'catalog' : 3,
+	'width' : 1024,
+	'products_per_page' : 12,
+	'products_hide' : ['benefits']
+});
+</script>
+<!-- Fin du code -->
+
+
+</body>
+
+</html>
+

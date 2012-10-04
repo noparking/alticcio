@@ -1,0 +1,132 @@
+body {
+	background-color:#FFF;
+	margin:0;
+	padding:0;
+	font-size:11px;
+	font-family:Arial;
+	color:#9C9D9F;
+	text-align:center;
+}
+#container {
+	background-image:url('../images/logo-handisport.jpg');
+	background-position:top left;
+	background-repeat:no-repeat;
+	width:960px;
+	margin:0 auto;
+	padding:0;
+	text-align:left;
+}
+#block_left {
+	float:left;
+	width:140px;
+	margin:0;
+	padding:0;
+	text-align:right;
+}
+#block_content {
+	float:right;
+	width:780px;
+	margin:0;
+	padding:0;
+	text-align:right;
+}
+.spacer {
+	clear:both;
+	margin:0;
+	padding:0;
+	height:1px;
+}
+
+
+/* -------------------    Titre ---------------  */
+h1 {
+	margin:200px 0 20px 30px;
+	padding:20px 0;
+	text-transform:uppercase;
+	color:#1A171B;
+	font-weight:bold;
+	font-size:16px;
+	border-bottom:1px solid #666;
+	width:110px;
+}
+h1 span {
+	font-size:9px;
+	font-weight:normal;
+}
+.intro a {
+	color:#9C9D9F;
+}
+
+
+/* -------------------    Menu des sites   ----------  */
+#menu_sites {
+	margin:10px 0 0 170px;
+	padding:0;
+	list-style-type:none;
+	width:600px;
+}
+#menu_sites li {
+	display:inline;
+	padding:0 10px;
+}
+#menu_sites li a {
+	color:#9C9D9F;
+	text-decoration:none;
+}
+#menu_sites li a:hover {
+	color:#333;
+	text-decoration:underline;
+}
+
+
+/* -------------------   Navigation   ----------  */
+#navigation {
+	margin:70px 0 0 280px;
+	padding:10px 0;
+	list-style-type:none;
+	width:500px;
+	border-top:1px solid #CCC;
+}
+#navigation li {
+	display:inline;
+	padding:0 10px;
+	font-size:12px;
+	font-weight:bold;
+}
+#navigation li a {
+	color:#666;
+	text-decoration:none;
+}
+#navigation li a:hover {
+	background-color:#EDEDED;
+}
+.border1 {
+	border-bottom:3px solid #C8D20A;
+}
+.border2 {
+	border-bottom:3px solid #009DDB;
+}
+.border3 {
+	border-bottom:3px solid #E2001A;
+}
+
+
+
+/* -----------------   Animation  ----------  */
+#content {
+	margin:40px 0 0 0;
+	padding:0;
+}
+.arrondis {
+	background-color:#DDD;
+	margin:2px 0;
+	padding:2px 4px;
+	font-size:10px;
+	color:#663300;
+}
+.arrondis span {
+	padding:0 0 0 430px;
+}
+.arrondis span img {
+	padding:0 0 0 0px;
+}

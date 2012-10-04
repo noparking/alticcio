@@ -1,0 +1,49 @@
+CLASSE Url DE GESTION DES URL
+
+Création d'un objet Url
+-----------------------
+
+Le constructeur ne prend pas de paramètre.
+$url = new Url();
+
+
+Définition de la base des urls du site
+--------------------------------------
+
+La méthode set_base($base) définie la base des urls du site.
+
+
+Description de l'URL
+--------------------
+
+On utilise la méthode elements() pour donner la liste des éléments constitutifs des URLs
+Par exemple, si les urls sont de la forme : http://monsite.com/{page}/{action}/{id}, on écrira :
+$url->elements('page', 'action', 'id')
+
+
+Récupération des éléments de l'URL
+----------------------------------
+
+La méthode get() permet de récupérer les valeurs des éléments constitutifs de l'URL.
+En reprenant l'exemple précédent, si on est sur la page http://monsite.com/user/edit/42, on pourra récupérer les éléments constitutifs de l'URL de la façons suivante :
+$url->get('page'); # user
+$url->get('action'); # edit
+$url->get('id'); # 42
+
+
+Construction d'une URL
+----------------------
+
+On construit une URL en appelant la méthode make().
+Les paramètres passés à make seront automatiquement passé à la méthode build().
+La méthode build est une méthode abstraite de la classe Url qui doit donc être définie dans la classe dérivant de Url que l'on instanciera.
+La méthode build renverra un tableau associatif dont les clé sont les éléments constitutif de l'URL (voir la méthode elements()) et les valeurs, les valeurs de ces éléments.
+La méthode make renvoie l'Url à partir des paramètres renvoyé par build et de la base_url.
+
+
+Autres méthode de la classe Url
+-------------------------------
+
+La méthode goto() redirige vers une page.
+Si le premier paramètre passé est une URL qui commence par "http://", on est redirigé vers cette URL.
+Sinon, on est renvoyé vers l'url retournée par make() à laquelle on transmet les paramètres donnés à goto.

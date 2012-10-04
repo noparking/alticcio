@@ -1,0 +1,10 @@
+#menu-main {
+	margin:15px 0 0 0;
+}
+#main fieldset legend {
+	position:relative;
+	top:-1em;
+	left:-1em;
+	margin:0;
+	width:90%;
+}

@@ -1,0 +1,32 @@
+html {
+     background-color: white;
+}
+
+div.menu {
+     margin-top : 0px;
+     background-color: white;
+     padding-right : 1em;
+     border-right : dotted darkgray 1px;
+}
+
+div.infotext {
+    margin-right:4em;
+    border : solid black 1px;
+    background-color:lightyellow;
+    padding:5px;
+    width:400px;
+}
+
+.infotext h3 {
+    font-family:sans serif;
+    font-size:1.0em;
+    margin-top:0;
+}
+
+.menu table {
+     background-color:lightblue;
+     border : solid black 1px;
+     margin-right:1em;
+}
+
+

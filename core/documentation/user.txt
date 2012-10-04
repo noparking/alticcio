@@ -1,0 +1,37 @@
+CLASSE User DE GESTION DES UTILISATEURS
+
+Création d'un objet User :
+--------------------------
+
+On crée un objet de classe User de la façon suivante :
+
+$form = new Form($sql);
+
+où $sql est un objet de la classe Mysql de gestion de la base de donnée.
+Les sessions sont requises (faire un session_start).
+
+
+Méthodes de la classe User :
+----------------------------
+
+create($data)	Création d'un utilisateur
+Renvoie User::ALLREADYEXISTS si l'utilisateur existe déjà
+Renvoie User::CREATED en cas de succès.
+
+delete($user_id)	Suppression d'un utilisateur
+
+login($data)	Connexion d'un utilisateur.
+Renvoie User::UNKNOWN si le login n'est pas enregistré.
+Renvoie User::UNAUTHORIZED si l'utilisateur n'a pas accès (acces = 0)
+Renvoie User::WRONGPASSWORD si le mot de passe est mauvais.
+Renvoie User::LOGGED en cas de succès ($_SESSION['extranet']['user'] contient alors les données de l'utilisateur).
+
+logout()	Déconnecte un utilisateur.
+
+is_logged()	Renvoie TRUE si l'utilisateur est connecté, FALSE sinon.
+
+data()	Renvoie le contenu de $_SESSION['extranet']['user'] (données de l'utilisateur connecté)
+
+get_list() renvoie la liste des utilisateurs dans un tableau.
+Les clés sont les user_id, les valeurs sont les logins.
+
