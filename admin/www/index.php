@@ -11,10 +11,11 @@ include include_path("includes/url.php");
 
 $config->core_include("outils/debug");
 
-switch ($url->get(0)) {
-	case "photomail":
-		include "_photomail/index.php";
+if (function_exists('subsites')) {
+	if ($subsite = subsites($url->get(0))) {
+		include $subsite;
 		exit;
+	}
 }
 
 $page = new Page(dirname(__FILE__)."/../");
