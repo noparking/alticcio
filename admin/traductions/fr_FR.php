@@ -568,6 +568,7 @@ $d['pages'] = array(
 	"diaporamas" => "diaporamas",
 	"menus" => "menus",
 	"update" => "mise-a-jour",
+     "statsshorturl" => "short-url",
 );
 
 $d['hd_extensions'] = array(
