@@ -73,13 +73,13 @@ $sql = new Mysql($config->db());
 //include dirname(__FILE__)."/../../../project/scripts/update_flags_prices.php";
 
 // Appelle le script pour nettoyer les derniers codes drapeaux
-include dirname(__FILE__)."/../../../project/scripts/update_flags_2012.php";
+//include dirname(__FILE__)."/../../../project/scripts/update_flags_2012.php";
 
 // Appelle le script pour le routage du CG2013
 //include dirname(__FILE__)."/../../../project/scripts/routage5.php";
 
 // Appelle le script pour le changer les url_keys
-//include dirname(__FILE__)."/../../../project/scripts/check_url_keys.php";
+include dirname(__FILE__)."/../scripts/check_url_keys.php";
 
 // Appelle le script pour nettoyer les derniers codes drapeaux
 //include dirname(__FILE__)."/../../../project/scripts/update_flags.php";
