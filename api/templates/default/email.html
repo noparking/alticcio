@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF8">
+<title>Insert title here</title>
+</head>
+<body>
+<style type="text/css">
+    body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+</style>
+
+<div style="font:11px/1.35em Verdana, Arial, Helvetica, sans-serif;text-align: left;">
+<table cellspacing="0" cellpadding="0" border="0" width="98%" style="margin-top:10px; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; margin-bottom:10px;">
+<tr>
+    <td align="center" valign="top">
+        <!-- [ header starts here] -->
+        <table cellspacing="0" cellpadding="0" border="0" width="650">
+            <tr>
+                <td align="left" valign="top">%infos_logo%</td>
+            </tr>
+        </table>
+        <!-- [ middle starts here] -->
+        <table cellspacing="0" cellpadding="0" border="0" width="650">
+            <tr>
+                <td align="left" valign="top">
+                    <p>
+                        <strong>Bonjour,</strong><br/>
+                        Voici le récapitulatif de votre commande du %infos_date% :
+                    </p>
+
+                    <h3 align="left" style="border-bottom:2px solid #eee; font-size:1.05em; padding-bottom:1px;"><span style="color:#C00;">Produits</span></h3>
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th align="left" width="60%" bgcolor="#0080C6" style="font-size:12px; padding:5px 9px 6px 9px; border:1px solid #0080C6; border-bottom:none; line-height:1em; color:#FFFFFF;">Produit</th>
+                            <th align="left" width="15%" bgcolor="#0080C6" style="font-size:12px; padding:5px 9px 6px 9px; border:1px solid #0080C6; border-bottom:none; line-height:1em; color:#FFFFFF;">Référence</th>
+                            <th align="left" width="10%" bgcolor="#0080C6" style="font-size:12px; padding:5px 9px 6px 9px; border:1px solid #0080C6; border-bottom:none; line-height:1em; color:#FFFFFF;">Quantité</th>
+                            <th align="left" width="15%" bgcolor="#0080C6" style="font-size:12px; padding:5px 9px 6px 9px; border:1px solid #0080C6; border-bottom:none; line-height:1em; color:#FFFFFF;">Prix unitaire</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+							%commande_liste_produits%
+						<tr>
+							<th colspan="3" align="right" style="font-size:12px;">Sous total</th>
+							<td style='padding:5px 9px;' align="right">%commande_sous_total%&nbsp;€</td>
+						</tr>
+						<tr>
+							<th colspan="3" align="right" style="font-size:12px;">Frais de port</th>
+							<td style='padding:5px 9px;' align="right">%commande_frais_de_port%&nbsp;€</td>
+						</tr>
+						<tr>
+							<th colspan="3" align="right" style="font-size:12px;">TVA</th>
+							<td style='padding:5px 9px;' align="right">%commande_tva%&nbsp;€</td>
+						</tr>
+						<tr>
+							<th colspan="3" align="right" style="font-size:12px;">Total</th>
+							<td style='padding:5px 9px;' align="right">%commande_total%&nbsp;€</td>
+						</tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <h3 align="left" style="border-bottom:2px solid #eee; font-size:1.05em; padding-bottom:1px;"><span style="color:#C00;">Votre commentaire</span></h3>
+					<p>
+						%commande_commentaire%
+					</p>
+                    <h3 align="left" style="border-bottom:2px solid #eee; font-size:1.05em; padding-bottom:1px;"><span style="color:#C00;">Informations personnelles</span></h3>
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tbody>
+                        <tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Nom
+                            </th>
+							<td>%commande_nom%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Prénom
+                            </th>
+							<td>%commande_prenom%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                %Voca_societe%
+                            </th>
+							<td>%commande_societe%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                N° de SIRET
+                            </th>
+							<td>%commande_siret%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Téléphone
+                            </th>
+							<td>%commande_telephone%</td>
+                        </tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Fax
+                            </th>
+							<td>%commande_fax%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Email
+                            </th>
+							<td>%commande_email%</td>
+						</tr>
+                        </tbody>
+                    </table>
+					<br/>
+                    <h3 align="left" style="border-bottom:2px solid #eee; font-size:1.05em; padding-bottom:1px;"><span style="color:#C00;">Adresse de livraison</span></h3>
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tbody>
+                        <tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Raison sociale
+                            </th>
+							<td>%livraison_societe%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                %voca_livraison_societe2%
+                            </th>
+							<td>%livraison_societe2%</td>
+						</tr>
+                        <tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Adresse
+                            </th>
+							<td>%livraison_adresse%<br />%livraison_adresse2%<br />%livraison_adresse3%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Code postal
+                            </th>
+							<td>%livraison_cp%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Ville
+                            </th>
+							<td>%livraison_ville%</td>
+                        </tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Cedex
+                            </th>
+							<td>%livraison_cedex%</td>
+                        </tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Pays
+                            </th>
+							<td>%livraison_pays%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <h3 align="left" style="border-bottom:2px solid #eee; font-size:1.05em; padding-bottom:1px;"><span style="color:#C00;">Adresse de facturation</span></h3>
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tbody>
+                        <tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Raison sociale
+                            </th>
+							<td>%facturation_societe%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                              	%voca_facturation_societe2%
+                            </th>
+							<td>%facturation_societe2%</td>
+						</tr>
+                        <tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Adresse
+                            </th>
+							<td>%facturation_adresse%<br />%facturation_adresse2%<br />%facturation_adresse3%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Code postal
+                            </th>
+							<td>%facturation_cp%</td>
+						</tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Ville
+                            </th>
+							<td>%facturation_ville%</td>
+                        </tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Cedex
+                            </th>
+							<td>%facturation_cedex%</td>
+                        </tr>
+						<tr>
+                            <th align="left" valign="top" style="padding:4px 9px; font-size:12px; background:#FFFFFF;">
+                                Pays
+                            </th>
+							<td>%facturation_pays%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <p>
+                        %infos_paiement%
+                    </p>
+                    <p>
+                    	%voca_message_commande%
+                    </p>
+                    <p align="left">Merci pour votre commande !<br/><strong>%infos_signature%</strong></p>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+</table>
+</div>
+</body>
+</html>

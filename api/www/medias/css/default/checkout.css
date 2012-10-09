@@ -1,0 +1,259 @@
+.clear {clear:both;line-height:0;height:0;}
+.clearfix:after {content: ".";display: block;clear: both;visibility: hidden;line-height: 0;height: 0;}
+* html .clearfix {height: 1%;}
+body {font-family: sans-serif; width: 960; margin: 0 auto;}
+/*========================/
+	Lightbox Checkout
+/========================*/
+
+
+
+/*//// Step ////*/
+.checkout-logo {
+	margin-bottom:20px;
+}
+
+.checkout-step {
+	padding:10px 10px;
+	margin-bottom:20px;
+	background:#999;
+	background: -moz-linear-gradient(top, #B7B5B5 , #999999);
+	background: -webkit-gradient(linear,left top,left bottom,from(#B7B5B5),to(#999999));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#B7B5B5', endColorstr='#999999');
+	border-radius:8px;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+}
+
+.checkout-step p {
+	font-size:16px;
+	color:#666;
+	text-shadow:0 1px 0 #bbb;
+	padding:0;
+	margin:0;
+	font-weight:normal;
+}
+
+.checkout-step strong {
+	color:#FFF;
+	text-shadow:0 1px 0 #333;
+	font-weight:normal;
+}
+
+
+/*//// Mise en forme du formulaire ////*/
+.form-step-action {
+	border-bottom:1px dotted #cccccc;
+	padding-bottom:20px;
+	margin-bottom:20px;
+}
+
+.form-checkout {
+	font-size:14px;
+	color:#333;
+}
+
+.form-checkout fieldset {
+	border:none;
+	margin:0;
+	padding:10px 0 20px 0;
+	margin-bottom:40px;
+}
+
+.form-checkout legend {
+	font-weight:bold;
+	font-size:14px;
+	color:#333;
+	padding:0;
+}
+
+.form-checkout fieldset .ligne-form {
+	margin:10px 0;
+}
+
+.form-checkout fieldset label {
+	display:block;
+	line-height:2em;
+	color:#666;
+	font-size:12px;
+}
+
+.form-checkout fieldset label.same_address {
+	display:inline;
+}
+
+.form-checkout fieldset input[type="text"] {
+	padding:6px;
+	border:1px solid #ccc;
+	width:250px;
+	box-shadow:inset 0px 0px 4px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow:inset 0px 0px 4px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow:inset 0px 0px 4px rgba(0, 0, 0, 0.1);
+	
+}
+
+.form-checkout fieldset input[type="text"]:focus {
+	border:1px solid #666;
+}
+
+label.form-checkout-input.invalid {
+	color: #E73F50;
+	font-weight: bold;
+}
+
+input.form-checkout-input.invalid[type="text"] {
+	background-color: #F4C4C4;
+	border: 1px solid #E73F50;
+}
+
+/* Submit */
+.form-checkout .form-checkout-input-submit, .checkout-validation button {
+	padding:4px;
+	font-weight:bold;
+	font-size:11px;
+	color:#FFF;
+	background:#000;
+	border:none;
+	border-radius:4px;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+}
+
+.form-checkout .form-checkout-input-submit:hover {
+	cursor:pointer;
+	background:#333;
+}
+
+.form-checkout .form-checkout-input-submit:active{
+	background:#000;
+}
+
+.next-step {
+	float:right;
+}
+
+.previous-step {
+	float:left;
+}
+
+.form-checkout .infos {
+	margin-bottom:20px;
+}
+
+.form-checkout .adresse {
+	border-bottom:1px dotted #cccccc;
+	margin-bottom:20px;
+}
+
+.form-checkout .infos-perso,
+.form-checkout .contact-perso, 
+.form-checkout .adresse-livraison,
+.form-checkout .adresse-facturation {
+	float:left;
+	width:300px;
+	margin:0;
+}
+
+.form-checkout .infos-perso,
+.form-checkout .adresse-livraison {
+	margin-right:50px;
+}
+
+
+/*//// Recapitulatif ////*/
+
+/* Table */
+table.checkout-products {
+	font-size:14px;
+	border-collapse:collapse;
+	width:100%;
+	text-align:left;
+}
+
+table.checkout-products img {
+	width:100px;
+	height:100px;
+}
+
+table.checkout-products thead th {
+	border-bottom:1px solid #efefef;
+	background:#efefef;
+	padding:10px;
+	color:#333;
+}
+
+table.checkout-products tbody td {
+	border-bottom:1px solid #efefef;
+	padding:10px;
+}
+
+table.checkout-products tfoot td {
+	padding:10px;
+	font-weight:bold;
+}
+
+/* Infos */
+.form-checkout-recap {
+	background:#F5F4F4;
+	margin:20px 0;
+	padding:20px;
+}
+
+.form-checkout-recap .infos-perso,
+.form-checkout-recap .contact-perso, 
+.form-checkout-recap .adresse-livraison,
+.form-checkout-recap .adresse-facturation {
+	float:left;
+	width:200px;
+	margin:0;
+}
+
+.form-checkout-recap .infos-perso,
+.form-checkout-recap .contact-perso, 
+.form-checkout-recap .adresse-livraison{
+	margin-right:10px;
+}
+
+.form-checkout-recap fieldset p {
+	color:#666;
+	margin:0;
+	line-height:1.4em;
+	padding-left:10px;
+	border-left:2px solid #ffffff;
+}
+
+.form-checkout-recap .adresse {
+	border-bottom:none;
+	margin-bottom:0;
+}
+
+.form-checkout-recap .adresse fieldset {
+	margin-bottom:0;
+	padding-bottom:0;
+}
+
+.bloc-cgv {
+	float:right;
+	margin:10px 0;
+}
+
+.bloc-commentaire label {
+	float:left;
+	width: 220px;
+	text-align: justify;
+	margin-right: 10px;
+	margin-bottom: 20px;
+}
+
+.bloc-commentaire textarea {
+	float:left;
+	width: 330px;
+	height: 70px;
+	margin-bottom: 20px;
+}
+
+/*//// Validation ////*/
+.checkout-validation {
+	text-align:center;
+	color:#666;
+}

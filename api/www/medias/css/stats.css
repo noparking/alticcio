@@ -1,0 +1,493 @@
+/*-----------------------------------------------------------------------------------------------------
+		Projet : Api Doublet
+		Website : http://www.doublet.fr/
+		Auteur : Noparking (http://www.noparking.net/)
+
+		Sommaire :  General
+					Colonne Gauche:
+						_Navigation
+						
+					Colonne droite:
+						_General
+						_Produit
+						_Client
+						
+					Styles:
+						_Simple Grey
+						_Gradient Grey
+						_Simple Black
+						_Gradient Grey
+						_Simple Blue
+						_Gradient Blue
+					
+
+-------------------------------------------------------------------------------------------------------*/
+
+@import url(colorbox.css);
+
+/* General
+-------------------------------------------------------------------------------------------------------*/
+.clear {clear:both;line-height:0;height:0;}
+.clearfix:after {content: ".";display: block;clear: both;visibility: hidden;line-height: 0;height: 0;}
+html[xmlns] .clearfix {display: block;}
+* html .clearfix {height: 1%;}
+.statistiques-doublet a {color:#333;}
+.statistiques-doublet a:hover {color:#666;text-decoration:underline;}
+.statistiques-doublet p, .statistiques-doublet h2 {margin:0;pading:0;}
+.statistiques-doublet ul, ol {list-style:none;margin:0;padding:0;}
+.statistiques-doublet img {-ms-interpolation-mode: bicubic;border:none;width:auto;}
+.corner-4 {border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;}
+.corner-8 {border-radius:8px;-moz-border-radius:8px;-webkit-border-radius:8px;-khtml-border-radius:8px;}
+.corner-12 {border-radius:12px;-moz-border-radius:12px;-webkit-border-radius:12px;-khtml-border-radius:12px;}
+.statistiques-doublet button,input[type="submit"]{padding: 5px 5px 2px 5px;font-weight:bold;font-size:11px;}
+.statistiques-doublet button:hover,input[type="submit"]:hover{cursor:pointer;}
+.statistiques-doublet select {padding: 2px 5px;}
+
+
+
+/* Colonne gauche (Navigation)
+-------------------------------------------------------------------------------------------------------*/
+
+.statistiques-doublet {
+	width:100%;	
+	border: 1px solid #ccc;
+	font:12px/1.2em Arial, Helvetica, sans-serif;
+	color:black;
+	position:relative;
+}
+
+/*/// Widget Titre ///*/
+.doublet-stats-title {
+	background:#efefef;
+	border-bottom:1px solid #DFDFDF;
+	padding:10px 0;	
+}
+
+.doublet-stats-title h1,
+.doublet-stats-title p {
+	margin:0;
+	padding:0 10px;	
+	color:#333;
+	text-shadow:0 1px 0 #efefef;
+	line-height:1em;
+}
+
+/*/// Container ///*/
+.doublet-stats-container {
+	padding:10px;	
+}
+
+.doublet-stats-left {
+	float: left;
+	width: 200px;
+	margin-right:40px;
+}
+
+
+/*========================/
+	Boutons
+/========================*/
+
+.doublet-stats-buttons {
+	margin-bottom:20px;
+	padding-bottom:10px;
+	border-bottom:1px dotted #CCC;
+}
+
+
+/*========================/
+	Navigation (produits)
+/========================*/
+
+.doublet-stats-area-produits p.titre  {
+	padding-bottom:4px;
+	margin-bottom:10px;
+	border-bottom:1px dotted #CCC;
+	font-size:14px;
+}
+
+.doublet-stats-area-produits ul li a {
+	margin-bottom:4px;
+	color:#333;
+	text-decoration:none;
+	display:block;
+}
+
+.doublet-stats-area-produits ul li a:hover {
+	color:#666;
+}
+
+/*/// Level 1 ///*/
+.doublet-stats-area-produits ul.level1 li a {
+	padding-left:16px;
+	font-size:14px;
+}
+
+.doublet-stats-area-produits ul.level1 li.collapse a:active {
+	background: url("../images/toggle-minus.png") no-repeat left center;
+}
+
+.doublet-stats-area-produits ul.level1 li.expand a:active {
+	background: url("../images/toggle-plus.png") no-repeat left center;
+}
+
+.doublet-stats-area-produits ul.level1 li.collapse a {
+	background: url("../images/toggle-plus.png") no-repeat left center;
+}
+
+.doublet-stats-area-produits ul.level1 li.expand a {
+	background: url("../images/toggle-minus.png") no-repeat left center;
+}
+
+
+/*/// Level 2 ///*/
+.doublet-stats-area-produits ul.level2 {
+	margin:0 0 10px 8px;
+	padding-left:0px;
+	border-left:1px dotted #ccc;
+}
+
+.doublet-stats-area-produits ul.level2 li a {
+	padding-left:18px;
+	color:#666;
+	background: url("../images/puce-level2.gif") no-repeat left center !important;
+	font-size:12px;
+	display:block;
+}
+
+.doublet-stats-area-produits ul.level2 li a:hover {
+	color:#333;
+}
+
+/*/// Logo ///*/
+.doublet-logo {
+	margin-top:20px;
+}
+
+/* Colonne Droite
+-------------------------------------------------------------------------------------------------------*/
+.doublet-stats-right {
+	float: left;
+	/*width:800px;*/
+}
+
+/*/// Titre  ///*/
+.doublet-stats-area h2 {
+	font-weight:normal;
+	font-size:18px;
+	padding-bottom:4px;
+	margin: 16px 0 10px 0;
+	border-bottom:1px dotted #CCC;
+}
+
+.doublet-stats-area h3 {
+	font-weight:normal;
+	font-size:14px;
+	padding-bottom:4px;
+	margin-bottom:10px;
+}
+
+.doublet-stats-table {
+	font-size:12px;
+	color:#333;
+	background:#ffffff;
+	border-collapse:collapse;
+	margin: 10px 0 10px 0; 
+}
+
+.doublet-stats-table tr th {
+	background:#DDDDDD;
+	color:#000;
+}
+
+.doublet-stats-table tr th,
+.doublet-stats-table tr td {
+	padding:5px;
+	text-align:left;
+}
+
+.doublet-stats-table tr:hover {
+	background:#f5f4f4;
+}
+
+/* Styles
+-------------------------------------------------------------------------------------------------------*/
+/*========================/
+	"corner-x"
+	_Border-radius = "x"px
+	Coin arrondis
+/========================*/
+/* 4 */
+.corner-4 .doublet-product-item, .corner-4 button, .corner-4 select, .corner-4 a, .corner-4 .doublet-cart-checkout-box {border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;}
+.corner-4 .doublet-stats-title {border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-webkit-border-top-left-radius:4px;-webkit-border-top-right-radius:4px;-khtml-border-radius:4px 4px 0 0;}
+/* 8 */
+.corner-8 .doublet-product-item, .corner-8 button, .corner-8 select, .corner-8 a, .corner-8 .doublet-cart-checkout-box {border-radius:8px;-moz-border-radius:8px;-webkit-border-radius:8px;-khtml-border-radius:8px;}
+.corner-8 .doublet-stats-title {border-radius:8px 8px 0 0;-moz-border-radius:8px 8px 0 0;-webkit-border-top-left-radius:8px;-webkit-border-top-right-radius:8px;-khtml-border-radius:8px 8px 0 0;}
+/* 12 */
+.corner-12 .doublet-product-item, .corner-12 button, .corner-12 select, .corner-12 a, .corner-12 .doublet-cart-checkout-box {border-radius:12px;-moz-border-radius:12px;-webkit-border-radius:12px;-khtml-border-radius:12px;}
+.corner-12 .doublet-stats-title {border-radius:12px 12px 0 0;-moz-border-radius:12px 12px 0 0;-webkit-border-top-left-radius:12px;-webkit-border-top-right-radius:12px;-khtml-border-radius:12px 12px 0 0;}
+
+
+
+/*========================/
+	Grey Thème
+	simple & Gradient
+/========================*/
+
+/*/// "simple-grey" - Grey color ///*/
+.simple-grey.statistiques-doublet {
+	border: 1px solid #ccc;
+}
+
+.simple-grey .doublet-stats-title {
+	background:#efefef;
+	border-bottom:1px solid #DFDFDF;
+}
+
+.simple-grey .doublet-stats-title h1,
+.simple-grey .doublet-stats-title p {
+	color:#333;
+	text-shadow:0 1px 0 #efefef;
+}
+
+.simple-grey button {
+	color:#333;
+	background:#dfdfdf;
+	border:none;
+}
+
+.simple-grey button:hover {
+	cursor:pointer;
+	background:#cfcfcf;
+}
+
+.simple-grey button:active {
+	background:#afafaf;
+}
+
+
+/*/// "gradient-grey" ///*/
+.gradient-grey.statistiques-doublet {
+	border: 1px solid #ccc;
+}
+
+.gradient-grey .doublet-stats-title {
+	background:#efefef;
+	border-bottom:1px solid #AFAFAF;
+	background: -moz-linear-gradient(top, #efefef , #cccccc);
+	background: -webkit-gradient(linear,left top,left bottom,from(#efefef),to(#cccccc));	
+}
+
+.gradient-grey .doublet-stats-title h1,
+.gradient-grey .doublet-stats-title p {
+	color:#333;
+	text-shadow:0 1px 0 #efefef;
+}
+
+.gradient-grey button, .gradient-grey select {
+	color:#333;
+	text-shadow:0 1px 0 #efefef;
+	border:1px solid #ccc;
+	background:#dfdfdf;
+	background: -moz-linear-gradient(top, #dfdfdf , #cfcfcf);
+	background: -webkit-gradient(linear,left top,left bottom,from(#efefef),to(#cccccc));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#cccccc');
+	box-shadow:inset 0 1px 0 #efefef, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #efefef, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #efefef, 0 1px 2px #aaa;
+	
+}
+
+.gradient-grey button:hover {
+	cursor:pointer;
+	background:#cfcfcf;
+	background: -moz-linear-gradient(top, #cfcfcf , #dfdfdf);
+	background: -webkit-gradient(linear,left top,left bottom,from(#cfcfcf),to(#dfdfdf));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cfcfcf', endColorstr='#dfdfdf');
+	box-shadow:inset 0 1px 0 #dfdfdf, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #dfdfdf, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #dfdfdf, 0 1px 2px #aaa;
+}
+
+.gradient-grey button:active{
+	box-shadow:none;
+	-moz-box-shadow:none;
+	-webkit-box-shadow:none;
+}
+
+
+/*========================/
+	Black Thème
+	simple & Gradient
+/========================*/
+
+/*/// "simple-black" - black color ///*/
+.simple-black.statistiques-doublet {
+	border: 1px solid #000;
+}
+
+.simple-black .doublet-stats-title {
+	background:#000;
+	border-bottom:none;
+}
+
+.simple-black  .doublet-stats-title h1,
+.simple-black  .doublet-stats-title p {
+	color:#FFF;
+	text-shadow:none;
+}
+
+
+.simple-black button {
+	color:#FFF;
+	background:#000;
+	border:none;
+}
+
+.simple-black button:hover {
+	cursor:pointer;
+	background:#333;
+}
+
+.simple-black button:active {
+	background:#000;
+}
+
+
+/*/// "gradient-black" ///*/
+.gradient-black.statistiques-doublet {
+	border: 1px solid #000;
+}
+
+.gradient-black .doublet-stats-title {
+	background:#efefef;
+	border-bottom:1px solid #000;
+	background: -moz-linear-gradient(top, #5e5e5e , #3a3a3a);
+	background: -webkit-gradient(linear,left top,left bottom,from(#5e5e5e),to(#3a3a3a));	
+}
+
+.gradient-black .doublet-stats-title h1,
+.gradient-black .doublet-stats-title p {
+	color:#FFF;
+	text-shadow:0 -1px 0 #333;
+}
+
+.gradient-black button, .gradient-black select {
+	color:#FFF;
+	text-shadow:0 -1px 0 #333;
+	border:1px solid #000;
+	background:#5e5e5e;
+	background: -moz-linear-gradient(top, #5e5e5e , #3a3a3a);
+	background: -webkit-gradient(linear,left top,left bottom,from(#5e5e5e),to(#3a3a3a));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5e5e5e', endColorstr='#3a3a3a');
+	box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+	
+}
+
+.gradient-black button:hover {
+	cursor:pointer;
+	background:#3a3a3a;
+	background: -moz-linear-gradient(top, #3a3a3a , #5e5e5e);
+	background: -webkit-gradient(linear,left top,left bottom,from(#3a3a3a),to(#5e5e5e));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3a3a3a', endColorstr='#5e5e5e');
+	box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #868686, 0 1px 2px #aaa;
+}
+
+.gradient-black button:active {
+	box-shadow:none;
+	-moz-box-shadow:none;
+	-webkit-box-shadow:none;
+}
+
+
+/*========================/
+	Blue Thème
+	simple & Gradient
+/========================*/
+
+/*/// "simple-blue" - Blue "Doublet" color ///*/
+.simple-blue.statistiques-doublet {
+	border: 1px solid #0080C7;
+}
+
+.simple-blue .doublet-stats-title {
+	background:#0080C7;
+	border-bottom:none;
+}
+
+.simple-blue .doublet-stats-title h1,
+.simple-blue .doublet-stats-title p {
+	color:#FFF;
+	text-shadow:none;
+}
+
+
+.simple-blue button {
+	color:#FFF;
+	background:#0080C7;
+	border:none;
+}
+
+.simple-blue button:hover {
+	cursor:pointer;
+	background:#00669F;
+}
+
+.simple-blue button:active {
+	background:#0080C7;
+}
+
+
+/*/// "gradient-blue" ///*/
+.gradient-blue.statistiques-doublet {
+	border: 1px solid #0080C7;
+}
+
+.gradient-blue .doublet-stats-title {
+	background:#0080C7;
+	border-bottom:1px solid #00486F;
+	background: -moz-linear-gradient(top, #0080C7 , #00669F);
+	background: -webkit-gradient(linear,left top,left bottom,from(#0080C7),to(#00669F));	
+}
+
+.gradient-blue .doublet-stats-title h1,
+.gradient-blue .doublet-stats-title p {
+	color:#FFF;
+	text-shadow:0 -1px 0 #00486F;
+}
+
+.gradient-blue button, .gradient-blue select {
+	color:#FFF;
+	text-shadow:0 -1px 0 #00486F;
+	border:1px solid #00486F;
+	background:#0080C7;
+	background: -moz-linear-gradient(top, #0080C7 , #00669F);
+	background: -webkit-gradient(linear,left top,left bottom,from(#0080C7),to(#00669F));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0080C7', endColorstr='#00669F');
+	box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+	
+}
+
+.gradient-blue button:hover {
+	cursor:pointer;
+	background:#00669F;
+	background: -moz-linear-gradient(top, #00669F , #0080C7);
+	background: -webkit-gradient(linear,left top,left bottom,from(#00669F),to(#0080C7));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00669F', endColorstr='#0080C7');
+	box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+	-moz-box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+	-webkit-box-shadow:inset 0 1px 0 #2CAAEF, 0 1px 2px #aaa;
+}
+
+.gradient-blue button:active {
+	box-shadow:none;
+	-moz-box-shadow:none;
+	-webkit-box-shadow:none;
+}
+
