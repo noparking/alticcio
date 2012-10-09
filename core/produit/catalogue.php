@@ -105,6 +105,20 @@ SQL;
 		return $categories;
 	}
 
+	public function premieres_categories() {
+		$categories = array();
+		$q = <<<SQL
+SELECT id, nom, titre_url FROM dt_catalogues_categories
+WHERE id_catalogues = {$this->id} AND id_parent = 0
+ORDER BY classement ASC
+SQL;
+		$res = $this->sql->query($q);
+		while($row = $this->sql->fetch($res)) {
+			$categories[] = $row;
+		}
+		return $categories;
+	}
+
 	public function nb_produits() {
 		$q = <<<SQL
 SELECT COUNT(DISTINCT(id_produits)) AS nb FROM dt_catalogues_categories_produits AS ccp
