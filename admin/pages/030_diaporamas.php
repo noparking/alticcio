@@ -120,14 +120,14 @@ if ($form->is_submitted()) {
 			break;
 		case "save":
 			if ($form->validate()) {
-				$id_saved = $url_redirection->save_object($diaporama, $data, array('phrase_url_key'));
+				$id_saved = $url_redirection->save_object($diaporama, $data, array('phrase_url_key' => 'phrase_titre'));
 				if ($id_saved === false) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
 				else if ($id_saved == -1) {
 					$messages[] = '<p class="message">Il existe déjà un diaporama ayant cette référence</p>';
 				}
-				elseif ($id_saved > 0) {
+				else if ($id_saved > 0) {
 					$form->reset();
 				}
 			}

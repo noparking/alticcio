@@ -4,9 +4,9 @@ require_once "abstract_object.php";
 
 class Attribut extends AbstractObject {
 
-	protected $type = "attribut";
-	protected $table = "dt_attributs";
-	protected $phrase_fields = array('phrase_nom');
+	public $type = "attribut";
+	public $table = "dt_attributs";
+	public $phrase_fields = array('phrase_nom');
 
 	public function load($id) {
 		parent::load($id);

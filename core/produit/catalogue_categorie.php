@@ -4,8 +4,8 @@ require_once "abstract_object.php";
 
 class CatalogueCategorie extends AbstractObject {
 
-	protected $type = "catalogue_categorie";
-	protected $table = "dt_catalogues_categories";
+	public $type = "catalogue_categorie";
+	public $table = "dt_catalogues_categories";
 
 	public function delete($data) {
 		$q = <<<SQL

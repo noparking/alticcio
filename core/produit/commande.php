@@ -4,9 +4,9 @@ require_once "abstract_object.php";
 
 class Commande extends AbstractObject {
 
-	protected $type = "commande";
-	protected $table = "dt_commandes";
-	protected $phrase_fields = array();
+	public $type = "commande";
+	public $table = "dt_commandes";
+	public $phrase_fields = array();
 	
 	public function token2id($token) {
 		$q = <<<SQL

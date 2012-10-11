@@ -4,8 +4,8 @@ require_once "abstract_object.php";
 
 class Catalogue extends AbstractObject {
 
-	protected $type = "catalogue";
-	protected $table = "dt_catalogues";
+	public $type = "catalogue";
+	public $table = "dt_catalogues";
 
 	public function load($id) {
 		parent::load($id);

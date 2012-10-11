@@ -4,10 +4,10 @@ require_once "abstract_object.php";
 
 class Sku extends AbstractObject {
 
-	protected $type = "sku";
-	protected $table = "dt_sku";
-	protected $images_table = "dt_images_sku";
-	protected $phrase_fields = array('phrase_ultralog', 'phrase_commercial', 'phrase_path');
+	public $type = "sku";
+	public $table = "dt_sku";
+	public $images_table = "dt_images_sku";
+	public $phrase_fields = array('phrase_ultralog', 'phrase_commercial', 'phrase_path');
 
 	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL

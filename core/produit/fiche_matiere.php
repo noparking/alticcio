@@ -4,13 +4,13 @@ require_once "abstract_object.php";
 
 class FicheMatiere extends AbstractObject {
 
-	protected $type = "fiche";
-	protected $table = "dt_fiches_matieres_modeles";
-	protected $phrase_fields = array('phrase_nom');
-	protected $phrases;
-	protected $phrase;
-	protected $langue;
-	protected $id_langue;
+	public $type = "fiche";
+	public $table = "dt_fiches_matieres_modeles";
+	public $phrase_fields = array('phrase_nom');
+	public $phrases;
+	public $phrase;
+	public $langue;
+	public $id_langue;
 
 	public function __construct ($sql, $phrase = null, $langue = null, $id_langue = null, $matiere = null, $attribut = null, $phrases = null) {
 		parent::__construct($sql, $phrase, $langue);

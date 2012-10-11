@@ -197,51 +197,17 @@ if ($form->is_submitted()) {
 						}
 					}
 				}
-				$dont_save = false;
-		
-				foreach ($data['phrases']['phrase_url_key'] as $lang => $phrase_url_key) {
-					if ($phrase_url_key) {
-						$phrase_url_key = $data['phrases']['phrase_url_key'][$lang] = $url_redirection->normalize($phrase_url_key);
-						if (!$url_redirection->is_free($phrase_url_key)) {
-							$url_redirection_data =	array(
-								'table' => 'dt_produits',
-								'variable' => isset($data['produit']['id']) ? $data['produit']['id'] : 0,
-								'id_langues' => $langue->id($lang),
-							);
-							if (!$url_redirection->check($phrase_url_key, $url_redirection_data)) {
-								$messages[] = '<p class="message">'."Le code URL $phrase_url_key est déjà utilisé !".'</p>';
-								$dont_save = true;
-							}
-						}
-					}
+				$id_saved = $url_redirection->save_object($produit, $data, array('phrase_url_key' => 'phrase_nom'));
+				
+				if ($id_saved === false) {
+					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
+				}
+				else if ($id_saved > 0) {
+					$form->reset();
 				}
 
-				if (!$dont_save) {
-					$id = $produit->save($data);
-					$form->reset();
-					$produit->load($id);
-
-					$save_again = false;
-					foreach ($data['phrases']['phrase_url_key'] as $lang => $phrase_url_key) {
-						$code_url = $phrase_url_key ? $phrase_url_key : $url_redirection->create_by_name($data['phrases']['phrase_nom'][$lang]);
-						$url_redirection->save($code_url, array(
-							'id_langues' => $langue->id($lang),
-							'table' => "dt_produits",
-							'variable' => $id,
-						));
-						if (!$phrase_url_key) {
-							$save_again = true;
-							$data['phrases']['phrase_url_key'][$lang] = $code_url;
-						}
-					}
-					if ($save_again) {
-						$data['produit']['id'] = $id;
-						$produit->save($data);
-						$produit->load($id);
-					}
-					if ($action != "edit") {
-						$url2->redirect("current", array('action' => "edit", 'id' => $id));
-					}
+				if ($action != "edit") {
+					$url2->redirect("current", array('action' => "edit", 'id' => $id));
 				}
 			}
 			break;

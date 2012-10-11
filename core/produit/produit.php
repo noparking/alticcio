@@ -4,10 +4,10 @@ require_once "abstract_object.php";
 
 class Produit extends AbstractObject {
 
-	protected $type = "produit";
-	protected $table = "dt_produits";
-	protected $images_table = "dt_images_produits";
-	protected $phrase_fields = array(
+	public $type = "produit";
+	public $table = "dt_produits";
+	public $images_table = "dt_images_produits";
+	public $phrase_fields = array(
 		'phrase_nom',
 		'phrase_commercial',
 		'phrase_description_courte',

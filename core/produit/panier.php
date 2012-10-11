@@ -3,6 +3,6 @@
 require_once "abstract_object.php";
 
 class Panier extends AbstractObject {
-	protected $type = "panier";
-	protected $table = "dt_paniers";
+	public $type = "panier";
+	public $table = "dt_paniers";
 }

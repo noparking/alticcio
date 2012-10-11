@@ -4,10 +4,10 @@ require_once "abstract_object.php";
 
 class Matiere extends AbstractObject {
 
-	protected $type = "matiere";
-	protected $table = "dt_matieres";
-	protected $images_table = "dt_images_matieres";
-	protected $phrase_fields = array('phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
+	public $type = "matiere";
+	public $table = "dt_matieres";
+	public $images_table = "dt_images_matieres";
+	public $phrase_fields = array('phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
 
 	public function liste($lang, &$filter = null) {
 		$q = <<<SQL

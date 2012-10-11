@@ -4,9 +4,9 @@ require_once "abstract_object.php";
 
 class Application extends AbstractObject {
 
-	protected $type = "application";
-	protected $table = "dt_applications";
-	protected $phrase_fields = array('phrase_nom');
+	public $type = "application";
+	public $table = "dt_applications";
+	public $phrase_fields = array('phrase_nom');
 
 	public function liste(&$filter = null, $select_options = false) {
 		$q = <<<SQL

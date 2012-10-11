@@ -191,10 +191,10 @@ SQL;
 
 	public function save_object($object, $data, $url_key_fields) {
 
-		foreach ($url_key_fields as $field) {
-			foreach ($data['phrases'][$field] as $lang => $phrase_url_key) {
+		foreach ($url_key_fields as $key => $value) {
+			foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
 				if ($phrase_url_key) {
-					$phrase_url_key = $data['phrases'][$field][$lang] = $this->normalize($phrase_url_key);
+					$phrase_url_key = $data['phrases'][$key][$lang] = $this->normalize($phrase_url_key);
 					if (!$this->is_free($phrase_url_key)) {
 						$url_redirection_data =	array(
 							'table' => $object->table,
@@ -217,9 +217,9 @@ SQL;
 		$object->load($id_saved);
 
 		$save_again = false;
-		foreach ($url_key_fields as $field) {
-			foreach ($data['phrases'][$field] as $lang => $phrase_url_key) {
-				$code_url = $phrase_url_key ? $phrase_url_key : $this->create_by_name($data['phrases']['phrase_titre'][$lang]);
+		foreach ($url_key_fields as $key => $value) {
+			foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
+				$code_url = $phrase_url_key ? $phrase_url_key : $this->create_by_name($data['phrases'][$value][$lang]);
 				$this->save($code_url, array(
 					'table' => $object->table,
 					'variable' => $id_saved,
