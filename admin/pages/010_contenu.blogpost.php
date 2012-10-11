@@ -107,22 +107,11 @@ if ($form->is_submitted()) {
 			break;
 		default:
 			if ($form->validate()) {
-				$data['blogpost']['id_users'] = $_SESSION['extranet']['user']['id'];
-				$titre_url = $data['blogpost']['titre_url'];
-				$dont_save = false;
-				if (!$url_redirection->is_free($titre_url)) {
-					$url_redirection_data =	array(
-						'table' => 'dt_billets',
-						'variable' => isset($data['blogpost']['id']) ? $data['blogpost']['id'] : 0,
-						'id_langues' => $data['blogpost']['id_langues'],
-					);
-					if (!$url_redirection->check($titre_url, $url_redirection_data)) {
-						$message = '<p class="message">'."Le code URL {$titre_url} est déjà utilisé !".'</p>';
-						$dont_save = true;
-					}
+				$id_billets = $url_redirection->save_object($blogpost, $data, array('titre_url' => "titre"));
+				if ($id_billets === false) {
+					$messages = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
-				if (!$dont_save) {
-					$id_billets = $blogpost->save($data);
+				else {
 					switch($id_billets) {
 						case Blogpost::UNCOMPLETED :
 							$message = '<div class="message_error">'.$dico->t('VousDevezRenseignerTitre').'</div>';
@@ -131,25 +120,8 @@ if ($form->is_submitted()) {
 							$message = '<div class="message_error">'.$dico->t('VousDevezRenseignerDate').'</div>';
 							break;
 						default :
-							$form->reset();
-							$blogpost->load($id_billets);
 							$message = '<div class="message_succes">'.$dico->t('VosDonneesSauvegardees').'</div>';
-							$code_url = $titre_url ? $titre_url : $url_redirection->create_by_name($data['blogpost']['titre']);
-							$save_again = false;
-							$url_redirection->save($code_url, array(
-								'table' => "dt_billets",
-								'variable' => $id_billets,
-								'id_langues' => $data['blogpost']['id_langues'],
-							));
-							if (!$titre_url) {
-								$save_again = true;
-								$data['blogpost']['titre_url'] = $code_url;
-							}
-							if ($save_again) {
-								$data['blogpost']['id'] = $id_billets;
-								$blogpost->save($data);
-								$blogpost->load($id_billets);
-							}
+							$form->reset();
 							if ($action != "edit") {
 								$url2->redirect("current", array('action' => "edit", 'id' => $id_billets));
 							}

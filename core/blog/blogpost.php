@@ -5,7 +5,9 @@ class Blogpost {
 	const UNCOMPLETED = -1;
 	const UNDATED = -2;
 
-	private $sql;
+	public $table = "dt_billets";
+	public $type = "blogpost";
+	public $sql;
 	public $values;
 	public $themes;
 	
