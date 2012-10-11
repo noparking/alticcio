@@ -90,37 +90,15 @@ if ($form->is_submitted()) {
 			break;
 		case "save":
 			if ($form->validate()) {
-				$dont_save = false;
-				if ($data['page']['intitule_url']) {
-					if (!$url_redirection->is_free($data['page']['intitule_url'])) {
-						$url_redirection_data =	array(
-							'table' => 'dt_pages',
-							'variable' => isset($data['page']['id']) ? $data['page']['id'] : 0,
-							'id_langues' => $data['page']['id_langues'],
-						);
-						if (!$url_redirection->check($data['page']['intitule_url'], $url_redirection_data)) {
-							$messages[] = '<p class="message">'."Le code URL {$data['page']['intitule_url']} est déjà utilisé !".'</p>';
-							$dont_save = true;
-						}
-					}
+				$id_saved = $url_redirection->save_object($static_page, $data, array('intitule_url' => ""));
+				if ($id_saved === false) {
+					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
-				if (!$dont_save) {
-					$id_saved = $static_page->save($data);
-					if ($id_saved == -1) {
-						$messages[] = '<p class="message">Il existe déjà une page portant ce nom</p>';
-					}
-					else if ($id_saved > 0) {
-						$url_redirection->save($data['page']['intitule_url'], array(
-							'id_langues' => $data['page']['id_langues'],
-							'table' => "dt_pages",
-							'variable' => $id_saved,
-						));
-						$form->reset();
-						if ($id_saved != $id) {
-							$url->redirect("current", array('action' => "", 'id' => $id_saved));
-						}
-						$static_page->load($id);
-					}
+				else if ($id_saved == -1) {
+					$messages[] = '<p class="message">Il existe déjà une page portant ce nom</p>';
+				}
+				else if ($id_saved > 0) {
+					$form->reset();
 				}
 			}
 			break;

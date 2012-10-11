@@ -18,4 +18,14 @@ abstract class AbstractContent {
 		return false;
 
 	}
+
+	public function get_id_langues($code_langue) {
+		$q = <<<SQL
+SELECT id FROM dt_langues WHERE code_langue = '$code_langue'
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		return $row['id'];
+	}
 }

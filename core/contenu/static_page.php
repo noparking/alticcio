@@ -4,7 +4,9 @@ require_once "abstract_content.php";
 
 class StaticPage extends AbstractContent {
 
-	private $sql;
+	public $sql;
+	public $type = "page";
+	public $table = "dt_pages";
 	public $values;
 
 	public function __construct($sql) {
