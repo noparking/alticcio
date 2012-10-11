@@ -2,13 +2,13 @@
 // TODO : utiliser save_data à la place de save_image
 abstract class AbstractObject {
 	
-	protected $sql;
-	protected $phrase;
-	protected $langue;
-	protected $type;
-	protected $table;
-	protected $images_table;
-	protected $phrase_fields = array();
+	public $sql;
+	public $phrase;
+	public $langue;
+	public $type;
+	public $table;
+	public $images_table;
+	public $phrase_fields = array();
 	public $values;
 
 	public function __construct($sql, $phrase = null, $langue = 1) {
@@ -302,5 +302,15 @@ SQL;
 		$row = $this->sql->fetch($res);
 
 		return $row["max_classement"] + 1;
+	}
+
+	public function get_id_langues($code_langue) {
+		$q = <<<SQL
+SELECT id FROM dt_langues WHERE code_langue = '$code_langue'
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		return $row['id'];
 	}
 }

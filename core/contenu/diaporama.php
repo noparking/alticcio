@@ -4,9 +4,10 @@ require_once dirname(__FILE__)."/../produit/abstract_object.php";
 
 class Diaporama extends AbstractObject {
 
-	protected $type = "diaporama";
-	protected $table = "dt_diaporamas";
-	protected $phrase_fields = array('phrase_titre', 'phrase_description');
+	public $type = "diaporama";
+	public $table = "dt_diaporamas";
+	public $images_table = "dt_images_diaporamas";
+	public $phrase_fields = array('phrase_titre', 'phrase_description', 'phrase_url_key');
 
 	public function liste($lang, &$filter = null) {
 		$q = <<<SQL
@@ -23,27 +24,6 @@ SQL;
 		$liste = array();
 		while ($row = $filter->fetch($res)) {
 			$liste[$row['id']] = $row;
-		}
-		
-		return $liste;
-	}
-
-	public function themes_photos($lang) {
-		$q = <<<SQL
-SELECT tp.id, p.phrase AS nom, tp.annee FROM dt_themes_photos AS tp
-LEFT OUTER JOIN dt_phrases AS p ON p.id = tp.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '$lang' OR tp.phrase_nom = 0)
-ORDER BY annee DESC, nom ASC
-SQL;
-		$res = $this->sql->query($q);
-
-		$liste = array();
-		while ($row = $this->sql->fetch($res)) {
-			$liste[$row['id']] = array(
-				'opt' => $row['nom'],
-				'group' => $row['annee'],
-			);
 		}
 		
 		return $liste;
@@ -67,7 +47,7 @@ SQL;
 		return $this->sql->fetch($res) ? false : true;
 	}
 
-	public function save($data, $dir) {
+	public function save($data) {
 		if (!$this->is_free($data['diaporama']['ref'], isset($data['diaporama']['id']) ? $data['diaporama']['id'] : null)) {
 			return -1;
 		}
@@ -76,7 +56,7 @@ SQL;
 			preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
 			$ext = $matches[1];
 			$file_name = md5_file($file['tmp_name']).$ext;
-			move_uploaded_file($file['tmp_name'], $dir.$file_name);
+			move_uploaded_file($file['tmp_name'], $this->dir.$file_name);
 			$data['diaporama']['vignette'] = $file_name;
 		}
 
