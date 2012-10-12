@@ -90,4 +90,207 @@ class TestOfUrlRedirection extends UnitTestCase {
 		$this->assertEqual($ur->short_decode("9"), array(4, 2));
 		$this->assertEqual($ur->short_decode("a"), array(5, 2));
 	}
+
+	function test_save_object() {
+		$url_redirection = new UrlRedirectionMock();
+		$object = new ObjectMock(42);
+		$other_object = new ObjectMock(43);
+		
+		$url_fields = array('url' => '');
+
+		$data = array(
+			'object' => array(
+				'nom' => "Ceci est un Test",
+				'url' => "mon-url",
+			),
+		);
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($result, 42);
+		$this->assertEqual($object->values['url'], "mon-url");
+
+		// on peut sauvegarder deux fois de suite
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->values['url'], "mon-url");
+		// ce n'est pas le même object : sauvegarde impossible
+		$result = $url_redirection->save_object($other_object, $data, $url_fields);
+		$this->assertEqual($result, false);
+
+		// l'url est vide
+		$data = array(
+			'object' => array(
+				'nom' => "Ceci est un Test",
+				'url' => "",
+			),
+		);
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->values['url'], "");
+
+		// l'url est vide mais déduite du nom
+		$url_fields = array('url' => 'nom');
+		$data = array(
+			'object' => array(
+				'nom' => "Ceci est un Test",
+				'url' => "",
+			),
+		);
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->values['url'], "ceci-est-un-test");
+
+		// enregistrement impossible car url déjà réservée
+		$data = array(
+			'object' => array(
+				'nom' => "Ceci est un Test",
+				'url' => "mon-url",
+			),
+		);
+		$url_fields = array('url' => 'nom');
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($result, false);
+		$this->assertEqual($object->values['url'], "ceci-est-un-test");
+
+		// Url vide. Celle déduite du nom est déjà prise, donc on rajoute "-1" (puis "-2", etc.)
+		$data = array(
+			'object' => array(
+				'nom' => "Ceci est un Test",
+				'url' => "",
+			),
+		);
+		$url_fields = array('url' => 'nom');
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->values['url'], "ceci-est-un-test-1");
+
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->values['url'], "ceci-est-un-test-2");
+
+		// Url gérée dans les phrases
+		$data = array(
+			'object' => array(
+				'phrase_nom' => 0,
+				'phrase_url' => 0,
+			),
+			'phrases' => array(
+				'phrase_nom' => array(
+					'fr_FR' => "Nom Français",
+					'en_UK' => "English name",
+				),
+				'phrase_url' => array(
+					'fr_FR' => "url-fr",
+					'en_UK' => "url-en",
+				),
+			),
+		);
+		$url_fields = array('phrase_url' => '');
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->phrases['phrase_url']['fr_FR'], "url-fr");
+		$this->assertEqual($object->phrases['phrase_url']['en_UK'], "url-en");
+		
+		// Url vide gérée dans les phrases
+		$data = array(
+			'object' => array(
+				'phrase_nom' => 0,
+				'phrase_url' => 0,
+			),
+			'phrases' => array(
+				'phrase_nom' => array(
+					'fr_FR' => "Nom Français",
+					'en_UK' => "English name",
+				),
+				'phrase_url' => array(
+					'fr_FR' => "",
+					'en_UK' => "",
+				),
+			),
+		);
+		$url_fields = array('phrase_url' => '');
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->phrases['phrase_url']['fr_FR'], "");
+		$this->assertEqual($object->phrases['phrase_url']['en_UK'], "");
+
+		// Url automatique gérée dans les phrases
+		$data = array(
+			'object' => array(
+				'phrase_nom' => 0,
+				'phrase_url' => 0,
+			),
+			'phrases' => array(
+				'phrase_nom' => array(
+					'fr_FR' => "Nom Francais",
+					'en_UK' => "English name",
+				),
+				'phrase_url' => array(
+					'fr_FR' => "",
+					'en_UK' => "",
+				),
+			),
+		);
+		$url_fields = array('phrase_url' => 'phrase_nom');
+		$result = $url_redirection->save_object($object, $data, $url_fields);
+		$this->assertEqual($object->phrases['phrase_url']['fr_FR'], "nom-francais");
+		$this->assertEqual($object->phrases['phrase_url']['en_UK'], "english-name");
+	}
+
+}
+
+class UrlRedirectionMock extends UrlRedirection {
+	public $records = array();
+	
+	function __construct() {
+	}
+
+	function load($code_url) {
+		foreach ($this->records as $record) {
+			if ($record['code_url'] == $code_url) {
+				return $record;
+			}
+		}
+	
+		return false;
+	}
+
+	function save($code_url, $data) {
+		if (!$code_url || !$this->is_free($code_url)) {
+			return false;
+		}
+
+		$data['code_url'] = $code_url;
+		$this->records[] = $data;
+
+		return true;
+	}
+
+}
+
+class ObjectMock {
+	public $type = "object";
+	public $table = "table_object";
+	public $values = array('id_langues' => 1);
+	public $phrases = array();
+	public $id;
+
+	function __construct($id) {
+		$this->id = $id;
+	}
+
+	function load() {
+	}
+
+	function save($data) {
+		if (isset($data['object'])) {
+			$this->values = array_merge($this->values, $data['object']);
+		}
+		if (isset($data['phrases'])) {
+			$this->phrases = array_merge($this->phrases, $data['phrases']);
+		}
+		
+		return $this->id;
+	}
+
+	function get_id_langues($code_langue) {
+		$ids = array(
+			'fr_FR' => 1,
+			'en_UK' => 2,
+		);
+
+		return $ids[$code_langue];
+	}
 }
