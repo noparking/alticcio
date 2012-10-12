@@ -2,7 +2,9 @@
 
 class BlogTheme {
 	
-	private $sql;
+	public $sql;
+	public $table = "dt_themes_blogs";
+	public $type = "theme";
 	public $values;
 
 	function __construct($sql) {
@@ -31,8 +33,9 @@ SQL;
 
 	public function load($id) {
 		$q = <<<SQL
-SELECT tb.id, tb.nom, tb.affichage, tb.id_parent, tb.titre_url, btb.id_blogs FROM dt_themes_blogs AS tb
+SELECT tb.id, tb.nom, tb.affichage, tb.id_parent, tb.titre_url, btb.id_blogs, bl.id_langues FROM dt_themes_blogs AS tb
 LEFT OUTER JOIN dt_blogs_themes_blogs AS btb ON btb.id_themes_blogs = tb.id
+LEFT OUTER JOIN dt_blogs_langues AS bl ON bl.id_blogs = btb.id_blogs
 WHERE tb.id = $id
 SQL;
 		$res = $this->sql->query($q);

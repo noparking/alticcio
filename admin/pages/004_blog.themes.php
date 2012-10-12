@@ -52,41 +52,14 @@ if ($form->is_submitted()) {
 			break;
 		default:
 			if ($action == "edit" or $action == "create") {
-				$titre_url = $data['theme']['titre_url'];
-				$dont_save = false;
-				if (!$url_redirection->is_free($titre_url)) {
-					$url_redirection_data =	array(
-						'table' => 'dt_themes_blogs',
-						'variable' => isset($data['theme']['id']) ? $data['theme']['id'] : 0,
-						'id_langues' => 1,
-					);
-					if (!$url_redirection->check($titre_url, $url_redirection_data)) {
-						$message = '<p class="message">'."Le code URL {$titre_url} est déjà utilisé !".'</p>';
-						$dont_save = true;
+				if ($form->validate()) {
+					$id_saved = $url_redirection->save_object($theme, $data, array('titre_url' => "nom"));
+					if ($id_saved === false) {
+						$message = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 					}
-				}
-				if (!$dont_save) {
-					$id = $theme->save($data);
-					$code_url = $titre_url ? $titre_url : $url_redirection->create_by_name($data['theme']['nom']);
-					$save_again = false;
-					$url_redirection->save($code_url, array(
-						'table' => "dt_themes_blogs",
-						'variable' => $id,
-						'id_langues' => 1,
-					));
-					if (!$titre_url) {
-						$save_again = true;
-						$data['theme']['titre_url'] = $code_url;
+					else if ($id_saved > 0) {
+						$form->reset();
 					}
-					if ($save_again) {
-						$data['blogpost']['id'] = $id;
-						$theme->save($data);
-					}
-					$form->reset();
-					if ($action != "edit") {
-						$url2->redirect("current", array('action' => "edit", 'id' => $id));
-					}
-					$theme->load($id);
 				}
 			}
 			break;
