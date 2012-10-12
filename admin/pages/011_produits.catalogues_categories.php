@@ -100,48 +100,15 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit") {
-				$titre_url = $data['catalogue_categorie']['titre_url'];
-				$dont_save = false;
-				if (!$url_redirection->is_free($titre_url)) {
-					$url_redirection_data =	array(
-						'table' => 'dt_catalogues_categories',
-						'variable' => isset($data['catalogue_categorie']['id']) ? $data['catalogue_categorie']['id'] : 0,
-						'id_langues' => $catalogue->values['id_langues'],
-					);
-					if (!$url_redirection->check($titre_url, $url_redirection_data)) {
-						$messages[] = '<p class="message">'."Le code URL {$titre_url} est déjà utilisé !".'</p>';
-						$dont_save = true;
+				if ($form->validate()) {
+					$id_saved =
+						$url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
+					if ($id_saved === false) {
+						$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 					}
-				}
-				if (!$dont_save) {
-
-					$filter_selected = $filter->selected();
-					if (isset($data['produits'])) {
-						foreach ($data['produits'] as $element_id => $element) {
-							if (!in_array($element_id, $filter_selected)) {
-								unset($data['produits'][$element_id]);
-							}
-						}
+					else if ($id_saved > 0) {
+						$form->reset();
 					}
-					$id = $categorie->save($data);
-					$code_url = $titre_url ? $titre_url : $url_redirection->create_by_name($data['catalogue_categorie']['nom']);
-					$save_again = false;
-					$url_redirection->save($code_url, array(
-						'table' => 'dt_catalogues_categories',
-						'variable' => $id,
-						'id_langues' => $catalogue->values['id_langues'],
-					));
-					if (!$titre_url) {
-						$save_again = true;
-						$data['catalogue_categorie']['titre_url'] = $code_url;
-					}
-					if ($save_again) {
-						$data['catalogue_categorie']['id'] = $id;
-						$categorie->save($data);
-					}
-					$form->reset();
-					$categorie->load($id);
-					$catalogue->load($categorie->values['id_catalogues']);
 				}
 			}
 			break;

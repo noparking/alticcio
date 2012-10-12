@@ -7,6 +7,21 @@ class CatalogueCategorie extends AbstractObject {
 	public $type = "catalogue_categorie";
 	public $table = "dt_catalogues_categories";
 
+	public function load($id) {
+		$id = parent::load($id);
+		if ($id) {
+			$q = <<<SQL
+SELECT id_langues FROM dt_catalogues WHERE id =	{$this->values['id_catalogues']}
+SQL;
+			$res = $this->sql->query($q);
+			$row = $this->sql->fetch($res);
+
+			$this->values['id_langues'] = $row['id_langues'];
+		}
+
+		return $id;
+	}
+
 	public function delete($data) {
 		$q = <<<SQL
 DELETE FROM dt_catalogues_categories_produits WHERE id_catalogues_categories = {$data['catalogue_categorie']['id']}
