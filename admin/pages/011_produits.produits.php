@@ -197,12 +197,12 @@ if ($form->is_submitted()) {
 						}
 					}
 				}
-				$id_saved = $url_redirection->save_object($produit, $data, array('phrase_url_key' => 'phrase_nom'));
+				$id = $url_redirection->save_object($produit, $data, array('phrase_url_key' => 'phrase_nom'));
 				
-				if ($id_saved === false) {
+				if ($id === false) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
-				else if ($id_saved > 0) {
+				else if ($id > 0) {
 					$form->reset();
 				}
 
