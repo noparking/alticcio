@@ -246,7 +246,7 @@ HTML;
 			$images_rows[$order] = <<<HTML
 <tr>
 	<td class="drag-handle"></td>
-	<td><img class="produit-image" src="{$config->core_media("produits/".$image['ref'])}" /></td>
+	<td><img class="produit-image" src="{$config->core_media("diaporamas/".$image['ref'])}" /></td>
 	<td>
 		{$form->input(array('name' => "image[".$image['id']."][phrase_legende]", 'type' => "hidden"))}
 		{$form->input(array('name' => "phrases[image][".$image['id']."][phrase_legende]", 'items' => $displayed_lang))}
