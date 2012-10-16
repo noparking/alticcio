@@ -102,12 +102,14 @@ SQL;
 	}
 
 	public function get($id, $id_langues) {
+		$id_condition = is_numeric($id) ? "d.id = $id" : "p3.phrase = '".addslashes($id)."'";
 		$q = <<<SQL
 SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, p1.phrase as titre, p2.phrase AS description
 FROM dt_diaporamas AS d
 LEFT OUTER JOIN dt_phrases AS p1 ON d.phrase_titre = p1.id AND p1.id_langues = $id_langues
 LEFT OUTER JOIN dt_phrases AS p2 ON d.phrase_description = p2.id AND p2.id_langues = $id_langues
-WHERE d.id = $id AND actif = 1
+LEFT OUTER JOIN dt_phrases AS p3 ON d.phrase_url_key = p3.id AND p3.id_langues = $id_langues
+WHERE {$id_condition} AND actif = 1
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
@@ -116,7 +118,7 @@ SQL;
 SELECT id.id, id.ref, phr.phrase AS legende
 FROM dt_images_diaporamas AS id
 LEFT OUTER JOIN dt_phrases AS phr ON id.phrase_legende = phr.id AND phr.id_langues = $id_langues
-WHERE id.id_diaporamas = $id
+WHERE id.id_diaporamas = {$row['id']}
 ORDER BY id.classement
 SQL;
 			$res = $this->sql->query($q);
