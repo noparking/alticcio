@@ -69,12 +69,17 @@ SQL;
 
 	public function last_from_section($section, $number, $id_langues) {
 		$q = <<<SQL
-SELECT d.id, d.ref, d.vignette, d.section, ph.phrase AS titre FROM dt_diaporamas AS d
+SELECT d.id, d.ref, d.vignette, d.section, ph.phrase AS titre, ph2.phrase AS url_key
+FROM dt_diaporamas AS d
 LEFT OUTER JOIN dt_phrases AS ph ON d.phrase_titre = ph.id AND ph.id_langues = $id_langues
+LEFT OUTER JOIN dt_phrases AS ph2 ON d.phrase_url_key = ph2.id AND ph2.id_langues = $id_langues
 WHERE d.section = '$section' AND actif = 1
 ORDER BY d.id DESC
-LIMIT 0, $number
 SQL;
+		if ($number) {
+			$q .= " LIMIT 0, $number";
+		}
+
 		$diaporamas = array();
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -108,11 +113,11 @@ SQL;
 		if ($row = $this->sql->fetch($res)) {
 			$id_themes_photos = $row['id_themes_photos'];
 			$q = <<<SQL
-SELECT p.id, p.ref, phr.phrase AS legende
-FROM dt_photos_themes_photos AS ptp
-INNER JOIN dt_photos AS p ON p.id = ptp.id_photos AND id_themes_photos = $id_themes_photos
-LEFT OUTER JOIN dt_phrases AS phr ON p.phrase_legende = phr.id AND phr.id_langues = $id_langues
-ORDER BY ptp.classement
+SELECT id.id, id.ref, phr.phrase AS legende
+FROM dt_images_diaporamas AS id
+LEFT OUTER JOIN dt_phrases AS phr ON id.phrase_legende = phr.id AND phr.id_langues = $id_langues
+WHERE id.id_diaporamas = $id
+ORDER BY id.classement
 SQL;
 			$res = $this->sql->query($q);
 			$photos = array();
