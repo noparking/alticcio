@@ -438,6 +438,7 @@ $t['SonIdentite'] = "Son identité";
 $t['Souligne'] = "Souligné";
 $t['Statistiques'] = "Statistiques";
 $t['StatsApiBoutiques'] = "Statistiques sur les API/Boutiques";
+$t['StatsCommandes'] = "Statistiques ventes en ligne";
 $t['StatsDemandesContacts'] = "Statistiques sur les demandes de contact";
 $t['StatsEmailings'] = "Statistiques sur les campagnes d'emailing";
 $t['StatsSondagesSatisfaction'] = "Statistiques sur la satisfaction clients";
@@ -569,6 +570,7 @@ $d['pages'] = array(
 	"menus" => "menus",
 	"update" => "mise-a-jour",
      "statsshorturl" => "short-url",
+     "statscommandes" => "commandes",
 );
 
 $d['hd_extensions'] = array(
