@@ -642,4 +642,83 @@ class TestOfForm extends UnitTestCase {
 
 		$form->reset();
 	}
+
+	function test_permissions() {
+		// pas de permissions
+		$form = new Form(array(
+			'id' => "my-form",
+		));
+		$params = array(
+			'name' => "save",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		// permissions pour sauvegarder un objet
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "save",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		$params = array(
+			'name' => "delete",
+		);
+		$this->assertFalse($form->is_permitted($params));
+
+		// permissions pour sauvegarder n'importe quoi
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "save",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		$params = array(
+			'name' => "delete",
+		);
+		$this->assertFalse($form->is_permitted($params));
+
+		// permissions de faire n'importe quoi sur les objets
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('all objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "save",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		$params = array(
+			'name' => "delete",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		// permissions de faire n'importe quoi sur n'importe quoi
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('all'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "save",
+		);
+		$this->assertTrue($form->is_permitted($params));
+
+		$params = array(
+			'name' => "delete",
+		);
+		$this->assertTrue($form->is_permitted($params));
+	}
 }

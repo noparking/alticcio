@@ -566,6 +566,10 @@ li.blogs {
 	color:#000;
 }
 
+.buttons_actions li input.disabled {
+	color:#FAA;
+}
+
 
 /* Produits - sections */
 .produit-sections {

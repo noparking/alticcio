@@ -51,6 +51,8 @@ $form = new Form(array(
 		"delete-image",
 		"duplicate",
 	),
+	'permissions' => $user->perms(),
+	'permissions_object' => "produit",
 	'files' => array("new_image_file", "new_gabarit_file"),
 ));
 
@@ -267,10 +269,12 @@ if ($action == "create" or $action == "edit") {
 	$buttons[] = $page->l($dico->t('Retour'), $url2->make("current", array('action' => "", 'id' => "")));
 }
 
-$buttons[] = $page->l($dico->t('NouveauProduit'), $url2->make("current", array('action' => "create", 'id' => "")));
+if ($user->has_one_perm(array("create all", "create produit"))) {
+	$buttons[] = $page->l($dico->t('NouveauProduit'), $url2->make("current", array('action' => "create", 'id' => "")));
+}
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 	$buttons[] = $page->l($dico->t('FicheTechnique'), $url3->make("FicheTechnique", array('id' => $id)));

@@ -34,9 +34,40 @@ class User {
 			return self::WRONGPASSWORD;
 		}
 		$_SESSION['extranet']['user'] = $user;
+		
+		$permissions = array();
+		$q = "SELECT perm FROM dt_groupes_users WHERE id = {$user['id_groupes_users']}";
+		$result = $this->sql->query($q);
+		$row = $this->sql->fetch($result);
+		foreach (explode(",", $row['perm']) as $perm) {
+			$permissions[] = trim($perm);
+		}
+		$_SESSION['extranet']['user']['permissions'] = $permissions;
+
 		return self::LOGGED;
 	}
-	
+
+	public function perms() {
+		return $_SESSION['extranet']['user']['permissions'];
+	}	
+
+	public function has_one_perm($permissions) {
+		foreach ($permissions as $permission) {
+			if (in_array($permission, $_SESSION['extranet']['user']['permissions'])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function has_all_perm($permissions) {
+		foreach ($permissions as $permission) {
+			if (!in_array($permission, $_SESSION['extranet']['user']['permissions'])) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	public function reset() {
 		if ($this->is_logged()) {

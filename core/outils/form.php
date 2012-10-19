@@ -46,6 +46,8 @@ class Form {
 	private $attr = array();
 	private $as_unsubmitted = false;
 	private $form_validation = null;	
+	private $permissions = null;
+	private $permissions_object = null;
 	
 	public function __construct($params = array()) {
 		$this->template = isset($params['template']) ? $params['template'] : $this->default_template();
@@ -115,6 +117,12 @@ class Form {
 				$this->attr[$cle] = $valeur;
 			}
 		}
+		if (isset($params['permissions'])) {
+			$this->permissions = $params['permissions'];
+		}
+		if (isset($params['permissions_object'])) {
+			$this->permissions_object = $params['permissions_object'];
+		}
 	}
 
 	private function merge_values($values, $post) {
@@ -139,7 +147,7 @@ class Form {
 			$this->set_value($unregistered, null, $_SESSION['form_values'][$this->form_id]);
 		}
 	}
-	
+
 	public function form_start($step = null) {
 		$this->in_form = true;
 		if (is_numeric($step)) {
@@ -253,6 +261,19 @@ class Form {
   	return "</fieldset>";
   }
   
+	public function is_permitted($param) {
+		if (!isset($this->permissions) or !isset($this->permissions_object)
+			or in_array($param['name'].' '.$this->permissions_object, $this->permissions)
+			or in_array('all '.$this->permissions_object, $this->permissions)
+			or in_array($param['name'].' all', $this->permissions)
+			or in_array('all', $this->permissions)) {
+				return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
   public function html($html) {
 		if ($this->in_form && $this->form_count != $this->step) return "";
 		return $html;
@@ -271,6 +292,7 @@ class Form {
 			$params['field'] .= '<ul class="'.$this->form_class.'-input-item"><li>';
 		}
 		$fields = array();
+		$readonly_fields = array();
 		foreach ($items as $item => $item_label) {
 			$type = $params['type'] = isset($params['type']) ? $params['type'] : "text";
 			$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
@@ -288,7 +310,18 @@ class Form {
 			$disabled = (isset($params['disabled']) and $params['disabled']) ? ' disabled="disabled"': "";
 			$onclick = "";
 			$hiddenfield = "";
-			
+
+			$permitted = "";
+			if (!$this->is_permitted($params)) {
+				if ($type == "submit" and !$disabled) {
+					$disabled = ' disabled="disabled"';
+					$class .= " disabled";
+				}
+				else {
+					$permitted = ' readonly="readonly"';
+				}
+			}
+
 			switch ($type) {
 				case "hidden" :
 					$params['template'] = "#{field}";
@@ -316,7 +349,7 @@ class Form {
 					$attr .= " $cle=\"$valeur\"";
 				}
 			}
-			$fields[] = $hiddenfield.'<input type="'.$type.'" name="'.$name.'" id="'.$id.'" class="'.$class.'" value="'.$value.'" '.$checked.$disabled.$onclick.$attr.' />'.$item_label;
+			$fields[] = $hiddenfield.'<input type="'.$type.'" name="'.$name.'" id="'.$id.'" class="'.$class.'" value="'.$value.'" '.$permitted.$checked.$disabled.$onclick.$attr.' />'.$item_label;
 		}
 		$params['field'] .= implode("</li><li>", $fields);
 		if (count($items) > 1) {
@@ -383,6 +416,14 @@ class Form {
 			$params['field'] .= '<ul class="'.$this->form_class.'-input-item"><li>';
 		}
 		$fields = array();
+
+		if ($is_permitted = $this->is_permitted($params)) {
+			$permitted = "";
+		}
+		else{
+			$permitted = ' readonly="readonly"';
+		}
+
 		foreach ($items as $item => $item_label) {
 			$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
 			if ($item) {
@@ -396,7 +437,7 @@ class Form {
 			$params['class'] = $class;
 			$value = htmlspecialchars($this->get_value($params, $name));
 			
-			$fields[] = '<textarea name="'.$name.'" id="'.$id.'" class="'.$class.'">'.$value.'</textarea>'.$item_label;
+			$fields[] = '<textarea name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.'>'.$value.'</textarea>'.$item_label;
 		}
 		$params['field'] .= implode("</li><li>", $fields);
 		if (count($items) > 1) {
