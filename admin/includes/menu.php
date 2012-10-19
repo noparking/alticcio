@@ -185,6 +185,11 @@ $menus = array(
 						'label' => $dico->t('Visites produits'),
 						'url' => $url->make("StatsVisitesProduits", array("action" => "")),
 					),
+                        'commandes' => array(
+						'level' => 30,
+						'label' => $dico->t('Commandes'),
+						'url' => $url2->make("StatsCommandes", array("action" => "")),
+					),
 				),
 			),
 			
