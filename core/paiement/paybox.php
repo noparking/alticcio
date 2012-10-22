@@ -16,6 +16,7 @@ class Paybox {
 	public $num_trans = "0000526489";
 	public $num_appel = "0000436527";
 	public $code_retour;
+	public $question = "";
 	
 	
 	function __construct(Config $config) {
@@ -27,12 +28,12 @@ class Paybox {
 		$this->differe = $config->get("paybox_differe");
 		$this->activite = $config->get("paybox_activite");
 		$this->devise = $config->get("paybox_devise");
-		$this->identifiant = "";//$config->get("paybox_identifiant");
+		$this->identifiant = $config->get("paybox_identifiant");
 	}
 	
 	function describe_error($code_erreur) {
 		$dico = $GLOBALS['dico'];
-		switch ($code) {
+		switch ($code_erreur) {
     		case "00016":
     			return $dico->t("AlreadyRegistered");
     		case "00004":
@@ -95,9 +96,6 @@ HTML;
 	#{field}
 </p>
 HTML;
-		$str .= <<<HTML
-{$form->input(array('type' => "submit", 'name' => "submit", 'value' => "Payer"))}<br />
-HTML;
 		return $str;
 	}
 	
@@ -125,7 +123,8 @@ HTML;
 	}
 	
 	function debit_account($porteur, $dateval, $cvv, $timestamp = null) {
-		$this->type = "00002";
+		$this->type = "00003";
+		$this->question = mt_rand(1, 2147483647);
 		$this->montant = str_pad((int)(100 * $this->montant), 10, 0, STR_PAD_LEFT);
 		$vars['porteur'] = $porteur;
 		$vars['dateval'] = $dateval;
@@ -142,7 +141,7 @@ HTML;
 		"&DATEQ=".date("dmYHis", $timestamp).
 		"&TYPE=".$this->type.
 		"&MONTANT=".$this->montant.
-		"&NUMQUESTION=0000000001".
+		"&NUMQUESTION=".$this->question.
 		"&SITE=".$this->site.
 		"&RANG=".$this->rang.
 		"&REFERENCE=".$this->reference.
@@ -164,13 +163,28 @@ HTML;
 	
 	function send_question($vars, $timestamp = null) {
 		$question = $this->build_question($vars, $timestamp);
-		var_dump($question);
 		$value = $this->post_request(
 			$GLOBALS['config']->get("paybox_url"),
 			$question
 		);
 	
 		return $value;
+	}
+	
+	function parse_retour() {
+		$table = array();
+		parse_str($this->code_retour, $table);
+		return $table;
+	}
+	
+	function paiement_effectue() {
+		$code = $this->parse_retour();
+		return ($code['CODEREPONSE'] == "00000");
+	}
+	
+	function show_paybox_error() {
+		$code = $this->parse_retour();
+		return $this->describe_error($code['CODEREPONSE']);
 	}
 	
 }
