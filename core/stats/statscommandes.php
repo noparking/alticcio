@@ -12,10 +12,10 @@ class StatsCommandes {
 	}
 	
 	public function nombre_commandes_par_mois() {
-		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS year, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS month, COUNT(*) AS total
+		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, COUNT(*) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement != 'refuse'  OR c.paiement != 'annule') 
-				GROUP BY year, month ";
+				WHERE (c.paiement != 'refuse' OR c.paiement != 'annule') AND shop = 3 AND id_api_keys = 0
+				GROUP BY annee, mois ";
 		$rs = $this->sql->query($q);
 		$tab = array();
 		while ($row = $this->sql->fetch($rs)) {
@@ -24,10 +24,10 @@ class StatsCommandes {
 		return $tab;
 	}
 	
-	public function chiffre_affaires_par_mois() {
+	public function chiffre_affaires_par_annee_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, SUM(c.montant) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement != 'refuse'  OR c.paiement != 'annule') 
+				WHERE (c.paiement != 'refuse' OR c.paiement != 'annule') AND shop = 3 AND id_api_keys = 0
 				GROUP BY annee, mois";
 		$rs = $this->sql->query($q);
 		$tab = array();
@@ -38,34 +38,59 @@ class StatsCommandes {
 	}
 	
 	public function afficher_tableau($valeurs) {
-		$html = '<table>';
+		$i = 0;
+		$prev_annee = 0;
+		$mois = array(	"01" => $this->dico->t('Janvier'),
+				    "02" => $this->dico->t('Fevrier'),
+				    "03" => $this->dico->t('Mars'),
+				    "04" => $this->dico->t('Avril'),
+				    "05" => $this->dico->t('Mai'),
+				    "06" => $this->dico->t('Juin'),
+				    "07" => $this->dico->t('Juillet'),
+				    "08" => $this->dico->t('Aout'),
+				    "09" => $this->dico->t('Septembre'),
+				    "10" => $this->dico->t('Octobre'),
+				    "11" => $this->dico->t('Novembre'),
+				    "12" => $this->dico->t('Decembre') );
+		
+		// on recense les années
+		$annees = array();
+		$annees[] = "";
 		foreach($valeurs as $k => $v) {
-			
+			if ($prev_annee != $v['annee']) {
+				$annees[] = $v['annee'];
+			}
+			$prev_annee = $v['annee'];
 		}
 		
-		
-		
-		
-		foreach($valeurs as $k => $v) {
-			$details_date = explode("-",$v['month']);
-			if ($prev_annee != $details_date[0]) {
-				if ($n > 0) {
-					$html .= '</tr>';
-				}
-				$html .= '<tr>';
-				$html .= '<td>'.$details_date[0].' '.$v['month'].'</td>';
+		// On génére le tableau HTML
+		$html = '<table>';
+		foreach($annees as $a) {
+			$html .= '<tr>';
+			$html .= '<td>'.$a.'</td>';
+			if (empty($a)) {
 				foreach($mois as $m => $month) {
-					$html .= '<td>';
-					if (isset($details_date[1]) AND $m == $details_date[1]) {
-						$html .= $v['total'];
-					}
-					$html .= '</td>';
+					$html .= '<td>'.$month.'</td>';
 				}
 			}
-			$prev_annee = $details_date[0];
-			$n++;
+			else {
+				foreach($mois as $m => $month) {
+					$total = 0;
+					foreach($valeurs as $k => $v) {
+						if ($v['annee'] == $a AND $v['mois'] == $m) {
+							$total = round($v['total'],2);
+						}
+					}
+					if ($total > 0) {
+						$html .= '<td>'.$total.'</td>';
+					}
+					else {
+						$html .= '<td>0</td>';
+					}
+				}
+			}
+			$html .= '</tr>';
 		}
-		$html .= '</tr>';
 		$html .= '</table>';
 		return $html;
 	}
