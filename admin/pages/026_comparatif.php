@@ -173,8 +173,8 @@ CSV;
 
 			$comparatif .= <<<HTML
 <tr>
-<td>{$data['id']}</td>
-<td>{$nom}</td>
+<td>{$page->l($data['id'], $url2->make("produits", array('type' => "produits", 'action' => 'edit', 'id' => $data['id'])))}</td>
+<td>{$page->l($nom, $url2->make("produits", array('type' => "produits", 'action' => 'edit', 'id' => $data['id'])))}</td>
 <td>{$data['ref']}</td>
 <td>{$types[$data['id_types_produits']]}</td>
 <td>{$statut}</td>
