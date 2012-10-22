@@ -46,57 +46,9 @@ class Paybox {
     		case "00020":
     			return $dico->t("CVVIncorrect");
     		default:
-    			return $dico->t("ErrorOccured");
+    			return $dico->t("ErrorOccured")." - {$code_erreur}";
 			
 		}
-	}
-	
-	function get_form(Form $form) {
-		$dico = $GLOBALS['dico'];
-		$form->template = <<<HTML
-<p>
-	#{label}
-	#{field}
-HTML;
-		$mois = array(
-			'01' => $dico->t("Janvier"),
-			'02' => $dico->t("Février"),
-			'03' => $dico->t("Mars"),
-			'04' => $dico->t("Avril"),
-			'05' => $dico->t("Mai"),
-			'06' => $dico->t("Juin"),
-			'07' => $dico->t("Juillet"),
-			'08' => $dico->t("Aout"),
-			'09' => $dico->t("Septembre"),
-			'10' => $dico->t("Octobre"),
-			'11' => $dico->t("Novembre"),
-			'12' => $dico->t("Decembre"),
-		);
-		$annee = array();
-		$current_year = (int) date("Y", time());
-		for ($year = $current_year ; $year < $current_year + 10 ; $year++) {
-			$y = $year - ((int) ($year / 100) * 100);
-			$annee[$y] = $year;
-		}
-		$str = <<<HTML
-{$form->input(array('name' => "paiement[carte]", 'type' => "text", 'label' => $dico->t("NumeroCarte")))}
-{$form->input(array('name' => "paiement[cvv]", 'type' => "text", 'label' => $dico->t("NumeroCVV")))}
-{$form->select(array('name' => "paiement[expiration][mois]", 'label' => $dico->t("DateExpiration"), 'options' => $mois))}
-HTML;
-		$form->template = <<<HTML
-#{field}
-</p>
-HTML;
-		$str .= <<<HTML
-{$form->select(array('name' => "paiement[expiration][annee]", 'options' => $annee))}
-HTML;
-		$form->template = <<<HTML
-<p>
-	#{label}
-	#{field}
-</p>
-HTML;
-		return $str;
 	}
 	
 	function post_request($url, $data, $optional_headers = null) {
