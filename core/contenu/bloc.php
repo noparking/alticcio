@@ -108,6 +108,19 @@ HTML;
 		return $id;
 	}
 
+	public function duplicate($data) {
+		unset($data['bloc']['id']);
+		$data['bloc']['nom'] = $this->get_next_name($data['bloc']['nom']);
+		return parent::duplicate($data);
+	}
+
+	public function get_next_name($name) {
+		if ($this->get_id_blocs($name)) {
+			return $this->get_next_name($name."_copie");
+		}
+		return $name;
+	}
+
 	public function verifier_existance($sub_blocs) {
 		foreach ($sub_blocs as $bloc_name) {
 			$q = "SELECT id FROM dt_blocs WHERE id = '$bloc_name' OR nom = '$bloc_name'";

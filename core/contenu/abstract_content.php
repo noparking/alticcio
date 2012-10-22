@@ -28,4 +28,14 @@ SQL;
 
 		return $row['id'];
 	}
+
+	public function duplicate($data) {
+		function abstract_content_duplicate_callback (&$value, $field) {
+			if (strpos($field, "phrase_") === 0) {
+				$value = 0;
+			}
+		}
+		array_walk_recursive($data, "abstract_content_duplicate_callback");
+		return $this->save($data);
+	}
 }

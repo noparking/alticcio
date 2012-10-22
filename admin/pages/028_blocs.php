@@ -67,7 +67,7 @@ if ($id = $url->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-bloc-$id",
 	'class' => "form-edit-bloc",
-	'actions' => array("save", "delete", "cancel"),
+	'actions' => array("save", "delete", "cancel", "duplicate"),
 	'required' => array("bloc[nom]"),
 	'check' => array(
 		'bloc[contenu]' => array("validate_html"),
@@ -116,7 +116,7 @@ HTML;
 						case -1 : $message = "Il existe déjà un bloc portant ce nom."; break;
 						case -2 : $message = "Ce bloc fait référence à un ou plusieurs blocs inexistants"; break;
 						case -3 : $message = "Erreur de dépendance de blocs"; break;
-						default : $message = "Unne erreur s'est produite"; break;
+						default : $message = "Une erreur s'est produite"; break;
 					}
 					$messages[] = <<<HTML
 <p class="message">
@@ -125,6 +125,10 @@ HTML;
 HTML;
 				}
 			}
+			break;
+		case "duplicate" :
+			$id = $bloc->duplicate($data);
+			$url->redirect("current", array('action' => "edit", 'id' => $id));
 			break;
 	}
 }
@@ -167,6 +171,7 @@ if ($action == "create" or $action == "edit") {
 }
 
 if ($action == "edit") {
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 	$main .= <<<HTML
 {$form->input(array('name' => "bloc[id]", 'type' => "hidden"))}
