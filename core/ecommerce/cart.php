@@ -111,14 +111,16 @@ class Cart {
 		}
 	}
 
-	public function qte_min_to_add($id_produits, $id_sku, $qte_min) {
+	public function qte_min_to_add($id_produits, $id_sku, $qte_min, $colisage = 0) {
 		$id = "$id_produits-$id_sku";
 		if (isset($_SESSION['cart']['items'][$id])) {
-			return max(1, $qte_min - $_SESSION['cart']['items'][$id]['qte']);
+			$qte_min = max(1, $qte_min - $_SESSION['cart']['items'][$id]['qte']);
 		}
-		else {
-			return $qte_min;
+		if ($colisage) {
+			$qte_min = ceil($qte_min / $colisage) * $colisage;
 		}
+
+		return $qte_min;
 	}
 
 	public function emptycart() {

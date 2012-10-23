@@ -605,14 +605,12 @@ SQL;
 	}
 
 	public function nom_commercial($phrases, $code_langue) {
-		if ($phrases['phrase_commercial'][$code_langue]) {
-			return $phrases['phrase_commercial'][$code_langue];
+		foreach (array('phrase_commercial', 'phrase_ultralog') as $phrase) {
+			if (isset($phrases[$phrase][$code_langue]) && $phrases[$phrase][$code_langue]) {
+				return $phrases[$phrase][$code_langue];
+			}
 		}
-		else if ($phrases['phrase_ultralog'][$code_langue]) {
-			return $phrases['phrase_ultralog'][$code_langue];
-		}
-		else {
-			return "";
-		}
+		
+		return "";
 	}
 }
