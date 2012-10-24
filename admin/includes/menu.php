@@ -160,10 +160,10 @@ $menus = array(
 				//'url' => $url->make("StatsEmailingList", array("action" => "list")),
 				'level' => 30,
 				'items' => array(
-					'emailing' => array(
-						'level' => 60,
-						'label' => $dico->t('Emailings'),
-						'url' => $url->make("StatsEmailingList"),
+                        'commandes' => array(
+						'level' => 30,
+						'label' => $dico->t('Commandes'),
+						'url' => $url2->make("StatsCommandes", array("action" => "")),
 					),
 					'messages' => array(
 						'level' => 40,
@@ -185,10 +185,15 @@ $menus = array(
 						'label' => $dico->t('Visites produits'),
 						'url' => $url->make("StatsVisitesProduits", array("action" => "")),
 					),
-                        'commandes' => array(
+                        'shorturl' => array(
 						'level' => 30,
-						'label' => $dico->t('Commandes'),
-						'url' => $url2->make("StatsCommandes", array("action" => "")),
+						'label' => $dico->t('ShortUlr'),
+						'url' => $url2->make("StatsShorturl", array("action" => "")),
+					),
+                        'emailing' => array(
+						'level' => 60,
+						'label' => $dico->t('Emailings'),
+						'url' => $url->make("StatsEmailingList"),
 					),
 				),
 			),
