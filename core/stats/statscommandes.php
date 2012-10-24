@@ -40,18 +40,18 @@ class StatsCommandes {
 	public function afficher_tableau($valeurs) {
 		$i = 0;
 		$prev_annee = 0;
-		$mois = array(	"01" => $this->dico->t('Janvier'),
-				    "02" => $this->dico->t('Fevrier'),
-				    "03" => $this->dico->t('Mars'),
-				    "04" => $this->dico->t('Avril'),
-				    "05" => $this->dico->t('Mai'),
-				    "06" => $this->dico->t('Juin'),
-				    "07" => $this->dico->t('Juillet'),
-				    "08" => $this->dico->t('Aout'),
-				    "09" => $this->dico->t('Septembre'),
-				    "10" => $this->dico->t('Octobre'),
-				    "11" => $this->dico->t('Novembre'),
-				    "12" => $this->dico->t('Decembre') );
+		$mois = array(	"01" => $this->dico->t('MoisJanvier'),
+				    "02" => $this->dico->t('MoisFevrier'),
+				    "03" => $this->dico->t('MoisMars'),
+				    "04" => $this->dico->t('MoisAvril'),
+				    "05" => $this->dico->t('MoisMai'),
+				    "06" => $this->dico->t('MoisJuin'),
+				    "07" => $this->dico->t('MoisJuillet'),
+				    "08" => $this->dico->t('MoisAout'),
+				    "09" => $this->dico->t('MoisSeptembre'),
+				    "10" => $this->dico->t('MoisOctobre'),
+				    "11" => $this->dico->t('MoisNovembre'),
+				    "12" => $this->dico->t('MoisDecembre') );
 		
 		// on recense les années
 		$annees = array();

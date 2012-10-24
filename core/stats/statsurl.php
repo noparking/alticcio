@@ -6,50 +6,80 @@
 
 class StatsUrl {
 	
-	public function __construct($sql = null, $dico, $annee) {
+	public function __construct($sql = null, $dico) {
 		$this->sql = $sql;
 		$this->dico = $dico;
-		$this->annee = $annee;
 	}
-	
-	private function timestamp_debut() {
-		return mktime(0, 0, 0, 1, 1, $this->annee);
-	}
-	
-	private function timestamp_fin() {
-		return mktime(0, 0, 0, 1, 1, ($this->annee + 1));
-	}
-	
-	private function lister_resultats() {
-		$debut = $this->timestamp_debut();
-		$fin = $this->timestamp_fin();
-		$q = 'SELECT DATE_FORMAT(FROM_UNIXTIME(s.date_requete), "%m") AS month, COUNT(*) AS total
+		
+	public function lister_resultats() {
+		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(s.date_requete), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(s.date_requete), '%m') AS mois, COUNT(*) AS total
 				FROM shorturl_log as s
-				WHERE s.date_requete > '.$debut.' AND s.date_requete < '.$fin.'
-				GROUP BY month ';
+				GROUP BY annee, mois
+				ORDER BY annee, mois ";
 		$rs = $this->sql->query($q);
-		$row = $this->sql->fetch($rs);
-		return $row;
+		$tab = array();
+		while ($row = $this->sql->fetch($rs)) {
+			$tab[] = $row;
+		};
+		return $tab;
 	}
 
-	public function tableau_resultats($months) {
-		$resultats = $this->lister_resultats();
-		$html = '<table id="" name="" summary="">';
-		$html .= '<thead>';
-		$html .= '<tr>';
-		foreach($months as $key => $value) {
-			$html .= '<td>'.$value.'</td>';
+	public function afficher_tableau($valeurs) {
+		$i = 0;
+		$prev_annee = 0;
+		$mois = array(	"01" => $this->dico->t('MoisJanvier'),
+				    "02" => $this->dico->t('MoisFevrier'),
+				    "03" => $this->dico->t('MoisMars'),
+				    "04" => $this->dico->t('MoisAvril'),
+				    "05" => $this->dico->t('MoisMai'),
+				    "06" => $this->dico->t('MoisJuin'),
+				    "07" => $this->dico->t('MoisJuillet'),
+				    "08" => $this->dico->t('MoisAout'),
+				    "09" => $this->dico->t('MoisSeptembre'),
+				    "10" => $this->dico->t('MoisOctobre'),
+				    "11" => $this->dico->t('MoisNovembre'),
+				    "12" => $this->dico->t('MoisDecembre') );
+		
+		// on recense les années
+		$annees = array();
+		$annees[] = "";
+		foreach($valeurs as $k => $v) {
+			if ($prev_annee != $v['annee']) {
+				$annees[] = $v['annee'];
+			}
+			$prev_annee = $v['annee'];
 		}
-		$html .= '</tr>';
-		$html .= '</thead>';
-		$html .= '<tbody>';
-		$html .= '<tr>';
-		foreach($resultats as $k => $v) {
-			$html .= '<td>'.$value.'</td>';
+		
+		// On génére le tableau HTML
+		$html = '<table>';
+		foreach($annees as $a) {
+			$html .= '<tr>';
+			$html .= '<td>'.$a.'</td>';
+			if (empty($a)) {
+				foreach($mois as $m => $month) {
+					$html .= '<td>'.$month.'</td>';
+				}
+			}
+			else {
+				foreach($mois as $m => $month) {
+					$total = 0;
+					foreach($valeurs as $k => $v) {
+						if ($v['annee'] == $a AND $v['mois'] == $m) {
+							$total = round($v['total'],2);
+						}
+					}
+					if ($total > 0) {
+						$html .= '<td>'.$total.'</td>';
+					}
+					else {
+						$html .= '<td>0</td>';
+					}
+				}
+			}
+			$html .= '</tr>';
 		}
-		$html .= '</tr>';
-		$html .= '</tbody>';
 		$html .= '</table>';
+		return $html;
 	}
 }
 ?>
