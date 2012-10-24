@@ -107,6 +107,7 @@ if ($form->is_submitted()) {
 			break;
 		default:
 			if ($form->validate()) {
+				$data['blogpost']['id_users'] = $_SESSION['extranet']['user']['id'];
 				$id_billets = $url_redirection->save_object($blogpost, $data, array('titre_url' => "titre"));
 				if ($id_billets === false) {
 					$messages = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
@@ -260,18 +261,17 @@ HTML;
 		$q = <<<SQL
 SELECT DISTINCT(b.id), b.titre, u.login, lg.code_langue, b.affichage, b.date_affichage 
 FROM dt_billets AS b
-INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
-INNER JOIN dt_langues AS lg ON lg.id = b.id_langues
-INNER JOIN dt_themes_blogs AS tb ON tb.id = btb.id_themes_blogs
-INNER JOIN dt_users AS u ON u.id = b.id_users
+LEFT OUTER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
+LEFT OUTER JOIN dt_langues AS lg ON lg.id = b.id_langues
+LEFT OUTER JOIN dt_themes_blogs AS tb ON tb.id = btb.id_themes_blogs
+LEFT OUTER JOIN dt_users AS u ON u.id = b.id_users
 SQL;
 		if ($user_data['id_groupes_users'] != 99) {
-			$blogthemes = array();
-			foreach ($user->blogthemes() as $theme) {
-				$blogthemes[] = $theme['id'];
-			}
-			$bloglangues = array_keys($user->bloglangues());
-			$q .= " WHERE lg.id IN (".implode(",", $bloglangues).") AND tb.id IN (".implode(",", $blogthemes).")";
+			$q .= "\n".<<<SQL
+LEFT OUTER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = tb.id 
+LEFT OUTER JOIN dt_users_blogs AS ub ON ub.id_blogs = bltb.id_blogs
+WHERE ub.id_users = {$user_data['id']} OR b.id_users = {$user_data['id']}
+SQL;
 		}
 		$pager = new Pager($sql, array(20, 30, 50, 100, 200));
 		$filter = new Filter($pager, array(
