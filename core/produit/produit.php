@@ -127,7 +127,7 @@ DELETE FROM dt_personnalisations_produits WHERE id_produits = $id
 SQL;
 				$this->sql->query($q);
 			foreach ($data['personnalisation'] as $type => $perso) {
-				if ($perso['has']) {
+				if (isset($perso['has']) and $perso['has']) {
 					$q = <<<SQL
 INSERT INTO dt_personnalisations_produits (`id_produits`, `type`, `libelle`)
 VALUES ($id, '$type', '{$perso['libelle']}')

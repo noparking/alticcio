@@ -651,7 +651,7 @@ class TestOfForm extends UnitTestCase {
 		$params = array(
 			'name' => "save",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		// permissions pour sauvegarder un objet
 		$form = new Form(array(
@@ -663,12 +663,12 @@ class TestOfForm extends UnitTestCase {
 		$params = array(
 			'name' => "save",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		$params = array(
 			'name' => "delete",
 		);
-		$this->assertFalse($form->is_permitted($params));
+		$this->assertFalse($form->is_permitted("submit", $params));
 
 		// permissions pour sauvegarder n'importe quoi
 		$form = new Form(array(
@@ -680,12 +680,12 @@ class TestOfForm extends UnitTestCase {
 		$params = array(
 			'name' => "save",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		$params = array(
 			'name' => "delete",
 		);
-		$this->assertFalse($form->is_permitted($params));
+		$this->assertFalse($form->is_permitted("submit", $params));
 
 		// permissions de faire n'importe quoi sur les objets
 		$form = new Form(array(
@@ -697,12 +697,12 @@ class TestOfForm extends UnitTestCase {
 		$params = array(
 			'name' => "save",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		$params = array(
 			'name' => "delete",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		// permissions de faire n'importe quoi sur n'importe quoi
 		$form = new Form(array(
@@ -714,11 +714,132 @@ class TestOfForm extends UnitTestCase {
 		$params = array(
 			'name' => "save",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
 
 		$params = array(
 			'name' => "delete",
 		);
-		$this->assertTrue($form->is_permitted($params));
+		$this->assertTrue($form->is_permitted("submit", $params));
+
+		// permissions forcée pour une action
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "reset",
+			'permitted' => true,
+		);
+		$this->assertTrue($form->is_permitted("submit", $params));
+
+		// permissions ou non de sauvegarder un champ texte
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertTrue($form->is_permitted("text", $params));
+
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array(),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertFalse($form->is_permitted("text", $params));
+
+		// permissions ou non de sauvegarder un champ textarea
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertTrue($form->is_permitted("textarea", $params));
+
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array(),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertFalse($form->is_permitted("textarea", $params));
+
+		// permissions ou non de sauvegarder un champ select
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('save objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertTrue($form->is_permitted("select", $params));
+
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array(),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "nom",
+		);
+		$this->assertFalse($form->is_permitted("select", $params));
+
+		// permissions ou non de traduire un champ texte
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('translate objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "phrases[phrase_nom]",
+		);
+		$this->assertTrue($form->is_permitted("text", $params));
+
+		$params = array(
+			'name' => "prix",
+		);
+		$this->assertFalse($form->is_permitted("text", $params));
+
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('translate other_objet'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "phrases[phrase_nom]",
+		);
+		$this->assertFalse($form->is_permitted("text", $params));
+
+		$form = new Form(array(
+			'id' => "my-form",
+			'permissions' => array('translate all'),
+			'permissions_object' => "objet", 
+		));
+
+		$params = array(
+			'name' => "phrases[phrase_nom]",
+		);
+		$this->assertTrue($form->is_permitted("text", $params));
 	}
 }

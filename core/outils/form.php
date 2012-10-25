@@ -261,17 +261,41 @@ class Form {
   	return "</fieldset>";
   }
   
-	public function is_permitted($param) {
+	public function is_permitted($type, $params) {
 		if (!isset($this->permissions) or !isset($this->permissions_object)
-			or in_array($param['name'].' '.$this->permissions_object, $this->permissions)
+			or (isset($params['permitted']) and $params['permitted'])
 			or in_array('all '.$this->permissions_object, $this->permissions)
-			or in_array($param['name'].' all', $this->permissions)
 			or in_array('all', $this->permissions)) {
-				return true;
+			return true;
 		}
-		else {
-			return false;
+		if (in_array($type, array("text", "checkbox", "textarea", "select",	"radio", "date"))) {
+			if (!in_array('save '.$this->permissions_object, $this->permissions)
+				and !in_array('save all', $this->permissions)
+				and !(($params['name'] == "lang" or strpos($params['name'], "phrases[") === 0) 
+					and (in_array('translate '.$this->permissions_object, $this->permissions)
+						or in_array('translate all', $this->permissions)
+						)
+					)
+				) {
+				return false;
+			}
 		}
+		if ($type == "submit") {
+			if ($params['name'] == "save") {
+				if (!in_array('save '.$this->permissions_object, $this->permissions)
+					and !in_array('save all', $this->permissions)
+					and !in_array('translate '.$this->permissions_object, $this->permissions)
+					and !in_array('translate all', $this->permissions)) {
+					return false;
+				}
+			}
+			else if (!in_array($params['name'].' '.$this->permissions_object, $this->permissions)
+				and !in_array($params['name'].' all', $this->permissions)) {
+				return false;
+			}
+		}
+		
+		return true; // par défaut pour les champs chachés, html, etc.
 	}
 	
   public function html($html) {
@@ -292,7 +316,6 @@ class Form {
 			$params['field'] .= '<ul class="'.$this->form_class.'-input-item"><li>';
 		}
 		$fields = array();
-		$readonly_fields = array();
 		foreach ($items as $item => $item_label) {
 			$type = $params['type'] = isset($params['type']) ? $params['type'] : "text";
 			$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
@@ -312,8 +335,10 @@ class Form {
 			$hiddenfield = "";
 
 			$permitted = "";
-			if (!$this->is_permitted($params)) {
-				if ($type == "submit" and !$disabled) {
+			$is_permitted = true;
+			if (!$this->is_permitted($type, $params)) {
+				$is_permitted = false;
+				if (!$disabled and ($type == "submit" or $type == "checkbox")) {
 					$disabled = ' disabled="disabled"';
 					$class .= " disabled";
 				}
@@ -340,7 +365,12 @@ class Form {
 					$onclick = " onclick=\"form_action = document.getElementById('$id').name;$target\" onfocus=\"form_action = document.getElementById('$id').name;\" onblur=\"form_action='default'\"";
 					break;
 				case "checkbox" :
-					$hiddenfield = '<input type="hidden" name="checkboxes[]" value="'.$name.'" />';
+					if ($is_permitted) {
+						$hiddenfield = '<input type="hidden" name="checkboxes[]" value="'.$name.'" />';
+					}
+					else if ($checked) {
+						$hiddenfield = '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+					}
 					break;
 			}
 			$attr = "";
@@ -417,7 +447,7 @@ class Form {
 		}
 		$fields = array();
 
-		if ($is_permitted = $this->is_permitted($params)) {
+		if ($is_permitted = $this->is_permitted('textarea', $params)) {
 			$permitted = "";
 		}
 		else{
@@ -465,8 +495,15 @@ class Form {
 				$options[$cle] = $valeur;
 			}
 		}
+
+		if ($is_permitted = $this->is_permitted('select', $params)) {
+			$permitted = "";
+		}
+		else{
+			$permitted = ' disabled="disabled"';
+		}
 		
-		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'">';
+		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.'>';
 		foreach ($options as $cle => $valeur) {
     		$params['field'] .= '<option value="'.$cle.'"';
     		if ($value !== "" and $value == $cle) {
@@ -499,8 +536,14 @@ class Form {
 		$params['class'] = $class;
 		$value = $this->get_value($params);
 		$options = isset($params['options']) ? $params['options'] : array();
-		
-		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'">';
+
+		if ($is_permitted = $this->is_permitted('select', $params)) {
+			$permitted = "";
+		}
+		else{
+			$permitted = ' disabled="disabled"';
+		}
+		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.'>';
 		$optgroup = "";
 		foreach ($options as $cle => $valeur) {
 			if ($optgroup != $valeur['group']) {
@@ -533,6 +576,13 @@ class Form {
 		}
 		$params['class'] = $class;
 		$value = $this->get_value($params);
+
+		if ($is_permitted = $this->is_permitted('radio', $params)) {
+			$permitted = "";
+		}
+		else{
+			$permitted = ' disabled="disabled"';
+		}
 		$options = isset($params['options']) ? $params['options'] : array();
 		
 		$params['field'] = '<ul class="'.$class.'">';
@@ -609,7 +659,7 @@ HTML;
 		$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
 		$format = $params['format'] = isset($params['format']) ? $params['format'] : $this->date_format;
 		$id = $params['id'] = isset($params['id']) ? $params['id'] : $this->id_by_name($name);
-		$class = $this->form_class."-input ".$this->form_class."-input-date";
+		!v!?
 		if (isset($params['class'])) {
 			$class .= " ".$params['class'];
 		}
@@ -617,8 +667,14 @@ HTML;
 		$value = $this->get_value($params);
 		$disabled = (isset($params['disabled']) and $params['disabled']) ? 'disabled="disabled"': "";
 		
+		if ($is_permitted = $this->is_permitted('date', $params)) {
+			$permitted = "";
+		}
+		else{
+			$permitted = ' readonly="readonly"';
+		}
 		$params['field'] = '<input type="hidden" name="'.$name.'" id="'.$id.'" value="'.$value.'" />';
-		$params['field'] .= '<input name="" id="'.$id.'-visible" value="'.($value ? date($format, $value) : "").'" class="date-input '.$class.'" '.$disabled.' />';
+		$params['field'] .= '<input name="" id="'.$id.'-visible" value="'.($value ? date($format, $value) : "").'" class="date-input '.$class.'" '.$disabled.$permitted.' />';
 		
 		return $this->render_element($params);
 	}

@@ -276,7 +276,7 @@ if ($user->has_one_perm(array("create all", "create produit"))) {
 if ($action == "create" or $action == "edit") {
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser'), 'permitted' => true ));
 	$buttons[] = $page->l($dico->t('FicheTechnique'), $url3->make("FicheTechnique", array('id' => $id)));
 	//$buttons[] = $page->l($dico->t('FichePerso'), $url3->make("FichePerso", array('id' => $id)));
 }
