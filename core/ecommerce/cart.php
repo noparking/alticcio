@@ -174,17 +174,15 @@ SQL;
 		}
 		$sku_ids = implode(",", $sku_ids);
 		$q = <<<SQL
-SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.montant_ht FROM dt_sku AS s
+SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog FROM dt_sku AS s
 LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = $id_langues
 LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = $id_langues
-LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id
 WHERE s.id IN ($sku_ids)
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$data[$row['id']]['nom'] = addslashes($row['phrase_commercial'] ? $row['phrase_commercial'] : $row['phrase_ultralog']);
 			$data[$row['id']]['ref'] = $row['ref_ultralog'];
-			$data[$row['id']]['prix_unitaire'] = $row['montant_ht'];
 		}
 		foreach ($_SESSION['cart']['personnalisations'] as $perso) {
 			$id_sku = $perso["id_sku"];
@@ -193,7 +191,7 @@ SQL;
 				'id_sku' => $id_sku,
 				'ref' => $data[$id_sku]['ref'],
 				'nom' =>  $data[$id_sku]['nom'],
-				'prix_unitaire' =>  $data[$id_sku]['prix_unitaire'],
+				'prix_unitaire' =>  $this->prix_unitaire_pour_qte($id_sku, $perso['qte']),
 				'quantite' => $perso['qte'],
 				'personnalisation_texte' => $perso['texte'],
 				'personnalisation_fichier' => $perso['fichier'],
@@ -206,6 +204,30 @@ SQL;
 		}
 
 		return $produits;
+	}
+
+	public function prix_unitaire_pour_qte($id_sku, $qte, $id_catalogues = 0) {
+		$q = <<<SQL
+SELECT MIN(montant_ht) AS prix FROM dt_prix_degressifs
+WHERE id_sku = $id_sku AND quantite <= $qte AND id_catalogues = $id_catalogues
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		if ($row['prix']) {
+			$prix = $row['prix'];
+		}
+		else {
+			$q = <<<SQL
+SELECT montant_ht FROM dt_prix
+WHERE id_sku = $id_sku AND id_catalogues = $id_catalogues
+SQL;
+			$res = $this->sql->query($q);
+			$row = $this->sql->fetch($res);
+			$prix = $row['montant_ht'];
+		}
+
+		return $prix;
 	}
 
 	public function set_token() {
