@@ -263,22 +263,32 @@ HTML;
 		}
 	}
 	
-	public function selectbox($id) {
+	public function selectbox($id, $enabled = true) {
 		
 		$checked = "";
 		if ((in_array($id, $this->selected()) and !$this->inverted) or (!in_array($id, $this->selected()) and $this->inverted)) {
 			$checked = 'checked="checked"';
 		}
 		$this->items[] = $id;
-		
-		return <<<HTML
+
+		if ($enabled) {
+			return <<<HTML
 <input class="filter-selected" name="{$this->name}[selected][{$id}]" type="checkbox" value="1" $checked />
 HTML;
+		}
+		else {
+			$value = $checked ? 1 : 0;
+			return <<<HTML
+<input name="{$this->name}[selected][{$id}]" type="hidden" value="{$value}" />
+<input class="filter-selected" name="{$this->name}[selected-disabled][{$id}]" type="checkbox" disabled="disabled" value="1" $checked />
+HTML;
+		}
 	}
 	
-	public function allpagebox() {
+	public function allpagebox($enabled = true) {
+		$disabled = $enabled ? '' : ' disabled="disabled"';
 		return <<<HTML
-<input class="filter-allpage" name="{$this->name}[allpage]" type="checkbox" value="1" />
+<input class="filter-allpage" name="{$this->name}[allpage]" type="checkbox" value="1" {$disabled} />
 HTML;
 	}
 	

@@ -4,6 +4,13 @@ global $config, $page, $dico, $pager, $filter, $form;
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("filter.js");
 
+if (isset($form) and $form) {
+	$is_permitted = $form->is_permitted("checkbox", array("name" => ""));
+}
+else {
+	$is_permitted = true;
+}
+
 $html = <<<HTML
 <div class="filter-pager">
 	{$page->inc("snippets/pager")} |
@@ -19,7 +26,7 @@ $html = <<<HTML
 <table id="table_pager">
 <thead>
 <tr>
-<th>{$filter->allpagebox()}</th>
+<th>{$filter->allpagebox($is_permitted)}</th>
 HTML;
 	foreach ($filter->elements() as $element) {
 		$html .= <<<HTML
@@ -50,7 +57,7 @@ HTML;
 		$html .= <<<HTML
 <tr class="filter-data-row">
 <td>
-{$filter->selectbox($row['id'])}
+{$filter->selectbox($row['id'], $is_permitted)}
 </td>
 HTML;
 		foreach ($row as $cle => $valeur) {
