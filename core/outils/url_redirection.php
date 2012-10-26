@@ -161,8 +161,8 @@ SQL;
 		}
 
 		$q = <<<SQL
-SELECT ur.id_langues, ur.code_url, ur.table, ur.variable, l.code_langue FROM dt_url_redirections AS ur
-INNER JOIN dt_url_redirections_contenu AS urc ON urc.id_url_redirections = ur.id
+SELECT ur.id_langues, ur.code_url, ur.table, ur.variable, l.code_langue FROM dt_url_redirections_contenu AS urc
+INNER JOIN dt_url_redirections AS ur ON urc.id_url_redirections = ur.id AND ur.niveau = 1
 INNER JOIN dt_langues AS l ON ur.id_langues = l.id
 WHERE MATCH(urc.contenu) AGAINST ('$terme')
 SQL;
