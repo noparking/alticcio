@@ -268,7 +268,7 @@ class Form {
 			or in_array('all', $this->permissions)) {
 			return true;
 		}
-		if (in_array($type, array("text", "checkbox", "textarea", "select",	"radio", "date"))) {
+		if (in_array($type, array("text", "checkbox", "textarea", "select",	"radio", "date", "file"))) {
 			if (!in_array('save '.$this->permissions_object, $this->permissions)
 				and !in_array('save all', $this->permissions)
 				and !(($params['name'] == "lang" or strpos($params['name'], "phrases[") === 0) 
@@ -338,7 +338,7 @@ class Form {
 			$is_permitted = true;
 			if (!$this->is_permitted($type, $params)) {
 				$is_permitted = false;
-				if (!$disabled and ($type == "submit" or $type == "checkbox")) {
+				if (!$disabled and in_array($type, array("submit", "checkbox", "file"))) {
 					$disabled = ' disabled="disabled"';
 					$class .= " disabled";
 				}
@@ -593,7 +593,7 @@ class Form {
 			$params['field'] .= '<li class="'.$class.'">';
 			$params['field'] .= '<input type="radio" id="'."$id-$cle".'" name="'.$name.'" value="'.$cle.'" class="'.$class.'"';
 			if ($value == $cle) $params['field'] .= ' checked="checked"';
-			$params['field'] .= ' /><label for="'."$id-$cle".'" class="'.$class.'">'.$valeur.'</label></li>';
+			$params['field'] .= $permitted.' /><label for="'."$id-$cle".'" class="'.$class.'">'.$valeur.'</label></li>';
 		}
 		$params['field'] .= '</ul>';
 		
