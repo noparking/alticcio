@@ -659,7 +659,7 @@ HTML;
 		$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
 		$format = $params['format'] = isset($params['format']) ? $params['format'] : $this->date_format;
 		$id = $params['id'] = isset($params['id']) ? $params['id'] : $this->id_by_name($name);
-		!v!?
+		$class = $this->form_class."-input ".$this->form_class."-input-date";
 		if (isset($params['class'])) {
 			$class .= " ".$params['class'];
 		}
