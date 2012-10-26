@@ -157,7 +157,7 @@ FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
 INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs
 WHERE b.affichage = 1 AND bltb.id_blogs = $id_blogs
-ORDER BY date_creation
+ORDER BY date_affichage DESC
 LIMIT 0, $nb
 SQL;
 		$billets = array();
