@@ -178,8 +178,8 @@ SQL;
 	public function search_count($s) {
 		$s = addslashes(trim($this->lowercase($s)));
 		$q = <<<SQL
-SELECT COUNT(ur.id) AS nb FROM dt_url_redirections AS ur
-INNER JOIN dt_url_redirections_contenu AS urc ON urc.id_url_redirections = ur.id
+SELECT COUNT(ur.id) AS nb FROM dt_url_redirections_contenu AS urc
+INNER JOIN dt_url_redirections AS ur ON urc.id_url_redirections = ur.id AND ur.niveau = 1
 INNER JOIN dt_langues AS l ON ur.id_langues = l.id
 WHERE MATCH(urc.contenu) AGAINST ('$s')
 SQL;
