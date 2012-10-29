@@ -98,9 +98,9 @@ class Dico {
 		return $term;
 	}
 
-	public function prix($prix, $suffix = "") {
-		if ($prix == 0) {
-			return $this->t("ADeviser");
+	public function prix($prix, $suffix = "", $alt = null) {
+		if ($prix == 0 and $alt !== null) {
+			return $alt;
 		}
 		$data = $this->data['prix'];
 		$montant = number_format($prix * $data['facteur'], $data['decimals'], $data['dec_point'], $data['thousands_sep']);
