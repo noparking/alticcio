@@ -1,5 +1,5 @@
 <?php
-class Paybox {
+class Paybox_DirectPlus {
 	public $site = "";
 	public $type = "";
 	public $rang = "";
@@ -26,7 +26,6 @@ class Paybox {
 		$this->reference = $config->get("paybox_reference");
 		$this->activite = $config->get("paybox_activite");
 		$this->differe = $config->get("paybox_differe");
-		$this->activite = $config->get("paybox_activite");
 		$this->devise = $config->get("paybox_devise");
 		$this->identifiant = $config->get("paybox_identifiant");
 	}
