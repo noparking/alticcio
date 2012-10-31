@@ -101,8 +101,13 @@ if ($form->is_submitted()) {
 		default :
 			if ($action == "edit") {
 				if ($form->validate()) {
-					$id_saved =
-						$url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
+					$selected_produits = $filter->selected();
+					foreach ($data['produits'] as $id_produits => $p) {
+						if (!in_array($id_produits, $selected_produits)) {
+							unset($data['produits'][$id_produits]);
+						}
+					}
+					$id_saved = $url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
 					if ($id_saved === false) {
 						$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 					}
@@ -166,7 +171,7 @@ HTML;
 	$categorie->all_produits($filter);
 	$main .= $page->inc("snippets/filter-form");
 	foreach ($filter->selected() as $selected_produit) {
-		$main .= $form->hidden(array('name' => "produits[$selected_produit][classement]"));
+		$main .= "\n".$form->hidden(array('name' => "produits[$selected_produit][classement]"));
 	}
 	$main .= <<<HTML
 {$form->fieldset_end()}
