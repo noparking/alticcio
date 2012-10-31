@@ -218,8 +218,8 @@ class Form {
 
 	public function first_or_next_or_previous() {
 		if (isset($_SERVER['HTTP_REFERER'])) {
-			$referer = preg_replace("/\/\d+/", "", $_SERVER['HTTP_REFERER']);
-			$uri = preg_replace("/\/\d+/", "", $_SERVER['REQUEST_URI']);
+			$referer = preg_replace("/\/\d+$/", "", $_SERVER['HTTP_REFERER']);
+			$uri = preg_replace("/\/\d+$/", "", $_SERVER['REQUEST_URI']);
 			if ($referer == "http://".$_SERVER['HTTP_HOST'].$uri) {
 	  			return $this->next_or_previous();
 			}
