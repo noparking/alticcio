@@ -4,17 +4,17 @@ class Paybox_DirectPlus {
 	public $type = "";
 	public $rang = "";
 	public $reference = "";
-	public $version = "00104";
+	public $version = "";
 	public $cle = "";
 	public $identifiant = "";
 	public $devise = "";
-	public $activite = "024";
-	public $archivage = "aaaaaa";
-	public $differe = "000";
+	public $activite = "";
+	public $archivage = "";
+	public $differe = "";
 	public $autorisation = "";
-	public $pays = "FRA";
-	public $num_trans = "0000526489";
-	public $num_appel = "0000436527";
+	public $pays = "";
+	public $num_trans = "";
+	public $num_appel = "";
 	public $code_retour;
 	public $question = "";
 	

@@ -14,13 +14,14 @@ class Paybox_System {
 	public $effectue;
 	public $refuse;
 	public $repondre_a;
-	
+	public $pubKey;
 	public $total;
 	public $cmd;
 	public $porteur;
 	public $hash = "SHA512";
 	public $hmac;
 	public $time;
+	public $data;
 	
 	function __construct(Config $config) {
 		$this->site = $config->get("paybox_site");
@@ -37,6 +38,7 @@ class Paybox_System {
 		$this->effectue = $config->get("paybox_payment_effectue");
 		$this->refuse = $config->get("paybox_payment_refuse");
 		$this->repondre_a = $config->get("paybox_payment_validate");
+		$this->pubKey = $config->get("paybox_public_key");
 	}
 	
 	function generateHmac($message) {
@@ -57,78 +59,112 @@ class Paybox_System {
 	}
 	
 	function buildForm() {
+		$this->time = date("c");
+		$values = array(
+			'PBX_SITE' => $this->site,
+			'PBX_RANG' => $this->rang,
+			'PBX_IDENTIFIANT' => $this->identifiant,
+			'PBX_TOTAL' => $this->total,
+			'PBX_DEVISE' => $this->devise,
+			'PBX_CMD' => $this->cmd,
+			'PBX_PORTEUR' => $this->porteur,
+			'PBX_RETOUR' => $this->retour,
+			'PBX_EFFECTUE' => $this->effectue,
+			'PBX_ANNULE' => $this->annule,
+			'PBX_REFUSE' => $this->refuse,
+			//'PBX_REPONDRE_A' => $this->repondre_a,
+			'PBX_HASH' => $this->hash,
+			'PBX_TIME' => $this->time,
+			'PBX_HMAC' => "",
+		);
 		$server = $this->getOnlineServer();
-		$message = $this->createMessage();
+		$message = $this->createMessage($values);
 		$this->generateHmac($message);
-		var_dump($message);
-		$this->urlencode("time");
+		$values['PBX_HMAC'] = $this->hmac;
 		$form = <<<HTML
 <form method="post" action="{$server}">
-	<input type="hidden" name="PBX_SITE" value="{$this->site}" />
-	<input type="hidden" name="PBX_RANG" value="{$this->rang}" />
-	<input type="hidden" name="PBX_IDENTIFIANT" value="{$this->identifiant}" />
-	<input type="hidden" name="PBX_TOTAL" value="{$this->total}" />
-	<input type="hidden" name="PBX_DEVISE" value="{$this->devise}" />
-	<input type="hidden" name="PBX_CMD" value="{$this->cmd}" />
-	<input type="hidden" name="PBX_PORTEUR" value="{$this->porteur}" />
-	<input type="hidden" name="PBX_RETOUR" value="{$this->retour}" />
-	<input type="hidden" name="PBX_HASH" value="{$this->hash}" />
-	<input type="hidden" name="PBX_TIME" value="{$this->time}" />
-	<input type="hidden" name="PBX_EFFECTUE" value="{$this->effectue}" />
-	<input type="hidden" name="PBX_ANNULE" value="{$this->annule}" />
-	<input type="hidden" name="PBX_REFUSE" value="{$this->refuse}" />
-	<input type="hidden" name="PBX_REPONDRE_A" value="{$this->repondre_a}" />
 HTML;
-	if ($this->paybox) {
+		foreach ($values as $key => $value) {
+			$form .= <<<HTML
+<input type="hidden" name="{$key}" value="{$value}" />
+HTML;
+		}
 		$form .= <<<HTML
-<input type="hidden" name="PBX_PAYBOX" value="{$this->paybox}" />
-<input type="hidden" name="PBX_BACKUP1" value="{$this->backup1}" />
-<input type="hidden" name="PBX_BACKUP2" value="{$this->backup2}" />
-HTML;
-	}
-	$form .= <<<HTML
-	<input type="hidden" name="PBX_HMAC" value="{$this->hmac}">
-	<input type="submit" value="Envoyer">
+	<input type="submit" value="Envoyer" />
 </form>	
 HTML;
 		return $form;
 	}
 	
-	function createMessage() {
-		$this->time = date("c", time());
-		$message = <<<URL
-PBX_SITE={$this->site}
-&PBX_RANG={$this->rang}
-&PBX_IDENTIFIANT={$this->identifiant}
-&PBX_TOTAL={$this->total}
-&PBX_DEVISE={$this->devise}
-&PBX_CMD={$this->cmd}
-&PBX_PORTEUR={$this->porteur}
-&PBX_RETOUR={$this->retour}
-&PBX_HASH={$this->hash}
-&PBX_TIME={$this->time}
-&PBX_EFFECTUE={$this->effectue}
-&PBX_ANNULE={$this->annule}
-&PBX_REFUSE={$this->refuse}
-&PBX_REPONDRE_A={$this->repondre_a}
-URL;
-		if ($this->paybox) {
-			$message .= <<<URL
-&PBX_PAYBOX={$this->paybox}
-&PBX_BACKUP1={$this->backup1}
-&PBX_BACKUP2={$this->backup2}
-URL;
+	function createMessage($values) {
+		$str = "";
+		foreach ($values as $key => $value) {
+			if ($key != "PBX_HMAC") {
+				if ($str != "") {
+					$str .= "&";
+				}
+				$str .= "$key=$value";
+			}
 		}
-		return $message;
+		return $str;
 	}
 	
-	function urlencode($var) {
-		if (is_array($var)) {
-			foreach ($var as $value) {
-				$this->urlencode($value);
-			}
-		} else {
-			$this->$var = urlencode($this->$var);
+	function array_urlencode($var) {
+		$array = array();
+		foreach ($var as $key =>$value) {
+			$array[$key] = urlencode($value);
 		}
+		return $array;
+	}
+	
+	function describeError() {
+		$array = array();
+		parse_str($this->data, $array);
+		$dico = $GLOBALS['dico'];
+		switch ($array['erreur']) {
+			case "00016":
+				return $dico->t("AlreadyRegistered");
+			case "00004":
+			case "00014":
+			case "00097":
+				return $dico->t("CarteInvalide");
+			case "00007":
+			case "00008":
+				return $dico->t("DateExpirationInvalide");
+			case "00020":
+				return $dico->t("CVVIncorrect");
+			default:
+				return $dico->t("ErrorOccured")." - {$code_erreur}";	
+		}
+	}
+	
+	function traitementRetour() {
+		$fsize =  filesize($this->pubKey);
+		$fp = fopen($this->pubKey, 'r');
+		$filedata = fread($fp, $fsize);
+		fclose($fp);
+		$key = openssl_pkey_get_public($filedata);
+		$first = strpos($_SERVER['REQUEST_URI'], "?");
+		$queryStr = substr($_SERVER['REQUEST_URI'], $first + 1);
+		$pos = strrpos($queryStr, "&");
+		$data = substr($queryStr, 0, $pos);
+		$pos = strpos($queryStr, "=", $pos) + 1;
+		$sig = substr($queryStr, $pos);
+		$sig = base64_decode(urldecode($sig));
+		$t = openssl_verify($data, $sig, $key);
+		$this->data = $data;
+		return ($t == 1);
+	}
+	
+	function noError() {
+		$array = array();
+		parse_str($this->data, $array);
+		return ($array['error'] == "00000");
+	}
+	
+	function getReference() {
+		$array = array();
+		parse_str($this->data, $array);
+		return $array['reference'];
 	}
 }
