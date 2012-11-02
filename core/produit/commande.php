@@ -119,4 +119,21 @@ SQL;
 		}
 		$this->sql->query($q);
 	}
+
+	public function liste(&$filter = null) {
+		$q = <<<SQL
+SELECT id, nom FROM dt_commandes AS c
+SQL;
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+		$res = $filter->query($q);
+
+		$liste = array();
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
 }

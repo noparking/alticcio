@@ -437,8 +437,9 @@ $d['pages'] = array(
 	"diaporamas" => "slideshows",
 	"menus" => "menus",
 	"update" => "update",
-      "statsshorturl" => "short-url",
-      "statscommandes" => "orders",
+    "statsshorturl" => "stats-short-url",
+    "statscommandes" => "stats-orders",
+	"commandes" => "commandes",
 );
 
 $d['hd_extensions'] = array(

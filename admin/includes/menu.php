@@ -102,6 +102,11 @@ $menus = array(
 						'url' => $url->make("Comparatif"),
 						'level' => 70,
 					),
+					'commandes' => array(
+						'level' => 80,
+						'label' => $dico->t('Commandes'),
+						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
+					),
 				),
 			),
 			
