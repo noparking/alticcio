@@ -487,6 +487,47 @@ SQL;
 			}
 		}
 
+		return $this->attributs_data_get_references($attributs);
+	}
+
+	public function attributs_data_get_references($attributs = array()) {
+		foreach ($attributs as $id_attributs => $attribut) {
+			if ($attribut['id_types_attributs'] == 6) {
+				$q = <<<SQL
+SELECT * FROM dt_attributs_references WHERE id_attributs = {$id_attributs}
+SQL;
+				$res = $this->sql->query($q);
+				$data_ref = $this->sql->fetch($res);
+
+				$q = <<<SQL
+SELECT {$data_ref['field_label']} AS ref_value FROM `{$data_ref['table_name']}` WHERE {$data_ref['field_value']}
+SQL;
+				if (is_array($attribut['valeur_numerique'])) {
+					$q .= " IN ('".implode("','", $attribut['valeur_numerique'])."')";
+				}
+				else {
+					$q .= " = '{$attribut['valeur_numerique']}'";
+				}
+
+				$res = $this->sql->query($q);
+				if (is_array($attribut['valeur_numerique'])) {
+					$ref_value = array();
+					while ($row = $this->sql->fetch($res)) {
+						$ref_value[] = $row['ref_value'];
+					}
+				}
+				else {
+					$ref_value = $this->sql->fetch($res);
+				}
+				if (strpos($data_ref['field_label'], "phrase_") === 0) {
+					$attributs[$id_attributs]['phrase_valeur'] = $ref_value;
+				}
+				else {
+					$attributs[$id_attributs]['valeur_numerique'] = $ref_value;
+				}
+			}
+		}
+	
 		return $attributs;
 	}
 
