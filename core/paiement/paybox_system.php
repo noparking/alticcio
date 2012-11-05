@@ -58,7 +58,7 @@ class Paybox_System {
 		$this->cmd = $ref;
 	}
 	
-	function buildForm() {
+	function buildForm($typepaiement = null, $typecarte = null) {
 		$this->time = date("c");
 		$values = array(
 			'PBX_SITE' => $this->site,
@@ -75,14 +75,17 @@ class Paybox_System {
 			//'PBX_REPONDRE_A' => $this->repondre_a,
 			'PBX_HASH' => $this->hash,
 			'PBX_TIME' => $this->time,
-			'PBX_HMAC' => "",
 		);
+		if ($typepaiement && $typecarte) {
+			$values['PBX_TYPEPAIEMENT'] = $typepaiement;
+			$values['PBX_TYPECARTE'] = $typecarte;
+		}
 		$server = $this->getOnlineServer();
 		$message = $this->createMessage($values);
 		$this->generateHmac($message);
 		$values['PBX_HMAC'] = $this->hmac;
 		$form = <<<HTML
-<form method="post" action="{$server}">
+<form method="post" action="{$server}" id="payboxSystemForm">
 HTML;
 		foreach ($values as $key => $value) {
 			$form .= <<<HTML
@@ -90,7 +93,6 @@ HTML;
 HTML;
 		}
 		$form .= <<<HTML
-	<input type="submit" value="Envoyer" />
 </form>	
 HTML;
 		return $form;
