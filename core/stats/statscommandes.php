@@ -24,6 +24,21 @@ class StatsCommandes {
 		return $tab;
 	}
 	
+	public function nombre_lignes_commandes_par_mois() {
+		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, AVG(cp.id_commandes) AS total
+				FROM dt_commandes_produits AS cp
+				INNER JOIN dt_commandes AS c
+				ON cp.id_commandes = c.id  
+				AND (c.paiement != 'refuse' OR c.paiement != 'annule') AND c.shop = 3 AND c.id_api_keys = 0
+				GROUP BY cp.id_commandes, c.annee, c.mois ";
+		$rs = $this->sql->query($q);
+		$tab = array();
+		while ($row = $this->sql->fetch($rs)) {
+			$tab[] = $row;
+		};
+		return $tab;
+	}
+	
 	public function chiffre_affaires_par_annee_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, SUM(c.montant) AS total
 				FROM dt_commandes as c
