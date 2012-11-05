@@ -13,7 +13,11 @@ $page->css[] = $config->media("reporting.css");
  */
 $sql = new Mysql($config->db());
 
-// les dates : d0 = lundi dernier, d1 = le lundi d'avant et d2 = le lundi d'avant avant
+/*
+ * Stats par semaine
+ * les dates : d0 = lundi dernier, d1 = le lundi d'avant et d2 = le lundi d'avant avant
+ */
+/*
 $d0 = strtotime('Last sunday');
 $d1 = $d0 - 604800;
 $d2 = $d0 - 1209600;
@@ -33,6 +37,18 @@ function calculer($date_debut, $date_fin, $champ) {
 	$row = $sql->fetch($rs);
 	return $row['NUM'];
 }
+
+$date_week1 = date('d/m',$d1);
+$date_week2 = date('d/m',$d0);
+*/
+
+
+
+/*
+ * Stats mensuelles
+ */
+$mois_en_cours = date('m');
+$mois_precedent = "";
 
 function moyenne($note, $nbre, $sur) {
 	if ($note > 0) {
@@ -69,8 +85,7 @@ function evolution($note_now, $note_prev) {
  */
 $titre_page = $dico->t("ReportingSatisfaction");
 
-$date_week1 = date('d/m',$d1);
-$date_week2 = date('d/m',$d0);
+
 
 $main = <<<HTML
 <div id="container">
