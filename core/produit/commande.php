@@ -35,8 +35,10 @@ SQL;
 	public function save($data) {
 		$data['commande']['date_commande'] = $_SERVER['REQUEST_TIME'];
 		$montant = 0;
-		foreach ($data['produits'] as $produit) {
-			$montant +=  $produit['prix_unitaire'] * $produit['quantite'];
+		if (isset($data['produits'])) {
+			foreach ($data['produits'] as $produit) {
+				$montant +=  $produit['prix_unitaire'] * $produit['quantite'];
+			}
 		}
 		$frais_de_port = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
 		$data['commande']['montant'] = $montant;
@@ -48,24 +50,55 @@ SQL;
 
 		$id = parent::save($data);
 		
-		foreach ($data['produits'] as $produit) {
-			$tables = "";
-			$valeurs = "";
-			$produit['id_commandes'] = $id;
-			foreach ($produit as $cle => $valeur) {
-				if ($tables != "") {
-					$tables .= ", ";
-					$valeurs .= ", ";
-				}
-				$tables .= $cle;
-				$valeurs .= "'{$valeur}'";
-			}
-			$q = <<<SQL
-INSERT INTO dt_commandes_produits ({$tables}) VALUES ({$valeurs})
+		if (isset($data['produits'])) {
+			$keys = array_keys($this->produits());
+			foreach ($data['produits'] as $id_commandes_produits => $produit) {
+				if (in_array($id_commandes_produits, $keys)) {
+					$values = array();
+					$produit['id_commandes'] = $id;
+					foreach ($produit as $cle => $valeur) {
+						$values[] = "{$cle}='{$valeur}'";
+					}
+					$values = implode(",", $values);
+					$q = <<<SQL
+UPDATE dt_commandes_produits SET $values WHERE id = {$id_commandes_produits}
 SQL;
-			$this->sql->query($q);
+				}
+				else {
+					$fields = array();
+					$values = array();
+					$produit['id_commandes'] = $id;
+					foreach ($produit as $cle => $valeur) {
+						$fields[] = $cle;
+						$values[] = "'{$valeur}'";
+					}
+					$fields = implode(",", $fields);
+					$values = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_commandes_produits ({$fields}) VALUES ({$values})
+SQL;
+				}
+				$this->sql->query($q);
+			}
 		}
+
 		return $id;
+	}
+
+	public function delete($data) {
+		$q = <<<SQL
+DELETE FROM dt_commandes_produits WHERE id_commandes = {$data['commande']['id']}
+SQL;
+		$this->sql->query($q);
+
+		return parent::delete($data);
+	}
+
+	public function delete_produit($id) {
+		$q = <<<SQL
+DELETE FROM dt_commandes_produits WHERE id = {$id}
+SQL;
+		$this->sql->query($q);
 	}
 
 	public function montant() {

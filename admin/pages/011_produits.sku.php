@@ -71,7 +71,7 @@ if ($id = $url2->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-sku-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "cancel", "add-image", "delete-image", "add-prix-degressif", "delete-prix-degressif", "add-attribut", "delete-attribut", "duplicate"),
+	'actions' => array("save", "delete", "reset", "add-image", "delete-image", "add-prix-degressif", "delete-prix-degressif", "add-attribut", "delete-attribut", "duplicate"),
 	'files' => array("new_image_file", "new_gabarit_file"),
 	'date_format' => $dico->d('FormatDate'),
 ));
@@ -195,7 +195,7 @@ if ($action == "create" or $action == "edit") {
 $buttons[] = $page->l($dico->t('NouveauSku'), $url2->make("current", array('action' => "create", 'id' => "")));
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
+	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 }
