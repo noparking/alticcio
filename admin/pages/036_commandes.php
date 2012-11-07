@@ -8,8 +8,8 @@ $config->core_include("outils/filter", "outils/pager");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
+$page->javascript[] = $config->core_media("jquery-ui.datepicker.min.js");
 $page->javascript[] = $config->media("produit.js");
-$page->javascript[] = $config->core_media("jquery.form.js");
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
 	"dico" => $dico->export(array(
@@ -18,6 +18,7 @@ $page->jsvars[] = array(
 );
 
 $page->css[] = $config->media("produit.css");
+$page->css[] = $config->core_media("jquery-ui.custom.css");
 
 $sql = new Mysql($config->db());
 
@@ -234,10 +235,50 @@ switch($action) {
 				'type' => 'between',
 				'order' => 'DESC',
 				'field' => 'c.id',
+				'group_by' => true,
 			),
 			'nom' => array(
 				'title' => $dico->t('Nom'),
 				'type' => 'contain',
+				'field' => 'c.nom',
+			),
+			'shop' => array(
+				'title' => $dico->t('Shop'),
+				'field' => 'c.shop',
+			),
+			'id_api_keys' => array(
+				'title' => $dico->t('Clé API'),
+				'field' => 'c.id_api_keys',
+			),
+			'montant' => array(
+				'title' => $dico->t('Montant'),
+				'type' => 'between',
+				'field' => 'c.montant',
+				'order' => 'DESC',
+			),
+			'nb_produits' => array(
+				'title' => $dico->t('Produits'),
+				'type' => 'between',
+				'order' => 'DESC',
+				'group' => true,
+			),
+			'paiement' => array(
+				'title' => $dico->t('Paiement'),
+				'field' => 'c.paiement',
+			),
+			'paiement_statut' => array(
+				'title' => $dico->t('StatutPaiement'),
+				'field' => 'c.paiement_statut',
+			),
+			'date_from' => array(
+				'title' => $dico->t('DateDebut'),
+				'type' => 'date_from',
+				'field' => 'c.date_commande',
+			),
+			'date_to' => array(
+				'title' => $dico->t('DateFin'),
+				'type' => 'date_to',
+				'field' => 'c.date_commande',
 			),
 		), array(), "filter_commandes");
 		$commande->liste($filter);

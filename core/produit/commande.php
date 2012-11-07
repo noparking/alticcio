@@ -155,10 +155,17 @@ SQL;
 
 	public function liste(&$filter = null) {
 		$q = <<<SQL
-SELECT id, nom FROM dt_commandes AS c
+SELECT c.id, c.nom, c.shop, c.id_api_keys, c.etat, c.montant,
+COUNT(cp.id) AS nb_produits, paiement, paiement_statut,
+c.date_commande AS date_from, c.date_commande AS date_to
+FROM dt_commandes AS c
+LEFT OUTER JOIN dt_commandes_produits AS cp ON cp.id_commandes = c.id
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
+			$q .= <<<SQL
+GROUP BY c.id
+SQL;
 		}
 		$res = $filter->query($q);
 
