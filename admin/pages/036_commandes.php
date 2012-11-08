@@ -8,7 +8,7 @@ $config->core_include("outils/filter", "outils/pager");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
-$page->javascript[] = $config->core_media("jquery-ui.datepicker.min.js");
+$page->inc("snippets/date-input");
 $page->javascript[] = $config->media("produit.js");
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
@@ -151,6 +151,10 @@ if ($action == "create" or $action == "edit") {
 {$form->text(array('name' => "commande[montant]", 'label' => "Montant"))}
 {$form->text(array('name' => "commande[frais_de_port]", 'label' => "Frais de port"))}
 {$form->input(array('name' => "commande[tva]", 'label' => "TVA"))}
+{$form->date(array('name' => "commande[date_commande]", 'label' => "Date de la commande"))}
+{$form->select(array('name' => "commande[paiement]", 'label' => "Paiement", 'options' => $paiements))}
+{$form->select(array('name' => "commande[paiement_statut]", 'label' => "Statut  du paiement", 'options' => $paiements_statuts))}
+{$form->textarea(array('name' => "commande[commentaire]", 'label' => "Commentaire"))}
 {$form->fieldset_end()}
 
 {$form->fieldset_start(array('legend' => $dico->t('Client'), 'class' => "produit-section produit-section-client".$hidden['client'], 'id' => "produit-section-commande"))}

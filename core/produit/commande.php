@@ -33,7 +33,9 @@ SQL;
 	}
 
 	public function save($data) {
-		$data['commande']['date_commande'] = $_SERVER['REQUEST_TIME'];
+		if (!isset($data['commande']['date_commande'])) {
+			$data['commande']['date_commande'] = $_SERVER['REQUEST_TIME'];
+		}
 		$montant = 0;
 		if (isset($data['produits'])) {
 			foreach ($data['produits'] as $produit) {
