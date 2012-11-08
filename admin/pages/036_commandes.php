@@ -32,6 +32,30 @@ if ($id = $url->get('id')) {
 	$commande->load($id);
 }
 
+$etats = array(
+	0 => "En cours",
+	1 => "Expédiée",
+	2 => "Annulée",
+);
+
+$paiements = array(
+	'cheque' => "Chèque",
+	'mandat' => "Mandat",
+	'facture' => "Facture",
+	'cb' => "CB",
+	'paypal' => "Paypal",
+	'devis' => "Devis",
+);
+
+$paiements_statuts = array(
+	'attente' => "Attente",
+	'valide' => "Validé",
+	'refuse' => "Refusé",
+	'annule' => "Annulé",
+	'rembourse' => "Remboursé",
+	'test' => "Test",
+);
+	
 $form = new Form(array(
 	'id' => "form-edit-commande-$id",
 	'class' => "form-edit",
@@ -116,12 +140,6 @@ if ($action == "create" or $action == "edit") {
 
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
-
-	$etats = array(
-		0 => "En cours",
-		1 => "Expédiée",
-		2 => "Annulée",
-	);
 
 	$main = <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
@@ -242,8 +260,14 @@ switch($action) {
 				'field' => 'c.shop',
 			),
 			'id_api_keys' => array(
-				'title' => $dico->t('Clé API'),
+				'title' => $dico->t('API'),
 				'field' => 'c.id_api_keys',
+			),
+			'etat' => array(
+				'title' => $dico->t('Etat'),
+				'field' => 'c.etat',
+				'type' => "select",
+				'options' => $etats,
 			),
 			'nom' => array(
 				'title' => $dico->t('Nom'),
@@ -265,10 +289,14 @@ switch($action) {
 			'paiement' => array(
 				'title' => $dico->t('Paiement'),
 				'field' => 'c.paiement',
+				'type' => "select",
+				'options' => $paiements,
 			),
 			'paiement_statut' => array(
-				'title' => $dico->t('StatutPaiement'),
+				'title' => $dico->t('Statut'),
 				'field' => 'c.paiement_statut',
+				'type' => "select",
+				'options' => $paiements_statuts,
 			),
 			'date_commande' => array(
 				'title' => $dico->t('Date'),

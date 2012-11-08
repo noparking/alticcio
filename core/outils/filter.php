@@ -266,8 +266,8 @@ HTML;
 				$end = isset($value['end']) ? $value['end'] : "";
 				$id = "{$this->name}[values][{$element['id']}]";
 				$format = isset($element['format']) ? $element['format'] : "d/m/Y"; 
-				$date_start = $value ? date($format, $start) : "";
-				$date_end = $value ? date($format, $end) : "";
+				$date_start = $start ? date($format, $start) : "";
+				$date_end = $end ? date($format, $end) : "";
 				return <<<HTML
 <span class="filter-element filter-{$element['type']}">
 <input type="hidden" name="{$id}[start]}" id="{$id}[start]" value="{$start}" />
