@@ -108,6 +108,8 @@ SQL;
 			$this->sql->query($q);
 		}
 
+		$this->id = $id;
+
 		return $id;
 	}
 
