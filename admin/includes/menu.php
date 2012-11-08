@@ -102,11 +102,6 @@ $menus = array(
 						'url' => $url->make("Comparatif"),
 						'level' => 70,
 					),
-					'commandes' => array(
-						'level' => 80,
-						'label' => $dico->t('Commandes'),
-						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
-					),
 				),
 			),
 			
@@ -158,6 +153,13 @@ $menus = array(
 				'label' => $dico->t("Clients"),
 				//'url' => '';
 				'level' => 30,
+				'items' => array(
+					'commandes' => array(
+						'level' => 80,
+						'label' => $dico->t('Commandes'),
+						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
+					),
+				),
 			),
 			
 			'stats' => array(

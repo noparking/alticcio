@@ -260,6 +260,23 @@ HTML;
 <input type="hidden" name="{$id}" id="{$id}" value="{$value}" />
 <input name="" id="{$id}-visible" value="{$date}" class="date-input filter-date" />
 HTML;
+				break;
+			case "date_between" :
+				$start = isset($value['start']) ? $value['start'] : "";
+				$end = isset($value['end']) ? $value['end'] : "";
+				$id = "{$this->name}[values][{$element['id']}]";
+				$format = isset($element['format']) ? $element['format'] : "d/m/Y"; 
+				$date_start = $value ? date($format, $start) : "";
+				$date_end = $value ? date($format, $end) : "";
+				return <<<HTML
+<span class="filter-element filter-{$element['type']}">
+<input type="hidden" name="{$id}[start]}" id="{$id}[start]" value="{$start}" />
+<input type="hidden" name="{$id}[end]}" id="{$id}[end]" value="{$end}" />
+[<input name="" id="{$id}[start]-visible" type="text" class="date-input filter-date" value="{$date_start}" />
+-<input name="" id="{$id}[end]-visible" type="text" class="date-input filter-date" value="{$date_end}" />]
+</span>
+HTML;
+				break;
 		}
 	}
 	
@@ -399,6 +416,16 @@ HTML;
 						$valeur = mysql_real_escape_string($valeur);
 						$cond .= " AND {$this->elements[$cle]['field']} <= {$valeur}";
 					}
+					else if($this->elements[$cle]['type'] == 'date_between') {
+						if ($valeur['start']) {
+							$start = mysql_real_escape_string($valeur['start']);
+							$cond .= " AND {$this->elements[$cle]['field']} >= {$start}";
+						}
+						if ($valeur['end']) {
+							$end = mysql_real_escape_string($valeur['end']);
+							$cond .= " AND {$this->elements[$cle]['field']} <= {$end}";
+						}
+					}
 					if (isset($this->elements[$cle]['group']) and $this->elements[$cle]['group']) {
 						$having .= $cond;
 					}
@@ -461,9 +488,17 @@ HTML;
 	
 	public function fetch($res) {
 		if ($row = $this->sql->fetch($res)) {
-			$this->add($row);
+			$ordered_row = array();
+			foreach ($this->elements as $key => $element) {
+				$ordered_row[$key] = $row[$key];
+			}
+			$this->add($ordered_row);
+			
+			return $ordered_row;
 		}
-		return $row;
+		else {
+			return false;
+		}
 	}
 	
 	public function found_rows() {

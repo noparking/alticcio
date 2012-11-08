@@ -1,6 +1,6 @@
 <?php
 
-$menu->current('main/products/commandes');
+$menu->current('main/customers/commandes');
 
 $config->core_include("produit/commande");
 $config->core_include("outils/form", "outils/pays");
@@ -237,11 +237,6 @@ switch($action) {
 				'field' => 'c.id',
 				'group_by' => true,
 			),
-			'nom' => array(
-				'title' => $dico->t('Nom'),
-				'type' => 'contain',
-				'field' => 'c.nom',
-			),
 			'shop' => array(
 				'title' => $dico->t('Shop'),
 				'field' => 'c.shop',
@@ -249,6 +244,11 @@ switch($action) {
 			'id_api_keys' => array(
 				'title' => $dico->t('Clé API'),
 				'field' => 'c.id_api_keys',
+			),
+			'nom' => array(
+				'title' => $dico->t('Nom'),
+				'type' => 'contain',
+				'field' => 'c.nom',
 			),
 			'montant' => array(
 				'title' => $dico->t('Montant'),
@@ -270,14 +270,9 @@ switch($action) {
 				'title' => $dico->t('StatutPaiement'),
 				'field' => 'c.paiement_statut',
 			),
-			'date_from' => array(
-				'title' => $dico->t('DateDebut'),
-				'type' => 'date_from',
-				'field' => 'c.date_commande',
-			),
-			'date_to' => array(
-				'title' => $dico->t('DateFin'),
-				'type' => 'date_to',
+			'date_commande' => array(
+				'title' => $dico->t('Date'),
+				'type' => 'date_between',
 				'field' => 'c.date_commande',
 			),
 		), array(), "filter_commandes");
