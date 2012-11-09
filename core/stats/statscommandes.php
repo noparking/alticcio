@@ -14,7 +14,7 @@ class StatsCommandes {
 	public function nombre_commandes_par_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, COUNT(*) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement != 'refuse' OR c.paiement != 'annule') AND shop = 3 AND id_api_keys = 0
+				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = 3 AND id_api_keys = 0
 				GROUP BY annee, mois ";
 		$rs = $this->sql->query($q);
 		$tab = array();
@@ -42,7 +42,7 @@ class StatsCommandes {
 	public function chiffre_affaires_par_annee_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, SUM(c.montant) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement != 'refuse' OR c.paiement != 'annule') AND shop = 3 AND id_api_keys = 0
+				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = 3 AND id_api_keys = 0
 				GROUP BY annee, mois";
 		$rs = $this->sql->query($q);
 		$tab = array();
