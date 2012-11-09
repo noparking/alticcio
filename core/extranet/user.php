@@ -53,7 +53,17 @@ class User {
 
 	public function has_one_perm($permissions) {
 		foreach ($permissions as $permission) {
+			if (in_array("all", $_SESSION['extranet']['user']['permissions'])) {
+				return true;
+			}
 			if (in_array($permission, $_SESSION['extranet']['user']['permissions'])) {
+				return true;
+			}
+			list($action, $object) = explode(" ", $permission);
+			if (in_array("all $object", $_SESSION['extranet']['user']['permissions'])) {
+				return true;
+			}
+			if (in_array("$action all", $_SESSION['extranet']['user']['permissions'])) {
 				return true;
 			}
 		}
