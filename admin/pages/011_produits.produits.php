@@ -269,7 +269,7 @@ if ($action == "create" or $action == "edit") {
 	$buttons[] = $page->l($dico->t('Retour'), $url2->make("current", array('action' => "", 'id' => "")));
 }
 
-if ($user->has_one_perm(array("create produit"))) {
+if ($user->has_perm("create produit")) {
 	$buttons[] = $page->l($dico->t('NouveauProduit'), $url2->make("current", array('action' => "create", 'id' => "")));
 }
 
