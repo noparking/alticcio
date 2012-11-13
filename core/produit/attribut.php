@@ -125,6 +125,7 @@ SQL;
 		$res = $this->sql->query($q);
 		
 		$row = $this->sql->fetch($res);
+
 		return $row === false ? array() : $row;
 	}
 
@@ -158,6 +159,17 @@ SQL;
 
 		return $options; 
 	}
+	
+	public function valeur() {
+		$q = <<<SQL
+SELECT valeur FROM dt_attributs_valeurs WHERE id_attributs = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		
+		$row = $this->sql->fetch($res);
+
+		return $row === false ? "" : $row['valeur'];
+	}
 
 	public function phrases() {
 		$ids = parent::phrases();
@@ -178,6 +190,18 @@ SQL;
 			$q = "DELETE FROM dt_attributs_references WHERE id_attributs = $id";
 			$this->sql->query($q);
 			$q = "INSERT INTO dt_attributs_references (id_attributs, table_name, field_label, field_value) VALUES ($id, '{$data['reference']['table_name']}', '{$data['reference']['field_label']}', '{$data['reference']['field_value']}')";
+			$this->sql->query($q);
+		}
+		if (isset($data['valeur'])) {
+			$q = "DELETE FROM dt_attributs_valeurs WHERE id_attributs = $id";
+			$this->sql->query($q);
+			$q = "INSERT INTO dt_attributs_valeurs (id_attributs, valeur) VALUES ($id, '{$data['valeur']}')";
+			$this->sql->query($q);
+			$q = "UPDATE dt_produits_attributs SET valeur_numerique='{$data['valeur']}' WHERE id_attributs = $id";
+			$this->sql->query($q);
+			$q = "UPDATE dt_sku_attributs SET valeur_numerique='{$data['valeur']}' WHERE id_attributs = $id";
+			$this->sql->query($q);
+			$q = "UPDATE dt_matieres_attributs SET valeur_numerique='{$data['valeur']}' WHERE id_attributs = $id";
 			$this->sql->query($q);
 		}
 

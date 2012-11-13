@@ -113,6 +113,7 @@ if ($action == 'edit') {
 	$form->default_values['phrases'] = $phrase->get($attribut->phrases());
 	$form->default_values['options'] = $attribut->options();
 	$form->default_values['reference'] = $attribut->reference();
+	$form->default_values['valeur'] = $attribut->valeur();
 }
 
 $form_start = $form->form_start();
@@ -210,6 +211,16 @@ HTML;
 {$form->input(array('name' => "reference[table_name]", 'label' => $dico->t('Table')))}
 {$form->input(array('name' => "reference[field_label]", 'label' => $dico->t('ChampIntitule')))}
 {$form->input(array('name' => "reference[field_value]", 'label' => $dico->t('ChampValeur')))}
+{$form->fieldset_end()}
+HTML;
+	}
+	else if (strpos($type_attribut, "readonly") !== false) {
+		$sections['valeur'] = $dico->t('Valeur');
+		// variable $hidden mise à jour dans ce snippet
+		$left = $page->inc("snippets/produits-sections");
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Valeur'), 'class' =>	"produit-section produit-section-valeur".$hidden['valeur'], 'id' => "produit-section-valeur"))}
+{$form->input(array('name' => "valeur", 'label' => $dico->t('Valeur')))}
 {$form->fieldset_end()}
 HTML;
 	}

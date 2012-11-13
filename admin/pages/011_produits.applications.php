@@ -62,7 +62,7 @@ $filter_attributs = new Filter($pager_attributs, array(
 		'order' => 'DESC',
 		'field' => 'a.id',
 	),
-	'phrase_nom' => array(
+	'name' => array(
 		'title' => $dico->t('Nom'),
 		'type' => 'contain',
 		'field' => 'p.phrase',

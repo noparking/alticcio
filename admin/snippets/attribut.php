@@ -54,6 +54,9 @@ switch ($attribut->type_attribut) {
 		$options = $attribut->reference_options($id_langue);
 		echo $form->select(array('name' => "attributs[".$attribut_id."]", 'options' => $options, 'label' => $label[$config->get('langue')], 'unit' => $unit));
 		break;
+	case 'readonly' :
+		echo $form->input(array('name' => "attributs[".$attribut_id."]", 'label' => $label[$config->get('langue')], 'readonly' => true, 'value' => $attribut->valeur()));
+		break;
 	default :
 		echo $form->input(array('name' => "attributs[".$attribut_id."]", 'label' => $label[$config->get('langue')]));
 		break;

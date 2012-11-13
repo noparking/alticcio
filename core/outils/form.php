@@ -334,6 +334,7 @@ class Form {
 			$value = $type == 'file' ? "" : htmlspecialchars($this->get_value($params, $name));
 			$checked = $this->get_checked($params, $name); 
 			$disabled = (isset($params['disabled']) and $params['disabled']) ? ' disabled="disabled"': "";
+			$readonly = (isset($params['readonly']) and $params['readonly']) ? ' readonly="readonly"': "";
 			$onclick = "";
 			$hiddenfield = "";
 
@@ -345,7 +346,7 @@ class Form {
 					$disabled = ' disabled="disabled"';
 					$class .= " disabled";
 				}
-				else {
+				else if (!$readonly) {
 					$permitted = ' readonly="readonly"';
 				}
 			}
@@ -382,7 +383,8 @@ class Form {
 					$attr .= " $cle=\"$valeur\"";
 				}
 			}
-			$fields[] = $hiddenfield.'<input type="'.$type.'" name="'.$name.'" id="'.$id.'" class="'.$class.'" value="'.$value.'" '.$permitted.$checked.$disabled.$onclick.$attr.' />'.$item_label;
+			$fields[] = $hiddenfield.'<input type="'.$type.'" name="'.$name.'"
+				id="'.$id.'" class="'.$class.'" value="'.$value.'"'.$permitted.$checked.$disabled.$readonly.$onclick.$attr.' />'.$item_label;
 		}
 		$params['field'] .= implode("</li><li>", $fields);
 		if (count($items) > 1) {
