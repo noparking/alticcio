@@ -148,4 +148,21 @@ SQL;
 		$q = "DELETE FROM dt_billets WHERE id = {$this->id}";
 		$this->sql->query($q);
 	}
+
+	public function in_blog($id_billets, $id_blogs) {
+		$q = <<<SQL
+SELECT b.id
+FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
+INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs
+WHERE bltb.id_blogs = $id_blogs AND b.id = {$id_billets}
+SQL;
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
