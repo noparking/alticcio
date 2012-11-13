@@ -9,7 +9,7 @@ class Blog {
 	}
 	public function all_themes($id_blog = null) {
 		$q = <<<SQL
-SELECT t.id, t.nom, t.id_parent FROM dt_themes_blogs AS t
+SELECT t.id, t.nom, t.id_parent, t.titre_url FROM dt_themes_blogs AS t
 SQL;
 		if ($id_blog !== null) {
 			$q .= " " . <<<SQL
