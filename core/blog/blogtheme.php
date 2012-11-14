@@ -54,7 +54,7 @@ SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url
 FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id AND bitb.id_themes_blogs = {$this->id}
 WHERE b.affichage = 1 AND date_affichage <= {$date_affichage}
-ORDER BY date_affichage
+ORDER BY date_affichage DESC
 SQL;
 		$billets = array();
 		$res = $this->sql->query($q);

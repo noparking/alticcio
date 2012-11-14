@@ -157,10 +157,11 @@ SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url
 FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
 INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs
-WHERE b.affichage = 1 AND date_affichage <= {$date_affichage} AND bltb.id_blogs = $id_blogs
-ORDER BY date_affichage DESC
+WHERE b.affichage = 1 AND b.date_affichage <= {$date_affichage} AND bltb.id_blogs = $id_blogs
+ORDER BY b.date_affichage
 LIMIT 0, $nb
 SQL;
+		echo $q;
 		$billets = array();
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
