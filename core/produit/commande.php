@@ -36,19 +36,20 @@ SQL;
 		if (!isset($data['commande']['date_commande'])) {
 			$data['commande']['date_commande'] = $_SERVER['REQUEST_TIME'];
 		}
-		$montant = 0;
 		if (isset($data['produits'])) {
+			$montant = 0;
 			foreach ($data['produits'] as $produit) {
 				$montant +=  $produit['prix_unitaire'] * $produit['quantite'];
 			}
+			$frais_de_port = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
+			$data['commande']['montant'] = $montant;
+			$data['commande']['frais_de_port'] = $frais_de_port;
+			if (!isset($data['commande']['tva']) and isset($data['tva'])) {
+				$tva = (float)$data['tva'] * ($montant + $frais_de_port) / 100;
+				$data['commande']['tva'] = round($tva, 2);
+			}
 		}
-		$frais_de_port = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
-		$data['commande']['montant'] = $montant;
-		$data['commande']['frais_de_port'] = $frais_de_port;
-		if (!isset($data['commande']['tva']) and isset($data['tva'])) {
-			$tva = (float)$data['tva'] * ($montant + $frais_de_port) / 100;
-			$data['commande']['tva'] = round($tva, 2);
-		}
+
 
 		$id = parent::save($data);
 		
@@ -176,5 +177,14 @@ SQL;
 		}
 		
 		return $liste;
+	}
+	
+	public function changer_etat($etat) {
+		$this->save(array(
+			'commande' => array(
+				'id' => $this->id,
+				'etat' => $etat,
+			),	
+		));
 	}
 }
