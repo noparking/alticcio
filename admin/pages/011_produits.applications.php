@@ -226,6 +226,7 @@ if ($action == "create" or $action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'attributs' => $dico->t('Attributs'),
+		'produits' => $dico->t('Produits'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
@@ -233,6 +234,11 @@ if ($action == "create" or $action == "edit") {
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "produit-section-presentation"))}
 {$form->input(array('name' => "application[phrase_nom]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+{$form->input(array('name' => "application[ref]", 'label' => $dico->t('Reference') ))}
+{$form->input(array('name' => "application[phrase_description_courte]", 'type' => "hidden"))}
+{$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor"))}
+{$form->input(array('name' => "application[phrase_description]", 'type' => "hidden"))}
+{$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 {$dico->t('CochezAttributs')}
@@ -258,7 +264,36 @@ HTML;
 }
 
 if ($action == "edit") {
+	$pager = new Pager($sql, array(20, 30, 50, 100, 200));
+	$filter = new Filter($pager, array(
+		'id' => array(
+			'title' => 'ID',
+			'type' => 'between',
+			'order' => 'DESC',
+			'field' => 'pr.id',
+		),
+		'ref' => array(
+			'title' => $dico->t('Reference'),
+			'type' => 'contain',
+		),
+		'nom' => array(
+			'title' => $dico->t('Nom'),
+			'type' => 'contain',
+			'field' => 'ph.phrase',
+		),
+		'actif' => array(
+			'title' => $dico->t('Nom'),
+			'type' => 'select',
+			'options' => array(1 => "Oui", 0 => "Non"),
+		),
+	), array(), "filter_application_produits");
+	
+	$application->liste_produits($filter);
 	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
+{$page->inc("snippets/filter-simple")}
+{$form->fieldset_end()}
+
 {$form->input(array('type' => "hidden", 'name' => "application[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;

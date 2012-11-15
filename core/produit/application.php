@@ -6,7 +6,11 @@ class Application extends AbstractObject {
 
 	public $type = "application";
 	public $table = "dt_applications";
-	public $phrase_fields = array('phrase_nom');
+	public $phrase_fields = array(
+		'phrase_nom',
+		'phrase_description_courte',
+		'phrase_description',
+	);
 
 	public function liste(&$filter = null, $select_options = false) {
 		$q = <<<SQL
@@ -85,6 +89,27 @@ SQL;
 			$produits[] = $row['id'];
 		}
 		return $produits;
+	}
+
+	public function liste_produits(&$filter = null) {
+		$q = <<<SQL
+SELECT pr.id, pr.ref, ph.phrase AS nom, pr.actif FROM dt_produits AS pr
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom
+LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
+WHERE (l.id = '{$this->langue}' OR pr.phrase_nom = 0)
+AND id_applications = {$this->id}
+SQL;
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+		$res = $filter->query($q);
+
+		$liste = array();
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
 	}
 
 	public function save($data) {
