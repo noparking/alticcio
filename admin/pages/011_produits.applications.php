@@ -3,7 +3,7 @@
 $menu->current('main/products/applications');
 
 $config->core_include("produit/application", "outils/form", "outils/mysql");
-$config->core_include("outils/phrase", "outils/langue");
+$config->core_include("outils/phrase", "outils/langue", "outils/url_redirection");
 $config->core_include("outils/filter", "outils/pager");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
@@ -27,6 +27,8 @@ $id_langue = $langue->id($config->get("langue"));
 $phrase = new Phrase($sql);
 
 $application = new Application($sql, $phrase, $id_langue);
+
+$url_redirection = new UrlRedirection($sql);
 
 $pager_applications = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter_applications = new Filter($pager_applications, array(
@@ -175,7 +177,7 @@ if ($form->is_submitted()) {
 						}
 					}
 				}
-				$id = $application->save($data);
+				$id = $url_redirection->save_object($application, $data, array('phrase_url_key' => 'phrase_nom'));
 				$form->reset();
 				if ($action != "edit") {
 					$url2->redirect("current", array('action' => "edit", 'id' => $id));
@@ -235,6 +237,8 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "application[phrase_nom]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "application[ref]", 'label' => $dico->t('Reference') ))}
+{$form->input(array('name' => "application[phrase_url_key]", 'type' => "hidden"))}
+{$form->input(array('name' => "phrases[phrase_url_key]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "application[phrase_description_courte]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "application[phrase_description]", 'type' => "hidden"))}

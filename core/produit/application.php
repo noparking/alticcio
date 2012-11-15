@@ -10,6 +10,7 @@ class Application extends AbstractObject {
 		'phrase_nom',
 		'phrase_description_courte',
 		'phrase_description',
+		'phrase_url_key',
 	);
 
 	public function liste(&$filter = null, $select_options = false) {
