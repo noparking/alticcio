@@ -153,6 +153,9 @@ SQL;
 	public function delete_revisions($id_commande) {
 		$q = <<<SQL
 DELETE FROM dt_commandes_revision WHERE commande_id = $id_commande;
+SQL;
+		$this->sql->query($q);
+		$q = <<<SQL
 DELETE FROM dt_commandes_produits_revision WHERE id_commandes = $id_commande;
 SQL;
 		$this->sql->query($q);
