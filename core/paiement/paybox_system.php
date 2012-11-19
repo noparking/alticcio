@@ -72,13 +72,15 @@ class Paybox_System {
 			'PBX_EFFECTUE' => $this->effectue,
 			'PBX_ANNULE' => $this->annule,
 			'PBX_REFUSE' => $this->refuse,
-			//'PBX_REPONDRE_A' => $this->repondre_a,
 			'PBX_HASH' => $this->hash,
 			'PBX_TIME' => $this->time,
 		);
 		if ($typepaiement && $typecarte) {
 			$values['PBX_TYPEPAIEMENT'] = $typepaiement;
 			$values['PBX_TYPECARTE'] = $typecarte;
+		}
+		if ($this->repondre_a && !empty($this->repondre_a)) {
+			$values['PBX_REPONDRE_A'] = $this->repondre_a;
 		}
 		$server = $this->getOnlineServer();
 		$message = $this->createMessage($values);
