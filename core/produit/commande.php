@@ -233,7 +233,6 @@ SQL;
 	
 	public function changer_etat($etat, $id = null) {
 		$id_commande = ($id ? $id : $this->id);
-		var_dump($id_commande);
 		$this->save(array(
 			'commande' => array(
 				'id' => $id_commande,
