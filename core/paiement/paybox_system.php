@@ -171,4 +171,17 @@ HTML;
 		parse_str($this->data, $array);
 		return $array['reference'];
 	}
+	
+	function validatePayment() {
+		if ($this->noError() == true) {
+			$ref = $this->getReference();
+			if (preg_match("#^([0-3]+)aberlaas([0-9]+)#i", $ref, $matches)) {
+				$commande = new Commande($GLOBALS['sql']);
+				$commande->load($matches[2]);
+				if ($commande->values['shop'] == (int) $matches[1]) {
+					$commande->update_paiement("valide", 'cb');
+				}
+			}
+		}
+	}
 }
