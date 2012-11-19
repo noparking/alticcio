@@ -30,6 +30,8 @@ UPDATE dt_commandes SET $set
 WHERE id = {$this->id}
 SQL;
 		$this->sql->query($q);
+		
+		$this->ajouter_revision($this->id);
 	}
 
 	public function save($data) {
@@ -84,8 +86,59 @@ SQL;
 				$this->sql->query($q);
 			}
 		}
+		
+		$this->ajouter_revision($id);
 
 		return $id;
+	}
+	
+	public function ajouter_revision($id_commande) {
+		$commande = new Commande($this->sql);
+		$commande->load($id_commande);
+		$fields = array();
+		$values = array();
+		$cmd_values = $commande->values;
+		$cmd_values['commande_id'] = $cmd_values['id'];
+		unset($cmd_values['id']);
+		$revision = $this->get_last_revision_id($id_commande) + 1;
+		$cmd_values['revision'] = $revision;
+		foreach ($cmd_values as $cle => $valeur) {
+			$fields[] = $cle;
+			$values[] = "'$valeur'";
+		}
+		$fields = implode(",", $fields);
+		$values = implode(",", $values);
+		$q = <<<SQL
+INSERT INTO dt_commandes_revision ($fields) VALUES($values)
+SQL;
+		$this->sql->query($q);
+		$produits = $commande->produits();
+		foreach ($produits as $id => $produit) {
+			$fields = array();
+			$values = array();
+			$produit['commandes_produits_id'] = $id;
+			unset($produit['id']);
+			$produit['revision'] = $revision;
+			foreach ($produit as $cle => $valeur) {
+				$fields[] = $cle;
+				$values[] = "'{$valeur}'";
+			}
+			$fields = implode(",", $fields);
+			$values = implode(",", $values);
+			$q = <<<SQL
+INSERT INTO dt_commandes_produits_revision ({$fields}) VALUES ({$values})
+SQL;
+			$this->sql->query($q);
+		}
+	}
+	
+	public function get_last_revision_id($id_commande) {
+		$q = <<<SQL
+SELECT MAX(revision) AS `max` FROM dt_commandes_revision WHERE commande_id = {$id_commande}
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+		return (int) $row['max'];
 	}
 
 	public function delete($data) {
@@ -93,8 +146,16 @@ SQL;
 DELETE FROM dt_commandes_produits WHERE id_commandes = {$data['commande']['id']}
 SQL;
 		$this->sql->query($q);
-
+		$this->delete_revisions($data['commande']['id']);
 		return parent::delete($data);
+	}
+	
+	public function delete_revisions($id_commande) {
+		$q = <<<SQL
+DELETE FROM dt_commandes_revision WHERE commande_id = $id_commande;
+DELETE FROM dt_commandes_produits_revision WHERE id_commandes = $id_commande;
+SQL;
+		$this->sql->query($q);
 	}
 
 	public function delete_produit($id) {
@@ -144,16 +205,7 @@ SQL;
 	}
 
 	public function update_paiement($statut, $paiement = null) {
-		$q = <<<SQL
-UPDATE dt_commandes SET paiement_statut = '$statut'
-WHERE id = {$this->id}
-SQL;
-		if ($paiement) {
-			$q .= <<<SQL
- AND paiement = '$paiement'
-SQL;
-		}
-		$this->sql->query($q);
+		$this->update(array('commande' => array('paiement_statut' => $statut)));
 	}
 
 	public function liste(&$filter = null) {
