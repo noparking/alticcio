@@ -52,7 +52,31 @@ class StatsCommandes {
 		return $tab;
 	}
 	
-	public function afficher_tableau($valeurs) {
+	public function panier_moyen_par_annee_mois() {
+		$q = "SELECT DATE_FORMAT( FROM_UNIXTIME( c.date_commande ) , '%Y' ) AS annee, DATE_FORMAT( FROM_UNIXTIME( c.date_commande ) , '%m' ) AS mois, SUM( c.montant ) AS total, COUNT( * ) AS nbre
+				FROM dt_commandes AS c
+				WHERE ( c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule' )
+				AND shop =3
+				AND id_api_keys =0
+				GROUP BY annee, mois";
+		$rs = $this->sql->query($q);
+		$tab = array();
+		while ($row = $this->sql->fetch($rs)) {
+			$tab[] = array("annee"=>$row['annee'], "mois"=>$row['mois'], "total"=>$row['total']/$row['nbre']);
+		};
+		return $tab;
+	}
+	
+	private function format_results($nombre, $format) {
+		if ($format == "montant") {
+			return number_format($nombre, 2, ',', '.');
+		}
+		else {
+			return $nombre;
+		}
+	}
+	
+	public function afficher_tableau($valeurs, $format="") {
 		$i = 0;
 		$prev_annee = 0;
 		$mois = array(	"01" => $this->dico->t('MoisJanvier'),
@@ -87,8 +111,10 @@ class StatsCommandes {
 				foreach($mois as $m => $month) {
 					$html .= '<td>'.$month.'</td>';
 				}
+				$html .= '<td><strong>TOTAL</strong></td>';
 			}
 			else {
+				$total_annee = 0;
 				foreach($mois as $m => $month) {
 					$total = 0;
 					foreach($valeurs as $k => $v) {
@@ -96,13 +122,16 @@ class StatsCommandes {
 							$total = round($v['total'],2);
 						}
 					}
+					$total_annee = $total_annee + $total;
 					if ($total > 0) {
-						$html .= '<td>'.$total.'</td>';
+						$html .= '<td>'.$this->format_results($total, $format).'</td>';
+						
 					}
 					else {
 						$html .= '<td>0</td>';
 					}
 				}
+				$html .= '<td><strong>'.$this->format_results($total_annee, $format).'</strong></td>';
 			}
 			$html .= '</tr>';
 		}
