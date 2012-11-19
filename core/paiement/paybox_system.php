@@ -125,7 +125,7 @@ HTML;
 		$array = array();
 		parse_str($this->data, $array);
 		$dico = $GLOBALS['dico'];
-		switch ($array['erreur']) {
+		switch ($array['error']) {
 			case "00016":
 				return $dico->t("AlreadyRegistered");
 			case "00004":
@@ -138,7 +138,7 @@ HTML;
 			case "00020":
 				return $dico->t("CVVIncorrect");
 			default:
-				return $dico->t("ErrorOccured")." - {$code_erreur}";	
+				return $dico->t("ErrorOccured")." - {$array['error']}";	
 		}
 	}
 	
@@ -163,7 +163,7 @@ HTML;
 	function noError() {
 		$array = array();
 		parse_str($this->data, $array);
-		return ($array['error'] == "00000");
+		return ($array['error'] == "00000" and isset($array['autorisation']));
 	}
 	
 	function getReference() {
