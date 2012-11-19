@@ -231,10 +231,12 @@ SQL;
 		return $liste;
 	}
 	
-	public function changer_etat($etat) {
+	public function changer_etat($etat, $id = null) {
+		$id_commande = ($id ? $id : $this->id);
+		var_dump($id_commande);
 		$this->save(array(
 			'commande' => array(
-				'id' => $this->id,
+				'id' => $id_commande,
 				'etat' => $etat,
 			),	
 		));
