@@ -247,4 +247,38 @@ SQL;
 			),	
 		));
 	}
+	
+	public function compare_revisions($start = 0, $end = 0) {
+		$revisions = array();
+		$where = "AND revision > $start";
+		if ($end > $start) {
+			$where .= " AND revision < $end";
+		}
+		$q = <<<SQL
+SELECT dt_commandes_revision.*, dt_users.login AS user FROM dt_commandes_revision
+LEFT JOIN dt_users ON dt_users.id = dt_commandes_revision.user_id
+WHERE commande_id = $this->id $where
+ORDER BY revision ASC;
+SQL;
+		$res = $this->sql->query($q);
+		while ($data = $this->sql->fetch($res)) {
+			$revision = $data['revision'];
+			unset($data['revision']);
+			unset($data['id']);
+			$revisions[$revision]['user'] = $data['user'] ? $data['user'] : "non identifié";
+			unset($data['user']);
+			unset($data['user_id']);
+			if ($revision == 1) {
+				$revisions[$revision] += $data;
+			} else {
+				foreach ($data as $cle => $valeur) {
+					for ($i = 1 ; $i < $revision and !isset($revisions[$revision - $i][$cle]) ; $i++);
+					if ($revisions[$revision - $i][$cle] != $valeur) {
+						$revisions[$revision][$cle] = $valeur;
+					}
+				}
+			}
+		}
+		return $revisions;
+	}
 }
