@@ -92,7 +92,7 @@ $filter_schema_produits = array(
 	'ref' => array(
 		'title' => $dico->t('Reference'),
 	),
-	'phrase_ultralog' => array(
+	'nom' => array(
 		'title' => $dico->t('Nom'),
 		'type' => 'contain',
 		'field' => 'ph.phrase',
