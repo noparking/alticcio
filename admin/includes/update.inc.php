@@ -73,4 +73,8 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_revision` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
 	$update->sql->query($q);
+	$q = <<<SQL
+ALTER TABLE  `dt_commandes_revision` ADD  `user_id` INT NOT NULL AFTER  `societe`
+SQL;
+	$update->sql->query($q);
 };

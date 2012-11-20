@@ -102,6 +102,10 @@ SQL;
 		unset($cmd_values['id']);
 		$revision = $this->get_last_revision_id($id_commande) + 1;
 		$cmd_values['revision'] = $revision;
+		$cmd_values['user_id'] = 0;
+		if (isset($_SESSION['extranet']['user']['id'])) {
+			$cmd_values['user_id'] = $_SESSION['extranet']['user']['id'];
+		}
 		foreach ($cmd_values as $cle => $valeur) {
 			$fields[] = $cle;
 			$values[] = "'$valeur'";
