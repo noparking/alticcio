@@ -72,6 +72,13 @@ if ($user->is_logged() and !$menu->can_access($_SERVER['REQUEST_URI'])) {
 }
 
 include include_path($page_file);
+
+$format_file = $page->get_format($page_file);
+$format_file_path = include_path($format_file);
+if (file_exists($format_file_path)) {
+	include $format_file_path;
+}
+
 $html_debug = debug::display();
 include include_path($page->get_template());
 
