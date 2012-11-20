@@ -113,7 +113,7 @@ if ($action == 'edit') {
 	$form->default_values['phrases'] = $phrase->get($attribut->phrases());
 	$form->default_values['options'] = $attribut->options();
 	$form->default_values['reference'] = $attribut->reference();
-	$form->default_values['valeur'] = $attribut->valeur();
+	$form->default_values['valeurs'] = $attribut->valeurs();
 }
 
 $form_start = $form->form_start();
@@ -220,7 +220,15 @@ HTML;
 		$left = $page->inc("snippets/produits-sections");
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Valeur'), 'class' =>	"produit-section produit-section-valeur".$hidden['valeur'], 'id' => "produit-section-valeur"))}
-{$form->input(array('name' => "valeur", 'label' => $dico->t('Valeur')))}
+{$form->input(array('type' => "radio", 'name' => "valeurs[type_valeur]", 'id' => "attribut-type_valeur-numerique", 'class' => "switch", 'switch' => "fieldset.attribut-valeur-numerique", 'value' => 'valeur_numerique', 'label' => $dico->t('ValeurNumerique')))}
+{$form->input(array('type' => "radio", 'name' => "valeurs[type_valeur]", 'id' => "attribut-type_valeur-phrase", 'class' => "switch", 'switch' => "fieldset.attribut-phrase-valeur", 'value' => 'phrase_valeur', 'label' => $dico->t('ValeurTextuelle')))}
+{$form->fieldset_start(array('legend' => $dico->t('ValeurNumerique'), 'class' => "attribut-valeur-numerique"))}
+{$form->input(array('name' => "valeurs[valeur_numerique]", 'label' => $dico->t('ValeurNumerique')))}
+{$form->input(array('type' => "hidden", 'name' => "valeurs[phrase_valeur]"))}
+{$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('ValeurTextuelle'), 'class' => "attribut-phrase-valeur"))}
+{$form->input(array('name' => "phrases[valeurs][phrase_valeur]", 'label' => $dico->t('ValeurTextuelle'), 'items' => $displayed_lang))}
+{$form->fieldset_end()}
 {$form->fieldset_end()}
 HTML;
 	}

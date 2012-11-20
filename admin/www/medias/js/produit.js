@@ -80,4 +80,20 @@ $(document).ready(function () {
 	$(".nom_hd").click(function () {
 		$(this).select();
 	});
+
+	$("input.switch[type=radio]").each(function () {
+		if ($(this).attr('checked') != "checked") {
+			$($(this).attr("switch")).hide();
+		}
+	});
+	$("input.switch[type=radio]").change(function () {
+		$("input.switch[type=radio]").each(function () {
+			if ($(this).attr('checked') != "checked") {
+				$($(this).attr("switch")).hide();
+			}
+			else {
+				$($(this).attr("switch")).show();
+			}
+		});
+	});
 });

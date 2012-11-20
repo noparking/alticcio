@@ -195,7 +195,6 @@ SQL;
 					else {
 						$set[] = "$field = '$value'";
 					}
-
 				}
 				$q = "UPDATE `{$table}` SET ".implode(',', $set)." WHERE id = $key_id";
 				$this->sql->query($q);

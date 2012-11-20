@@ -55,7 +55,14 @@ switch ($attribut->type_attribut) {
 		echo $form->select(array('name' => "attributs[".$attribut_id."]", 'options' => $options, 'label' => $label[$config->get('langue')], 'unit' => $unit));
 		break;
 	case 'readonly' :
-		echo $form->input(array('name' => "attributs[".$attribut_id."]", 'label' => $label[$config->get('langue')], 'readonly' => true, 'value' => $attribut->valeur()));
+		$valeurs = $attribut->valeurs();
+		if ($valeurs['type_valeur'] == 'phrase_valeur') {
+			echo $form->input(array('name' => "attributs[".$attribut_id."]", 'type' => "hidden", 'forced_value' => $valeurs['phrase_valeur']));
+			echo $form->input(array('name' => "phrases[valeurs_attributs][".$attribut_id."]", 'label' => $label[$config->get('langue')], 'readonly' => true, 'items' => $displayed_lang));
+		}
+		else {
+			echo $form->input(array('name' => "attributs[".$attribut_id."]", 'label' => $label[$config->get('langue')], 'readonly' => true, 'forced_value' => $valeurs['valeur_numerique']));
+		}
 		break;
 	default :
 		echo $form->input(array('name' => "attributs[".$attribut_id."]", 'label' => $label[$config->get('langue')]));

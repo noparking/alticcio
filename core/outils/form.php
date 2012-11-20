@@ -379,7 +379,7 @@ class Form {
 			}
 			$attr = "";
 			foreach ($params as $cle => $valeur) {
-				if (in_array($cle, array('min', 'max', 'step'))) {
+				if (in_array($cle, array('min', 'max', 'step', 'switch'))) {
 					$attr .= " $cle=\"$valeur\"";
 				}
 			}
@@ -1103,10 +1103,17 @@ HTML;
 			if (isset($params['checked']) and $params['checked']) {
 				return 'checked="checked"';
 			}
-			if (in_array($params['type'], array("checkbox", "radio"))) {
-				if ($this->get_default_value($name, $this->default_values)) {
-					return 'checked="checked"';
-				}
+			switch ($params['type']) {
+				case "checkbox" :
+					if ($this->get_default_value($name, $this->default_values)) {
+						return 'checked="checked"';
+					}
+					break;
+				case "radio" :
+					if ($this->get_default_value($name, $this->default_values) == $params['value']) {
+						return 'checked="checked"';
+					}
+					break;
 			}
 		}
 		return "";
