@@ -82,6 +82,7 @@ if ($form->is_submitted()) {
 			break;
 		case "delete-produit" :
 			$commande->delete_produit($form->action_arg());
+			$form->reset();
 			break;
 	}
 }
