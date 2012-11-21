@@ -39,7 +39,7 @@ if ($user->is_logged()) {
 		$url->redirect("accueil");
 	}
 	else {
-		$url->redirect();
+		$url->redirect("current");
 	}
 }
 
