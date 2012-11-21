@@ -483,7 +483,6 @@ HTML;
 		if (!preg_match("/^SELECT SQL_CALC_FOUND_ROWS/i", $q)) {
 			$q = preg_replace("/^select/i", "SELECT SQL_CALC_FOUND_ROWS", $q);
 		}
-var_dump($q);
 		$res = $this->sql->query($q);
 
 		if (!isset($this->total)) {
