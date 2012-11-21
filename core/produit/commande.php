@@ -102,9 +102,9 @@ SQL;
 		unset($cmd_values['id']);
 		$revision = $this->get_last_revision_id($id_commande) + 1;
 		$cmd_values['revision'] = $revision;
-		$cmd_values['user_id'] = 0;
+		$cmd_values['id_users'] = 0;
 		if (isset($_SESSION['extranet']['user']['id'])) {
-			$cmd_values['user_id'] = $_SESSION['extranet']['user']['id'];
+			$cmd_values['id_users'] = $_SESSION['extranet']['user']['id'];
 		}
 		foreach ($cmd_values as $cle => $valeur) {
 			$fields[] = $cle;
@@ -256,7 +256,7 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT dt_commandes_revision.*, dt_users.login AS user FROM dt_commandes_revision
-LEFT JOIN dt_users ON dt_users.id = dt_commandes_revision.user_id
+LEFT JOIN dt_users ON dt_users.id = dt_commandes_revision.id_users
 WHERE commande_id = $this->id $where
 ORDER BY revision ASC;
 SQL;
@@ -267,7 +267,7 @@ SQL;
 			unset($data['id']);
 			$revisions[$revision]['user'] = $data['user'] ? $data['user'] : "non identifié";
 			unset($data['user']);
-			unset($data['user_id']);
+			unset($data['id_users']);
 			if ($revision == 1) {
 				$revisions[$revision] += $data;
 			} else {
