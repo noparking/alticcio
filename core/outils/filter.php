@@ -113,6 +113,7 @@ class Filter {
 		// On a traité la sélection avant le reset car le reset n'affecte pas la sélection
 		if ($this->action('reset')) {
 			$filter = array();
+			$_SESSION['filters'][$this->name] = array();
 			if (method_exists($sql, "reset")) {
 				$sql->reset();
 			}
