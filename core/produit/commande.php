@@ -98,7 +98,7 @@ SQL;
 		$fields = array();
 		$values = array();
 		$cmd_values = $commande->values;
-		$cmd_values['commande_id'] = $cmd_values['id'];
+		$cmd_values['id_commandes'] = $cmd_values['id'];
 		unset($cmd_values['id']);
 		$revision = $this->get_last_revision_id($id_commande) + 1;
 		$cmd_values['revision'] = $revision;
@@ -113,14 +113,14 @@ SQL;
 		$fields = implode(",", $fields);
 		$values = implode(",", $values);
 		$q = <<<SQL
-INSERT INTO dt_commandes_revision ($fields) VALUES($values)
+INSERT INTO dt_commandes_revisions ($fields) VALUES($values)
 SQL;
 		$this->sql->query($q);
 		$produits = $commande->produits();
 		foreach ($produits as $id => $produit) {
 			$fields = array();
 			$values = array();
-			$produit['commandes_produits_id'] = $id;
+			$produit['id_commandes_produits'] = $id;
 			unset($produit['id']);
 			$produit['revision'] = $revision;
 			foreach ($produit as $cle => $valeur) {
@@ -130,7 +130,7 @@ SQL;
 			$fields = implode(",", $fields);
 			$values = implode(",", $values);
 			$q = <<<SQL
-INSERT INTO dt_commandes_produits_revision ({$fields}) VALUES ({$values})
+INSERT INTO dt_commandes_produits_revisions ({$fields}) VALUES ({$values})
 SQL;
 			$this->sql->query($q);
 		}
@@ -138,7 +138,7 @@ SQL;
 	
 	public function get_last_revision_id($id_commande) {
 		$q = <<<SQL
-SELECT MAX(revision) AS `max` FROM dt_commandes_revision WHERE commande_id = {$id_commande}
+SELECT MAX(revision) AS `max` FROM dt_commandes_revisions WHERE id_commandes = {$id_commande}
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
@@ -156,11 +156,11 @@ SQL;
 	
 	public function delete_revisions($id_commande) {
 		$q = <<<SQL
-DELETE FROM dt_commandes_revision WHERE commande_id = $id_commande;
+DELETE FROM dt_commandes_revisions WHERE id_commandes = $id_commande;
 SQL;
 		$this->sql->query($q);
 		$q = <<<SQL
-DELETE FROM dt_commandes_produits_revision WHERE id_commandes = $id_commande;
+DELETE FROM dt_commandes_produits_revisions WHERE id_commandes = $id_commande;
 SQL;
 		$this->sql->query($q);
 	}
@@ -255,9 +255,9 @@ SQL;
 			$where .= " AND revision < $end";
 		}
 		$q = <<<SQL
-SELECT dt_commandes_revision.*, dt_users.login AS user FROM dt_commandes_revision
-LEFT JOIN dt_users ON dt_users.id = dt_commandes_revision.id_users
-WHERE commande_id = $this->id $where
+SELECT dt_commandes_revisions.*, dt_users.login AS user FROM dt_commandes_revisions
+LEFT JOIN dt_users ON dt_users.id = dt_commandes_revisions.id_users
+WHERE id_commandes = $this->id $where
 ORDER BY revision ASC;
 SQL;
 		$res = $this->sql->query($q);
