@@ -29,6 +29,7 @@ SQL;
 CREATE TABLE IF NOT EXISTS `dt_commandes_revision` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
+  `id_users` int(11) NOT NULL,
   `commande_id` int(11) NOT NULL,
   `shop` int(11) NOT NULL,
   `id_api_keys` int(11) NOT NULL,
@@ -71,10 +72,6 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_revision` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `revision` (`revision`,`commande_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-SQL;
-	$update->sql->query($q);
-	$q = <<<SQL
-ALTER TABLE  `dt_commandes_revision` ADD  `user_id` INT NOT NULL AFTER  `societe`
 SQL;
 	$update->sql->query($q);
 };
