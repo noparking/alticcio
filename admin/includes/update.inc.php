@@ -5,10 +5,10 @@ $update->maj[0] = function() {
 
 $update->maj[1] = function($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revision` (
+CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
-  `commandes_produits_id` int(11) NOT NULL,
+  `id_commandes_produits` int(11) NOT NULL,
   `id_commandes` int(11) NOT NULL,
   `id_produits` int(11) NOT NULL,
   `id_sku` int(11) NOT NULL,
@@ -21,16 +21,16 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revision` (
   `personnalisation_nom_fichier` varchar(128) NOT NULL,
   `personnalisation_objet` longblob NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `revision` (`revision`,`commandes_produits_id`)
+  UNIQUE KEY `revision` (`revision`,`id_commandes_produits`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
 	$update->sql->query($q);
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_commandes_revision` (
+CREATE TABLE IF NOT EXISTS `dt_commandes_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
   `id_users` int(11) NOT NULL,
-  `commande_id` int(11) NOT NULL,
+  `id_commandes` int(11) NOT NULL,
   `shop` int(11) NOT NULL,
   `id_api_keys` int(11) NOT NULL,
   `token` varchar(16) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_revision` (
   `paiement_statut` enum('attente','valide','refuse','annule','rembourse','test') NOT NULL,
   `commentaire` text NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `revision` (`revision`,`commande_id`)
+  UNIQUE KEY `revision` (`revision`,`id_commandes`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
 	$update->sql->query($q);
