@@ -514,10 +514,14 @@ class Form {
     		if ($value !== "" and $value == $cle) {
 				$params['field'] .= ' selected="selected"';
 			}
-			if (isset($params['enable']) and !in_array($cle, $params['enable'])) {
+			if (isset($params['enable']) and 
+				((is_array($params['enable']) and !in_array($cle, $params['enable'])) or 
+				(!is_array($params['enable']) and !preg_match($params['enable'], $valeur)))) {
     			$params['field'] .= ' disabled="disabled"';
 			}
-			if (isset($params['disable']) and in_array($cle, $params['disable'])) {
+			if (isset($params['disable']) and 
+				((!is_array($params['disable']) and preg_match($params['disable'], $valeur)) or 
+				(is_array($params['disable']) and in_array($cle, $params['disable'])))) {
     			$params['field'] .= ' disabled="disabled"';
 			}
     		$params['field'] .= '>'.$valeur.'</option>';
