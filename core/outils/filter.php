@@ -435,6 +435,12 @@ HTML;
 				}
 			}
 		}
+
+		foreach ($this->elements() as $element) {
+			if (isset($element['where_in'])) {
+				$where .= " AND {$element['field']} IN ('".implode("','", $element['where_in'])."')";
+			}
+		}
 		
 		if ($where) {
 			if (preg_match("/\Wwhere\W/i", $q)) {
@@ -477,6 +483,7 @@ HTML;
 		if (!preg_match("/^SELECT SQL_CALC_FOUND_ROWS/i", $q)) {
 			$q = preg_replace("/^select/i", "SELECT SQL_CALC_FOUND_ROWS", $q);
 		}
+var_dump($q);
 		$res = $this->sql->query($q);
 
 		if (!isset($this->total)) {
