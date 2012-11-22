@@ -269,6 +269,8 @@ SQL;
 			$revisions[$revision]['user'] = $data['user'] ? $data['user'] : "non identifié";
 			unset($data['user']);
 			unset($data['id_users']);
+			$revisions[$revision]['date_revision'] = $data['date_revision'];
+			unset($data['date_revision']);
 			if ($revision == 1) {
 				$revisions[$revision] += $data;
 			} else {
@@ -279,7 +281,6 @@ SQL;
 					}
 				}
 			}
-			$revisions[$revision]['date_revision'] = $data['date_revision'];
 		}
 		return $revisions;
 	}
