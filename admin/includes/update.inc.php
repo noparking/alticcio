@@ -8,6 +8,7 @@ $update->maj[1] = function($update) {
 CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
+  `date_revision` int(11) NOT NULL,
   `id_commandes_produits` int(11) NOT NULL,
   `id_commandes` int(11) NOT NULL,
   `id_produits` int(11) NOT NULL,
@@ -29,6 +30,7 @@ SQL;
 CREATE TABLE IF NOT EXISTS `dt_commandes_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
+  `date_revision` int(11) NOT NULL,
   `id_users` int(11) NOT NULL,
   `id_commandes` int(11) NOT NULL,
   `shop` int(11) NOT NULL,
