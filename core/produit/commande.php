@@ -279,6 +279,7 @@ SQL;
 					}
 				}
 			}
+			$revisions[$revision]['date_revision'] = $data['date_revision'];
 		}
 		return $revisions;
 	}
