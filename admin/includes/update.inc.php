@@ -74,4 +74,12 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_revisions` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
 	$update->sql->query($q);
+	$q = <<<SQL
+ALTER TABLE  `dt_commandes_revisions` ADD  `date_revision` INT NOT NULL AFTER  `revision`
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
+ALTER TABLE  `dt_commandes_produits_revisions` ADD  `date_revision` INT NOT NULL AFTER  `revision`
+SQL;
+	$update->sql->query($q);
 };

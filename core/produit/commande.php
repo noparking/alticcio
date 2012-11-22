@@ -103,6 +103,7 @@ SQL;
 		$revision = $this->get_last_revision_id($id_commande) + 1;
 		$cmd_values['revision'] = $revision;
 		$cmd_values['id_users'] = 0;
+		$cmd_values['date_revision'] = time();
 		if (isset($_SESSION['extranet']['user']['id'])) {
 			$cmd_values['id_users'] = $_SESSION['extranet']['user']['id'];
 		}
