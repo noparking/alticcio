@@ -15,6 +15,7 @@ class Filter {
 	private $inputs = array();
 
 	public function __construct($sql, $elements, $selected = array(), $name = "filter", $selected_only = null) {
+//unset($_SESSION['filters'][$name]);
 		$this->sql = $sql;
 		$this->name = $name;
 		$this->elements = array();
@@ -90,7 +91,7 @@ class Filter {
 		}
 
 		if ($this->inverted) {
-			if (isset($filter['items'])) {
+			if (isset($filter['items']) and $filter['items']) {
 				$items = explode(",", $filter['items']);
 				foreach ($items as $item) {
 					if (!isset($filter['selected'][$item]) and !in_array($item, $this->selected)) {
@@ -359,7 +360,6 @@ HTML;
 	
 	public function query($q) {
 		$filter = $this->filter;
-		
 		$where = "";
 		$having = "";
 		if (isset($filter['selection'])) {
