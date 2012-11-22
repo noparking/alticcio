@@ -18,7 +18,6 @@ class Filter {
 		$this->sql = $sql;
 		$this->name = $name;
 		$this->elements = array();
-		
 		if (isset($_POST[$this->name])) {
 			$filter = $_POST[$this->name];
 			$_SESSION['filters'][$this->name] = $filter;
@@ -273,8 +272,7 @@ HTML;
 <span class="filter-element filter-{$element['type']}">
 <input type="hidden" name="{$id}[start]}" id="{$id}[start]" value="{$start}" />
 <input type="hidden" name="{$id}[end]}" id="{$id}[end]" value="{$end}" />
-[<input name="" id="{$id}[start]-visible" type="text" class="date-input filter-date" value="{$date_start}" />
--<input name="" id="{$id}[end]-visible" type="text" class="date-input filter-date" value="{$date_end}" />]
+[<input name="" id="{$id}[start]-visible" type="text" class="date-input filter-date" value="{$date_start}" />-<input name="" id="{$id}[end]-visible" type="text" class="date-input filter-date" value="{$date_end}" />]
 </span>
 HTML;
 				break;
@@ -369,16 +367,33 @@ HTML;
 			$element = array_shift($elements);
 			$field = $element['field'];
 			if ($filter['selection'] == 1) {
-				if (count($this->selected)) {
-					$where .= " AND $field IN (".implode(",", $this->selected).")";
+				if ($this->inverted) {
+					if (count($this->selected)) {
+						$where .= " AND $field NOT IN (".implode(",", $this->selected).")";
+					}
 				}
 				else {
-					$where .= " AND 0";
+					if (count($this->selected)) {
+						$where .= " AND $field IN (".implode(",", $this->selected).")";
+					}
+					else {
+						$where .= " AND 0";
+					}
 				}
 			}
 			if ($filter['selection'] == -1) {
-				if (count($this->selected)) {
-					$where .= " AND $field NOT IN (".implode(",", $this->selected).")";
+				if ($this->inverted) {
+					if (count($this->selected)) {
+						$where .= " AND $field IN (".implode(",", $this->selected).")";
+					}
+					else {
+						$where .= " AND 0";
+					}
+				}
+				else {
+					if (count($this->selected)) {
+						$where .= " AND $field NOT IN (".implode(",", $this->selected).")";
+					}
 				}
 			}
 		}
