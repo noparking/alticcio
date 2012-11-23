@@ -38,12 +38,6 @@ SQL;
 			$q = "UPDATE dt_blogs SET ".implode(",", $values);
 			$q .= " WHERE id=".$id;
 			$this->sql->query($q);
-			
-			$q = "DELETE FROM dt_blogs_themes_blogs WHERE id_blogs = $id";
-			$this->sql->query($q);
-			
-			$q = "DELETE FROM dt_blogs_langues WHERE id_blogs = $id";
-			$this->sql->query($q);
 		}
 		else {
 			$fields = array();
@@ -60,6 +54,9 @@ SQL;
 		}
 
 		if (isset($data['themes'])) {
+			$q = "DELETE FROM dt_blogs_themes_blogs WHERE id_blogs = $id";
+			$this->sql->query($q);
+			
 			$themes_blogs = array();
 			foreach ($data['themes'] as $theme => $checked) {
 				if ($checked) {
@@ -73,6 +70,9 @@ SQL;
 		}
 
 		if (isset($data['langues'])) {
+			$q = "DELETE FROM dt_blogs_langues WHERE id_blogs = $id";
+			$this->sql->query($q);
+
 			$langues_blogs = array();
 			foreach ($data['langues'] as $langue => $checked) {
 				if ($checked) {
