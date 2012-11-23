@@ -1,7 +1,9 @@
 <?php
 class Facebook_Share_Button {
 	public $href;
+	public $app_id;
 	public $redirect_uri;
+	public $link;
 	public $picture;
 	public $name;
 	public $caption;
@@ -9,6 +11,13 @@ class Facebook_Share_Button {
 	
 	function __construct(array $data) {
 		$this->href = $data['href'];
+		$this->app_id = $data['app_id'];
+		$this->redirect_uri = $data['redirect_uri'];
+		$this->link = $data['link'];
+		$this->picture = $data['picture'];
+		$this->name = $data['name'];
+		$this->caption = $data['caption'];
+		$this->description = $data['description'];
 	}
 	
 	function generer_bouton() {
@@ -16,15 +25,15 @@ class Facebook_Share_Button {
 		$js = <<<Javascript
 $(document).ready(function() {
 	$("#fb-partage").click(function() {
-		FB.init({appId: "486457814727883", status: true, cookie: true});
+		FB.init({appId: "{$this->app_id}", status: true, cookie: true});
 		var obj = {
 			method: 'feed',
-			redirect_uri: facebook_wall_url,
-			link: facebook_wall_url,
-			picture: '{$config->get("site_url")}{$config->media("logo.png")}',
-			name: 'Mon tapis de jeu Aberlaas',
-			caption: 'Aberlaas',
-			description: "Comment trouvez-vous le tapis que j'ai choisi ?",
+			redirect_uri: {$this->redirect_uri},
+			link: {$this->link},
+			picture: '{$this->picture}',
+			name: '{$this->name}',
+			caption: '{$this->caption}',
+			description: "{$this->description}",
 		};
 		function callback(reponse) { }
 		FB.ui(obj, callback);
