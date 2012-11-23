@@ -5,6 +5,7 @@ class Filter {
 	private $sql; // $sql can be a pager
 	private $filter;
 	private $elements;
+	private $visible_elements;
 	private $name;
 	private $total;
 	private $rows = array();
@@ -125,6 +126,9 @@ class Filter {
 				$element['field'] = "`".$cle."`";
 			}
 			$this->elements[$cle] = $element;
+			if (!isset($element['type']) or $element['type'] != "hidden") {
+				$this->visible_elements[$cle] = $element;
+			}
 			if (!isset($filter['sort']['column']) and isset($element['order'])) {
 				$filter['sort']['column'] = $cle;
 				$filter['sort']['order'] = $element['order'];
@@ -147,6 +151,10 @@ class Filter {
 	
 	public function elements() {
 		return $this->elements;
+	}
+
+	public function visible_elements() {
+		return $this->visible_elements;
 	}
 	
 	public function selected() {

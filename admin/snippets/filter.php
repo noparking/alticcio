@@ -32,7 +32,7 @@ HTML;
 <th>{$filter->allpagebox()}</th>
 HTML;
 
-$elements = $filter->elements();
+$elements = $filter->visible_elements();
 foreach ($elements as $element) {
 	$html .= <<<HTML
 <th>{$filter->column($element)}</th>

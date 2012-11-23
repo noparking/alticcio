@@ -28,11 +28,13 @@ $html = <<<HTML
 <tr>
 <th>{$filter->allpagebox($is_permitted)}</th>
 HTML;
-	foreach ($filter->elements() as $element) {
-		$html .= <<<HTML
+
+$elements = $filter->visible_elements();
+foreach ($elements as $element) {
+	$html .= <<<HTML
 <th>{$filter->column($element)}</th>
 HTML;
-	}
+}
 	$html .= <<<HTML
 </tr>
 <tr>
@@ -40,7 +42,7 @@ HTML;
 	{$filter->selection(array(0 => $dico->t("Tous"), 1 => $dico->t("Oui"), -1 => $dico->t("Non")))}
 </td>
 HTML;
-	foreach ($filter->elements() as $element) {
+	foreach ($elements as $element) {
 		$html .= <<<HTML
 <td>
 	{$filter->field($element)}
@@ -61,10 +63,12 @@ HTML;
 </td>
 HTML;
 		foreach ($row as $cle => $valeur) {
-			$replacements = array("%id%" => $row['id']);
-			$html .= <<<HTML
+			if (isset($elements[$cle])) {
+				$replacements = array("%id%" => $row['id']);
+				$html .= <<<HTML
 <td class="filter-data">{$filter->value_or_input($form, $cle, $valeur, $replacements)}</td>
 HTML;
+			}
 		}
 		$html .= <<<HTML
 </tr>
