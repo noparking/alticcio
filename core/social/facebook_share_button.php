@@ -20,7 +20,7 @@ $(document).ready(function() {
 		var obj = {
 			method: 'feed',
 			redirect_uri: facebook_wall_url,
-			link: 'https://developers.facebook.com/docs/reference/dialogs/',
+			link: facebook_wall_url,
 			picture: '{$config->get("site_url")}{$config->media("logo.png")}',
 			name: 'Mon tapis de jeu Aberlaas',
 			caption: 'Aberlaas',
