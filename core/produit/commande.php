@@ -52,7 +52,6 @@ SQL;
 			}
 		}
 
-
 		$id = parent::save($data);
 		
 		if (isset($data['produits'])) {
@@ -109,7 +108,7 @@ SQL;
 		}
 		foreach ($cmd_values as $cle => $valeur) {
 			$fields[] = $cle;
-			$values[] = "'$valeur'";
+			$values[] = "'".addslashes($valeur)."'";
 		}
 		$fields = implode(",", $fields);
 		$values = implode(",", $values);
