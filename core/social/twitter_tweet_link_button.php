@@ -23,7 +23,7 @@ class Twitter_Tweet_Link_Button {
 			$link .= "&amp;url={$this->href}";
 		}
 		return <<<HTML
-<a href="{$link}" target="_blank" id="twitter-partage">
+<a href="{$link}" target="_blank" id="twitter-partage" onclick="window.open(this.href,'name','height=250,width=500'); return false;">
 	<img src="{$config->media("twitter.png")}" />
 </a>
 HTML;
