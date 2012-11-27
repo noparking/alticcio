@@ -172,15 +172,12 @@ HTML;
 		return $array['reference'];
 	}
 	
-	function validatePayment() {
-		if ($this->noError() == true) {
-			$ref = $this->getReference();
-			if (preg_match("#^([0-3]+)aberlaas([0-9]+)#i", $ref, $matches)) {
-				$commande = new Commande($GLOBALS['sql']);
-				$commande->load($matches[2]);
-				if ($commande->values['shop'] == (int) $matches[1]) {
-					$commande->update_paiement("valide", 'cb');
-				}
+	function validatePayment($data = null) {
+		if ($data) {
+			$commande = new Commande($GLOBALS['sql']);
+			$commande->load($data['id_commande']);
+			if ($commande->values['shop'] == $data['shop']) {
+				$commande->update_paiement("valide", 'cb');
 			}
 		}
 	}
