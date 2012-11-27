@@ -11,6 +11,7 @@ class User {
 	const UNAUTHORIZED = -2;
 	const WRONGPASSWORD = -3;
 	const ALLREADYEXISTS = -4;
+	const UNKNOW_KEY = -5;
 	
 	
 	public function __construct($sql = null) {
@@ -356,5 +357,45 @@ SQL;
 			$blogblogs[$row['id']] = $row['nom'];
 		}
 		return $blogblogs;
+	}
+	
+	function init_process_recuperer_password($id) {
+		$id = (int) $id;
+		$q = <<<SQL
+DELETE FROM dt_users_password WHERE id_users = {$id}
+SQL;
+		$this->sql->query($q);
+		$continue = true;
+		$key = $id.time().uniqid("aberlaas")."aberlaas.com";
+		$key = md5($key);
+		$q = <<<SQL
+INSERT INTO dt_users_password(id_users, `key`) VALUES ({$id}, '{$key}')
+SQL;
+		$this->sql->query($q);
+		return $key;
+	}
+	
+	function reinit_password($code_url, &$id_user) {
+		$code_url = mysql_real_escape_string($code_url);
+		$q = <<<SQL
+SELECT id_users FROM dt_users_password WHERE `key` = '{$code_url}'
+SQL;
+		$res = $this->sql->query($q);
+		$data = $this->sql->fetch($res);
+		if (!$data) {
+			return self::UNKNOW_KEY;
+		}
+		$new_password = mt_rand(100000, 999999);
+		$update = array(
+			'password' => $new_password,
+			'acces' => 1,
+		);
+		$this->update($data['id_users'], $update);
+		$id_user = $data['id_users'];
+		$q = <<<SQL
+DELETE FROM dt_users_password WHERE `key` = '{$code_url}'
+SQL;
+		$this->sql->query($q);
+		return $new_password;
 	}
 }
