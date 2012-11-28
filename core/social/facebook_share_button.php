@@ -1,6 +1,5 @@
 <?php
 class Facebook_Share_Button {
-	public $href;
 	public $app_id;
 	public $redirect_uri;
 	public $link;
@@ -8,9 +7,9 @@ class Facebook_Share_Button {
 	public $name;
 	public $caption;
 	public $description;
+	public $id;
 	
 	function __construct(array $data) {
-		$this->href = $data['href'];
 		$this->app_id = $data['app_id'];
 		$this->redirect_uri = $data['redirect_uri'];
 		$this->link = $data['link'];
@@ -18,13 +17,14 @@ class Facebook_Share_Button {
 		$this->name = $data['name'];
 		$this->caption = $data['caption'];
 		$this->description = $data['description'];
+		$this->id = isset($data['id']) ? $data['id'] : uniqid();
 	}
 	
 	function generer_bouton() {
 		global $config, $page;
 		$js = <<<Javascript
 $(document).ready(function() {
-	$("#fb-partage").click(function() {
+	$("#fb-partage-{$this->id}").click(function() {
 		FB.init({appId: "{$this->app_id}", status: true, cookie: true});
 		var obj = {
 			method: 'feed',
@@ -42,7 +42,7 @@ $(document).ready(function() {
 Javascript;
 		$page->post_javascript[] = $js;
 		return <<<HTML
-<img src="{$config->media("facebook.png")}" id="fb-partage" style="cursor:pointer;"/>
+<img src="{$config->media("facebook.png")}" id="fb-partage-{$this->id}" style="cursor:pointer;"/>
 HTML;
 	}
 }
