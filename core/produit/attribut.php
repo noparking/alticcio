@@ -196,18 +196,29 @@ SQL;
 		}
 		if (isset($data['valeurs'])) {
 			$valeurs = $data['valeurs'];
+			if (!isset($valeurs['type_valeur'])) {
+				$valeurs['type_valeur'] = "valeur_numerique";
+			}
 			foreach ($data['phrases']['valeurs']['phrase_valeur'] as $lang => $phrase) {
 				$id_phrase = $this->phrase->save($lang, $phrase, $valeurs['phrase_valeur']);
+			}
+			if ($valeurs['type_valeur'] == "valeur_numerique") {
+				$valeur_numerique = $valeurs['valeur_numerique'];
+				$phrase_valeur = 0;
+			}
+			else {
+				$valeur_numerique = 0;
+				$phrase_valeur = $id_phrase;
 			}
 			$q = "DELETE FROM dt_attributs_valeurs WHERE id_attributs = $id";
 			$this->sql->query($q);
 			$q = "INSERT INTO dt_attributs_valeurs (id_attributs, type_valeur, valeur_numerique, phrase_valeur) VALUES ($id, '{$valeurs['type_valeur']}', {$valeurs['valeur_numerique']}, {$id_phrase})";
 			$this->sql->query($q);
-			$q = "UPDATE dt_produits_attributs SET valeur_numerique={$valeurs['valeur_numerique']}, phrase_valeur='{$id_phrase}' WHERE id_attributs = $id";
+			$q = "UPDATE dt_produits_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
-			$q = "UPDATE dt_sku_attributs SET valeur_numerique={$valeurs['valeur_numerique']}, phrase_valeur='{$id_phrase}' WHERE id_attributs = $id";
+			$q = "UPDATE dt_sku_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
-			$q = "UPDATE dt_matieres_attributs SET valeur_numerique={$valeurs['valeur_numerique']}, phrase_valeur='{$id_phrase}' WHERE id_attributs = $id";
+			$q = "UPDATE dt_matieres_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
 		}
 
