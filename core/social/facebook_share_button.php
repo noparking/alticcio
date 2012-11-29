@@ -41,6 +41,9 @@ $(document).ready(function() {
 });
 Javascript;
 		$page->post_javascript[] = $js;
+		if (!in_array("http://connect.facebook.net/en_US/all.js", $page->javascript)) {
+			$page->javascript[] = "http://connect.facebook.net/en_US/all.js";
+		}
 		return <<<HTML
 <img src="{$config->media("facebook.png")}" id="fb-partage-{$this->id}" style="cursor:pointer;"/>
 HTML;
