@@ -19,7 +19,7 @@ class Facebook_Share_Button {
 		$this->caption = $data['caption'];
 		$this->description = $data['description'];
 		$this->id = isset($data['id']) ? $data['id'] : uniqid();
-		$this->js = isset($data['js']) ? $data['js'] : "send_to_facebook({$this->getId()});";
+		$this->js = isset($data['js']) ? $data['js'] : "send_to_facebook_{$this->id}(\"{$this->getId()}\");";
 	}
 	
 	function getId() {
@@ -28,7 +28,7 @@ class Facebook_Share_Button {
 	
 	function facebookJs() {
 		return <<<Javascript
-function send_to_facebook() {		
+function send_to_facebook_{$this->id}() {		
 	FB.init({appId: "{$this->app_id}", status: true, cookie: true});
 	var obj = {
 		method: 'feed',

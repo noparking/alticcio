@@ -11,7 +11,7 @@ class Pinterest_Pin_It_Button {
 		$this->media = $data['media'];
 		$this->description = $data['description'];
 		$this->id = isset($data['id']) ? $data['id'] : uniqid();
-		$this->js = isset($data['js']) ? $data['js'] : "send_to_pinterest()";
+		$this->js = isset($data['js']) ? $data['js'] : "send_to_pinterest_{$this->id}()";
 	}
 	
 	function getId() {
@@ -25,7 +25,7 @@ class Pinterest_Pin_It_Button {
 			$page->javascript[] = "http://assets.pinterest.com/js/pinit.js";
 		}
 		$js = <<<Javascript
-function send_to_pinterest() {
+function send_to_pinterest_{$this->id}() {
 	var url = encodeURI({$this->url});
 	var media = encodeURI({$this->media});
 	var description = encodeURI("{$this->description}");
