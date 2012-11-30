@@ -11,29 +11,48 @@ class Pinterest_Pin_It_Button {
 		$this->media = $data['media'];
 		$this->description = $data['description'];
 		$this->id = isset($data['id']) ? $data['id'] : uniqid();
-		$this->js = isset($data['js']) ? $data['js'] : "send_to_pinterest_{$this->id}()";
+		$this->js = isset($data['js']) ? $data['js'] : "send_to_pinterest(pinterest_object_{$this->id});";
 	}
 	
 	function getId() {
 		return "pinterest-{$this->id}";
 	}
 	
+	function pinterestJs() {
+		return <<<Javascript
+function send_to_pinterest(object) {
+	var url = encodeURI(object.url);
+	var media = encodeURI(object.media);
+	var description = encodeURI(object.description);
+	var newWindowUrl = "http://pinterest.com/pin/create/button/?url="+url+"&media="+media+"&description="+description;
+	window.open(newWindowUrl,'name','height=350,width=600');
+}		
+Javascript;
+	}
+	
+	function defaultJs() {
+		return <<<Javascript
+var pinterest_object_{$this->id} = {
+	url: {$this->url},
+	media: {$this->media},
+	description: "{$this->description}"
+};
+Javascript;
+	}
+	
 	function generer_bouton() {
 		global $page;
 		
+		if (!in_array($this->pinterestJs(), $page->post_javascript)) {
+			$page->post_javascript[] = $this->pinterestJs();
+		}
 		if (!in_array("http://assets.pinterest.com/js/pinit.js", $page->javascript)) {
 			$page->javascript[] = "http://assets.pinterest.com/js/pinit.js";
 		}
 		$js = <<<Javascript
-function send_to_pinterest_{$this->id}() {
-	var url = encodeURI({$this->url});
-	var media = encodeURI({$this->media});
-	var description = encodeURI("{$this->description}");
-	var newWindowUrl = "http://pinterest.com/pin/create/button/?url="+url+"&media="+media+"&description="+description;
-	window.open(newWindowUrl,'name','height=350,width=600');
-}
 $(document).ready(function() {
 	$("#{$this->getId()}").click(function() {
+		{$this->defaultJs()}
 		{$this->js}
 	});
 });

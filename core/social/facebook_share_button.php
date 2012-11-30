@@ -19,7 +19,7 @@ class Facebook_Share_Button {
 		$this->caption = $data['caption'];
 		$this->description = $data['description'];
 		$this->id = isset($data['id']) ? $data['id'] : uniqid();
-		$this->js = isset($data['js']) ? $data['js'] : "send_to_facebook_{$this->id}(\"{$this->getId()}\");";
+		$this->js = isset($data['js']) ? $data['js'] : "send_to_facebook(facebook_object_{$this->id});";
 	}
 	
 	function getId() {
@@ -28,16 +28,16 @@ class Facebook_Share_Button {
 	
 	function facebookJs() {
 		return <<<Javascript
-function send_to_facebook_{$this->id}() {		
-	FB.init({appId: "{$this->app_id}", status: true, cookie: true});
+function send_to_facebook(object) {		
+	FB.init({appId: "object.app_id", status: true, cookie: true});
 	var obj = {
 		method: 'feed',
-		redirect_uri: {$this->redirect_uri},
-		link: {$this->link},
-		picture: {$this->picture},
-		name: '{$this->name}',
-		caption: '{$this->caption}',
-		description: "{$this->description}",
+		redirect_uri: object.redirect_uri,
+		link: object.link,
+		picture: object.picture,
+		name: object.name,
+		caption: object.caption,
+		description: object.description,
 	};
 	function callback(reponse) { }
 	FB.ui(obj, callback);
@@ -45,12 +45,29 @@ function send_to_facebook_{$this->id}() {
 Javascript;
 	}
 	
+	function defaultJs() {
+		return <<<Javascript
+var facebook_object_{$this->id} = {
+	app_id: "{$this->app_id}",
+	redirect_uri: {$this->redirect_uri},
+	link: {$this->link},
+	picture: {$this->picture},
+	name: "{$this->name}",
+	caption: "{$this->caption}",
+	description: "{$this->description}"
+};
+Javascript;
+	}
+	
 	function generer_bouton() {
 		global $config, $page;
+		if (!in_array($this->facebookJs(), $page->post_javascript)) {
+			$page->post_javascript[] = $this->facebookJs();
+		}
 		$js = <<<Javascript
-{$this->facebookJs()}
 $(document).ready(function() {
 	$("#{$this->getId()}").click(function() {
+		{$this->defaultJs()}
 		{$this->js}
 	});
 });
