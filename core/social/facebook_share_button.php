@@ -31,7 +31,7 @@ class Facebook_Share_Button {
 		$js = <<<Javascript
 $(document).ready(function() {
 	$("#{$this->getId()}").click(function() {
-		{$js}
+		{$this->js}
 		FB.init({appId: "{$this->app_id}", status: true, cookie: true});
 		var obj = {
 			method: 'feed',
