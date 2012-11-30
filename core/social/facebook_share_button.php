@@ -20,17 +20,21 @@ class Facebook_Share_Button {
 		$this->id = isset($data['id']) ? $data['id'] : uniqid();
 	}
 	
+	function getId() {
+		return "fb-partage-{$this->id}";
+	}
+	
 	function generer_bouton() {
 		global $config, $page;
 		$js = <<<Javascript
 $(document).ready(function() {
-	$("#fb-partage-{$this->id}").click(function() {
+	$("#{$this->getId()}").click(function() {
 		FB.init({appId: "{$this->app_id}", status: true, cookie: true});
 		var obj = {
 			method: 'feed',
 			redirect_uri: {$this->redirect_uri},
 			link: {$this->link},
-			picture: '{$this->picture}',
+			picture: {$this->picture},
 			name: '{$this->name}',
 			caption: '{$this->caption}',
 			description: "{$this->description}",
@@ -45,7 +49,7 @@ Javascript;
 			$page->javascript[] = "http://connect.facebook.net/en_US/all.js";
 		}
 		return <<<HTML
-<img src="{$config->media("facebook.png")}" id="fb-partage-{$this->id}" style="cursor:pointer;"/>
+<img src="{$config->media("facebook.png")}" id="{$this->getId()}" style="cursor:pointer;"/>
 HTML;
 	}
 }
