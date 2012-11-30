@@ -29,7 +29,7 @@ class Facebook_Share_Button {
 	function facebookJs() {
 		return <<<Javascript
 function send_to_facebook(object) {		
-	FB.init({appId: "object.app_id", status: true, cookie: true});
+	FB.init({appId: object.app_id, status: true, cookie: true});
 	var obj = {
 		method: 'feed',
 		redirect_uri: object.redirect_uri,
