@@ -3,11 +3,13 @@ class Pinterest_Pin_It_Button {
 	public $url;
 	public $media;
 	public $description;
+	public $id;
 	
 	function __construct(array $data) {
 		$this->url = $data['url'];
 		$this->media = $data['media'];
 		$this->description = $data['description'];
+		$this->id = isset($data['id']) ? $data['id'] : uniqid();
 	}
 	
 	
@@ -22,7 +24,7 @@ class Pinterest_Pin_It_Button {
 		$link .= "&media=".urlencode($this->media);
 		$link .= "&description=".urlencode($this->description);
 		return <<<HTML
-<a href="{$link}" class="pin-it-button" count-layout="none">
+<a href="{$link}" class="pin-it-button" count-layout="none" id="pinterest_{$data['id']}">
 	<img border="0" src="http://assets.pinterest.com/images/PinExt.png" title="Pin It" />
 </a>
 HTML;
