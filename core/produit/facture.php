@@ -40,6 +40,7 @@ class Facture extends AbstractObject {
 	
 	function save($data) {
 		$data['facture']['id_commandes'] = $data['facture']['id'];
+		$data['facture']['date_commande'] = time();
 		unset($data['facture']['id']);
 		$facture = new Facture($this->sql);
 		if ($facture->load($data['facture']['id_commandes'], self::LOAD_CMD_ID)) {
