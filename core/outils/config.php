@@ -161,7 +161,6 @@ class Config {
 		else {
 			$url = $this->get('base_url');
 		}
-		var_dump("$dir/$file");
 		if ($dir) {
 			return $url.$medias."$dir/$file";
 		} else {
