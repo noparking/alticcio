@@ -108,19 +108,21 @@ class Config {
 	}
 	
 	public function media($file, $type = null) {
+		$filename = null;
 		$version = $this->get("version");
 		if (file_exists($this->get('base_path')."/www/medias/".$file) or
 				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$file))) {
 			$filename = $this->media_file("base", "", $file);
 		}
-		if ($type === null) {
+		if (!$filename and $type === null) {
 			preg_match("/\.([^\.]+)$/", $file, $matches);
 			$type = strtolower($matches[1]);
 		}
-		if (file_exists($this->get('base_path')."/www/medias/".$type) or
-				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$type))) {
+		if (!$filename and 
+				(file_exists($this->get('base_path')."/www/medias/".$type) or
+				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$type)))) {
 			$filename = $this->media_file("base", $type, $file);
-		} else {
+		} else if (!$filename) {
 			$filename = $this->media_file("base", "images", $file);
 		}
 		if ($version and in_array($type, array("js", "css"))) {
@@ -159,6 +161,7 @@ class Config {
 		else {
 			$url = $this->get('base_url');
 		}
+		var_dump("$dir/$file");
 		if ($dir) {
 			return $url.$medias."$dir/$file";
 		} else {
