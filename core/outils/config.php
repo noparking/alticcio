@@ -108,9 +108,10 @@ class Config {
 	}
 	
 	public function media($file, $type = null) {
+		$version = $this->get("version");
 		if (file_exists($this->get('base_path')."/www/medias/".$file) or
 				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$file))) {
-			return $this->media_file("base", "", $file);
+			$filename = $this->media_file("base", "", $file);
 		}
 		if ($type === null) {
 			preg_match("/\.([^\.]+)$/", $file, $matches);
@@ -118,10 +119,14 @@ class Config {
 		}
 		if (file_exists($this->get('base_path')."/www/medias/".$type) or
 				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$type))) {
-			return $this->media_file("base", $type, $file);
+			$filename = $this->media_file("base", $type, $file);
 		} else {
-			return $this->media_file("base", "images", $file);
+			$filename = $this->media_file("base", "images", $file);
 		}
+		if ($version and in_array($type, array("js", "css"))) {
+			$filename .= "?{$version}";
+		}
+		return $filename;
 	}
 	
 	public function set($var, $value) {
