@@ -150,3 +150,14 @@ CREATE TABLE IF NOT EXISTS `dt_factures_produits` (
 SQL;
 	$update->sql->query($q);
 };
+$update->maj[3] = function($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_users_password` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`id_users` int(11) NOT NULL,
+		`key` varchar(256) NOT NULL,
+		PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SQL;
+	$update->sql->query($q);
+};
