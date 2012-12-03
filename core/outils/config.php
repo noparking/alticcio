@@ -114,7 +114,7 @@ class Config {
 				($this->get('base_path_alticcio') and file_exists($this->get('base_path_alticcio')."/www/medias/".$file))) {
 			$filename = $this->media_file("base", "", $file);
 		}
-		if (!$filename and $type === null) {
+		if ($type === null) {
 			preg_match("/\.([^\.]+)$/", $file, $matches);
 			$type = strtolower($matches[1]);
 		}
