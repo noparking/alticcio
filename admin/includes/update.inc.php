@@ -161,3 +161,13 @@ CREATE TABLE IF NOT EXISTS `dt_users_password` (
 SQL;
 	$update->sql->query($q);
 };
+$update->maj[4] = function($update) {
+	$q = <<<SQL
+ALTER TABLE  `dt_commandes` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
+ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+SQL;
+	$update->sql->query($q);
+}
