@@ -171,3 +171,27 @@ ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'che
 SQL;
 	$update->sql->query($q);
 };
+
+$update->maj[5] = function($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_clients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(128) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `acces` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `login` (`login`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_clients_password` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_clients` int(11) NOT NULL,
+  `key` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;	
+SQL;
+	$update->sql->query($q);
+};
