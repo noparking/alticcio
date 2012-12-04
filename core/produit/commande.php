@@ -239,13 +239,26 @@ SQL;
 	}
 	
 	public function changer_etat($etat, $id = null) {
-		$id_commande = ($id ? $id : $this->id);
-		$this->save(array(
+		$old_id = false;
+		$undef = false;
+		if (isset($this->id) and $id !=  null) {
+			$old_id = $this->id;
+			$this->id = $id;
+		} else if ($id != null) {
+			$this->id = $id;
+			$undef = true;
+		}
+		$this->update(array(
 			'commande' => array(
-				'id' => $id_commande,
 				'etat' => $etat,
 			),	
 		));
+		if ($old_id !== false) {
+			$this->id = $old_id;
+		}
+		if ($undef == true) {
+			unset($this->id);
+		}
 	}
 	
 	public function compare_revisions($start = 0, $end = 0) {
