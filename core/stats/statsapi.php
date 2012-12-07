@@ -215,6 +215,27 @@ SQL;
 		}
 		
 		return $clients;
+	}
 
+	public function produits_details() {
+		$date_start = null;
+		$date_stop = null;
+		$this->init_dates($date_start, $date_stop);
+		$q = <<<SQL
+SELECT cp.nom, COUNT(cp.id_sku) AS nb_commandes, SUM(cp.quantite) AS quantite_totale
+FROM dt_commandes_produits AS cp
+INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
+AND c.date_commande BETWEEN {$date_start} AND {$date_stop}
+GROUP BY cp.id_sku
+ORDER BY nb_commandes DESC, quantite_totale DESC, cp.nom ASC
+SQL;
+		$res = $this->sql->query($q);
+
+		$products = array();
+		while ($row = $this->sql->fetch($res)) {
+			$products[] = $row;
+		}
+
+		return $products;
 	}
 }

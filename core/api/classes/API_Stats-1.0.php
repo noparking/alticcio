@@ -52,4 +52,12 @@ class API_Stats {
 			'clients' => $details,
 		);
 	}
+
+	public function produits() {
+		$details = $this->stats->produits_details();
+		return array(
+			'year' => $this->annee,
+			'products' => $details,
+		);
+	}
 }

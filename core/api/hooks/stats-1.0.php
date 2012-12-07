@@ -17,3 +17,10 @@ function get_stats_clients($api, $annee) {
 	$ret = $stats->clients();
 	return $ret;
 }
+
+function get_stats_products($api, $annee) {
+	$stats = new API_Stats($api, $annee);
+	$ret = $stats->produits();
+	return $ret;
+}
+

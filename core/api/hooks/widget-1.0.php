@@ -38,5 +38,12 @@ function get_widget_stats($api) {
 	$ret = array();
 	$stats = new StatsApi($api->sql);
 	$ret['years'] = $stats->annees();
+	$data = $api->data();
+	if (isset($data['statsoptions'])) {
+		$ret['options'] = explode(',', $data['statsoptions']);
+	}
+	else {
+		$ret['options'] = array();
+	}
 	return $ret;
 }
