@@ -440,6 +440,7 @@ $d['pages'] = array(
     "statsshorturl" => "stats-short-url",
     "statscommandes" => "stats-orders",
 	"commandes" => "commandes",
+	"factures" => "invoices",
 );
 
 $d['hd_extensions'] = array(
