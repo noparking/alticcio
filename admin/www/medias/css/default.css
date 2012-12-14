@@ -802,3 +802,8 @@ div.filter-actions a {
 .input-text-numeric {
 	width: 50px;
 }
+
+.multiselect {
+	width: 460px;
+	height: 120px;
+}

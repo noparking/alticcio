@@ -507,11 +507,24 @@ class Form {
 		else{
 			$permitted = ' disabled="disabled"';
 		}
-		
-		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.'>';
+
+		if (isset($params['multiple']) and $params['multiple']) {
+			$multiple = " multiple";
+			$class .= " multiselect";
+			$selected_options = array();
+			ksort($value);
+			foreach ($value as $v) {	
+				$selected_option[$v] = $options[$v];
+			}
+			$options = $selected_option + $options;
+		}
+		else {
+			$multiple = "";
+		}
+		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.$multiple.'>';
 		foreach ($options as $cle => $valeur) {
     		$params['field'] .= '<option value="'.$cle.'"';
-    		if ($value !== "" and $value == $cle) {
+    		if ($value !== "" and ($value == $cle or (is_array($value) and in_array($cle, $value)))) {
 				$params['field'] .= ' selected="selected"';
 			}
 			if (isset($params['enable']) and 
@@ -1155,6 +1168,9 @@ HTML;
 	public function value($name, $values = null, $undefined = null) {
 		if ($values === null) {
 			$values = $this->merge_values($this->default_values, $this->values);
+		}
+		if (substr($name, -2) == "[]") {
+			$name = substr($name, 0, -2);
 		}
 		if (preg_match("/([^\[]*)\[([^\]]*)\](.*)/", $name, $matches)) {
 			if (is_array($values)) {
