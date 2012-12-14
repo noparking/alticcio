@@ -7,7 +7,7 @@ class Hellocoton_Billet_Article_Button {
 	}
 	
 	function generer_bouton() {
-		$url = $this->url;
+		$url = str_replace("http://", "", $this->url);
 		return <<<HTML
 <span style="display:block;width:147px;height:26px;position:relative;padding:0;border:10px 0px;margin:0;clear:both;">
 	<a href="http://www.hellocoton.fr/vote?url={$url}" target="_blank" style="display:block;width:121px;height:26px;position:absolute;top:0;left:0;">
