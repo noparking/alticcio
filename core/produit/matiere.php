@@ -97,14 +97,14 @@ SQL;
 	public function attributs() {
 		$attributs = array();
 		$q = <<<SQL
-SELECT id_attributs, valeur_numerique, phrase_valeur FROM dt_matieres_attributs
+SELECT id_attributs, valeur_numerique, phrase_valeur, classement FROM dt_matieres_attributs
 WHERE id_matieres = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
 			$value = $row['phrase_valeur'] ?  $row['phrase_valeur'] : $row['valeur_numerique'];
-			$attributs[$row['id_attributs']] = $value;
+			$attributs[$row['id_attributs']][$row['classement']] = $value;
 		}
 
 		return $attributs;
@@ -263,24 +263,28 @@ SQL;
 DELETE FROM dt_matieres_attributs WHERE id_matieres = $id
 SQL;
 			$this->sql->query($q);
-			foreach ($data['attributs'] as $attribut_id => $attribut) {
-				$valeur = $attribut;
-				if (isset($data['phrases']['attributs'][$attribut_id])) {
-					$type_valeur = "phrase_valeur";
-					if (is_array($data['phrases']['attributs'][$attribut_id])) {
-						foreach ($data['phrases']['attributs'][$attribut_id] as $lang => $phrase) {
-							$valeur = $this->phrase->save($lang, $phrase, $attribut);
+
+			ksort($data['attributs']);
+			foreach ($data['attributs'] as $attribut_id => $valeurs) {
+				foreach ($valeurs as $classement => $valeur) { 
+					$type_valeur = "valeur_numerique";
+					if (isset($data['phrases']['attributs'][$attribut_id])) {
+						$type_valeur = "phrase_valeur";
+						if (is_array($data['phrases']['attributs'][$attribut_id])) {
+							foreach ($data['phrases']['attributs'][$attribut_id] as $lang => $phrase) {
+								$valeur = $this->phrase->save($lang, $phrase, $attribut);
+							}
 						}
 					}
-				}
-				else {
-					$type_valeur = "valeur_numerique";
-				}
-				$q = <<<SQL
-INSERT INTO dt_matieres_attributs (id_attributs, id_matieres, $type_valeur)
-VALUES ($attribut_id, $id, $valeur)
+					else {
+						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
+					}
+					$q = <<<SQL
+INSERT INTO dt_matieres_attributs (id_attributs, id_matieres, $type_valeur, classement)
+VALUES ($attribut_id, $id, $valeur, $classement)
 SQL;
-				$this->sql->query($q);
+					$this->sql->query($q);
+				}
 			}
 		}
 

@@ -412,40 +412,55 @@ SQL;
 	public function attributs() {
 		$attributs = array();
 		$q = <<<SQL
-SELECT id_attributs, valeur_numerique, phrase_valeur FROM dt_sku_attributs
+SELECT id_attributs, valeur_numerique, phrase_valeur, classement FROM dt_sku_attributs
 WHERE id_sku = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
 			$value = $row['phrase_valeur'] ?  $row['phrase_valeur'] : $row['valeur_numerique'];
-			$attributs[$row['id_attributs']] = $value;
+			$attributs[$row['id_attributs']][$row['classement']] = $value;
 		}
 		return $attributs;
 	}
 
 	public function save_attributs($data, $id) {
 		if (isset($data['attributs'])) {
-			foreach ($data['attributs'] as $attribut_id => $attribut) {
-				$type_valeur = "valeur_numerique";
-				$valeur = $attribut;
-				if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
-					$type_valeur = "phrase_valeur";
-					if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
-						foreach ($data['phrases']['valeurs_attributs'][$attribut_id] as $lang => $phrase) {
-							$valeur = $this->phrase->save($lang, $phrase, $attribut);
-						}
-					}
-					$valeur = (int)$valeur;
-				}
-				else {
-					$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
-				}
-				$q = <<<SQL
-UPDATE dt_sku_attributs SET $type_valeur = $valeur
-WHERE id_attributs = $attribut_id AND id_sku = $id
+			$q = <<<SQL
+DELETE FROM dt_sku_attributs WHERE id_sku = $id AND classement > 0
 SQL;
-				$this->sql->query($q);
+			$this->sql->query($q);
+	
+			ksort($data['attributs']);
+			foreach ($data['attributs'] as $attribut_id => $valeurs) {
+				foreach ($valeurs as $classement => $valeur) { 
+					$type_valeur = "valeur_numerique";
+					if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
+						$type_valeur = "phrase_valeur";
+						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
+							foreach ($data['phrases']['valeurs_attributs'][$attribut_id] as $lang => $phrase) {
+								$valeur = $this->phrase->save($lang, $phrase, $valeur);
+							}
+						}
+						$valeur = (int)$valeur;
+					}
+					else {
+						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
+					}
+					if ($classement == 0) {
+						$q = <<<SQL
+UPDATE dt_sku_attributs SET $type_valeur = $valeur
+WHERE id_attributs = $attribut_id AND id_sku = $id AND classement = 0
+SQL;
+					}
+					else {
+						$q = <<<SQL
+INSERT INTO dt_sku_attributs (id_attributs, id_sku, $type_valeur, classement)
+VALUES ($attribut_id, $id, $valeur, $classement)
+SQL;
+					}
+					$this->sql->query($q);
+				}
 			}
 		}
 	}
