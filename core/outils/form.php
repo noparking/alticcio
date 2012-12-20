@@ -511,12 +511,16 @@ class Form {
 		if (isset($params['multiple']) and $params['multiple']) {
 			$multiple = " multiple";
 			$class .= " multiselect";
-			$selected_options = array();
-			ksort($value);
-			foreach ($value as $v) {	
-				$selected_option[$v] = $options[$v];
+			if (is_array($value)) {
+				$selected_options = array();
+				ksort($value);
+				foreach ($value as $v) {	
+					if (isset($options[$v])) {
+						$selected_options[$v] = $options[$v];
+					}
+				}
+				$options = $selected_options + $options;
 			}
-			$options = $selected_option + $options;
 		}
 		else {
 			$multiple = "";
