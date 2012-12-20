@@ -5,6 +5,9 @@ include dirname(__FILE__)."/../includes/config.php";
 $dir = dirname(__FILE__)."/";
 
 $file = str_replace($config->get("base_url"), "/", $_SERVER['REQUEST_URI']);
+if ($_SERVER['QUERY_STRING']) {
+	$file = preg_replace("/\?{$_SERVER['QUERY_STRING']}$/", "", $file);
+}
 
 if (file_exists($dir.$file)) {
 	$header = $config->header($file);
