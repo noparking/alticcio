@@ -10,7 +10,7 @@ class Atom {
 	function __construct(array $array) {
 		$this->id = $array['id'];
 		$this->title = $array['title'];
-		$this->subtitle = isset($array['subtitle']) ? $array['subtitle'] : "";
+		$this->subtitle = $array['subtitle'];
 		$this->updated = $this->date($array['updated']);
 		$this->link = $array['link'];
 		$this->website = $array['website'];
