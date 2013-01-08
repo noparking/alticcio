@@ -56,7 +56,7 @@ switch ($attribut->type_attribut) {
 		}
 		$phrases_options = $phrase->get($phrase_ids);
 		foreach ($attribut->options() as $option) {
-			$options[$option['classement']] = $phrases_options[$option['id']][$config->get('langue')];
+			$options[$option['phrase_option']] = $phrases_options[$option['id']][$config->get('langue')];
 		}
 		echo $form->select(array('name' => "attributs[".$attribut_id."][]", 'options' => $options, 'label' => $label[$config->get('langue')], 'multiple' => true));
 		echo $form->input(array('name' => "phrases[valeurs_attributs][".$attribut_id."][]", 'type' => "hidden", 'forced_value' => 1));

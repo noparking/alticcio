@@ -370,7 +370,7 @@ SQL;
 		return isset($row['id']) ? $row['id'] : false;
 	}
 
-	public function all_attributs($option="") {
+	public function all_attributs($option = "") {
 		$q = <<<SQL
 SELECT a.id, p.phrase AS name, u.unite FROM dt_attributs AS a
 INNER JOIN dt_phrases AS p ON p.id = a.phrase_nom AND p.id_langues = {$this->langue}

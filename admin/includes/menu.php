@@ -52,6 +52,11 @@ $menus = array(
 				//'url' => $url2->make("Produits", array('type' => "")),
 				'level' => 70,
 				'items' => array(
+					'gammes' => array(
+						'label' => $dico->t("Gammes"),
+						'url' => $url2->make("Produits", array('type' => "gammes", 'action' => "", 'id' => "")),
+						'level' => 70,
+					),
 					'products' => array(
 						'label' => $dico->t("Produits"),
 						'url' => $url2->make("Produits", array('type' => "produits", 'action' => "", 'id' => "")),

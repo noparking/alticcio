@@ -89,7 +89,10 @@ SQL;
 		$data_options['options'][$id] = $data['new_option'];
 		$data_options['options'][$id]['phrase_option'] = 0;
 		$data_options['phrases']['options'][$id]['phrase_option'] = $data['new_option']['phrase_option'];
+
 		$this->save_data($data_options, "options", "dt_options_attributs");
+
+		return $id;
 	}
 
 	public function delete_option($data, $id) {
