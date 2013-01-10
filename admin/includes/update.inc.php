@@ -259,6 +259,15 @@ SQL;
 
 $update->maj[10] = function($update) {
 	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_attributs_valeurs` (
+  `id_attributs` int(11) NOT NULL,
+  `valeur_numerique` float NOT NULL,
+  `phrase_valeur` int(11) NOT NULL,
+  PRIMARY KEY (`id_attributs`)
+)
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
 SQL;
 	$update->sql->query($q);
