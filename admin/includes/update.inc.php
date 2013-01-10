@@ -198,9 +198,9 @@ SQL;
 
 $update->maj[6] = function($update) {
 	$q = <<<SQL
-ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL
-ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL
-ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL
+ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL;
+ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL;
+ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL;
 SQL;
 	$update->sql->query($q);
 };
