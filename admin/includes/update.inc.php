@@ -195,3 +195,65 @@ CREATE TABLE IF NOT EXISTS `dt_clients_password` (
 SQL;
 	$update->sql->query($q);
 };
+
+$update->maj[6] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL
+ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL
+ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL
+SQL;
+	$update->sql->query($q);
+};
+
+$update->maj[7] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_gammes` ADD `phrase_description_courte` INT NOT NULL ,
+ADD `phrase_url_key` INT NOT NULL ,
+ADD `ref` VARCHAR( 20 ) NOT NULL 
+SQL;
+	$update->sql->query($q);
+};
+
+$update->maj[8] = function($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_gammes_attributs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_attributs` int(11) NOT NULL,
+  `id_gammes` int(11) NOT NULL,
+  `valeur_numerique` float NOT NULL,
+  `phrase_valeur` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_attributs` (`id_attributs`),
+  KEY `id_gammes` (`id_gammes`)
+)
+SQL;
+	$update->sql->query($q);
+};
+
+$update->maj[9] = function($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_images_gammes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_gammes` int(11) NOT NULL,
+  `ref` varchar(250) NOT NULL,
+  `phrase_legende` int(11) NOT NULL,
+  `affichage` tinyint(1) NOT NULL,
+  `vignette` tinyint(1) NOT NULL,
+  `diaporama` tinyint(1) NOT NULL,
+  `classement` int(11) NOT NULL,
+  `hd_extension` varchar(8) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_sku` (`id_gammes`),
+  KEY `phrase_legende` (`phrase_legende`)
+)
+SQL;
+	$update->sql->query($q);
+};
+
+$update->maj[10] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
+SQL;
+	$update->sql->query($q);
+};
