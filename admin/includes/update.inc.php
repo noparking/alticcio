@@ -165,11 +165,19 @@ $update->maj[4] = function($update) {
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 };
 
 $update->maj[5] = function($update) {
@@ -200,15 +208,27 @@ $update->maj[6] = function($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 };
 
 $update->maj[7] = function($update) {
@@ -217,7 +237,11 @@ ALTER TABLE `dt_gammes` ADD `phrase_description_courte` INT NOT NULL ,
 ADD `phrase_url_key` INT NOT NULL ,
 ADD `ref` VARCHAR( 20 ) NOT NULL 
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 };
 
 $update->maj[8] = function($update) {
@@ -270,5 +294,23 @@ SQL;
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
 SQL;
-	$update->sql->query($q);
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
+};
+
+$update->maj[11] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_applications` ADD `ref` VARCHAR( 20 ) NOT NULL ,
+ADD `phrase_description_courte` INT( 11 ) NOT NULL ,
+ADD `phrase_description` INT( 11 ) NOT NULL ,
+ADD `phrase_url_key` INT( 11 ) NOT NULL
+SQL;
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
 };
