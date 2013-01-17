@@ -30,6 +30,11 @@ $menus = array(
 				'url' => $url->make("MonCompte"),
 				'protected' => true,
 			),
+			'help' => array(
+				'label' => $dico->t("Aide"),
+				'url' => $url->make("Aide"),
+				'protected' => true,
+			),
 			'logout' => array(
 				'label' => $dico->t("Deconnexion"),
 				'url' => $url->make("login", array('action' => "logout")),

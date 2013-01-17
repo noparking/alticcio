@@ -446,6 +446,7 @@ $d['pages'] = array(
 	"commandes" => "commandes",
 	"gammes" => "ranges",
 	"factures" => "invoices",
+	"aide" => "help",
 );
 
 $d['hd_extensions'] = array(

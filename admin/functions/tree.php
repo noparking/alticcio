@@ -57,3 +57,18 @@ function print_link_tree($tree, $url, $name = "tree") {
 
 	return $links;
 }
+
+function print_callback_tree($tree, $callback, $name = "tree") {
+	$links = "<ul class='$name'>";
+	foreach ($tree as $element) {
+		$links .= "<li class='$name'>";
+		$links .= $callback($element);
+		if (count($element['children'])) {
+			$links .= print_callback_tree($element['children'], $callback,  $name);
+		}
+		$links .= "</li>";
+	}
+	$links .= "</ul>";
+
+	return $links;
+}
