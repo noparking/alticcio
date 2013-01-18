@@ -162,17 +162,17 @@ $form->template = $page->inc("snippets/produits-form-template");
 $main = $page->inc("snippets/messages");
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 }
-$buttons[] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 }
 
 if ($action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['duplicate'] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 	$main .= <<<HTML
 {$form->input(array('name' => "bloc[id]", 'type' => "hidden"))}
 HTML;
@@ -185,7 +185,7 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('type' => "checkbox", 'name' => "bloc[actif]", 'label' => $dico->t('Actif')))}
 {$form->textarea(array('name' => "bloc[contenu]", 'label' => $dico->t('Contenu'), 'class' => "dteditor"))}
 HTML;
-	$buttons[] = '<a class="bloc-apercu" href="#">Aperçu</a>';
+	$buttons['preview'] = '<a class="bloc-apercu" href="#">Aperçu</a>';
 	$main .= <<<HTML
 <div style="display:none">
 	<div id="bloc-apercu">

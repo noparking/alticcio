@@ -44,7 +44,7 @@ if ($action == "add-role") {
 {$form->fieldset_end()}
 HTML;
 
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 
 	$form_end = $form->form_end();
 }
@@ -119,7 +119,7 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 
 	$form_end = $form->form_end();
 }
@@ -135,7 +135,7 @@ else {
 	}
 	$titre_page = $dico->t('ListeOfRoles');
 
-	$buttons[] = $page->l($dico->t('NouveauRole'), $url->make("current", array('action' => "add-role", 'id' => "")));
+	$buttons['new'] = $page->l($dico->t('NouveauRole'), $url->make("current", array('action' => "add-role", 'id' => "")));
 
 	$table = <<<HTML
 <table>

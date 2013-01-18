@@ -37,11 +37,11 @@ $form->default_values['fiche_element'] = $fiche_element;
 
 $titre_page = $dico->t('FicheTechniqueElement')." # ID : ".$id;
 
-$buttons[] = $page->l($dico->t('Retour'), $url3->make("FicheTechnique", array('id' => $url2->get('type'))));
+$buttons['back'] = $page->l($dico->t('Retour'), $url3->make("FicheTechnique", array('id' => $url2->get('type'))));
 
 $form_start = $form->form_start();
 
-$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 $main = <<<HTML
 <p>Vous pouvez utiliser des balises HTML pour formater cet élément.</p>
 <p>Utilisez [value] pour faire référence à la valeur de l'élément.</p>

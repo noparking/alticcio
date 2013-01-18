@@ -161,9 +161,9 @@ $main .= $page->inc("snippets/messages");
 $hidden = array('presentation' => "");
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 }
-$buttons[] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
 
 if ($action == "edit") {
 	$sections = array(
@@ -181,8 +181,8 @@ HTML;
 }
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 
 	$vignette = "";
 	if ($diaporama->values['vignette']) {
@@ -209,7 +209,7 @@ HTML;
 }
 
 if ($action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('AjouterUneImage'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-new"))}

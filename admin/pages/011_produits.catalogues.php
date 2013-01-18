@@ -156,7 +156,7 @@ HTML;
 {$form->input(array('name' => "add-categorie", 'type' => "submit", 'value' => $dico->t('Ajouter'), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 if ($action == "edit") {
@@ -176,7 +176,7 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "catalogue[statut]", 'label' => $dico->t('Statut'), 'options' => array($dico->t('Desactive'), $dico->t('Active') )))}
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 }
 
 if ($action == "edit") {
@@ -226,8 +226,8 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Réinitialiser') ));
+	$buttons['duplicate'] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Réinitialiser') ));
 }
 
 switch($action) {
@@ -246,4 +246,4 @@ switch($action) {
 
 $form_end = $form->form_end();
 
-$buttons[] = $page->l($dico->t('NouveauCatalogue'), $url2->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t('NouveauCatalogue'), $url2->make("current", array('action' => "create", 'id' => "")));

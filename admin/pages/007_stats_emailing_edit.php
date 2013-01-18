@@ -114,8 +114,8 @@ while($row = mysql_fetch_array($res)) {
 /* 
  * Valeurs renvoyées dans le template
  */
-$buttons[] = $page->l($dico->t('Nouveau'), $url->make("StatsEmailingEdit", array('action' => "edit")));
-$buttons[] = $page->l($dico->t('VoirListe'), $url->make("StatsEmailingList", array('action' => "list")));
+$buttons['new'] = $page->l($dico->t('Nouveau'), $url->make("StatsEmailingEdit", array('action' => "edit")));
+$buttons['list'] = $page->l($dico->t('VoirListe'), $url->make("StatsEmailingList", array('action' => "list")));
 
 $titre_page = $dico->t("EditerCampagneEmailing");
 

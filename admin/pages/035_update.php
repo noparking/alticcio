@@ -27,7 +27,7 @@ HTML;
 
 $form_start = $form->form_start();
 
-$buttons[] = $form->input(array('type' => "submit", 'name' => "update",	'value' => $dico->t('Mettre à jour') ));
+$buttons['update'] = $form->input(array('type' => "submit", 'name' => "update",	'value' => $dico->t('Mettre à jour') ));
 
 $versions = array();
 foreach ($update->versions() as $version) {

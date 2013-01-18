@@ -135,12 +135,12 @@ HTML;
  * Valeurs renvoyées dans le template
  * Colonne centrale
  */
-$buttons[] = $page->l($dico->t('Nouveau'), $url->make("StatsEmailingEdit", array('action' => "edit")));
+$buttons['new'] = $page->l($dico->t('Nouveau'), $url->make("StatsEmailingEdit", array('action' => "edit")));
 if ($url->get('action') == "graph") {
-	$buttons[] = $page->l($dico->t('VoirListe'), $url->make("StatsEmailingList", array('action' => "list")));
+	$buttons['list'] = $page->l($dico->t('VoirListe'), $url->make("StatsEmailingList", array('action' => "list")));
 }
 else {
-	$buttons[] = $page->l($dico->t('Graphiques'), $url->make("StatsEmailingList", array('action' => "list", 'id' => '#graph')));
+	$buttons['graphs'] = $page->l($dico->t('Graphiques'), $url->make("StatsEmailingList", array('action' => "list", 'id' => '#graph')));
 }
 
 $titre_page = $dico->t("StatsEmailings");

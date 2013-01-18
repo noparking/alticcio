@@ -136,7 +136,7 @@ if ($action == "edit") {
 {$form->input(array('type' => "hidden", 'name' => "attribut[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 if ($action == "edit") {
@@ -250,8 +250,8 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "attribut[matiere]", 'type' => "checkbox", 'label' => $dico->t('Matiere')))}
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer')));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));
 }
 
 switch($action) {
@@ -270,4 +270,4 @@ switch($action) {
 
 $form_end = $form->form_end();
 
-$buttons[] = $page->l($dico->t('NouvelAttribut'), $url2->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t('NouvelAttribut'), $url2->make("current", array('action' => "create", 'id' => "")));

@@ -143,8 +143,8 @@ else {
  * Rendu HTML
  */
 
-$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
-$buttons[] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
+$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
 
 $blogs = $user->blogblogs();
 $id_blog = isset($data['id_blog']) ? $data['id_blog'] : key($blogs);
@@ -201,7 +201,7 @@ HTML;
 	
 	case "edit" :
 		$blog_id = $url2->get('id');
-		$buttons[] = $page->l($dico->t('Commentaires'), $url4->make("current", array('type' => "comments", 'action' => "list", 'nature' => "blog", "id" => $blog_id)));
+		$buttons['comments'] = $page->l($dico->t('Commentaires'), $url4->make("current", array('type' => "comments", 'action' => "list", 'nature' => "blog", "id" => $blog_id)));
 		$blogpost->load($blog_id);
 		$titre_page =  $dico->t("EditerBillet");
 		$form->default_values['blogpost'] = $blogpost->values;

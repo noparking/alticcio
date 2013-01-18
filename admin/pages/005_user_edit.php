@@ -97,9 +97,7 @@ else {
  */
 
 $titre_page = $dico->t("ModifierUtilisateur");
-$buttons = array(
-	$page->l($dico->t("VoirListeUtilisateurs"), $url->make("UserList", array('action' => "list"))),
-);
+$buttons['list'] = $page->l($dico->t("VoirListeUtilisateurs"), $url->make("UserList", array('action' => "list")));
 
 $form_start = $form->form_start();
 

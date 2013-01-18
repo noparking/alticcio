@@ -85,7 +85,7 @@ $form_end = $form->form_end();
 if ($url->get("action") == "produit" and $url->get("id")) {
 	$titre_page = "Statistiques sur les visites du produit #{$url->get("id")} ({$stats->nom_produit($url->get("id"), $id_langues)})";
 	$main = "";
-	$buttons[] = $page->l("Retour", $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l("Retour", $url->make("current", array('action' => "", 'id' => "")));
 
 	$mois = array(
 		"Janvier",

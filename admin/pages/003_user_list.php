@@ -72,9 +72,7 @@ else {
  */
 
 $titre_page = $dico->t('ListeUtilisateurs');
-$buttons = array(
-	$page->l($dico->t("Nouveau"), $url->make("UserEdit", array('action' => "edit", 'id' => ""))),
-);
+$buttons['new'] = $page->l($dico->t("Nouveau"), $url->make("UserEdit", array('action' => "edit", 'id' => "")));
 
 $main = <<<HTML
 	$message

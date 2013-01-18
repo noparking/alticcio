@@ -138,17 +138,17 @@ $main .= $page->inc("snippets/messages");
 $hidden = array('presentation' => "");
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 }
 
 if ($action == "edit") {
-	$buttons[] = $page->l($dico->t('FicheMatiere'), $url3->make("FicheMatiere", array('id' => $id)));
+	$buttons['fichematiere'] = $page->l($dico->t('FicheMatiere'), $url3->make("FicheMatiere", array('id' => $id)));
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "matiere[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 if ($action == "edit") {
@@ -289,4 +289,4 @@ switch($action) {
 
 $form_end = $form->form_end();
 
-$buttons[] = $page->l($dico->t('NouvelleMatiere'), $url2->make("current", array('action' => "create", 'id' => "")));
+$buttons['newmatiere'] = $page->l($dico->t('NouvelleMatiere'), $url2->make("current", array('action' => "create", 'id' => "")));

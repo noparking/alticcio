@@ -181,10 +181,10 @@ HTML;
 {$form->textarea(array('name' => "catalogue_categorie[meta_description]", 'label' => $dico->t('MetaDescription'), 'class' => "dteditor"))}
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $page->l($dico->t('RetourCatalogue'), $url2->make("current", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->id)));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+	$buttons['back'] = $page->l($dico->t('RetourCatalogue'), $url2->make("current", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->id)));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 }
 
 $form_end = $form->form_end();

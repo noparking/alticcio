@@ -25,7 +25,7 @@ $groupes = $menu->get_groupes();
 $main = get_submenu($menu->data);
 
 if (is_writable($config->get("base_path")."/includes/") or is_writable($config->get("base_path")."/includes/menu_edited.php")) {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 }
 else {
 	$main = <<<HTML

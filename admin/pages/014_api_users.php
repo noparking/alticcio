@@ -61,7 +61,7 @@ if ($action == "add-user") {
 {$form->fieldset_end()}
 HTML;
 
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 
 	$form_end = $form->form_end();
 }
@@ -127,7 +127,7 @@ else if ($action == "edit-user") {
 {$form->fieldset_end()}
 HTML;
 
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 
 	$form_end = $form->form_end();
 }
@@ -202,7 +202,7 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 
 	$form_end = $form->form_end();
 }
@@ -218,7 +218,7 @@ else {
 	}
 	$titre_page = $dico->t('ListeUtilisateursApi');
 
-	$buttons[] = $page->l($dico->t('NouvelUtilisateur'), $url->make("current", array('action' => "add-user", 'id' => "")));
+	$buttons['new'] = $page->l($dico->t('NouvelUtilisateur'), $url->make("current", array('action' => "add-user", 'id' => "")));
 
 	$table = <<<HTML
 <table>

@@ -133,16 +133,16 @@ $form->template = $page->inc("snippets/produits-form-template");
 $main = $page->inc("snippets/messages");
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 }
-$buttons[] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t("Nouveau"), $url->make("current", array('action' => "create", 'id' => "")));
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 }
 
 if ($action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 	$main .= <<<HTML
 {$form->input(array('name' => "page[id]", 'type' => "hidden"))}
 HTML;
@@ -160,7 +160,7 @@ if ($action == "create" or $action == "edit") {
 {$form->textarea(array('name' => "page[meta_description]", 'label' => $dico->t('MetaDescription')))}
 {$form->textarea(array('name' => "page[meta_keywords]", 'label' => $dico->t('MetaKeywords')))}
 HTML;
-	$buttons[] = '<a class="page-apercu" href="#">Aperçu</a>';
+	$buttons['preview'] = '<a class="page-apercu" href="#">Aperçu</a>';
 	$main .= <<<HTML
 <div style="display:none">
 	<div id="page-apercu">

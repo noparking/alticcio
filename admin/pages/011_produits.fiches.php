@@ -119,8 +119,8 @@ HTML;
 	$right .= <<<HTML
 {$form->textarea(array('name' => "fiche[css]", 'label' => $dico->t('CSS'), 'class' => "fiche-css"))}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 if ($action == "edit") {
@@ -145,4 +145,4 @@ switch($action) {
 
 $form_end = $form->form_end();
 
-$buttons[] = $page->l($dico->t('NouveauModeleFiche'), $url2->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t('NouveauModeleFiche'), $url2->make("current", array('action' => "create", 'id' => "")));

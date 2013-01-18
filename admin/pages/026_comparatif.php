@@ -297,10 +297,10 @@ $titre_page = "Comparatif";
 
 $form_start = $form->form_start();
 
-$buttons[] = $form->input(array('type' => "submit", 'name' => "fiche", 'value' => $dico->t('Fiche') ));
-$buttons[] = $form->input(array('type' => "submit", 'name' => "fiche-csv", 'value' => $dico->t('Fiche')." CSV" ));
-$buttons[] = $form->input(array('type' => "submit", 'name' => "attributs", 'value' => $dico->t('Attributs') ));
-$buttons[] = $form->input(array('type' => "submit", 'name' => "attributs-csv", 'value' => $dico->t('Attributs')." CSV" ));
+$buttons['fiche'] = $form->input(array('type' => "submit", 'name' => "fiche", 'value' => $dico->t('Fiche') ));
+$buttons['fichecsv'] = $form->input(array('type' => "submit", 'name' => "fiche-csv", 'value' => $dico->t('Fiche')." CSV" ));
+$buttons['attributs'] = $form->input(array('type' => "submit", 'name' => "attributs", 'value' => $dico->t('Attributs') ));
+$buttons['attributscsv'] = $form->input(array('type' => "submit", 'name' => "attributs-csv", 'value' => $dico->t('Attributs')." CSV" ));
 
 $main = <<<HTML
 {$form->select(array('name' => "application", 'label' => $dico->t('Application'), 'options' => $application->select()))}

@@ -99,8 +99,8 @@ switch ($action) {
 {$form->input(array('name' => "create", 'type' => "submit", 'value' => $dico->t("Creer"), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create", 'id' => "")));
-		$buttons[] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list", 'id' => "")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create", 'id' => "")));
+		$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list", 'id' => "")));
 		break;
 
 	case "edit" :
@@ -111,8 +111,8 @@ HTML;
 {$form->input(array('name' => "delete", 'class' => "confirm-delete", 'type' => "submit", 'value' => $dico->t('Supprimer'), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
-		$buttons[] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+		$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
 		break;
 
 	case "list" :
@@ -162,7 +162,7 @@ SQL;
 		$main = <<<HTML
 {$page->inc("snippets/filter")}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
 		break;
 }
 

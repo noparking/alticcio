@@ -189,15 +189,15 @@ $main .= $page->inc("snippets/messages");
 $hidden = array('presentation' => "");
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $page->l($dico->t('Retour'), $url2->make("current", array('action' => "", 'id' => "")));
+	$buttons['back'] = $page->l($dico->t('Retour'), $url2->make("current", array('action' => "", 'id' => "")));
 }
 
-$buttons[] = $page->l($dico->t('NouveauSku'), $url2->make("current", array('action' => "create", 'id' => "")));
+$buttons['new'] = $page->l($dico->t('NouveauSku'), $url2->make("current", array('action' => "create", 'id' => "")));
 
 if ($action == "create" or $action == "edit") {
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['duplicate'] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
+	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 }
 
 if ($action == "edit") {
@@ -398,7 +398,7 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	}
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 if ($action == "create" or $action == "edit") {

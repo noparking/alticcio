@@ -122,8 +122,8 @@ switch ($action) {
 {$form->input(array('name' => "create", 'type' => "submit", 'value' => $dico->t("Creer"), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
-		$buttons[] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+		$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
 		break;
 	case "edit" :
 		$titre_page = $dico->t('EditerBlog')." #".$id;
@@ -133,9 +133,9 @@ HTML;
 {$form->input(array('name' => "delete", 'class' => "confirm-delete", 'type' => "submit", 'value' => "Supprimer", 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
-		$buttons[] = $page->l($dico->t('BilletdeBlog'), $url2->make("current", array('action' => "posts")));
-		$buttons[] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+		$buttons['items'] = $page->l($dico->t('BilletdeBlog'), $url2->make("current", array('action' => "posts")));
+		$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
 		break;
 	case "posts" :
 		$titre_page = $dico->t('BilletsduBlog')." #".$id;
@@ -188,7 +188,7 @@ SQL;
 		$main = <<<HTML
 {$page->inc("snippets/filter")}
 HTML;
-		$buttons[] = $page->l($dico->t('RetourBlog'), $url2->make("current", array('action' => "edit")));
+		$buttons['back'] = $page->l($dico->t('RetourBlog'), $url2->make("current", array('action' => "edit")));
 		break;
 	case "list" :
 	default :
@@ -222,7 +222,7 @@ SQL;
 		$main = <<<HTML
 {$page->inc("snippets/filter")}
 HTML;
-		$buttons[] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
+		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
 		break;
 }
 

@@ -566,7 +566,7 @@ li.blogs {
 	color:#000;
 }
 
-.buttons_actions li input.disabled, #main input.disabled {
+.buttons_actions .disabled, #main input.disabled {
 	color:#FAA;
 }
 

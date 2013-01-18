@@ -81,14 +81,13 @@ HTML;
 
 	$file = "fiche";
 
-	$buttons = 	array(	
-		$page->l($dico->t('Retour'), $url2->make("Produits", array("type" => "produits", "action"=>"edit", "id" => $id))),
-		$form->input(array("type" => "submit", "name" => "action[save]", "value" => $dico->t('Sauvegarder') )),
-		$form->input(array("type" => "submit", "name" => "action[reset]", "value" => $dico->t('Reinitialiser') )),
-		$page->l("HTML", $url3->make("current", array("file" => $file.".html"))),
-		$page->l("PDF", $url3->make("current", array("file" => $file.".pdf"))),
-		$page->l("XML", $url3->make("current", array("file" => $file.".xml"))),
-	);
+	$buttons = array();
+	$buttons['back'] = $page->l($dico->t('Retour'), $url2->make("Produits", array("type" => "produits", "action"=>"edit", "id" => $id)));
+	$buttons['save'] = $form->input(array("type" => "submit", "name" => "action[save]", "value" => $dico->t('Sauvegarder') ));
+	$buttons['reset'] = $form->input(array("type" => "submit", "name" => "action[reset]", "value" => $dico->t('Reinitialiser') ));
+	$buttons['html'] = $page->l("HTML", $url3->make("current", array("file" => $file.".html")));
+	$buttons['pdf'] = $page->l("PDF", $url3->make("current", array("file" => $file.".pdf")));
+	$buttons['xml'] = $page->l("XML", $url3->make("current", array("file" => $file.".xml")));
 
 	$form_end = $form->form_end();
 }

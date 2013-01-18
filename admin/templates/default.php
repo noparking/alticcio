@@ -1,5 +1,4 @@
 <?php
-
 array_unshift($page->css, $config->media("default.css"));
 
 $page->javascript[] = $config->core_media("jquery.min.js");
@@ -19,9 +18,13 @@ if (!isset($form_start)) {
 if (!isset($form_end)) {
 	$form_end = "";
 }
+
 if (isset($buttons) and is_array($buttons)) {
+	$config->core_include("outils/buttons_manager");
+	$buttons_manager = new ButtonsManager($config->get("buttons"));
+
 	$bloc_buttons = '<div id="buttons"><ul class="buttons_actions">';
-	foreach ($buttons as $key => $button) {
+	foreach ($buttons_manager->order($buttons) as $key => $button) {
 		$bloc_buttons .= '<li class="button-'.$key.'">'.$button.'</li>';
 	}
 	$bloc_buttons .= '</ul></div>';

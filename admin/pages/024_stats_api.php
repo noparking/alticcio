@@ -43,9 +43,9 @@ $stats = new StatsApi($sql, $params);
 $boutiques = $stats->keys_by_role("boutique");
 
 if (isset($params['id_keys'])) {
-	$buttons[] = $form->input(array('type'=>'submit', 'name'=>'general', 'value'=> "Général"));
-	$buttons[] = $form->input(array('type'=>'submit', 'name'=>'products', 'value'=> "Produits"));
-	$buttons[] = $form->input(array('type'=>'submit', 'name'=>'clients', 'value'=> "Clients"));
+	$buttons['overview'] = $form->input(array('type'=>'submit', 'name'=>'general', 'value'=> "Général"));
+	$buttons['products'] = $form->input(array('type'=>'submit', 'name'=>'products', 'value'=> "Produits"));
+	$buttons['clients'] = $form->input(array('type'=>'submit', 'name'=>'clients', 'value'=> "Clients"));
 
 	$produits = $stats->produits($boutiques[$params['id_keys']]);
 	if (!isset($params['id_produits'])) {

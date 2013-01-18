@@ -78,8 +78,8 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "commentaire[email_auteur]", 'label' => $dico->t('Email') ))}
 {$form->fieldset_end()}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
-	$buttons[] = $page->l($dico->t('ListeOfCommentaires'), $url4->make("current", array('action' => "list", "id" => $commentaire->item)));
+	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
+	$buttons['list'] = $page->l($dico->t('ListeOfCommentaires'), $url4->make("current", array('action' => "list", "id" => $commentaire->item)));
 	$form_end = $form->form_end();
 }
 
@@ -94,7 +94,7 @@ if ($action == "edit") {
 {$form->input(array('type' => "hidden", 'name' => "commentaire[item]"))}
 {$form->input(array('type' => "hidden", 'name' => "commentaire[id]", 'value' => $id))}
 HTML;
-	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'value' => $dico->t('Supprimer')));
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'value' => $dico->t('Supprimer')));
 }
 
 switch ($nature) {
@@ -165,7 +165,7 @@ SQL;
 		switch ($nature) {
 			case "blog" :
 				if ($id) {
-					$buttons[] = $page->l($dico->t('NouveauCommentaire'), $url4->make("current", array('action' => "create")));
+					$buttons['new_comment'] = $page->l($dico->t('NouveauCommentaire'), $url4->make("current", array('action' => "create")));
 				}
 				$q .= " AND nature='blog'";
 				break;
