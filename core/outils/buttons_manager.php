@@ -2,29 +2,40 @@
 
 class ButtonsManager {
 	
-	private $order = array();
+	private $buttons = array();
+	public $groupe = array('default' => array());
 	
-	public function __construct($order) {
-		$this->order = $order;
+	public function __construct($buttons) {
+		$this->buttons = $buttons;
 	}
 
-	public function order($buttons) {
+	public function groupe($id) {
 		$ordered_buttons = array();
-		foreach ($this->order as $action => $show_anyway) {
-			$found = false;
-			foreach ($buttons as $key => $button) {
-				if (preg_match("/^$action($|_)/", $key)) {
-					$ordered_buttons[$key] = $button;
-					$found = true;
+		if (isset($this->groupe[$id])) {
+			foreach ($this->groupe[$id] as $action => $show_anyway) {
+				$found = false;
+				foreach ($this->buttons as $key => $button) {
+					if (preg_match("/^$action($|_)/", $key)) {
+						$ordered_buttons[$key] = $button;
+						$found = true;
+					}
+				}
+				if (!$found and $show_anyway) {
+					$ordered_buttons[$action] = '<span class="disabled">'.$show_anyway.'</span>';
 				}
 			}
-			if (!$found and $show_anyway) {
-				$ordered_buttons[$action] = '<span class="disabled">'.$show_anyway.'</span>';
-			}
-		}
-		foreach ($buttons as $key => $button) {
-			if (!isset($ordered_buttons[$key])) {
-				$ordered_buttons[$key] = $button;
+			if ($id == "default") {
+				$all_keys_in_group = array();
+				foreach ($this->groupe as $groupe) {
+					foreach ($groupe as $key => $value) {
+						$all_keys_in_group[$key] = $key;
+					}
+				}
+				foreach ($this->buttons as $key => $button) {
+					if (!isset($all_keys_in_group[$key])) {
+						$ordered_buttons[$key] = $button;
+					}
+				}
 			}
 		}
 

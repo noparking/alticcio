@@ -201,6 +201,8 @@ HTML;
 	
 	case "edit" :
 		$blog_id = $url2->get('id');
+		$buttons['save'] = $form->input(array('name' => "save", 'type' => "submit", 'value' => $dico->t("Sauvegarder"), 'template' => "#{field}"));
+		$buttons['delete'] = $form->input(array('name' => "delete", 'type' => "submit", 'value' => $dico->t("Supprimer"), 'template' => "#{field}"));
 		$buttons['comments'] = $page->l($dico->t('Commentaires'), $url4->make("current", array('type' => "comments", 'action' => "list", 'nature' => "blog", "id" => $blog_id)));
 		$blogpost->load($blog_id);
 		$titre_page =  $dico->t("EditerBillet");
@@ -220,10 +222,6 @@ HTML;
 {$form->textarea(array('name' => "blogpost[meta_description]", 'id' => 'meta_description', 'label' => $dico->t("MetaDescription")))}
 {$form->textarea(array('name' => "blogpost[meta_keywords]", 'id' => 'meta_keywords', 'label' => $dico->t("MetaKeywords")))}
 {$form->input(array('name' => "blogpost[titre_url]", 'id' => 'titre_url', 'label' => $dico->t("TitreURL")))}
-{$form->fieldset_end()}
-{$form->fieldset_start($dico->t('Validation:'))}
-{$form->input(array('name' => "save", 'type' => "submit", 'value' => $dico->t("Sauvegarder"), 'template' => "#{field}"))}
-{$form->input(array('name' => "delete", 'type' => "submit", 'value' => $dico->t("Supprimer"), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 HTML;
 	$themes_checkboxes = "<ul>";

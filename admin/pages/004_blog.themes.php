@@ -105,12 +105,8 @@ HTML;
 
 	case "edit" :
 		$titre_page = $dico->t('EditerThemeBlog')." #".$id;
-		$main .= <<<HTML
-{$form->fieldset_start($dico->t('Validation:'))}
-{$form->input(array('name' => "save", 'type' => "submit", 'value' => $dico->t('Sauvegarder'), 'template' => "#{field}"))}
-{$form->input(array('name' => "delete", 'class' => "confirm-delete", 'type' => "submit", 'value' => $dico->t('Supprimer'), 'template' => "#{field}"))}
-{$form->fieldset_end()}
-HTML;
+		$buttons['save'] = $form->input(array('name' => "save", 'type' => "submit", 'value' => $dico->t('Sauvegarder'), 'template' => "#{field}"));
+		$buttons['delete'] = $form->input(array('name' => "delete", 'class' => "confirm-delete", 'type' => "submit", 'value' => $dico->t('Supprimer'), 'template' => "#{field}"));
 		$buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create")));
 		$buttons['list'] = $page->l($dico->t("VoirListe"), $url2->make("current", array('action' => "list")));
 		break;

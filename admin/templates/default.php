@@ -27,27 +27,42 @@ if (!isset($form_end)) {
 	$form_end = "";
 }
 
+$bloc_buttons = '';
 if (isset($buttons) and is_array($buttons)) {
 	$config->core_include("outils/buttons_manager");
-	$buttons_manager = new ButtonsManager(array(
-		'back' => $dico->t('Retour'),
+	$buttons_manager = new ButtonsManager($buttons);
+	$buttons_manager->groupe['default'] = array(
+		'back' => "",
 		'list' => "",
+		'items' => "",
+	);
+	$buttons_manager->groupe['operations'] = array(
 		'new' => "",
 		'save' => "",
 		'duplicate' => "",			
-		'items' => "",
 		'reset' => "",
 		'delete' => "",				
-	));
+	);
 
-	$bloc_buttons = '<div id="buttons"><ul class="buttons_actions">';
-	foreach ($buttons_manager->order($buttons) as $key => $button) {
-		$bloc_buttons .= '<li class="button-'.$key.'">'.$button.'</li>';
+	// autres boutons
+	$default_buttons = $buttons_manager->groupe("default");
+	if (count($default_buttons)) {
+		$bloc_buttons .= '<div id="buttons"><ul class="buttons_actions">';
+		foreach ($default_buttons as $key => $button) {
+			$bloc_buttons .= '<li class="button-'.$key.'">'.$button.'</li>';
+		}
+		$bloc_buttons .= '</ul></div>';
 	}
-	$bloc_buttons .= '</ul></div>';
-}
-else {
-	$bloc_buttons = "";
+
+	// boutons d'opérations
+	$operations_buttons = $buttons_manager->groupe("operations");
+	if (count($operations_buttons)) {
+		$bloc_buttons .= '<div id="buttons"><ul class="buttons_actions">';
+		foreach ($operations_buttons as $key => $button) {
+			$bloc_buttons .= '<li class="button-'.$key.'">'.$button.'</li>';
+		}
+		$bloc_buttons .= '</ul></div>';
+	}
 }
 
 $bloc_right = "";
