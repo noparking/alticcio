@@ -13,13 +13,13 @@ class ButtonsManager {
 		foreach ($this->order as $action => $show_anyway) {
 			$found = false;
 			foreach ($buttons as $key => $button) {
-				if (preg_match("/^$key($|_)/", $action)) {
+				if (preg_match("/^$action($|_)/", $key)) {
 					$ordered_buttons[$key] = $button;
 					$found = true;
 				}
 			}
 			if (!$found and $show_anyway) {
-				$ordered_buttons[$action] = '<span class="button-disabled">'.$show_anyway.'</span>';
+				$ordered_buttons[$action] = '<span class="disabled">'.$show_anyway.'</span>';
 			}
 		}
 		foreach ($buttons as $key => $button) {

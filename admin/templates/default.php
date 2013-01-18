@@ -1,4 +1,12 @@
 <?php
+
+if (!isset($logo_src)) {
+	$logo_src = $config->media('logo-alticcio.jpg');
+}
+if (!isset($logo_alt)) {
+	$logo_alt ="logo alticcio";
+}
+
 array_unshift($page->css, $config->media("default.css"));
 
 $page->javascript[] = $config->core_media("jquery.min.js");
@@ -21,7 +29,16 @@ if (!isset($form_end)) {
 
 if (isset($buttons) and is_array($buttons)) {
 	$config->core_include("outils/buttons_manager");
-	$buttons_manager = new ButtonsManager($config->get("buttons"));
+	$buttons_manager = new ButtonsManager(array(
+		'back' => $dico->t('Retour'),
+		'list' => "",
+		'new' => "",
+		'save' => "",
+		'duplicate' => "",			
+		'items' => "",
+		'reset' => "",
+		'delete' => "",				
+	));
 
 	$bloc_buttons = '<div id="buttons"><ul class="buttons_actions">';
 	foreach ($buttons_manager->order($buttons) as $key => $button) {
@@ -64,7 +81,7 @@ $html_page = <<<HTML
 	
 		<!-- header : logo et stats -->
 		<div id="header">
-			<h1><img src="{$config->media('logo-alticcio.jpg')}" alt="logo alticcio" /></h1>
+			<h1><img src="{$logo_src}" alt="{$logo_alt}" /></h1>
 		</div>
 		
 		<!-- Navigation principale -->

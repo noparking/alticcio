@@ -434,6 +434,9 @@ form .form-edit-input-submit, .form-blog-input-submit, .form-blog-themes-input-s
 	font-size:10px;
 	font-weight:bold;
 }
+.button-delete {
+	background-image:url('../images/fond-buttons-critiques.jpg') !important;
+}
 span label.form-edit-input-submit {
 	background:none;
 	border:0;
