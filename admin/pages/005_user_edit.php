@@ -22,6 +22,7 @@ else {
 	$id_user = 0;
 }
 $user_profils = $user->list_profils();
+$user_langues = $user->list_langues();
 
 
 /*
@@ -111,6 +112,9 @@ $message
 {$form->fieldset_start($dico->t("SesDroits"))}
 {$form->input(array('name' => "acces", 'type' => "checkbox", 'label' => $dico->t("Acces"), 'value' => "1", 'template' => $template_checkbox, 'checked' => ($user_data['acces'] == 1)))}
 {$form->select(array('name' => 'id_groupes_users', 'label' => $dico->t("Profils"), 'id' => 'id_groupes_users', 'options' => $user_profils, 'value' => $user_data['id_groupes_users'], 'template' => $template_profils))}
+{$form->fieldset_end()}
+{$form->fieldset_start($dico->t("SesPreferences"))}
+{$form->select(array('name' => 'id_langues', 'label' => $dico->t("Langue"), 'options' => $user_langues, 'value' => $user_data['id_langues'], 'template' => $template_profils))}
 {$form->fieldset_end()}
 {$form->fieldset_start($dico->t("Validation"))}
 {$form->input(array('name' => "update", 'type' => "submit", 'value' => $dico->t("Sauvegarder"), 'template' => "#{field}"))}

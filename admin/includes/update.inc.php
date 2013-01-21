@@ -314,3 +314,14 @@ SQL;
 	catch (Exception $e) {
 	}
 };
+
+$update->maj[12] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_users` ADD `id_langues` INT NOT NULL
+SQL;
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
+};

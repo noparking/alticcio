@@ -35,11 +35,19 @@ if ($form->is_submitted()) {
 }
 
 if ($user->is_logged()) {
+	$user_data = $user->data();
+	$langues = $user->list_langues();
+	$params = array();
+	if ($user_data['id_langues']) {
+		list($langue, $pays) = explode("_", $langues[$user_data['id_langues']]);
+		$params['langue'] = $langue;
+		$params['pays'] = $pays;
+	}
 	if ($url->get('page_id') == 1) {
-		$url->redirect("accueil");
+		$url->redirect("accueil", $params);
 	}
 	else {
-		$url->redirect("current");
+		$url->redirect("current", $params);
 	}
 }
 

@@ -9,6 +9,7 @@ $menu->current('main/params/users');
 $sql = new Mysql($config->db());
 $user = new User($sql);
 
+$user_langues = $user->list_langues();
 
 /*
  * Récupération des données
@@ -66,6 +67,8 @@ $message
 <div class="ligne_form">{$form->html($dico->t("Profil")." : ".$profil_user)}</div>
 {$form->input(array('name' => "email", 'label' => $dico->t('Email'), 'value' => $user_data['email']))}
 {$form->input(array('name' => "password", 'type' => $dico->t("Password"), 'label' => $dico->t("Password"), 'description' => $dico->t("VidePasDeChangements")))}
+{$form->select(array('name' => 'id_langues', 'label' => $dico->t("Langue"), 'options' => $user_langues, 'value' => $user_data['id_langues']))}
+{$form->input(array('type' => "hidden", 'name' => 'acces', 'forced_value' => 1))}
 {$form->input(array('name' => "update", 'type' => "submit", 'value' => $dico->t("Sauvegarder"), 'template' => "#{field}"))}
 {$form->fieldset_end()}
 {$form->form_end()}

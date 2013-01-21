@@ -235,7 +235,7 @@ class User {
 	
 	private function get_data($params) {
 		$data = array();
-		foreach (array('id', 'login', 'password', 'email', 'acces', 'id_groupes_users') as $field) {
+		foreach (array('id', 'login', 'password', 'email', 'acces', 'id_groupes_users', 'id_langues') as $field) {
 			if (isset($params[$field])) {
 				$data[$field] = $params[$field];
 			}
@@ -255,6 +255,16 @@ class User {
 			$liste_profils[$row['id']] = $row['nom'];
 		}
 		return $liste_profils;
+	}
+
+	public function list_langues() {
+		$q = "SELECT id, code_langue FROM dt_langues ORDER BY id";
+		$result = $this->sql->query($q);
+		$liste_langues = array();
+		while($row = $this->sql->fetch($result)) {
+			$liste_langues[$row['id']] = $row['code_langue'];
+		}
+		return $liste_langues;
 	}
 
 	public function blogs($id_user = null) {
