@@ -12,8 +12,8 @@ $pays = new Pays($sql);
 $liste_pays = $pays->liste(1, 'id');
 
 $lang = $api->get("language");
-$produit = new Produit($sql, $phrase, $lang);
-$sku = new Sku($sql, $phrase, $lang);
+$produit = new Produit($sql, $phrase);
+$sku = new Sku($sql, $phrase);
 $panier = new Panier($sql);
 
 $voca = $api->vocabulary();
