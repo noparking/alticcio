@@ -2,13 +2,17 @@
 
 $page->template('javascript');
 
-$config->core_include("outils/mysql", "outils/image");
+$config->core_include("outils/mysql", "outils/image", "outils/langue");
 
 $sql = new Mysql($config->db());
+
+$langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
+
 $image = new Image($sql);
 
 $types = array("{'value' : '', 'label' : '{$dico->t("TailleReelle")}'}");
-foreach ($image->types($config->get('langue')) as $type) {
+foreach ($image->types($id_langues) as $type) {
 	$types[] = "{'value' : '{$type['largeur']}x{$type['hauteur']}', 'label' : '{$type['description']}'}";
 }
 $types_images = implode(",", $types);

@@ -9,7 +9,7 @@ $sql = new Mysql($config->db());
 $phrase = new Phrase($sql);
 
 $pays = new Pays($sql);
-$liste_pays = $pays->liste('fr_FR', 'id');
+$liste_pays = $pays->liste(1, 'id');
 
 $lang = $api->get("language");
 $produit = new Produit($sql, $phrase, $lang);

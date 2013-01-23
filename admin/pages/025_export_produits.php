@@ -12,11 +12,15 @@ $menu->current('main/products/export');
 
 // Initialisation des classes
 $sql = new Mysql($config->db());
+
+$langue = new Langue($sql);
+$code_langue = $config->get("langue");
+$id_langues = $langue->id($code_langue);
+
 $phrase = new Phrase($sql);
-$produit = new Produit($sql, $phrase, $config->get("langue"));
-$attribut = new Attribut($sql, $phrase, $config->get("langue"));
-$sku = new Sku($sql, $phrase, $config->get("langue"));
-$langue = $config->get("langue");
+$produit = new Produit($sql, $phrase, $id_langues);
+$attribut = new Attribut($sql, $phrase, $id_langues);
+$sku = new Sku($sql, $phrase, $id_langues);
 $form = new Form(array(
 	'id' => "form-exports",
 	'class' => "form-exports",
@@ -51,7 +55,7 @@ if ($form->is_submitted() and $form->validate()) {
 		$produit->load($row['id']);
 		$phrases = $phrase->get($produit->phrases());
 		$images = $produit->images();
-		$fiche = new Fiche($sql, $phrase, $langue, $produit, $sku, $attribut, $phrases);
+		$fiche = new Fiche($sql, $phrase, $code_langue, $produit, $sku, $attribut, $phrases);
 		$xml .= "<item>".$fiche->xml()."</item>";
 	}
 	$xml .= "</items>";

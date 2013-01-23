@@ -1,15 +1,18 @@
 <?php
 
 $config->core_include("produit/commande");
-$config->core_include("outils/form", "outils/pays");
+$config->core_include("outils/form", "outils/pays", "outils/langue");
 $config->core_include("outils/filter", "outils/pager");
 
 $sql = new Mysql($config->db());
 
+$langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
+
 $commande = new Commande($sql);
 
 $pays = new Pays($sql);
-$liste_pays = $pays->liste($config->get("langue"));
+$liste_pays = $pays->liste($id_langues);
 
 $action = $url->get('action');
 if ($id = $url->get('id')) {

@@ -2,7 +2,7 @@
 
 $sql = new Mysql($config->db());
 $phrase = new Phrase($sql);
-$produit = new Produit($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $phrase, $id_langues);
 $api_data = $api->data();
 
 $jq = array();

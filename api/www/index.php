@@ -2,10 +2,13 @@
 
 include dirname(__FILE__)."/../includes/config.php";
 
-$config->core_include("api/api", "outils/mysql", "outils/phrase");
+$config->core_include("api/api", "outils/mysql", "outils/phrase", "outils/langue");
 $config->core_include("produit/produit");
 
 $sql = new Mysql($config->db());
+
+$langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
 
 $api = new API("api_", $sql);
 

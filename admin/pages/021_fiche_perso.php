@@ -2,17 +2,20 @@
 
 $menu->current('main/products/products');
 
-$config->core_include("produit/produit", "produit/attribut", "produit/sku", "outils/form", "outils/mysql", "outils/phrase");
+$config->core_include("produit/produit", "produit/attribut", "produit/sku", "outils/form", "outils/mysql", "outils/phrase", "outils/langue");
 
 $sql = new Mysql($config->db());
 
+$langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
+
 $phrase = new Phrase($sql);
 
-$produit = new Produit($sql, $phrase, $config->get("langue"));
-$attribut = new Attribut($sql, $phrase, $config->get("langue"));
-$sku = new Sku($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $id_langues);
+$attribut = new Attribut($sql, $id_langues);
+$sku = new Sku($sql, $phrase, $id_langues);
 
-$langue = $config->get("langue");
+$code_langue = $config->get("langue");
 
 if ($id = $url3->get('id')) {
 	$produit->load($id);
@@ -105,7 +108,7 @@ function fiche_display_zone($zone, $display) {
 }
 
 function fiche_display_element($element, $display) {
-	global $url2, $phrases, $config, $produit, $images, $langue, $page, $dico;
+	global $url2, $phrases, $config, $produit, $images, $code_langue, $page, $dico;
 
 	$value = "";
 	$phrase = "";
@@ -131,8 +134,8 @@ function fiche_display_element($element, $display) {
 			$value = fiche_relations($element, $display);
 			break;
 	}
-	if (isset($phrases[$phrase][$langue])) {
-		$value = $phrases[$phrase][$langue];
+	if (isset($phrases[$phrase][$code_langue])) {
+		$value = $phrases[$phrase][$code_langue];
 	}
 	if (preg_match("/^img([0-9]+)$/", $element['element'], $matches)) {
 		$html = "";
@@ -190,8 +193,8 @@ HTML;
 }
 
 function fiche_attributs($element, $display) {
-	global $produit, $attribut, $langue, $dico;
-	$attributs = $produit->fiche_perso_attributs($attribut, $langue);
+	global $produit, $attribut, $code_langue, $dico;
+	$attributs = $produit->fiche_perso_attributs($attribut, $code_langue);
 	$choix = array("N/A", $dico->t("Oui"), $dico->t("Non"));
 
 	switch ($display) {
@@ -220,7 +223,7 @@ function fiche_attributs($element, $display) {
 }
 
 function fiche_relations($element, $display) {
-	global $produit, $sku, $phrase, $langue;
+	global $produit, $sku, $phrase, $code_langue;
 	$method = $element['element'];
 	
 	switch ($display) {
@@ -238,7 +241,7 @@ function fiche_relations($element, $display) {
 					$sku->load($id);
 					$phrases = $phrase->get($sku->phrases());
 					$output .= "<tr>";
-					$output .= "<td>{$phrases['phrase_ultralog'][$langue]}</td>";
+					$output .= "<td>{$phrases['phrase_ultralog'][$code_langue]}</td>";
 					$output .= "<td>{$sku->values['ref_ultralog']}</td>";
 					$prix = $sku->prix();
 					$prix_degressifs = $sku->prix_degressifs();

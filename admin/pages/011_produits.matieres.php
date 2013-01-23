@@ -27,11 +27,11 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$matiere = new Matiere($sql, $phrase, $id_langue);
+$matiere = new Matiere($sql, $phrase, $id_langues);
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter = new Filter($pager, array(
@@ -50,7 +50,7 @@ $filter = new Filter($pager, array(
 		'title' => $dico->t('Type'),
 		'type' => 'select',
 		'field' => 'm.id_familles_matieres',
-		'options' => $matiere->familles_matieres($id_langue),
+		'options' => $matiere->familles_matieres($id_langues),
 	),
 ), array(), "filter_matiere");
 
@@ -163,7 +163,7 @@ if ($action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langue);
+	$attribut = new Attribut($sql, $phrase, $id_langues);
 	foreach ($matiere->all_attributs() as $attribut_id) {
 		$main .= $page->inc("snippets/attribut");
 	}
@@ -258,9 +258,9 @@ if ($action == "create" or $action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "produit-section-presentation"))}
 {$form->input(array('name' => "matiere[nom_matiere]", 'label' => $dico->t('Nom') ))}
-{$form->select(array('name' => "matiere[id_familles_matieres]", 'label' => $dico->t('FamillesMatieres'), 'options' => $matiere->familles_matieres($id_langue) ))}
-{$form->select(array('name' => "matiere[id_ecolabels]", 'label' => $dico->t('EcoLabel'), 'options' => $matiere->ecolabels($id_langue) ))}
-{$form->select(array('name' => "matiere[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $matiere->recyclages($id_langue) ))}
+{$form->select(array('name' => "matiere[id_familles_matieres]", 'label' => $dico->t('FamillesMatieres'), 'options' => $matiere->familles_matieres($id_langues) ))}
+{$form->select(array('name' => "matiere[id_ecolabels]", 'label' => $dico->t('EcoLabel'), 'options' => $matiere->ecolabels($id_langues) ))}
+{$form->select(array('name' => "matiere[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $matiere->recyclages($id_langues) ))}
 {$form->input(array('name' => "matiere[phrase_description_courte]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "matiere[phrase_description]", 'type' => "hidden"))}
@@ -282,7 +282,7 @@ switch($action) {
 		break;
 	default :
 		$titre_page = $dico->t('ListeOfMatieres');
-		$matiere->liste($config->get('langue'), $filter);
+		$matiere->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

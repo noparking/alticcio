@@ -8,17 +8,17 @@ $config->core_include("outils/form", "outils/mysql", "outils/phrase", "outils/la
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$application = new Application($sql, $phrase, $id_langue);
+$application = new Application($sql, $phrase, $id_langues);
 
-$produit = new Produit($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $phrase, $id_langues);
 
-$sku = new Sku($sql, $phrase, $config->get("langue"));
+$sku = new Sku($sql, $phrase, $id_langues);
 
-$attribut = new Attribut($sql, $phrase, $id_langue);
+$attribut = new Attribut($sql, $phrase, $id_langues);
 
 $form = new Form(array(
 	'id' => "form-compare-products",
@@ -80,7 +80,7 @@ CSV;
 			2 => $dico->t('GammePro'),
 			3 => $dico->t('GammeExpert'),
 		);
-		$recyclages = $produit->recyclage($id_langue);
+		$recyclages = $produit->recyclage($id_langues);
 		foreach ($produits as $id_produits) {
 			$produit->load($id_produits);
 			$phrases = $phrase->get($produit->phrases());

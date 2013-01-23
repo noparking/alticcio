@@ -2,16 +2,19 @@
 
 $menu->current('main/products/products');
 
-$config->core_include("produit/fiche", "produit/produit", "produit/attribut", "produit/sku", "outils/form", "outils/mysql", "outils/phrase");
+$config->core_include("produit/fiche", "produit/produit", "produit/attribut", "produit/sku", "outils/form", "outils/mysql", "outils/phrase", "outils/langue");
 $config->core_include("outils/exterieurs/html2pdf/html2pdf.class");
 
 $sql = new Mysql($config->db());
 
+$langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
+
 $phrase = new Phrase($sql);
 
-$produit = new Produit($sql, $phrase, $config->get("langue"));
-$attribut = new Attribut($sql, $phrase, $config->get("langue"));
-$sku = new Sku($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $phrase, $id_langues);
+$attribut = new Attribut($sql, $phrase, $id_langues);
+$sku = new Sku($sql, $phrase, $id_langues);
 
 $langue = $config->get("langue");
 

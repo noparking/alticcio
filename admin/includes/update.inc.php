@@ -325,3 +325,23 @@ SQL;
 	catch (Exception $e) {
 	}
 };
+
+$update->maj[13] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_phrases` ADD INDEX ( `id` ) 
+SQL;
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
+
+	$q = <<<SQL
+ALTER TABLE `dt_phrases` ADD INDEX ( `id_langues` )
+SQL;
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
+};

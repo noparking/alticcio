@@ -20,12 +20,10 @@ class FicheMatiere extends AbstractObject {
 		$this->id_langue = $id_langue;
 	}
 
-	public function liste($lang, &$filter = null) {
+	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL
 SELECT f.id, p.phrase FROM {$this->table} AS f
-LEFT OUTER JOIN dt_phrases AS p ON p.id = f.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '$lang' OR f.phrase_nom = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = f.phrase_nom AND p.id_langues = $id_langues
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;

@@ -9,14 +9,12 @@ class Matiere extends AbstractObject {
 	public $images_table = "dt_images_matieres";
 	public $phrase_fields = array('phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
 
-	public function liste($lang, &$filter = null) {
+	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL
 SELECT m.id, m.nom_matiere, p.phrase 
 FROM dt_matieres AS m
 LEFT OUTER JOIN dt_familles_matieres AS f ON f.id = m.id_familles_matieres 
-LEFT OUTER JOIN dt_phrases AS p ON p.id = f.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '$lang' OR f.phrase_nom = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = f.phrase_nom AND p.id_langues = $id_langues
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
@@ -31,8 +29,8 @@ SQL;
 		return $liste;
 	}
 	
-	public function familles_matieres($id_langue) {
-		$q = "SELECT f.id, p.phrase FROM dt_familles_matieres AS f INNER JOIN dt_phrases AS p ON p.id = f.phrase_nom AND p.id_langues = ".$id_langue;
+	public function familles_matieres($id_langues) {
+		$q = "SELECT f.id, p.phrase FROM dt_familles_matieres AS f INNER JOIN dt_phrases AS p ON p.id = f.phrase_nom AND p.id_langues = ".$id_langues;
 		$res = $this->sql->query($q);
 		$familles = array('...');
 		while($row = $this->sql->fetch($res)) {
@@ -41,13 +39,13 @@ SQL;
 		return $familles;
 	}
 
-	public function famille_matiere($id_langue) {
-		$familles = $this->familles_matieres($id_langue);
+	public function famille_matiere($id_langues) {
+		$familles = $this->familles_matieres($id_langues);
 		return $familles[$this->values['id_familles_matieres']];
 	}
 
-	public function ecolabels($id_langue) {
-		$q = "SELECT e.id, p.phrase FROM dt_ecolabels AS e INNER JOIN dt_phrases AS p ON p.id = e.phrase_nom AND p.id_langues = ".$id_langue;
+	public function ecolabels($id_langues) {
+		$q = "SELECT e.id, p.phrase FROM dt_ecolabels AS e INNER JOIN dt_phrases AS p ON p.id = e.phrase_nom AND p.id_langues = ".$id_langues;
 		$res = $this->sql->query($q);
 		$ecolabels = array('...');
 		while($row = $this->sql->fetch($res)) {
@@ -56,17 +54,17 @@ SQL;
 		return $ecolabels;
 	}
 
-	public function ecolabel($id_langue) {
-		$ecolabels = $this->ecolabels($id_langue);
+	public function ecolabel($id_langues) {
+		$ecolabels = $this->ecolabels($id_langues);
 		return $ecolabels[$this->values['id_ecolabels']];
 	}
 
-	public function recyclages($id_langue) {
+	public function recyclages($id_langues) {
 		$q = "SELECT r.id, p.phrase 
 				FROM dt_recyclage AS r 
 				LEFT JOIN dt_phrases AS p 
 				ON p.id = r.phrase_nom
-				AND p.id_langues = ".$id_langue;
+				AND p.id_langues = ".$id_langues;
 		$res = $this->sql->query($q);
 		$recycle = array('...');
 		while($row = $this->sql->fetch($res)) {
@@ -75,8 +73,8 @@ SQL;
 		return $recycle;
 	}
 
-	public function recyclage($id_langue) {
-		$recyclages = $this->recyclages($id_langue);
+	public function recyclage($id_langues) {
+		$recyclages = $this->recyclages($id_langues);
 		return $recyclages[$this->values['id_recyclage']];
 	}
 	
@@ -176,13 +174,13 @@ SQL;
 		return $infos;
 	}
 	
-	public function liste_attributs($id_langue) {
+	public function liste_attributs($id_langues) {
 		$q = "SELECT ma.id_attributs, ma.valeur_numerique, ma.phrase_valeur, p.phrase, um.unite, a.id_types_attributs 
 				FROM dt_matieres_attributs AS ma
 				INNER JOIN dt_attributs AS a ON a.id = ma.id_attributs
 				LEFT OUTER JOIN dt_unites_mesure AS um ON um.id = a.id_unites_mesure
 				INNER JOIN dt_phrases AS p ON p.id = a.phrase_nom
-				AND p.id_langues = ".$id_langue."
+				AND p.id_langues = ".$id_langues."
 				AND ma.id_matieres =  ".$this->id;
 		$res = $this->sql->query($q);
 		$html = '<ul>';
@@ -190,7 +188,7 @@ SQL;
 			$value = $row['phrase_valeur'] ?  $row['phrase_valeur'] : $row['valeur_numerique'];
 			$html .= '<li><strong>'.$row['phrase'].'</strong> : ';
 			if ($row['phrase_valeur'] > 0) {
-				$qph = "SELECT * FROM dt_phrases WHERE id_langues = ".$id_langue." AND id = ".$row['phrase_valeur'];
+				$qph = "SELECT * FROM dt_phrases WHERE id_langues = ".$id_langues." AND id = ".$row['phrase_valeur'];
 				$rsph = $this->sql->query($qph);
 				$rowph = $this->sql->fetch($rsph);
 				$html .= $rowph['phrase'];
@@ -240,12 +238,12 @@ SQL;
 		return $liste;
 	}
 	
-	public function liste_applications($id_langue) {
+	public function liste_applications($id_langues) {
 		$q = "SELECT ma.id_matieres, ma.id_applications, p.phrase 
 				FROM dt_matieres_applications AS ma 
 				INNER JOIN dt_applications AS ap ON ap.id = ma.id_applications
 				INNER JOIN dt_phrases AS p ON p.id = ap.phrase_nom
-				AND p.id_langues = ".$id_langue."
+				AND p.id_langues = ".$id_langues."
 				AND ma.id_matieres = ".$this->id;
 		$res = $this->sql->query($q);
 		$html = '<ul>';

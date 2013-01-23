@@ -11,10 +11,10 @@ $phrase = new Phrase($sql);
 
 $langue = $config->get("langue");
 $lang = new Langue($sql);
-$id_langue = $lang->id($langue);
+$id_langues = $lang->id($langue);
 
-$matiere = new Matiere($sql, $phrase, $id_langue);
-$attribut = new Attribut($sql, $phrase, $langue);
+$matiere = new Matiere($sql, $phrase, $id_langues);
+$attribut = new Attribut($sql, $phrase, $id_langues);
 
 if ($id = $url5->get('id')) {
 	$matiere->load($id);
@@ -22,7 +22,7 @@ if ($id = $url5->get('id')) {
 	$images = $matiere->images();
 }
 
-$fiche = new FicheMatiere($sql, $phrase, $langue, $id_langue, $matiere, $attribut, $phrases);
+$fiche = new FicheMatiere($sql, $phrase, $langue, $id_langues, $matiere, $attribut, $phrases);
 
 $form = new Form(array(
 	'id' => "form-fiche-matiere-$id",

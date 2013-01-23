@@ -33,10 +33,8 @@ SQL;
 	public function all_produits(&$filter = null) {
 		$q = <<<SQL
 SELECT pr.id, pr.ref, ph.phrase AS nom, ccp.classement FROM dt_produits AS pr
-LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND ph.id_langues = {$this->langue}
 LEFT OUTER JOIN dt_catalogues_categories_produits AS ccp ON id_catalogues_categories = {$this->id} AND ccp.id_produits = pr.id
-WHERE (l.code_langue = '{$this->langue}' OR pr.phrase_nom = 0)
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;

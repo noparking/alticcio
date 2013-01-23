@@ -6,11 +6,11 @@ $config->core_include("produit/produit", "outils/phrase", "outils/langue");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$produit = new Produit($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $phrase, $id_langues);
 
 $produit->load($data['product']);
 $phrases = $phrase->get($produit->phrases());

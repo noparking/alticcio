@@ -95,10 +95,8 @@ SQL;
 	public function liste_produits(&$filter = null) {
 		$q = <<<SQL
 SELECT pr.id, pr.ref, ph.phrase AS nom, pr.actif FROM dt_produits AS pr
-LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
-WHERE (l.id = '{$this->langue}' OR pr.phrase_nom = 0)
-AND id_applications = {$this->id}
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND ph.id_langues = {$this->langue}
+WHERE id_applications = {$this->id}
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;

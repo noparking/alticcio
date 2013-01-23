@@ -13,10 +13,8 @@ class Sku extends AbstractObject {
 		$q = <<<SQL
 SELECT s.id, s.ref_ultralog, p1.phrase AS phrase_ultralog, p2.phrase AS phrase_commercial, s.actif
 FROM dt_sku AS s
-LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_ultralog
-LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_commercial
-WHERE (p1.id_langues = {$id_langues} OR s.phrase_ultralog = 0)
-AND (p2.id_langues = {$id_langues} OR s.phrase_commercial = 0)
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_ultralog AND p1.id_langues = $id_langues
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_commercial AND p2.id_langues = $id_langues
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
@@ -288,12 +286,10 @@ SQL;
 		return $qte * $this->prix_unitaire_pour_qte($id_sku, $qte, $id_catalogues);
 	}
 	
-	public function get_familles_ventes($lang) {
+	public function get_familles_ventes($id_langues) {
 		$q = <<<SQL
 SELECT f.id, f.code, f.id_parent, p.phrase AS nom FROM dt_familles_ventes AS f
-LEFT JOIN dt_phrases AS p ON p.id = f.phrase_famille
-LEFT JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE l.code_langue = '{$lang}'
+LEFT JOIN dt_phrases AS p ON p.id = f.phrase_famille AND p.id_langues = $id_langues
 ORDER BY f.id
 SQL;
 		$res = $this->sql->query($q);

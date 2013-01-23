@@ -25,13 +25,12 @@ class Produit extends AbstractObject {
 	public function liste(&$filter = null) {
 		$q = <<<SQL
 SELECT pr.id, pr.ref, ph.phrase, pr.actif FROM dt_produits AS pr
-LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
-WHERE (l.code_langue = '{$this->langue}' OR pr.phrase_nom = 0)
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND id_langues = {$this->langue}
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
 		}
+
 		$res = $filter->query($q);
 
 		$liste = array();
@@ -157,8 +156,8 @@ SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$id_phrase = 0;
-			foreach ($langues as $id_langue => $code_langue) {
-				$designation = $designations[$id_langue][$row['id']];
+			foreach ($langues as $id_langues => $code_langue) {
+				$designation = $designations[$id_langues][$row['id']];
 				if ($designation['auto']) {
 					$id_phrase = $this->phrase->save($code_langue, addslashes($designation['auto']), (int)$row['phrase_commercial']);
 				}
@@ -256,9 +255,7 @@ SQL;
 	public function applications() {
 		$q = <<<SQL
 SELECT a.id, p.phrase AS nom FROM dt_applications AS a
-LEFT OUTER JOIN dt_phrases AS p ON p.id = a.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '{$this->langue}' OR a.phrase_nom = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = a.phrase_nom AND p.id_langues = {$this->langue}
 ORDER BY nom
 SQL;
 		$res = $this->sql->query($q);
@@ -273,9 +270,7 @@ SQL;
 	public function gammes() {
 		$q = <<<SQL
 SELECT g.id, p.phrase AS nom FROM dt_gammes AS g
-LEFT OUTER JOIN dt_phrases AS p ON p.id = g.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '{$this->langue}' OR g.phrase_nom = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = g.phrase_nom AND p.id_langues = {$this->langue}
 ORDER BY nom
 SQL;
 		$res = $this->sql->query($q);
@@ -287,12 +282,12 @@ SQL;
 		return $gammes;
 	}
 
-	public function recyclage($id_langue) {
+	public function recyclage($id_langues) {
 		$q = "SELECT r.id, r.numero, p.phrase 
 				FROM dt_recyclage AS r 
 				LEFT JOIN dt_phrases AS p 
 				ON p.id = r.phrase_nom
-				AND p.id_langues = ".$id_langue;
+				AND p.id_langues = ".$id_langues;
 		$res = $this->sql->query($q);
 		$recycle = array('...');
 		while($row = $this->sql->fetch($res)) {
@@ -585,9 +580,7 @@ SQL;
 		$q = <<<SQL
 SELECT s.id, s.ref_ultralog, p.phrase AS nom, link.classement FROM dt_sku AS s
 LEFT OUTER JOIN $table AS link ON link.id_sku = s.id AND link.id_produits = {$this->id}
-LEFT OUTER JOIN dt_phrases AS p ON p.id = s.phrase_ultralog
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '{$this->langue}' OR s.phrase_ultralog = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = s.phrase_ultralog AND p.id_langues = {$this->langue}
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
@@ -646,10 +639,8 @@ SQL;
 	private function all_associated_produits($table, $id_field, &$filter = null) {
 		$q = <<<SQL
 SELECT pr.id, pr.ref, ph.phrase AS nom, link.classement FROM dt_produits AS pr
-LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom
-LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND ph.id_langues = {$this->langue}
 LEFT OUTER JOIN {$table} AS link ON link.{$id_field} = pr.id AND link.id_produits = {$this->id}
-WHERE (l.code_langue = '{$this->langue}' OR pr.phrase_nom = 0)
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;

@@ -25,13 +25,13 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
 $url_redirection = new UrlRedirection($sql);
 
-$categorie = new CatalogueCategorie($sql, $phrase, $config->get("langue"));
+$categorie = new CatalogueCategorie($sql, $phrase, $id_langues);
 $catalogue = new Catalogue($sql);
 
 $action = $url2->get('action');

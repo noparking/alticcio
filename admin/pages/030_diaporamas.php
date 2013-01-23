@@ -29,10 +29,10 @@ $page->css[] = $config->media("produit.css");
 
 $sql = new Mysql($config->db());
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 $phrase = new Phrase($sql);
 
-$diaporama = new Diaporama($sql, $phrase, $id_langue);
+$diaporama = new Diaporama($sql, $phrase, $id_langues);
 $diaporama->dir = $config->get("medias_path")."www/medias/images/diaporamas/";
 
 $url_redirection = new UrlRedirection($sql);
@@ -279,7 +279,7 @@ switch($action) {
 		break;
 	default :
 		$titre_page = "Liste des diaporamas";
-		$diaporama->liste($config->get('langue'), $filter);
+		$diaporama->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

@@ -22,11 +22,11 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$gamme = new Gamme($sql, $phrase, $id_langue);
+$gamme = new Gamme($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
 
@@ -182,7 +182,7 @@ if ($action == "edit") {
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langue);
+	$attribut = new Attribut($sql, $phrase, $id_langues);
 	foreach ($attributs_ids as $attribut_id) {
 		$main .= $page->inc("snippets/attribut");
 		$main .= <<<HTML
@@ -245,7 +245,7 @@ switch($action) {
 		$titre_page = $dico->t('ListeOfGammes');
 		$filter = $filter_gammes;
 		$pager = $pager_gammes;
-		$gamme->liste($id_langue, $filter);
+		$gamme->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

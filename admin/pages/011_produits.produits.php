@@ -25,18 +25,18 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$produit = new Produit($sql, $phrase, $config->get("langue"));
+$produit = new Produit($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
 
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
 	$produit->load($id);
-	$application = new Application($sql, $phrase, $id_langue);
+	$application = new Application($sql, $phrase, $id_langues);
 	$application->load($produit->values['id_applications']);
 }
 
@@ -381,7 +381,7 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langue);
+	$attribut = new Attribut($sql, $phrase, $id_langues);
 	foreach ($application->attributs() as $attribut_id) {
 		$main .= $page->inc("snippets/attribut");
 	}
@@ -520,7 +520,7 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "produit[actif]", 'label' => $dico->t('Statut'), 'options' => array(1 => $dico->t('Active'), 0 => $dico->t('Desactive') )))}
 {$form->select(array('name' => "produit[id_gammes]", 'label' => $dico->t('Gamme'), 'options' => $produit->gammes()))}
 {$form->select(array('name' => "produit[offre]", 'label' => $dico->t('Offre'), 'options' => $offres))}
-{$form->select(array('name' => "produit[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $produit->recyclage($id_langue) ))}
+{$form->select(array('name' => "produit[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $produit->recyclage($id_langues) ))}
 {$form->input(array('name' => "produit[phrase_url_key]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_url_key]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "produit[phrase_avantages_produit]", 'type' => "hidden"))}

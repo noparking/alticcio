@@ -52,7 +52,7 @@ $filter = new Filter($pager, array(
 ), array(), "filter_sku");
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 $pays = new Pays($sql);
@@ -60,7 +60,7 @@ $region = new Region($sql);
 $organisation = new Organisation($sql);
 $couleur = new Couleurs($sql);
 $duocouleurs = new Duocouleurs($sql);
-$sku = new Sku($sql, $phrase, $id_langue);
+$sku = new Sku($sql, $phrase, $id_langues);
 $mesure = new Mesure($sql);
 
 $action = $url2->get('action');
@@ -254,7 +254,7 @@ HTML;
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langue);
+	$attribut = new Attribut($sql, $phrase, $id_langues);
 	foreach ($attributs_ids as $attribut_id) {
 		$main .= $page->inc("snippets/attribut");
 		$main .= <<<HTML
@@ -273,7 +273,7 @@ HTML;
 HTML;
 		if ($id_catalogues == 0) {
 			$main .= <<<HTML
-{$form->select(array('name' => "sku[id_unites_vente]", 'label' => $dico->t('UniteVente'), 'options' => $sku->unites_vente($id_langue)))}
+{$form->select(array('name' => "sku[id_unites_vente]", 'label' => $dico->t('UniteVente'), 'options' => $sku->unites_vente($id_langues)))}
 {$form->input(array('name' => "sku[colisage]", 'label' => $dico->t('Colisage')))}
 {$form->input(array('name' => "sku[min_commande]", 'label' => $dico->t('MinimumCommande')))}
 HTML;
@@ -402,7 +402,7 @@ HTML;
 }
 
 if ($action == "create" or $action == "edit") {
-	$familles_options = options_select_tree(DBTools::tree($sku->get_familles_ventes($config->get('langue'))), $form, "familles_vente");
+	$familles_options = options_select_tree(DBTools::tree($sku->get_familles_ventes($id_langues)), $form, "familles_vente");
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "produit-section-presentation"))}
 {$form->input(array('name' => "sku[phrase_ultralog]", 'type' => "hidden"))}
@@ -428,7 +428,7 @@ switch($action) {
 		break;
 	default :
 		$titre_page = $dico->t('ListeOfSku');
-		$sku->liste($id_langue, $filter);
+		$sku->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

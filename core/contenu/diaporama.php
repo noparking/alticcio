@@ -9,12 +9,10 @@ class Diaporama extends AbstractObject {
 	public $images_table = "dt_images_diaporamas";
 	public $phrase_fields = array('phrase_titre', 'phrase_description', 'phrase_url_key');
 
-	public function liste($lang, &$filter = null) {
+	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL
 SELECT d.id, d.ref, p.phrase AS titre, d.section, d.actif FROM dt_diaporamas AS d
-LEFT OUTER JOIN dt_phrases AS p ON p.id = d.phrase_titre
-LEFT OUTER JOIN dt_langues AS l ON l.id = p.id_langues
-WHERE (l.code_langue = '$lang' OR d.phrase_titre = 0)
+LEFT OUTER JOIN dt_phrases AS p ON p.id = d.phrase_titre AND p.id_langues = $id_langues
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;

@@ -28,11 +28,11 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$fiche = new FicheMatiere($sql, $phrase, $langue);
+$fiche = new FicheMatiere($sql, $phrase, $id_langues);
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter = new Filter($pager, array(
@@ -148,7 +148,7 @@ switch($action) {
 		break;
 	default :
 		$titre_page = $dico->t('ListeOfModelesFichesMatieres');
-		$fiche->liste($config->get('langue'), $filter);
+		$fiche->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }
