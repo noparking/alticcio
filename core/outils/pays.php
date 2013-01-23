@@ -8,12 +8,10 @@ class Pays {
 		$this->sql = $sql;
 	}
 	
-	public function liste($langue, $option='') {
+	public function liste($id_langues, $option='') {
 		$q = <<<SQL
 SELECT p.code_iso, p.id, ph.phrase FROM dt_pays AS p
-LEFT OUTER JOIN dt_phrases as ph ON ph.id = p.phrase_nom
-LEFT OUTER JOIN dt_langues as lg ON lg.id = ph.id_langues
-WHERE lg.code_langue = '$langue'
+LEFT OUTER JOIN dt_phrases as ph ON ph.id = p.phrase_nom AND ph.id_langues = $id_langues
 ORDER BY ph.phrase
 SQL;
 		$res = $this->sql->query($q);
