@@ -88,7 +88,12 @@ class Message {
 		$accepter_email = isset($data['accepter_email']) && $data['accepter_email'] ? '1' : '0';
 		$accepter_tel = isset($data['accepter_tel']) && $data['accepter_tel'] ? '1' : '0';
 		$accepter_catalogue = ($type == "catalogue" or $data['accepter_catalogue']) ? '1' : '0';
-		$message = addslashes($data['message']); 
+		if (isset($data['message'])) {
+			$message = addslashes($data['message']); 
+		}
+		else {
+			$message = "";
+		}
 		$q = "INSERT INTO dt_messages (type, date_envoi, ip, version, profil, organisme,".
 		" civilite, nom, prenom, fonction, num_client, adresse, adresse2, adresse3, cp, ville, pays, id_pays, email,".
 		" tel, mob, fax, accepter_email, accepter_tel, accepter_catalogue, message, siret)".
