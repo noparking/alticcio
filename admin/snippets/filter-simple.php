@@ -8,8 +8,8 @@ $html = <<<HTML
 <div class="filter-pager">
 	{$page->inc("snippets/pager")} |
 	<div class="filter-buttons">
-		{$filter->actionbutton("reset", $dico->t("FiltreReset"))}
 		{$filter->actionbutton("search", $dico->t("FiltreSearch"))}
+		{$filter->actionbutton("reset", $dico->t("FiltreReset"))}
 	</div>
 </div>
 <table id="table_pager">
