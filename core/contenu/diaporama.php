@@ -13,6 +13,7 @@ class Diaporama extends AbstractObject {
 		$q = <<<SQL
 SELECT d.id, d.ref, p.phrase AS titre, d.section, d.actif FROM dt_diaporamas AS d
 LEFT OUTER JOIN dt_phrases AS p ON p.id = d.phrase_titre AND p.id_langues = $id_langues
+ORDER BY d.classement 
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
@@ -72,7 +73,7 @@ FROM dt_diaporamas AS d
 LEFT OUTER JOIN dt_phrases AS ph ON d.phrase_titre = ph.id AND ph.id_langues = $id_langues
 LEFT OUTER JOIN dt_phrases AS ph2 ON d.phrase_url_key = ph2.id AND ph2.id_langues = $id_langues
 WHERE d.section = '$section' AND actif = 1 AND d.phrase_titre <> 0 AND ph.phrase <> ''
-ORDER BY d.id DESC
+ORDER BY d.classement
 SQL;
 		if ($number) {
 			$q .= " LIMIT 0, $number";
