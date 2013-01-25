@@ -3,7 +3,7 @@
 $menu->current('main/products/sku');
 
 $config->core_include("outils/form", "outils/mysql", "outils/langue", "outils/phrase", "outils/pays", "outils/region", "outils/organisation");
-$config->core_include("produit/sku", "produit/attribut", "produit/mesure", "produit/duocouleurs");
+$config->core_include("produit/sku", "produit/produit", "produit/attribut", "produit/mesure", "produit/duocouleurs");
 $config->core_include("database/tools", "outils/filter", "outils/pager", "produit/couleurs");
 $config->base_include("functions/tree");
 
@@ -206,6 +206,7 @@ if ($action == "edit") {
 		'personnalisation' => $dico->t('Personnalisation'),
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
+		'produits' => $dico->t('Produits'),
 	);
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
 		$sections['prix-'.$id_catalogues] = $dico->t('Prix')." $nom_catalogue";
@@ -398,6 +399,37 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	}
+
+	$produit = new Produit($sql);
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
+<h3>Variantes</h3>
+<ul>
+HTML;
+	foreach ($sku->variante_for() as $id_produits) {
+		$produit->load($id_produits);
+		$phrases = $phrase->get($produit->phrases());
+		$main .= <<<HTML
+<li>{$page->l($phrases['phrase_nom'][$config->get('langue')], $url2->make("produits", array('type' => "produits", 'action' => "edit", 'id' => $id_produits)))}</li>
+HTML;
+	}
+	$main .= <<<HTML
+</ul>
+<h3>Accessoires</h3>
+<ul>
+HTML;
+	foreach ($sku->accessoire_for() as $id_produits) {
+		$produit->load($id_produits);
+		$phrases = $phrase->get($produit->phrases());
+		$main .= <<<HTML
+<li>{$page->l($phrases['phrase_nom'][$config->get('langue')], $url2->make("produits", array('type' => "produits", 'action' => "edit", 'id' => $id_produits)))}</li>
+HTML;
+	}
+	$main .= <<<HTML
+</ul>
+{$form->fieldset_end()}
+HTML;
+
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 

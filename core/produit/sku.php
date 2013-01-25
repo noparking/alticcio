@@ -624,4 +624,30 @@ SQL;
 		
 		return "";
 	}
+
+	public function variante_for() {
+		$q = <<<SQL
+SELECT id_produits FROM dt_sku_variantes WHERE id_sku = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		$produits = array();
+		while ($row = $this->sql->fetch($res)) {
+			$produits[] = $row['id_produits'];
+		}
+
+		return $produits;
+	}
+
+	public function accessoire_for() {
+		$q = <<<SQL
+SELECT id_produits FROM dt_sku_accessoires WHERE id_sku = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		$produits = array();
+		while ($row = $this->sql->fetch($res)) {
+			$produits[] = $row['id_produits'];
+		}
+
+		return $produits;
+	}
 }
