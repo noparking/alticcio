@@ -10,7 +10,6 @@ $config->core_include("outils/filter", "outils/pager", "outils/url_redirection")
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("filter-edit.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
-$page->javascript[] = $config->core_media("form.js");
 $page->javascript[] = $config->media("produit.js");
 $page->javascript[] = $config->core_media("jquery.form.js");
 $page->javascript[] = $config->core_media("jquery.dteditor.js");
@@ -105,7 +104,7 @@ if ($form->is_submitted()) {
 			$traduction = null;
 			break;
 		case "delete":
-			$diaporama->delete();
+			$diaporama->delete($data);
 			$form->reset();
 			$url->redirect("current", array('action' => "", 'id' => ""));
 			break;

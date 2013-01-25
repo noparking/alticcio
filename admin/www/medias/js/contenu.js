@@ -19,17 +19,22 @@ $(document).ready(function () {
       }
     }
   });
+
+	$("input[type=submit][class~=delete]").click(function () {
+		if ($(this).attr('name') == form_action) {
+			var answer = prompt(dico['ConfirmerSuppression']);
+			answer = answer.toLowerCase();
+			if (answer == "yes" || answer == "oui" || answer == "y" || answer == "o") {
+				form_action = $(this).attr("name");
+				return true;
+			}
+			else {
+				form_action = "default";
+				return false;
+			}
+		}
+	});
   
-  $("input[type=submit][name=delete]").click(function () {
-  	if (confirm(dico['ConfirmerSuppression'])) {
-  		form_action = $(this).attr("name");
-  		return true;
-  	}
-  	else {
-  		form_action = $(this).attr("default");
-  		return false;
-  	}
-  });
 });
 
 function check_parents(element) {
