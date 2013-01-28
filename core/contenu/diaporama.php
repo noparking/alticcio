@@ -13,10 +13,12 @@ class Diaporama extends AbstractObject {
 		$q = <<<SQL
 SELECT d.id, d.ref, p.phrase AS titre, d.section, d.actif FROM dt_diaporamas AS d
 LEFT OUTER JOIN dt_phrases AS p ON p.id = d.phrase_titre AND p.id_langues = $id_langues
-ORDER BY d.classement 
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
+			$q .= "\n".<<<SQL
+ORDER BY d.classement 
+SQL
 		}
 		$res = $filter->query($q);
 
