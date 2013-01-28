@@ -18,7 +18,7 @@ SQL;
 			$filter = $this->sql;
 			$q .= "\n".<<<SQL
 ORDER BY d.classement 
-SQL
+SQL;
 		}
 		$res = $filter->query($q);
 
