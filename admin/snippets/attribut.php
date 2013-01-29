@@ -1,6 +1,6 @@
 <?php
 
-global $page, $attribut, $attribut_id, $phrase, $form, $config, $displayed_lang, $id_langue;
+global $page, $attribut, $attribut_id, $phrase, $form, $config, $displayed_lang, $id_langues;
 
 $page->css[] = $config->media("jquery-ui.min.css");
 $page->css[] = $config->media("ui.multiselect.css");
@@ -62,7 +62,7 @@ switch ($attribut->type_attribut) {
 		echo $form->input(array('name' => "phrases[valeurs_attributs][".$attribut_id."][]", 'type' => "hidden", 'forced_value' => 1));
 		break;
 	case 'reference' :
-		$options = $attribut->reference_options($id_langue);
+		$options = $attribut->reference_options($id_langues);
 		echo $form->select(array('name' => "attributs[".$attribut_id."][0]", 'options' => $options, 'label' => $label[$config->get('langue')], 'unit' => $unit));
 		break;
 	case 'readonly' :
