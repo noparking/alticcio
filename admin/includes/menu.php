@@ -165,7 +165,7 @@ $menus = array(
 				'level' => 30,
 				'items' => array(
 					'commandes' => array(
-						'level' => 80,
+						'level' => 30,
 						'label' => $dico->t('Commandes'),
 						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
 					),
