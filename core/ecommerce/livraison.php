@@ -65,11 +65,12 @@ SQL;
 		return $forfaits;
 	}
 
-	public function forfait ($montant, $id_pays) {
+	public function forfait ($montant, $id_pays, $id_catalogues = 0) {
 		$q = <<<SQL
 SELECT forfait FROM dt_frais_port WHERE prix_min <= $montant 
 AND id_langues = {$this->id_langues}
-AND id_pays = $id_pays 
+AND id_pays = $id_pays
+AND id_catalogues = $id_catalogues
 ORDER BY prix_min DESC LIMIT 1
 SQL;
 		$res = $this->sql->query($q);
