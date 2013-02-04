@@ -125,7 +125,7 @@ SQL;
 			$produit['revision'] = $revision;
 			foreach ($produit as $cle => $valeur) {
 				$fields[] = $cle;
-				$values[] = "'{$valeur}'";
+				$values[] = "'".addslashes($valeur)."'";
 			}
 			$fields = implode(",", $fields);
 			$values = implode(",", $values);
