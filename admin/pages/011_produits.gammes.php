@@ -58,7 +58,8 @@ if ($id = $url2->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-gamme-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "cancel"),
+	'actions' => array("save", "delete", "cancel", "add-image", "delete-image", "add-attribut", "delete-attribut"),
+	'files' => array("new_image_file"),
 ));
 
 $section = "presentation";
@@ -83,6 +84,16 @@ if ($form->is_submitted()) {
 			$gamme->delete($data);
 			$form->reset();
 			$url2->redirect("current", array('action' => "", 'id' => ""));
+			break;
+		case "add-image" :
+			if ($file = $form->value('new_image_file')) {
+				$dir = $config->get("medias_path")."www/medias/images/produits/";
+				$gamme->add_image($data, $file, $dir);
+			}
+			$form->forget_value("new_image");
+			break;
+		case "delete-image" :
+			$gamme->delete_image($data, $form->action_arg());
 			break;
 		case "add-attribut" :
 			$gamme->add_attribut($data);
@@ -110,6 +121,7 @@ if ($form->changed()) {
 
 if ($action == 'edit') {
 	$form->default_values['gamme'] = $gamme->values;
+	$form->default_values['image'] = $gamme->images();
 	$form->default_values['phrases'] = $phrase->get($gamme->phrases());
 	$form->default_values['attributs'] = $gamme->attributs();
 }
@@ -146,6 +158,7 @@ if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'attributs' => $dico->t('Attributs'),
+		'images' => $dico->t('Images'),
 		'produits' => $dico->t('Produits'),
 	);
 	// variable $hidden mise à jour dans ce snippet
@@ -192,6 +205,75 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_end()}
 HTML;
+
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('AjouterUneImage'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-new"))}
+{$form->input(array('type' => "file", 'name' => "new_image_file", 'label' => $dico->t('SelectFichier')))}
+{$form->input(array('name' => "new_image[phrase_legende]", 'label' => $dico->t('TexteAlternatif'), 'items' => $displayed_lang))}
+{$form->input(array('name' => "new_image[classement]", 'type' => "hidden", 'forced_value' => $gamme->new_classement()))}
+{$form->input(array('type' => "submit", 'name' => "add-image", 'value' => $dico->t('Ajouter') ))}
+<p class="message">{$dico->t('AttentionSuppressionImage')}</p>
+<p><a href="mailto:{$config->get("photomail_email")}?Subject=gamme={$gamme->values['ref']}">{$dico->t('AjouterImagePhotomail')}</a></p>
+{$form->fieldset_end()}
+HTML;
+
+	$images = $gamme->images();
+	if (count($images)) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('LesImages'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-images"))}
+<table class="sortable" id="images">
+<thead>
+<tr>
+	<th>{$dico->t('Ordre')}</th>
+	<th>{$dico->t('Apercu')}</th>
+	<th>{$dico->t('TexteAlternatif')}</th>
+	<th>{$dico->t('Visibilite')}</th>
+	<th>{$dico->t('Diaporama')}</th>
+	<th>{$dico->t('Vignette')}</th>
+	<th>Image HD</th>
+	<td></td>
+</tr>
+</thead>
+<tbody>
+HTML;
+		$form_template = $form->template;
+		$form->template = "#{field}";
+		$images_rows = array();
+		$hd_extensions = $dico->d('hd_extensions');
+		foreach ($images as $image) {
+			$order = $form->value("images[{$image['id']}]") !== null ? $form->value("images[{$image['id']}][classement]") : $image['classement'];
+			$style_hd = $image['hd_extension'] ? '' : 'style="display:none;"';
+			$images_rows[$order] = <<<HTML
+<tr>
+	<td class="drag-handle"></td>
+	<td><img class="produit-image" src="{$config->core_media("produits/".$image['ref'])}" /></td>
+	<td>
+		{$form->input(array('name' => "image[".$image['id']."][phrase_legende]", 'type' => "hidden"))}
+		{$form->input(array('name' => "phrases[image][".$image['id']."][phrase_legende]", 'items' => $displayed_lang))}
+	</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][affichage]", 'type' => "checkbox", 'checked' => $image['affichage']))}</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][diaporama]", 'type' => "checkbox", 'checked' => $image['diaporama']))}</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][vignette]", 'type' => "checkbox", 'checked' => $image['vignette']))}</td>
+	<td>
+		{$form->select(array('name' => "image[".$image['id']."][hd_extension]", 'options' => $hd_extensions))}
+		<input class="nom_hd" name="{$gamme->image_hd($image['id'])}" {$style_hd} value="{$gamme->image_hd($image['id'])}.{$image['hd_extension']}" readonly="readonly" />
+	</td>
+	<td>
+		{$form->input(array('name' => "image[".$image['id']."][classement]", 'type' => "hidden", 'forced_value' => $order))}
+		{$form->input(array('type' => "submit", 'name' => "delete-image[".$image['id']."]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
+	</td>
+</tr>
+HTML;
+		}
+		ksort($images_rows);
+		$main .= implode("\n", $images_rows);
+		$form->template = $form_template;
+		$main .= <<<HTML
+</tbody>
+</table>
+{$form->fieldset_end()}
+HTML;
+	}
 
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')));
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));

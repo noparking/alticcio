@@ -186,5 +186,9 @@ SQL;
 		return $liste;
 	}
 
+	public function image_hd($image_id) {
+		return "gamme_{$this->id}_{$image_id}";
+	}
+
 }
 
