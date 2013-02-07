@@ -104,7 +104,7 @@ SQL;
 		if (isset($data['produits'])) {
 			$values = array();
 			foreach ($data['produits'] as $id_produits => $infos) {
-				$classement = $infos['classement'] ? $infos['classement'] : 0;
+				$classement = isset($infos['classement']) ? $infos['classement'] : 0;
 				$values[] = "($id, {$id_produits}, $classement)";
 			}
 			if (count($values)) {

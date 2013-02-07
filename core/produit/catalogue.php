@@ -78,6 +78,8 @@ SQL;
 INSERT INTO dt_catalogues_categories ({$fields}) VALUES ({$values})
 SQL;
 		$res = $this->sql->query($q);
+
+		return $this->sql->insert_id();
 	}
 
 	public function delete($data) {
