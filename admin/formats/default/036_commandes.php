@@ -50,7 +50,12 @@ if ($action == "create" or $action == "edit") {
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
-	$main = <<<HTML
+	$main = "";
+	if (isset($messages)) {
+		$main .= $page->inc("snippets/messages");
+	}
+
+	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 
 {$form->fieldset_start(array('legend' => $dico->t('Commande'), 'class' => "produit-section produit-section-commande".$hidden['commande'], 'id' => "produit-section-commande"))}

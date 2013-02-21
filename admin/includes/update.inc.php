@@ -345,3 +345,14 @@ SQL;
 	catch (Exception $e) {
 	}
 };
+
+$update->maj[14] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_groupes_users` ADD `perm` LONGTEXT NOT NULL
+SQL;
+	try {
+		$update->sql->query($q);
+	}
+	catch (Exception $e) {
+	}
+};
