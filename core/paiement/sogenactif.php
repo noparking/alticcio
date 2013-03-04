@@ -53,5 +53,65 @@ class Sogenactif {
 
 		return $html;
 	}
+
+	public function check($post) {
+		if(isset($post['DATA'])) {
+			$pathfile = "pathfile=".$this->config['pathfile'];
+			$message = "message=".$_POST['DATA'];
+			$result = exec(trim($this->config['response']." ".$message." ".$pathfile));
+
+			$tableau = explode ("!", $result);
+
+			$data = array();
+			$data['code'] = $tableau[1];
+			$data['error'] = $tableau[2];
+			$data['merchant_id'] = $tableau[3];
+			$data['merchant_country'] = $tableau[4];
+			$data['amount'] = $tableau[5];
+			$data['transaction_id'] = $tableau[6];
+			$data['payment_means'] = $tableau[7];
+			$data['transmission_date']= $tableau[8];
+			$data['payment_time'] = $tableau[9];
+			$data['payment_date'] = $tableau[10];
+			$data['response_code'] = $tableau[11];
+			$data['payment_certificate'] = $tableau[12];
+			$data['authorisation_id'] = $tableau[13];
+			$data['currency_code'] = $tableau[14];
+			$data['card_number'] = $tableau[15];
+			$data['cvv_flag'] = $tableau[16];
+			$data['cvv_response_code'] = $tableau[17];
+			$data['bank_response_code'] = $tableau[18];
+			$data['complementary_code'] = $tableau[19];
+			$data['complementary_info'] = $tableau[20];
+			$data['return_context'] = $tableau[21];
+			$data['caddie'] = $tableau[22];
+			$data['receipt_complement'] = $tableau[23];
+			$data['merchant_language'] = $tableau[24];
+			$data['language'] = $tableau[25];
+			$data['customer_id'] = $tableau[26];
+			$data['order_id'] = $tableau[27];
+			$data['customer_email'] = $tableau[28];
+			$data['customer_ip_address'] = $tableau[29];
+			$data['capture_day'] = $tableau[30];
+			$data['capture_mode'] = $tableau[31];
+			$data['data'] = $tableau[32];
+
+			if (($data['code'] == "") && ($data['error'] == "")) {
+				echo "erreur appel response\n";
+				print ("executable response non trouve $path_bin\n");
+				
+				return false;
+			}
+			else if ($data['code'] != 0){
+				echo " API call error.\n";
+				echo "Error message :  $error\n";
+
+				return false
+			}
+			else {
+				return $data;
+			}
+		}
+	}
 }
 
