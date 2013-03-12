@@ -15,6 +15,9 @@ JAVASCRIPT;
 $attribut->load($attribut_id);
 list($label) = $phrase->get(array($attribut->values['phrase_nom']));
 $unit = $attribut->attr("unite");
+
+echo $form->input(array('name' => "types_attributs[".$attribut_id."]", 'type' => "hidden", 'forced_value' => $attribut->type_attribut));
+
 switch ($attribut->type_attribut) {
 	case 'choice' :
 		$options = array(0 => "N/A", 1 => "Oui", 2 => "Non");
@@ -75,7 +78,33 @@ switch ($attribut->type_attribut) {
 			echo $form->input(array('name' => "attributs[".$attribut_id."][0]", 'label' => $label[$config->get('langue')], 'readonly' => true, 'forced_value' => $valeurs['valeur_numerique']));
 		}
 		break;
-	default :
-		echo $form->input(array('name' => "attributs[".$attribut_id."][]", 'label' => $label[$config->get('langue')]));
+	case 'multitext' :
+		$options = $attribut->options();
+		$phrase_ids = array();
+		foreach ($options as $option) {
+			$phrase_ids[$option['id']] = $option['phrase_option'];
+		}
+		$phrases_options = $phrase->get($phrase_ids);
+		foreach ($options as $option) {
+			echo $form->input(array('name' => "attributs[".$attribut_id."][".$option['classement']."]", 'type' => "hidden"));
+			echo $form->input(array('name' => "phrases[valeurs_attributs][".$attribut_id."][".$option['classement']."]", 'label' => $label[$config->get('langue')]." (".$phrases_options[$option['id']][$config->get('langue')].")", 'items' => $displayed_lang));
+		}
 		break;
+	case 'multifreevalue' :
+	case 'multinumber' :
+		$options = $attribut->options();
+		$phrase_ids = array();
+		$classements = array();
+		foreach ($options as $option) {
+			$phrase_ids[$option['id']] = $option['phrase_option'];
+			$classements[$option['id']] = $option['classement'];
+		}
+		$phrases_options = $phrase->get($phrase_ids);
+		foreach ($options as $option) {
+			echo $form->input(array('name' => "attributs[".$attribut_id."][".$option['classement']."]", 'label' => $label[$config->get('langue')]." (".$phrases_options[$option['id']][$config->get('langue')].")"));
+		}
+		break;
+	case 'freevalue' :
+	default :
+		echo $form->input(array('name' => "attributs[".$attribut_id."][0]", 'label' => $label[$config->get('langue')]));
 }

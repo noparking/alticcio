@@ -171,7 +171,7 @@ SQL;
 		
 		$row = $this->sql->fetch($res);
 
-		return $row === false ? array('phrase_valeur' => 0, 'valeur_numerique' => 0) : $row;
+		return $row === false ? array('phrase_valeur' => 0, 'valeur_numerique' => 0, 'valeur_libre' => 0) : $row;
 	}
 
 	public function phrases() {

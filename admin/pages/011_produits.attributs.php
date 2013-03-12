@@ -151,7 +151,7 @@ if ($action == "edit") {
 	}
 	$type_attribut = $types_attributs[$id_types_attributs];
 	
-	if (strpos($type_attribut, "select") !== false) {
+	if (strpos($type_attribut, "select") !== false or strpos($type_attribut, "multi") !== false) {
 		$sections['options'] = $dico->t('Options');
 		// variable $hidden mise à jour dans ce snippet
 		$left = $page->inc("snippets/produits-sections");

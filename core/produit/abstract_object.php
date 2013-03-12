@@ -314,4 +314,72 @@ SQL;
 
 		return $row['id'];
 	}
+
+	public function attributs() {
+		$attributs = array();
+		$q = <<<SQL
+SELECT * FROM {$this->attributs_table} WHERE {$this->id_field} = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		
+		while ($row = $this->sql->fetch($res)) {
+			$attributs[$row['id_attributs']][$row['classement']] = $row[$row['type_valeur']];
+		}
+
+		return $attributs;
+	}
+
+	public function add_attribut($data) {
+		$attribut = $this->attributs();
+		if (!isset($attribut[$data['new_attribut']])) {
+			$q = <<<SQL
+INSERT INTO {$this->attributs_table} (id_attributs, {$this->id_field}) VALUES ({$data['new_attribut']}, {$data[$this->type]['id']}) 
+SQL;
+			$res = $this->sql->query($q);
+		}
+	}
+
+	public function delete_attribut($data, $attribut_id) {
+		$q = <<<SQL
+DELETE FROM {$this->attributs_table} WHERE id_attributs = {$attribut_id} AND {$this->id_field} = {$data[$this->type]['id']}
+SQL;
+		$res = $this->sql->query($q);
+	}
+
+	public function save_attributs($data, $id) {
+		if (isset($data['attributs'])) {
+			$q = <<<SQL
+DELETE FROM {$this->attributs_table} WHERE {$this->id_field} = $id
+SQL;
+			$this->sql->query($q);
+	
+			ksort($data['attributs']);
+			foreach ($data['attributs'] as $attribut_id => $valeurs) {
+				foreach ($valeurs as $classement => $valeur) { 
+					if (strpos($data['types_attributs'][$attribut_id], "free") !== false) {
+						$type_valeur = "valeur_libre";
+					}
+					else if	(isset($data['phrases']['valeurs_attributs'][$attribut_id][$classement])) {
+						$type_valeur = "phrase_valeur";
+						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id][$classement])) {
+							foreach	($data['phrases']['valeurs_attributs'][$attribut_id][$classement] as $lang => $phrase) {
+								$valeur = $this->phrase->save($lang, $phrase, $valeur);
+							}
+						}
+						$valeur = (int)$valeur;
+					}
+					else {
+						$type_valeur = "valeur_numerique";
+						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
+					}
+
+					$q = <<<SQL
+INSERT INTO {$this->attributs_table} (id_attributs, {$this->id_field}, type_valeur, $type_valeur, classement)
+VALUES ($attribut_id, $id, '$type_valeur', '$valeur', $classement)
+SQL;
+					$this->sql->query($q);
+				}
+			}
+		}
+	}
 }

@@ -165,19 +165,11 @@ $update->maj[4] = function($update) {
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[5] = function($update) {
@@ -208,27 +200,18 @@ $update->maj[6] = function($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[7] = function($update) {
@@ -237,11 +220,7 @@ ALTER TABLE `dt_gammes` ADD `phrase_description_courte` INT NOT NULL ,
 ADD `phrase_url_key` INT NOT NULL ,
 ADD `ref` VARCHAR( 20 ) NOT NULL 
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[8] = function($update) {
@@ -294,11 +273,7 @@ SQL;
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[11] = function($update) {
@@ -308,51 +283,87 @@ ADD `phrase_description_courte` INT( 11 ) NOT NULL ,
 ADD `phrase_description` INT( 11 ) NOT NULL ,
 ADD `phrase_url_key` INT( 11 ) NOT NULL
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[12] = function($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_users` ADD `id_langues` INT NOT NULL
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[13] = function($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id` ) 
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id_langues` )
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
 };
 
 $update->maj[14] = function($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_groupes_users` ADD `perm` LONGTEXT NOT NULL
 SQL;
-	try {
-		$update->sql->query($q);
-	}
-	catch (Exception $e) {
-	}
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+$update->maj[15] = function($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_attributs_valeurs` ADD `valeur_libre` TEXT NOT NULL
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_gammes_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_matieres_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_produits_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_sku_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_produits_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_produits`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_sku_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_sku`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+ALTER TABLE `dt_gammes_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_gammes`
+SQL;
+	try { $update->sql->query($q); } catch (Exception $e) {}
+
+	$q = <<<SQL
+UPDATE `dt_produits_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_sku_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_gammes_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
+SQL;
+	$update->sql->query($q);
 };

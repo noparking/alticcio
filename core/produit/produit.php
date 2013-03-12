@@ -6,7 +6,9 @@ class Produit extends AbstractObject {
 
 	public $type = "produit";
 	public $table = "dt_produits";
+	public $id_field = "id_produits";
 	public $images_table = "dt_images_produits";
+	public $attributs_table = "dt_produits_attributs";
 	public $phrase_fields = array(
 		'phrase_nom',
 		'phrase_commercial',
@@ -92,34 +94,7 @@ SQL;
 			}
 		}
 
-		if (isset($data['attributs'])) {
-			$q = <<<SQL
-DELETE FROM dt_produits_attributs WHERE id_produits = $id
-SQL;
-			$this->sql->query($q);
-			foreach ($data['attributs'] as $attribut_id => $valeurs) {
-				foreach ($valeurs as $classement => $valeur) { 
-					$type_valeur = "valeur_numerique";
-					if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
-						$type_valeur = "phrase_valeur";
-						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
-							foreach ($data['phrases']['valeurs_attributs'][$attribut_id] as $lang => $phrase) {
-								$valeur = $this->phrase->save($lang, $phrase, $valeur);
-							}
-						}
-						$valeur = (int)$valeur;
-					}
-					else {
-						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
-					}
-					$q = <<<SQL
-INSERT INTO dt_produits_attributs (id_attributs, id_produits, $type_valeur, classement)
-VALUES ($attribut_id, $id, $valeur, $classement)
-SQL;
-					$this->sql->query($q);
-				}
-			}
-		}
+		$this->save_attributs($data, $id);
 
 		if (isset($data['personnalisation'])) {
 				$q = <<<SQL
@@ -296,22 +271,6 @@ SQL;
 		return $recycle;
 	}
 	
-	public function attributs() {
-		$attributs = array();
-		$q = <<<SQL
-SELECT id_attributs, valeur_numerique, phrase_valeur, classement FROM dt_produits_attributs
-WHERE id_produits = {$this->id}
-SQL;
-		$res = $this->sql->query($q);
-		
-		while ($row = $this->sql->fetch($res)) {
-			$value = $row['phrase_valeur'] ?  $row['phrase_valeur'] : $row['valeur_numerique'];
-			$attributs[$row['id_attributs']][$row['classement']] = $value;
-		}
-
-		return $attributs;
-	}
-
 	public function attributs_names() {
 		$attributs = array();
 		$q = <<<SQL
@@ -407,7 +366,7 @@ SQL;
 
 	public function variantes_filtre() {
 		$q = <<<SQL
-SELECT sv.id_sku, a.id, sa.valeur_numerique, sa.phrase_valeur
+SELECT sv.id_sku, a.id, sa.valeur_libre, sa.valeur_numerique, sa.phrase_valeur
 FROM dt_sku_variantes AS sv
 INNER JOIN dt_sku_attributs AS sa ON sa.id_sku = sv.id_sku
 INNER JOIN dt_attributs AS a ON a.id = sa.id_attributs
@@ -418,7 +377,7 @@ SQL;
 		$variantes = array();
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$variantes[$row['id_sku']][$row['id']] = $row['phrase_valeur'] ? $row['phrase_valeur'] : $row['valeur_numerique'];
+			$variantes[$row['id_sku']][$row['id']] = $row['phrase_valeur'] ? $row['phrase_valeur'] : ($row['valeur_numerique'] ?	$row['valeur_numerique'] : $row['valeur_libre']);
 		}
 
 		return $variantes;
@@ -427,7 +386,11 @@ SQL;
 	public function attributs_data() {
 		$attributs = array();
 		$q = <<<SQL
-SELECT a.phrase_nom, a.id_types_attributs, um.unite, pa.id_attributs, pa.valeur_numerique, pa.phrase_valeur, aa.fiche_technique, aa.pictos_vente, aa.top, aa.comparatif, aa.filtre FROM dt_produits_attributs AS pa
+SELECT a.phrase_nom, a.id_types_attributs, um.unite,
+	   pa.id_attributs, pa.type_valeur,
+	   pa.valeur_numerique, pa.phrase_valeur, pa.valeur_libre, pa.classement,
+	   aa.fiche_technique, aa.pictos_vente, aa.top, aa.comparatif, aa.filtre
+FROM dt_produits_attributs AS pa
 INNER JOIN dt_produits AS p ON pa.id_produits = p.id
 INNER JOIN dt_applications_attributs AS aa ON p.id_applications = aa.id_applications AND aa.id_attributs = pa.id_attributs
 INNER JOIN dt_attributs AS a ON a.id = pa.id_attributs
@@ -438,7 +401,7 @@ SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
-			$attributs[$row['id_attributs']] = $row;
+			$attributs[$row['id_attributs']][$row['classement']] = $row;
 		}
 
 		return $this->attributs_data_from_variantes($attributs);
@@ -449,7 +412,7 @@ SQL;
 		if (count($variantes)) {
 			$variantes_ids = implode(",", array_keys($variantes));
 			$q = <<<SQL
-SELECT sa.id_attributs, sa.valeur_numerique, sa.phrase_valeur FROM dt_sku_attributs AS sa
+SELECT sa.id_attributs, sa.type_valeur, sa.valeur_numerique, sa.phrase_valeur, sa.valeur_libre, sa.classement FROM dt_sku_attributs AS sa
 INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = sa.id_sku
 WHERE sa.id_sku IN ({$variantes_ids})
 ORDER BY sv.classement ASC
@@ -457,14 +420,20 @@ SQL;
 			$res = $this->sql->query($q);
 			
 			$valeurs_numeriques = array();
+			$valeurs_libres = array();
 			$phrases_valeurs = array();
 			$ids_attributs = array();
 			while ($row = $this->sql->fetch($res)) {
-				if ($row['phrase_valeur']) {
-					$phrases_valeurs[$row['id_attributs']][] = $row['phrase_valeur'];
-				}
-				else {
-					$valeurs_numeriques[$row['id_attributs']][] = $row['valeur_numerique'];
+				switch ($row['type_valeur']) {
+					case 'phrase_valeur' :
+						$phrases_valeurs[$row['id_attributs']][] = $row['phrase_valeur'];
+						break;
+					case 'valeur_libre' :
+						$valeurs_libres[$row['id_attributs']][] = $row['valeur_libre'];
+						break;
+					case 'valeur_numerique' :
+						$valeurs_numeriques[$row['id_attributs']][] = $row['valeur_numerique'];
+						break;
 				}
 				$ids_attributs[$row['id_attributs']] = $row['id_attributs'];
 			}
@@ -472,10 +441,17 @@ SQL;
 				if (isset($attributs[$id_attributs])) {
 					if (isset($phrases_valeurs[$id_attributs])) {
 						$attributs[$id_attributs]['valeur_numerique'] = array();
+						$attributs[$id_attributs]['valeur_libre'] = array();
 						$attributs[$id_attributs]['phrase_valeur'] = array_unique($phrases_valeurs[$id_attributs]);
+					}
+					else if (isset($valeurs_libres[$id_attributs])) {
+						$attributs[$id_attributs]['valeur_numerique'] = array();
+						$attributs[$id_attributs]['valeur_libre'] = array_unique($valeurs_libres[$id_attributs]);
+						$attributs[$id_attributs]['phrase_valeur'] = array();;
 					}
 					else {
 						$attributs[$id_attributs]['valeur_numerique'] = array_unique($valeurs_numeriques[$id_attributs]);
+						$attributs[$id_attributs]['valeur_libre'] = array();
 						$attributs[$id_attributs]['phrase_valeur'] = array();
 					}
 					$attributs[$id_attributs]['id_attributs'] = $id_attributs;
@@ -487,40 +463,42 @@ SQL;
 	}
 
 	public function attributs_data_get_references($attributs = array()) {
-		foreach ($attributs as $id_attributs => $attribut) {
-			if ($attribut['id_types_attributs'] == 6) {
-				$q = <<<SQL
+		foreach ($attributs as $id_attributs => $data) {
+			foreach ($data as $classement => $attribut) {
+				if (isset($attribut['id_types_attributs']) and $attribut['id_types_attributs'] == 6) {
+					$q = <<<SQL
 SELECT * FROM dt_attributs_references WHERE id_attributs = {$id_attributs}
 SQL;
-				$res = $this->sql->query($q);
-				$data_ref = $this->sql->fetch($res);
+					$res = $this->sql->query($q);
+					$data_ref = $this->sql->fetch($res);
 
-				$q = <<<SQL
+					$q = <<<SQL
 SELECT {$data_ref['field_label']} AS ref_value FROM `{$data_ref['table_name']}` WHERE {$data_ref['field_value']}
 SQL;
-				if (is_array($attribut['valeur_numerique'])) {
-					$q .= " IN ('".implode("','", $attribut['valeur_numerique'])."')";
-				}
-				else {
-					$q .= " = '{$attribut['valeur_numerique']}'";
-				}
-
-				$res = $this->sql->query($q);
-				if (is_array($attribut['valeur_numerique'])) {
-					$ref_value = array();
-					while ($row = $this->sql->fetch($res)) {
-						$ref_value[] = $row['ref_value'];
+					if (is_array($attribut['valeur_numerique'])) {
+						$q .= " IN ('".implode("','", $attribut['valeur_numerique'])."')";
 					}
-				}
-				else {
-					$ref_value = $this->sql->fetch($res);
-				}
-				if (strpos($data_ref['field_label'], "phrase_") === 0) {
-					$attributs[$id_attributs]['phrase_valeur'] = $ref_value;
-				}
-				else {
-					$attributs[$id_attributs]['valeur_numerique'] = $ref_value;
-				}
+					else {
+						$q .= " = '{$attribut['valeur_numerique']}'";
+					}
+
+					$res = $this->sql->query($q);
+					if (is_array($attribut['valeur_numerique'])) {
+						$ref_value = array();
+						while ($row = $this->sql->fetch($res)) {
+							$ref_value[] = $row['ref_value'];
+						}
+					}
+					else {
+						$ref_value = $this->sql->fetch($res);
+					}
+					if (strpos($data_ref['field_label'], "phrase_") === 0) {
+						$attributs[$id_attributs][$classement]['phrase_valeur'] = $ref_value;
+					}
+					else {
+						$attributs[$id_attributs][$classement]['valeur_numerique'] = $ref_value;
+					}
+				 }
 			}
 		}
 	
@@ -536,9 +514,11 @@ SQL;
 		}
 		$ids['valeurs_attributs'] = array();
 		$attributs = $this->attributs_data();
-		foreach ($attributs as $attribut) {
-			if ($attribut['phrase_valeur']) {
-				$ids['valeurs_attributs'][$attribut['id_attributs']] = $attribut['phrase_valeur'];
+		foreach ($attributs as $data) {
+			foreach ($data as $classement => $attribut) {
+				if (isset($attribut['phrase_valeur']) and $attribut['phrase_valeur']) {
+					$ids['valeurs_attributs'][$attribut['id_attributs']][$classement] = $attribut['phrase_valeur'];
+				}
 			}
 		}
 		return $ids;
@@ -750,45 +730,47 @@ SQL;
 	public function fiche_perso_attributs($attribut, $langue) {
 		$infos = array();
 		$phrases = $this->phrase->get($this->phrases());
-		foreach ($this->attributs_data() as $data) {
-			$attribut->load($data['id_attributs']);
+		foreach ($this->attributs_data() as $tab) {
+			foreach ($tab as $classement => $data) {
+				$attribut->load($data['id_attributs']);
 
-			$unites = $attribut->unites();
-			$unite = null;
-			if ($attribut->values['id_unites_mesure']) {
-				$unite = $unites[$attribut->values['id_unites_mesure']];
-			}
-
-			$types = $attribut->types();
-			$type = $types[$attribut->values['id_types_attributs']];
-			
-
-			if ($data['phrase_valeur']) {
-				if (isset($phrases['valeurs_attributs'][$data['id_attributs']][$langue])) {
-					$valeur = $phrases['valeurs_attributs'][$data['id_attributs']][$langue];
+				$unites = $attribut->unites();
+				$unite = null;
+				if ($attribut->values['id_unites_mesure']) {
+					$unite = $unites[$attribut->values['id_unites_mesure']];
 				}
-				elseif (is_array($phrases['valeurs_attributs'][$data['id_attributs']])) {
-					$valeur = array();
-					foreach ($phrases['valeurs_attributs'][$data['id_attributs']] as $phrase_valeur_attribut) {
-						$valeur[] = $phrase_valeur_attribut[$langue];
+
+				$types = $attribut->types();
+				$type = $types[$attribut->values['id_types_attributs']];
+				
+
+				if ($data['phrase_valeur']) {
+					if (isset($phrases['valeurs_attributs'][$data['id_attributs']][$langue])) {
+						$valeur = $phrases['valeurs_attributs'][$data['id_attributs']][$langue];
+					}
+					elseif (is_array($phrases['valeurs_attributs'][$data['id_attributs']])) {
+						$valeur = array();
+						foreach ($phrases['valeurs_attributs'][$data['id_attributs']] as $phrase_valeur_attribut) {
+							$valeur[] = $phrase_valeur_attribut[$langue];
+						}
 					}
 				}
-			}
-			else {
-				$valeur = $data['valeur_numerique'];
-			}
+				else {
+					$valeur = $data['valeur_numerique'];
+				}
 
-			$infos[] = array(
-				'nom' => $phrases['attributs'][$data['id_attributs']][$langue],
-				'valeur' => $valeur,
-				'type' => $type,
-				'unite' => $unite,
-				'fiche_technique' => $data['fiche_technique'],
-				'pictos_vente' => $data['pictos_vente'],
-				'top' => $data['top'],
-				'comparatif' => $data['comparatif'],
-				'filtre' => $data['filtre'],
-			);
+				$infos[] = array(
+					'nom' => $phrases['attributs'][$data['id_attributs']][$langue],
+					'valeur' => $valeur,
+					'type' => $type,
+					'unite' => $unite,
+					'fiche_technique' => $data['fiche_technique'],
+					'pictos_vente' => $data['pictos_vente'],
+					'top' => $data['top'],
+					'comparatif' => $data['comparatif'],
+					'filtre' => $data['filtre'],
+				);
+			}
 		}
 		return $infos;
 	}

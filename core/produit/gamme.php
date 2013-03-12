@@ -6,7 +6,9 @@ class Gamme extends AbstractObject {
 
 	public $type = "gamme";
 	public $table = "dt_gammes";
+	public $id_field = "id_gammes";
 	public $images_table = "dt_images_gammes";
+	public $attributs_table = "dt_gammes_attributs";
 	public $phrase_fields = array(
 		'phrase_nom',
 		'phrase_description_courte',
@@ -75,77 +77,21 @@ SQL;
 		return $liste;
 	}
 
-	public function add_attribut($data) {
-		$attribut = $this->attributs();
-		if (!isset($attribut[$data['new_attribut']])) {
-			$q = <<<SQL
-INSERT INTO dt_gammes_attributs (id_attributs, id_gammes) VALUES ({$data['new_attribut']}, {$data['gamme']['id']}) 
-SQL;
-			$res = $this->sql->query($q);
-		}
-	}
-
-	public function delete_attribut($data, $attribut_id) {
+	public function phrases() {
+		$ids = parent::phrases();
+		$ids['attributs'] = array();
+		$ids['valeurs_attributs'] = array();
 		$q = <<<SQL
-DELETE FROM dt_gammes_attributs WHERE id_attributs = {$attribut_id} AND id_gammes = {$data['gamme']['id']}
-SQL;
-		$res = $this->sql->query($q);
-	}
-
-	public function attributs() {
-		$attributs = array();
-		$q = <<<SQL
-SELECT id_attributs, valeur_numerique, phrase_valeur, classement FROM dt_gammes_attributs
-WHERE id_gammes = {$this->id}
+SELECT id_attributs, phrase_valeur, classement FROM dt_gammes_attributs
+WHERE id_gammes = {$this->id} AND phrase_valeur <> 0
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
-			$value = $row['phrase_valeur'] ?  $row['phrase_valeur'] : $row['valeur_numerique'];
-			$attributs[$row['id_attributs']][$row['classement']] = $value;
+			$ids['attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
+			$ids['valeurs_attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
 		}
-		return $attributs;
-	}
-
-	public function save_attributs($data, $id) {
-		if (isset($data['attributs'])) {
-			$q = <<<SQL
-DELETE FROM dt_gammes_attributs WHERE id_gammes = $id AND classement > 0
-SQL;
-			$this->sql->query($q);
-	
-			ksort($data['attributs']);
-			foreach ($data['attributs'] as $attribut_id => $valeurs) {
-				foreach ($valeurs as $classement => $valeur) { 
-					$type_valeur = "valeur_numerique";
-					if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
-						$type_valeur = "phrase_valeur";
-						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
-							foreach ($data['phrases']['valeurs_attributs'][$attribut_id] as $lang => $phrase) {
-								$valeur = $this->phrase->save($lang, $phrase, $valeur);
-							}
-						}
-						$valeur = (int)$valeur;
-					}
-					else {
-						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
-					}
-					if ($classement == 0) {
-						$q = <<<SQL
-UPDATE dt_gammes_attributs SET $type_valeur = $valeur
-WHERE id_attributs = $attribut_id AND id_gammes = $id AND classement = 0
-SQL;
-					}
-					else {
-						$q = <<<SQL
-INSERT INTO dt_gammes_attributs (id_attributs, id_gammes, $type_valeur, classement)
-VALUES ($attribut_id, $id, $valeur, $classement)
-SQL;
-					}
-					$this->sql->query($q);
-				}
-			}
-		}
+		return $ids;
 	}
 
 	public function produits($id_gammes, $produits = array(), $actif = null) {
