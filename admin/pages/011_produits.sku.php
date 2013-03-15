@@ -8,7 +8,6 @@ $config->core_include("database/tools", "outils/filter", "outils/pager", "produi
 $config->base_include("functions/tree");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
-$page->javascript[] = $config->core_media("filter-edit.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->inc("snippets/date-input");
 $page->javascript[] = $config->media("produit.js");
@@ -76,6 +75,8 @@ $form = new Form(array(
 	'date_format' => $dico->d('FormatDate'),
 ));
 
+$snippet_attribut_management = $page->inc("snippets/attribut_management");
+
 $section = "presentation";
 if ($form->value('section')) {
 	$section = $form->value('section');
@@ -88,6 +89,7 @@ if ($form->is_submitted()) {
 	$data = $form->escaped_values();
 	switch ($form->action()) {
 		case "translate":
+		case "filter":
 			break;
 		case "reset":
 			$form->reset();
@@ -150,6 +152,7 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
+				$filter_attributs_management->clean_data($data, 'attributs_management');
 				$id = $sku->save($data);
 				$form->reset();
 				if ($action != "edit") {
@@ -204,6 +207,7 @@ if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'personnalisation' => $dico->t('Personnalisation'),
+		'attributs_management' => $dico->t('AttributsManagement'),
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
 		'produits' => $dico->t('Produits'),
@@ -242,25 +246,15 @@ HTML;
 
 	$attributs = $sku->attributs();
 	$attributs_ids = array_keys($attributs);
-	$attributs_options = array();
-	foreach ($sku->all_attributs("unite") as $attribut_id => $label) {
-		if (!in_array($attribut_id, $attributs_ids)) {
-			$attributs_options[$attribut_id] = $label;
-		}
-	}
 	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => $dico->t('AjouterUnAttribut'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-new-attribut"))}
-{$form->select(array('name' => "new_attribut", 'options' => $attributs_options, 'template' => "#{field}"))}
-{$form->input(array('type' => "submit", 'name' => "add-attribut", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_start(array('legend' => $dico->t('AttributsManagement'), 'class' => "produit-section produit-section-attributs_management".$hidden['attributs_management'], 'id' => "produit-section-new-attribut"))}
+{$snippet_attribut_management}
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
 	$attribut = new Attribut($sql, $phrase, $id_langues);
 	foreach ($attributs_ids as $attribut_id) {
 		$main .= $page->inc("snippets/attribut");
-		$main .= <<<HTML
-{$form->input(array('type' => "submit", 'name' => "delete-attribut[$attribut_id]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}		
-HTML;
 	}
 	$main .= <<<HTML
 {$form->fieldset_end()}
@@ -459,6 +453,7 @@ switch($action) {
 		$titre_page = $dico->t('EditerSku')." # ID : ".$id;
 		break;
 	default :
+		$page->javascript[] = $config->core_media("filter-edit.js");
 		$titre_page = $dico->t('ListeOfSku');
 		$sku->liste($id_langues, $filter);
 		$main = $page->inc("snippets/filter");

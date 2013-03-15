@@ -30,6 +30,7 @@ $t['AttenteTelechargement'] = "Téléchargement en cours...";
 $t['AttentionNonSauvergarde'] = "Be careful : This item is not recorded.";
 $t['AttentionSuppressionImage'] = "Be careful : adding and deleting an image are done without a backup.";
 $t['Attributs'] = "Attributes";
+$t['AttributsManagement'] = "Attributs management";
 $t['Auteur'] = "Author";
 $t['AvantagesProduit'] = "The + product";
 $t['Barre'] = "Striked";

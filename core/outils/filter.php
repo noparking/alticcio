@@ -584,4 +584,15 @@ HTML;
 			return "";
 		}
 	}
+
+	function clean_data(&$data, $key) {
+		if (isset($data[$key])) {
+			$filter_selected = $this->selected();
+			foreach ($data[$key] as $element_id => $element) {
+				if (!in_array($element_id, $filter_selected)) {
+					unset($data[$key][$element_id]);
+				}
+			}
+		}
+	}
 }

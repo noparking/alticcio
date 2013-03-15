@@ -23,11 +23,11 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$attribut = new Attribut($sql, $phrase, $id_langue);
+$attribut = new Attribut($sql, $phrase, $id_langues);
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter = new Filter($pager, array(

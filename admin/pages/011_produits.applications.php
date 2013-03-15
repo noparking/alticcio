@@ -22,11 +22,11 @@ $page->css[] = $config->media("produit.css");
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langue = $langue->id($config->get("langue"));
+$id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$application = new Application($sql, $phrase, $id_langue);
+$application = new Application($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
 

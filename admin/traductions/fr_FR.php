@@ -38,6 +38,7 @@ $t['AttenteTelechargement'] = "Loading...";
 $t['AttentionNonSauvergarde'] = "Attention : cet enregistrement n'a pas été sauvegardé.";
 $t['AttentionSuppressionImage'] = "Attention : l'ajout et la suppression d'images prennent effet immédiatement.";
 $t['Attributs'] = "Attributs";
+$t['AttributsManagement'] = "Gestion des attributs";
 $t['Au'] = "au";
 $t['Auteur'] = "Auteur";
 $t['AvantagesProduit'] = "Le + produit";
