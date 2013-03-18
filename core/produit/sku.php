@@ -390,23 +390,6 @@ SQL;
 		return $liste;
 	}
 
-	public function phrases() {
-		$ids = parent::phrases();
-		$ids['attributs'] = array();
-		$ids['valeurs_attributs'] = array();
-		$q = <<<SQL
-SELECT id_attributs, phrase_valeur, classement FROM dt_sku_attributs
-WHERE id_sku = {$this->id} AND phrase_valeur <> 0
-SQL;
-		$res = $this->sql->query($q);
-		
-		while ($row = $this->sql->fetch($res)) {
-			$ids['attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
-			$ids['valeurs_attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
-		}
-		return $ids;
-	}
-
 	public function duplicate($data) {
 		unset($data['sku']['id']);
 		$data['sku']['ref_ultralog'] = "";
