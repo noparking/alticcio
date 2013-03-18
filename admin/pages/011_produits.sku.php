@@ -75,15 +75,11 @@ $form = new Form(array(
 	'date_format' => $dico->d('FormatDate'),
 ));
 
-$snippet_attribut_management = $page->inc("snippets/attribut_management");
-
 $section = "presentation";
 if ($form->value('section')) {
 	$section = $form->value('section');
 }
 $traduction = $form->value("lang");
-
-$messages = array();
 
 if ($form->is_submitted()) {
 	$data = $form->escaped_values();
@@ -152,6 +148,7 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
+				$page->inc("snippets/attribut_management");
 				$filter_attributs_management->clean_data($data, 'attributs_management');
 				$id = $sku->save($data);
 				$form->reset();
@@ -164,8 +161,13 @@ if ($form->is_submitted()) {
 	}
 }
 
+$messages = array();
+
 if ($form->changed()) {
 	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
+}
+else {
+	$attribut_management_selected = array_keys($sku->attributs());
 }
 
 if ($action == 'edit') {
@@ -173,6 +175,7 @@ if ($action == 'edit') {
 	$form->default_values['image'] = $sku->images();
 	$form->default_values['phrases'] = $phrase->get($sku->phrases());
 	$form->default_values['prix'] = $sku->prix_catalogues();
+	$form->default_values['attributs_management'] = $sku->attributs_management();
 	$form->default_values['attributs'] = $sku->attributs();
 }
 
@@ -244,19 +247,16 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
-	$attributs = $sku->attributs();
-	$attributs_ids = array_keys($attributs);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('AttributsManagement'), 'class' => "produit-section produit-section-attributs_management".$hidden['attributs_management'], 'id' => "produit-section-new-attribut"))}
-{$snippet_attribut_management}
+{$page->inc("snippets/attribut_management")}
 {$form->fieldset_end()}
-{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langues);
-	foreach ($attributs_ids as $attribut_id) {
-		$main .= $page->inc("snippets/attribut");
-	}
+
+	$attributs = $sku->attributs('grouped');
 	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
+{$page->inc("snippets/attributs")}
 {$form->fieldset_end()}
 HTML;
 

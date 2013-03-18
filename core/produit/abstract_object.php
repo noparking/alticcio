@@ -315,15 +315,40 @@ SQL;
 		return $row['id'];
 	}
 
-	public function attributs() {
+	public function attributs_management() {
+		$attributs_management = array();
+		$q = <<<SQL
+SELECT id_attributs, `groupe`, classement FROM dt_management_attributs
+WHERE table_name = '{$this->table}' AND linked_id = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+
+		while ($row = $this->sql->fetch($res)) {
+			$attributs_management[$row['id_attributs']] = $row;
+		}
+
+		return $attributs_management;
+	}
+
+	public function attributs($grouped = "") {
 		$attributs = array();
 		$q = <<<SQL
-SELECT * FROM {$this->attributs_table} WHERE {$this->id_field} = {$this->id}
+SELECT ma.id_attributs, ma.groupe, ma.classement AS classement_groupe, at.type_valeur, at.valeur_numerique, at.phrase_valeur, at.valeur_libre, at.classement
+FROM dt_management_attributs AS ma
+LEFT OUTER JOIN {$this->attributs_table} AS at ON ma.id_attributs = at.id_attributs AND ma.linked_id = {$this->id_field}
+WHERE ma.table_name = '{$this->table}' AND ma.linked_id = {$this->id}
+ORDER BY ma.groupe ASC, ma.classement ASC
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
-			$attributs[$row['id_attributs']][$row['classement']] = $row[$row['type_valeur']];
+			$valeur = isset($row[$row['type_valeur']]) ? $row[$row['type_valeur']] : "";
+			if ($grouped == 'grouped') {
+				$attributs[$row['groupe']][$row['id_attributs']][$row['classement']] = $valeur;
+			}
+			else {
+				$attributs[$row['id_attributs']][$row['classement']] = $valeur;
+			}
 		}
 
 		return $attributs;
