@@ -166,7 +166,7 @@ $messages = array();
 if ($form->changed()) {
 	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
 }
-else {
+else if ($action == 'edit') {
 	$attribut_management_selected = array_keys($sku->attributs());
 }
 

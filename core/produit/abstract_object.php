@@ -148,17 +148,19 @@ SQL;
 			$ids['image'][$image['id']]['phrase_legende'] = $image['phrase_legende'];
 		}
 
-		$ids['attributs'] = array();
-		$ids['valeurs_attributs'] = array();
-		$q = <<<SQL
+		if (isset($this->attributs_table)) {
+			$ids['attributs'] = array();
+			$ids['valeurs_attributs'] = array();
+			$q = <<<SQL
 SELECT at.id_attributs, at.phrase_valeur, at.classement FROM {$this->attributs_table} AS at
 WHERE at.{$this->id_field} = {$this->id} AND at.type_valeur = 'phrase_valeur'
 SQL;
-		$res = $this->sql->query($q);
+			$res = $this->sql->query($q);
 		
-		while ($row = $this->sql->fetch($res)) {
-			$ids['attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
-			$ids['valeurs_attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
+			while ($row = $this->sql->fetch($res)) {
+				$ids['attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
+				$ids['valeurs_attributs'][$row['id_attributs']][$row['classement']] = $row['phrase_valeur'];
+			}
 		}
 
 		return $ids;
