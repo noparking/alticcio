@@ -70,6 +70,8 @@ $traduction = $form->value("lang");
 
 $messages = array();
 
+$attribut_management_filter_pager_name = "attribut_management_gamme";
+
 if ($form->is_submitted()) {
 	$data = $form->escape_values();
 	switch ($form->action()) {
@@ -95,15 +97,10 @@ if ($form->is_submitted()) {
 		case "delete-image" :
 			$gamme->delete_image($data, $form->action_arg());
 			break;
-		case "add-attribut" :
-			$gamme->add_attribut($data);
-			$form->forget_value("new_attribut");
-			break;
-		case "delete-attribut" :
-			$gamme->delete_attribut($data, $form->action_arg());
-			break;
 		default :
 			if ($action == "edit" or $action == "create") {
+				$page->inc("snippets/attribut_management");
+				$filter_attributs_management->clean_data($data, 'attributs_management');
 				$id = $url_redirection->save_object($gamme, $data, array('phrase_url_key' => 'phrase_nom'));
 				$form->reset();
 				if ($action != "edit") {
@@ -118,11 +115,15 @@ if ($form->is_submitted()) {
 if ($form->changed()) {
 	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
 }
+else if ($action == 'edit') {
+	$attribut_management_selected = array_keys($gamme->attributs());
+}
 
 if ($action == 'edit') {
 	$form->default_values['gamme'] = $gamme->values;
 	$form->default_values['image'] = $gamme->images();
 	$form->default_values['phrases'] = $phrase->get($gamme->phrases());
+	$form->default_values['attributs_management'] = $gamme->attributs_management();
 	$form->default_values['attributs'] = $gamme->attributs();
 }
 else {
@@ -157,6 +158,7 @@ if ($action == "create" or $action == "edit") {
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
+		'attributs_management' => $dico->t('AttributsManagement'),
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
 		'produits' => $dico->t('Produits'),
@@ -180,29 +182,16 @@ if ($action == "create" or $action == "edit") {
 HTML;
 }
 if ($action == "edit") {
-	$attributs = $gamme->attributs();
-	$attributs_ids = array_keys($attributs);
-	$attributs_options = array();
-	foreach ($gamme->all_attributs("unite") as $attribut_id => $label) {
-		if (!in_array($attribut_id, $attributs_ids)) {
-			$attributs_options[$attribut_id] = $label;
-		}
-	}
 	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => $dico->t('AjouterUnAttribut'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-new-attribut"))}
-{$form->select(array('name' => "new_attribut", 'options' => $attributs_options, 'template' => "#{field}"))}
-{$form->input(array('type' => "submit", 'name' => "add-attribut", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_start(array('legend' => $dico->t('AttributsManagement'), 'class' => "produit-section produit-section-attributs_management".$hidden['attributs_management'], 'id' => "produit-section-new-attribut"))}
+{$page->inc("snippets/attribut_management")}
 {$form->fieldset_end()}
-{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-	$attribut = new Attribut($sql, $phrase, $id_langues);
-	foreach ($attributs_ids as $attribut_id) {
-		$main .= $page->inc("snippets/attribut");
-		$main .= <<<HTML
-{$form->input(array('type' => "submit", 'name' => "delete-attribut[$attribut_id]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}		
-HTML;
-	}
+
+	$attributs = $gamme->attributs('grouped');
 	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
+{$page->inc("snippets/attributs")}
 {$form->fieldset_end()}
 HTML;
 

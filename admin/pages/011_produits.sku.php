@@ -70,7 +70,7 @@ if ($id = $url2->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-sku-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "reset", "add-image", "delete-image", "add-prix-degressif", "delete-prix-degressif", "add-attribut", "delete-attribut", "duplicate"),
+	'actions' => array("save", "delete", "reset", "add-image", "delete-image", "add-prix-degressif", "delete-prix-degressif", "duplicate"),
 	'files' => array("new_image_file", "new_gabarit_file"),
 	'date_format' => $dico->d('FormatDate'),
 ));
@@ -80,6 +80,8 @@ if ($form->value('section')) {
 	$section = $form->value('section');
 }
 $traduction = $form->value("lang");
+
+$attribut_management_filter_pager_name = "attribut_management_sku";
 
 if ($form->is_submitted()) {
 	$data = $form->escaped_values();
@@ -126,13 +128,6 @@ if ($form->is_submitted()) {
 			break;
 		case "delete-prix-degressif" :
 			$sku->delete_prix_degressif($form->action_arg());
-			break;
-		case "add-attribut" :
-			$sku->add_attribut($data);
-			$form->forget_value("new_attribut");
-			break;
-		case "delete-attribut" :
-			$sku->delete_attribut($data, $form->action_arg());
 			break;
 		case "duplicate" :
 			$id = $sku->duplicate($data);
