@@ -46,7 +46,7 @@ $filter = $filter_attributs_management = new Filter($pager, array(
 			'class' => "input-text-numeric",
 		),
 	),
-), $attribut_management->attributs(), "filter_".$attribut_management_filter_pager_name, true);
+), array(), "filter_".$attribut_management_filter_pager_name, true);
 
 if (isset($attribut_management_selected)) {
 	$filter->select($attribut_management_selected);

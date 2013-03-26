@@ -18,7 +18,7 @@ class AttributManagement {
 		}
 		$application_id = isset($this->id) ? $this->id : 0;
 		$q = <<<SQL
-SELECT a.id, p.phrase AS name, ma.groupe, ma.classement FROM dt_attributs AS a
+SELECT DISTINCT(a.id), p.phrase AS name, ma.groupe, ma.classement FROM dt_attributs AS a
 LEFT OUTER JOIN dt_phrases AS p ON p.id = a.phrase_nom AND p.id_langues = {$this->langue}
 LEFT OUTER JOIN dt_management_attributs AS ma ON ma.id_attributs = a.id
 SQL;
@@ -30,10 +30,6 @@ SQL;
 		}
 		
 		return $liste;
-	}
-
-	public function attributs() {
-		return array();
 	}
 
 	public function groupes() {

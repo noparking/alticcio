@@ -393,8 +393,8 @@ DELETE FROM dt_management_attributs WHERE table_name = '{$this->table}' AND link
 SQL;
 			$this->sql->query($q);
 			foreach ($data['attributs_management'] as $attribut_id => $values) {
-				$groupe = (int)$values['groupe'];
-				$classement = (int)$values['classement'];
+				$groupe = isset($values['groupe']) ? (int)$values['groupe'] : 0;
+				$classement = isset($values['classement']) ? (int)$values['classement'] : 0;
 				$q = <<<SQL
 INSERT INTO dt_management_attributs (id_attributs, table_name, linked_id, `groupe`, classement)
 VALUES ($attribut_id, '{$this->table}', $id, $groupe, $classement)
