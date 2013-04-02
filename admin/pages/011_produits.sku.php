@@ -396,11 +396,12 @@ HTML;
 <ul>
 HTML;
 	foreach ($sku->variante_for() as $id_produits) {
-		$produit->load($id_produits);
-		$phrases = $phrase->get($produit->phrases());
-		$main .= <<<HTML
+		if ($produit->load($id_produits)) {
+			$phrases = $phrase->get($produit->phrases());
+			$main .= <<<HTML
 <li>{$page->l($phrases['phrase_nom'][$config->get('langue')], $url2->make("produits", array('type' => "produits", 'action' => "edit", 'id' => $id_produits)))}</li>
 HTML;
+		}
 	}
 	$main .= <<<HTML
 </ul>
@@ -408,11 +409,12 @@ HTML;
 <ul>
 HTML;
 	foreach ($sku->accessoire_for() as $id_produits) {
-		$produit->load($id_produits);
-		$phrases = $phrase->get($produit->phrases());
-		$main .= <<<HTML
+		if ($produit->load($id_produits)) {
+			$phrases = $phrase->get($produit->phrases());
+			$main .= <<<HTML
 <li>{$page->l($phrases['phrase_nom'][$config->get('langue')], $url2->make("produits", array('type' => "produits", 'action' => "edit", 'id' => $id_produits)))}</li>
 HTML;
+		}
 	}
 	$main .= <<<HTML
 </ul>
