@@ -1,11 +1,11 @@
 <?php
 
-$update->maj[0] = function() {
+function update_0() {
 };
 
-$update->maj[1] = function($update) {
+function update_1($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revisions` (
+CREATE TABLE `dt_commandes_produits_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
   `date_revision` int(11) NOT NULL,
@@ -26,8 +26,9 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_produits_revisions` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
 	$update->sql->query($q);
+
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_commandes_revisions` (
+CREATE TABLE `dt_commandes_revisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `revision` int(11) NOT NULL,
   `date_revision` int(11) NOT NULL,
@@ -78,9 +79,9 @@ SQL;
 	$update->sql->query($q);
 };
 
-$update->maj[2] = function($update) {
+function update_2($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_factures` (
+CREATE TABLE `dt_factures` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `number` varchar(256) NOT NULL,
   `id_commandes` int(11) NOT NULL,
@@ -128,8 +129,9 @@ CREATE TABLE IF NOT EXISTS `dt_factures` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 SQL;
 	$update->sql->query($q);
+
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_factures_produits` (
+CREATE TABLE `dt_factures_produits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_factures` int(11) NOT NULL,
   `id_produits` int(11) NOT NULL,
@@ -150,9 +152,10 @@ CREATE TABLE IF NOT EXISTS `dt_factures_produits` (
 SQL;
 	$update->sql->query($q);
 };
-$update->maj[3] = function($update) {
+
+function update_3($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_users_password` (
+CREATE TABLE `dt_users_password` (
 		`id` int(11) NOT NULL AUTO_INCREMENT,
 		`id_users` int(11) NOT NULL,
 		`key` varchar(256) NOT NULL,
@@ -161,20 +164,22 @@ CREATE TABLE IF NOT EXISTS `dt_users_password` (
 SQL;
 	$update->sql->query($q);
 };
-$update->maj[4] = function($update) {
+
+function update_4($update) {
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
+
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[5] = function($update) {
+function update_5($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_clients` (
+CREATE TABLE `dt_clients` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `login` varchar(128) NOT NULL,
   `password` varchar(128) NOT NULL,
@@ -185,8 +190,9 @@ CREATE TABLE IF NOT EXISTS `dt_clients` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 SQL;
 	$update->sql->query($q);
+
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_clients_password` (
+CREATE TABLE `dt_clients_password` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_clients` int(11) NOT NULL,
   `key` varchar(256) NOT NULL,
@@ -196,36 +202,36 @@ SQL;
 	$update->sql->query($q);
 };
 
-$update->maj[6] = function($update) {
+function update_6($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL;
 SQL;
 
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[7] = function($update) {
+function update_7($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_gammes` ADD `phrase_description_courte` INT NOT NULL ,
 ADD `phrase_url_key` INT NOT NULL ,
 ADD `ref` VARCHAR( 20 ) NOT NULL 
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[8] = function($update) {
+function update_8($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_gammes_attributs` (
+CREATE TABLE `dt_gammes_attributs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_attributs` int(11) NOT NULL,
   `id_gammes` int(11) NOT NULL,
@@ -240,9 +246,9 @@ SQL;
 	$update->sql->query($q);
 };
 
-$update->maj[9] = function($update) {
+function update_9($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_images_gammes` (
+CREATE TABLE `dt_images_gammes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_gammes` int(11) NOT NULL,
   `ref` varchar(250) NOT NULL,
@@ -260,9 +266,9 @@ SQL;
 	$update->sql->query($q);
 };
 
-$update->maj[10] = function($update) {
+function update_10($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_attributs_valeurs` (
+CREATE TABLE `dt_attributs_valeurs` (
   `id_attributs` int(11) NOT NULL,
   `valeur_numerique` float NOT NULL,
   `phrase_valeur` int(11) NOT NULL,
@@ -273,85 +279,85 @@ SQL;
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[11] = function($update) {
+function update_11($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_applications` ADD `ref` VARCHAR( 20 ) NOT NULL ,
 ADD `phrase_description_courte` INT( 11 ) NOT NULL ,
 ADD `phrase_description` INT( 11 ) NOT NULL ,
 ADD `phrase_url_key` INT( 11 ) NOT NULL
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[12] = function($update) {
+function update_12($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_users` ADD `id_langues` INT NOT NULL
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[13] = function($update) {
+function update_13($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id` ) 
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id_langues` )
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[14] = function($update) {
+function update_14($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_groupes_users` ADD `perm` LONGTEXT NOT NULL
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 };
 
-$update->maj[15] = function($update) {
+function update_15($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `valeur_libre` TEXT NOT NULL
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_gammes_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_produits`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_sku`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_gammes_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_gammes`
 SQL;
-	try { $update->sql->query($q); } catch (Exception $e) {}
+	$update->sql->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_produits_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
@@ -367,4 +373,71 @@ SQL;
 UPDATE `dt_gammes_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
 SQL;
 	$update->sql->query($q);
-};
+
+	$q = <<<SQL
+CREATE TABLE `dt_groupes_attributs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->sql->query($q);
+}
+
+function update_16($update) {
+	$q = <<<SQL
+CREATE TABLE `dt_management_attributs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_attributs` int(11) NOT NULL,
+  `table_name` varchar(128) NOT NULL,
+  `linked_id` int(11) NOT NULL,
+  `groupe` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_attributs` (`id_attributs`),
+  KEY `linked_id` (`id_attributs`)
+)
+SQL;
+	$update->sql->query($q);
+
+	$tables = array(
+		"id_sku" => "dt_gammes_attributs",
+		"id_produits" => "dt_produits_attributs",
+		"id_sku" => "dt_sku_attributs"
+	);
+	foreach ($tables as $id_field => $table) {
+		$q = <<<SQL
+UPDATE $table SET type_valeur = 'valeur_numerique'
+SQL;
+		$update->sql->query($q);
+
+		$q = <<<SQL
+UPDATE $table SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> ''
+SQL;
+		$update->sql->query($q);
+
+		$q = <<<SQL
+UPDATE $table SET type_valeur = 'valeur_libre' WHERE valeur_libre <> ''
+SQL;
+		$update->sql->query($q);
+		
+		$q = <<<SQL
+SELECT * FROM $table 
+SQL;
+		$res = $update->sql->query($q);
+		
+		while ($row = $update->sql->fetch($res)) {
+			$q = <<<SQL
+DELETE FROM dt_management_attributs WHERE id_attributs = {$row['id_attributs']}
+AND table_name = '$table' AND linked_id = {$row[$id_field]}
+SQL;
+			$update->sql->query($q);
+
+			$q = <<<SQL
+INSERT INTO dt_management_attributs (id_attributs, table_name, linked_id, classement)
+VALUES ({$row['id_attributs']}, '$table', {$row[$id_field]}, {$row['classement']}) 
+SQL;
+			$update->sql->query($q);
+		}
+	}
+}

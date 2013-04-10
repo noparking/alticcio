@@ -10,9 +10,9 @@ $form = new Form(array(
 	'actions' => array("update"),
 ));
 
-$update = new Update($sql);
-
 include dirname(__FILE__)."/../includes/update.inc.php";
+
+$update = new Update($sql);
 
 $message = "";
 if ($form->is_submitted()) {
@@ -21,8 +21,15 @@ if ($form->is_submitted()) {
 	$update->execute($data['nouvelle_version']);
 
 	$message = <<<HTML
-<p class="message">Mise à jour à la version {$update->version}</p>
+<p class="message">Mis à jour à la version {$update->version}</p>
 HTML;
+	if (count($update->errors)) {
+		foreach ($update->errors as $version => $error) {
+		$message .= <<<HTML
+<p class="message_error"><strong>Update $version:</strong> $error</p>
+HTML;
+		}
+	}
 }
 
 $form_start = $form->form_start();

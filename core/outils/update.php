@@ -5,6 +5,7 @@ class Update {
 	public $sql;
 	public $maj = array();
 	public $version = 0;
+	public $errors = array();
 
 	function __construct($sql) {
 		$this->sql = $sql;
@@ -24,22 +25,36 @@ SQL;
 		else {
 			$this->version = $row['valeur'];
 		}
+
+		$functions = get_defined_functions();
+		foreach ($functions['user'] as $function) {
+			if (preg_match("/update_(\d+)/", $function, $matches)) {
+				$this->maj[$matches[1]] = $function;
+			}
+		}
 	}
 
 	function execute($version_limite = null) {
 		$nouvelle_version = $this->version;
 		ksort($this->maj);
-		foreach ($this->maj as $version => $closure) {
+		foreach ($this->maj as $version => $function) {
 			if ($version > $this->version and ($version_limite === null or $version <= $version_limite)) {
 				$nouvelle_version = $version;
-				$closure($this);
+				try {
+					$function($this);
+				}
+				catch (Exception $e) {
+					$this->errors[$version] = $e->getMessage();
+				}
 			}
 		}
-		$q = <<<SQL
+		if (!isset($this->errors[$nouvelle_version])) {
+			$q = <<<SQL
 UPDATE dt_infos SET valeur = '$nouvelle_version' WHERE champ = 'version'
 SQL;
-		$this->sql->query($q);
-		$this->version = $nouvelle_version;
+			$this->sql->query($q);
+			$this->version = $nouvelle_version;
+		}
 	}
 
 	function last_version() {
