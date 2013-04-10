@@ -48,13 +48,13 @@ class WSMessage {
 		$this->message = new Message($sql);
 	}
 	
-	function get_messages($from = null, $to = null, $filter = array()) {
+	function get_messages_data($from = null, $to = null, $filter = array()) {
 		$messages_list = $this->message->get($from, $to);
 		$messages = array();
 		foreach ($messages_list as $m) {
 			$message = array(
 				'objet' => self::$objets[$m['type']],
-				'id' => $m['id_message'],
+				'id' => $m['id'],
 				'nom' => $m['nom'],
 				'prenom' => $m['prenom'],
 				'adresse' => array(
@@ -100,7 +100,12 @@ class WSMessage {
 				$messages[] = $message;
 			}
 		}
-		
+
+		return $messages;
+	}
+
+	function get_messages($from = null, $to = null, $filter = array()) {
+		$messages = $this->get_messages_data($from, $to, $filter);
 		if (count($messages)) {
 			$messages = array('message' => $messages);
 		}
@@ -135,7 +140,7 @@ class WSMessage {
 			$pays = new Pays($this->sql);
 			$codes_pays = $pays->codes_ultralog();
 		}
-		return sprintf("%04d", $codes_pays[$alpha2]);
+		return isset($codes_pays[$alpha2]) ? sprintf("%04d", $codes_pays[$alpha2]) : "";
 	}
 	
 	static function get_file_path($fichier) {
