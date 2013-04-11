@@ -333,8 +333,8 @@ SQL;
 	public function attributs_management() {
 		$attributs_management = array();
 		$q = <<<SQL
-SELECT id_attributs, `groupe`, classement FROM dt_management_attributs
-WHERE table_name = '{$this->table}' AND linked_id = {$this->id}
+SELECT id_attributs, `groupe`, classement FROM {$this->attributs_table}_management
+WHERE {$this->id_field} = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
 
@@ -349,9 +349,9 @@ SQL;
 		$attributs = array();
 		$q = <<<SQL
 SELECT ma.id_attributs, ma.groupe, ma.classement AS classement_groupe, at.type_valeur, at.valeur_numerique, at.phrase_valeur, at.valeur_libre, at.classement
-FROM dt_management_attributs AS ma
-LEFT OUTER JOIN {$this->attributs_table} AS at ON ma.id_attributs = at.id_attributs AND ma.linked_id = {$this->id_field}
-WHERE ma.table_name = '{$this->table}' AND ma.linked_id = {$this->id}
+FROM {$this->attributs_table}_management AS ma
+LEFT OUTER JOIN {$this->attributs_table} AS at ON ma.id_attributs = at.id_attributs AND ma.{$this->id_field} = at.{$this->id_field}
+WHERE ma.{$this->id_field} = {$this->id}
 ORDER BY ma.groupe ASC, ma.classement ASC
 SQL;
 		$res = $this->sql->query($q);
@@ -389,15 +389,15 @@ SQL;
 	public function save_attributs($data, $id) {
 		if (isset($data['attributs_management'])) {
 			$q = <<<SQL
-DELETE FROM dt_management_attributs WHERE table_name = '{$this->table}' AND linked_id = $id 
+DELETE FROM {$this->attributs_table}_management WHERE {$this->id_field} = $id 
 SQL;
 			$this->sql->query($q);
 			foreach ($data['attributs_management'] as $attribut_id => $values) {
 				$groupe = isset($values['groupe']) ? (int)$values['groupe'] : 0;
 				$classement = isset($values['classement']) ? (int)$values['classement'] : 0;
 				$q = <<<SQL
-INSERT INTO dt_management_attributs (id_attributs, table_name, linked_id, `groupe`, classement)
-VALUES ($attribut_id, '{$this->table}', $id, $groupe, $classement)
+INSERT INTO {$this->attributs_table}_management (id_attributs, {$this->id_field}, `groupe`, classement)
+VALUES ($attribut_id, $id, $groupe, $classement)
 SQL;
 				$this->sql->query($q);
 			}

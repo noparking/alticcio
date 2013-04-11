@@ -71,6 +71,7 @@ $traduction = $form->value("lang");
 $messages = array();
 
 $attribut_management_filter_pager_name = "attribut_management_gamme";
+$attributs_table = $gamme->attributs_table;
 
 if ($form->is_submitted()) {
 	$data = $form->escape_values();
