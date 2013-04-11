@@ -235,42 +235,50 @@ HTML;
 			$attributs = "";
 			$comparatif_csv .= "\n{$data['id']};{$nom}";
 			foreach  ($attributs_application as $attribut_id) {
-				$attribut->load($attribut_id);
-				switch ($attribut->type_attribut) {
-					case 'choice' :
-						switch ($attributs_produit[$attribut_id]) {
-							case 0 : $value = "N/A"; break;
-							case 1 : $value = "Oui"; break;
-							case 2 : $value = "Non"; break;
-						}
-						break;
-					case 'mark' :
-						$value = $attributs_produit[$attribut_id] ? $attributs_produit[$attribut_id] : "N/A";
-						break;
-					case 'text' :
-					case 'textarea' :
-						$value = isset($phrases['valeurs_attributs'][$attribut_id]) ? $phrases['valeurs_attributs'][$attribut_id][$config->get('langue')] : "";
-						break;
-					case 'select' :
-					case 'multiselect' :
-						$options = array();
-						$phrase_ids = array();
-						foreach ($attribut->options() as $option) {
-							$phrase_ids[$option['id']] = $option['phrase_option'];
-						}
-						$phrases_options = $phrase->get($phrase_ids);
-						foreach ($attribut->options() as $option) {
-							$options[$option['phrase_option']] = $phrases_options[$option['id']][$config->get('langue')];
-						}
-						$value = $options[$attributs_produit[$attribut_id]];
-						break;
-					case 'number' :
-					default :
-						$value = $attributs_produit[$attribut_id];
-						break;
+				if (isset($attributs_produit[$attribut_id])) {
+					$attribut->load($attribut_id);
+					switch ($attribut->type_attribut) {
+						case 'choice' :
+							switch ($attributs_produit[$attribut_id][0]) {
+								case 0 : $value = "N/A"; break;
+								case 1 : $value = "Oui"; break;
+								case 2 : $value = "Non"; break;
+							}
+							break;
+						case 'mark' :
+							$value = $attributs_produit[$attribut_id][0] ? $attributs_produit[$attribut_id][0] : "N/A";
+							break;
+						case 'text' :
+						case 'textarea' :
+							$value = isset($phrases['valeurs_attributs'][$attribut_id][0]) ? $phrases['valeurs_attributs'][$attribut_id][0][$config->get('langue')] : "";
+							break;
+						case 'select' :
+						case 'multiselect' :
+							$options = array();
+							$phrase_ids = array();
+							foreach ($attribut->options() as $option) {
+								$phrase_ids[$option['id']] = $option['phrase_option'];
+							}
+							$phrases_options = $phrase->get($phrase_ids);
+							foreach ($attribut->options() as $option) {
+								$options[$option['phrase_option']] = $phrases_options[$option['id']][$config->get('langue')];
+							}
+							$value = array();
+							foreach ($attributs_produit[$attribut_id] as $option) {
+								$value[] = $options[$option];
+							}
+							break;
+						case 'number' :
+						default :
+							$value = $attributs_produit[$attribut_id][0];
+							break;
+					}
+					if (is_array($value)) {
+						$value = implode(" ,", $value);
+					}
+					$attributs .= "<td>$value</td>";
+					$comparatif_csv .= ";{$value}";
 				}
-				$attributs .= "<td>$value</td>";
-				$comparatif_csv .= ";{$value}";
 			}
 			$comparatif .= <<<HTML
 <tr>

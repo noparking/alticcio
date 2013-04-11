@@ -430,7 +430,7 @@ SQL;
 		$values = array();
 		while ($row = $update->sql->fetch($res)) {
 			$values[] = "({$row['id_attributs']}, {$row[$id_field]}, {$row['classement']})";
-			if ($i % 33000 == 0) { // on insère par paqueet de 33000
+			if ($i % 33000 == 0) { // on insère par paquet de 33000
 				$values = implode (",", $values);
 				$q = <<<SQL
 INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
