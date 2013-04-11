@@ -385,27 +385,27 @@ SQL;
 }
 
 function update_16($update) {
-	$q = <<<SQL
-CREATE TABLE `dt_management_attributs` (
+	$tables = array(
+		"id_gammes" => "dt_gammes_attributs",
+		"id_produits" => "dt_produits_attributs",
+		"id_sku" => "dt_sku_attributs",
+	);
+	foreach ($tables as $id_field => $table) {
+
+		$q = <<<SQL
+CREATE TABLE `{$table}_management` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_attributs` int(11) NOT NULL,
-  `table_name` varchar(128) NOT NULL,
-  `linked_id` int(11) NOT NULL,
+  `{$id_field}` int(11) NOT NULL,
   `groupe` int(11) NOT NULL,
   `classement` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_attributs` (`id_attributs`),
-  KEY `linked_id` (`id_attributs`)
+  KEY `{$id_field}` (`{$id_field}`)
 )
 SQL;
-	$update->sql->query($q);
+		$update->sql->query($q);
 
-	$tables = array(
-		"id_sku" => "dt_gammes_attributs",
-		"id_produits" => "dt_produits_attributs",
-		"id_sku" => "dt_sku_attributs"
-	);
-	foreach ($tables as $id_field => $table) {
 		$q = <<<SQL
 UPDATE $table SET type_valeur = 'valeur_numerique'
 SQL;
@@ -425,19 +425,26 @@ SQL;
 SELECT * FROM $table 
 SQL;
 		$res = $update->sql->query($q);
-		
+	
+		$i = 1;
+		$values = array();
 		while ($row = $update->sql->fetch($res)) {
-			$q = <<<SQL
-DELETE FROM dt_management_attributs WHERE id_attributs = {$row['id_attributs']}
-AND table_name = '$table' AND linked_id = {$row[$id_field]}
+			$values[] = "({$row['id_attributs']}, {$row[$id_field]}, {$row['classement']})";
+			if ($i % 33000 == 0) { // on insère par paqueet de 33000
+				$values = implode (",", $values);
+				$q = <<<SQL
+INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
 SQL;
-			$update->sql->query($q);
-
-			$q = <<<SQL
-INSERT INTO dt_management_attributs (id_attributs, table_name, linked_id, classement)
-VALUES ({$row['id_attributs']}, '$table', {$row[$id_field]}, {$row['classement']}) 
-SQL;
-			$update->sql->query($q);
+				$update->sql->query($q);
+				$values = array();
+			}
+			$i++;
 		}
+		$values = implode (",", $values);
+		$q = <<<SQL
+INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
+SQL;
+		$update->sql->query($q); // insertion de ce qui reste
+
 	}
 }
