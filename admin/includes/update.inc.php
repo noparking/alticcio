@@ -343,7 +343,9 @@ SQL;
 ALTER TABLE `dt_sku_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
 	$update->sql->query($q);
+}
 
+function update_16($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_produits`
 SQL;
@@ -384,7 +386,7 @@ SQL;
 	$update->sql->query($q);
 }
 
-function update_16($update) {
+function update_17($update) {
 	$tables = array(
 		"id_gammes" => "dt_gammes_attributs",
 		"id_produits" => "dt_produits_attributs",
@@ -440,11 +442,11 @@ SQL;
 			}
 			$i++;
 		}
-		$values = implode (",", $values);
-		$q = <<<SQL
+		if ($values = implode (",", $values)) {
+			$q = <<<SQL
 INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
 SQL;
-		$update->sql->query($q); // insertion de ce qui reste
-
+			$update->sql->query($q); // insertion de ce qui reste
+		}
 	}
 }
