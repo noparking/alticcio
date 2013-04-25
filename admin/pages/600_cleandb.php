@@ -395,4 +395,17 @@ if (isset($_POST['ctrl']) AND $_POST['ctrl'] == "produitsconfig") {
 	$main .= '</ul>';
 	$main .= '<p class="message">'.$page->l($dico->t('ExportCSV'), $config->get('medias_url').'medias/docs/csv/'.$filename).'</p>';
 }
+
+
+/*
+ * *******************  LISTE DES PRIX EN DOUBLE POUR UN MEME SKU
+ * *******************
+ */
+/*
+ * SELECT *
+FROM `dt_prix` AS p1
+INNER JOIN `dt_prix` AS p2 ON p1.id_sku = p2.id_sku
+AND p1.id_catalogues = p2.id_catalogues
+AND p1.id <> p2.id
+ */		
 ?>
