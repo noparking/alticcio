@@ -435,26 +435,26 @@ SQL;
 						$valeurs_numeriques[$row['id_attributs']][] = $row['valeur_numerique'];
 						break;
 				}
-				$ids_attributs[$row['id_attributs']] = $row['id_attributs'];
+				$ids_attributs[$row['id_attributs']] = $row['classement'];
 			}
-			foreach ($ids_attributs as $id_attributs) {
+			foreach ($ids_attributs as $id_attributs => $classement) {
 				if (isset($attributs[$id_attributs])) {
 					if (isset($phrases_valeurs[$id_attributs])) {
-						$attributs[$id_attributs]['valeur_numerique'] = array();
-						$attributs[$id_attributs]['valeur_libre'] = array();
-						$attributs[$id_attributs]['phrase_valeur'] = array_unique($phrases_valeurs[$id_attributs]);
+						$attributs[$id_attributs][$classement]['valeur_numerique'] = array();
+						$attributs[$id_attributs][$classement]['valeur_libre'] = array();
+						$attributs[$id_attributs][$classement]['phrase_valeur'] = array_unique($phrases_valeurs[$id_attributs]);
 					}
 					else if (isset($valeurs_libres[$id_attributs])) {
-						$attributs[$id_attributs]['valeur_numerique'] = array();
-						$attributs[$id_attributs]['valeur_libre'] = array_unique($valeurs_libres[$id_attributs]);
-						$attributs[$id_attributs]['phrase_valeur'] = array();;
+						$attributs[$id_attributs][$classement]['valeur_numerique'] = array();
+						$attributs[$id_attributs][$classement]['valeur_libre'] = array_unique($valeurs_libres[$id_attributs]);
+						$attributs[$id_attributs][$classement]['phrase_valeur'] = array();;
 					}
 					else {
-						$attributs[$id_attributs]['valeur_numerique'] = array_unique($valeurs_numeriques[$id_attributs]);
-						$attributs[$id_attributs]['valeur_libre'] = array();
-						$attributs[$id_attributs]['phrase_valeur'] = array();
+						$attributs[$id_attributs][$classement]['valeur_numerique'] = array_unique($valeurs_numeriques[$id_attributs]);
+						$attributs[$id_attributs][$classement]['valeur_libre'] = array();
+						$attributs[$id_attributs][$classement]['phrase_valeur'] = array();
 					}
-					$attributs[$id_attributs]['id_attributs'] = $id_attributs;
+					$attributs[$id_attributs][$classement]['id_attributs'] = $id_attributs;
 				}
 			}
 		}
