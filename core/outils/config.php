@@ -139,10 +139,13 @@ class Config {
 		return isset($this->vars[$var]) ? $this->vars[$var] : null;
 	}
 	
-	public function db() {
+	public function db($type = "") {
+		if ($type) {
+			$type .= "_";
+		}
 		$params = array();
 		foreach (array("server", "user", "password", "database") as $var) {
-			$attr = "db_".$var;
+			$attr = "db_".$type.$var;
 			if ($this->get($attr)) {
 				$params[$var] = $this->get($attr);
 			}
