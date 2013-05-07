@@ -8,7 +8,7 @@ class Mysql {
 		$server = isset($params['server']) ? $params['server'] : "localhost";
 		$user = isset($params['user']) ? $params['user'] : "root";
 		$password = isset($params['password']) ? $params['password'] : "";
-		if (!($this->db = mysql_connect($server, $user, $password))) {
+		if (!($this->db = mysql_connect($server, $user, $password, true))) {
 			throw new Exception(mysql_error($this->db));
 		}
 		mysql_set_charset("utf8", $this->db);
