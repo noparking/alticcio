@@ -204,15 +204,31 @@ SQL;
 		}
 	}
 
-	function export($config, $data = array()) {
+	function save($data) {
+		$q = <<<SQL
+DELETE FROM dt_exports_catalogues WHERE id_catalogues = {$this->id} AND auto <> 0
+SQL;
+		$this->sql->query($q);
+
+		if ($data['catalogue']['export_frequency']) {
+			$this->export($data, $data['catalogue']['export_frequency']);
+		}
+
+		return parent::save($data);
+	}
+
+	function export($data = array(), $auto = 0) {
 		if (isset($data['export_data'])) {
 			$data = $data['export_data'];
 		}
 		$data = serialize($data);
-		$file = "catalogue_".preg_replace("/[^a-z0-9]+/", "_", strtolower($this->values['nom']))."_".date("YmdHis").".csv";
+
+		$complement = $auto ? "" : "_".date("YmdHis");
 		$date = time();
+		
+		$file = "catalogue_".preg_replace("/[^a-z0-9]+/", "_", strtolower($this->values['nom'])).$complement.".csv";
 		$q = <<<SQL
-INSERT INTO dt_exports_catalogues (id_catalogues, etat, fichier, date_export, data) VALUES ({$this->id}, 'tobuild', '$file', $date, '$data')
+INSERT INTO dt_exports_catalogues (id_catalogues, etat, fichier, date_export, data, auto) VALUES ({$this->id}, 'tobuild', '$file', $date, '$data', $auto)
 SQL;
 		$this->sql->query($q);
 	}
@@ -220,7 +236,7 @@ SQL;
 	function get_export() {
 		$q = <<<SQL
 SELECT * FROM dt_exports_catalogues WHERE id_catalogues = {$this->id}
-ORDER BY id DESC
+ORDER BY date_export DESC
 LIMIT 0, 1
 SQL;
 		$res = $this->sql->query($q);

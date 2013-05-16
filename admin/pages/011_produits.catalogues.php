@@ -97,7 +97,7 @@ if ($form->is_submitted()) {
 			$url2->redirect("current", array('action' => "edit", 'id' => $id));
 			break;
 		case "export":
-			$catalogue->export($config, $data);
+			$catalogue->export($data);
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
@@ -168,12 +168,19 @@ HTML;
 }
 
 if ($action == "create" or $action == "edit") {
+	$auto = array(
+		0 => "Manuellement",
+		3600 => "Toutes les heures",
+		86400 => "Tous les jours",
+		604800 => "Toutes les semaines",
+	);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section", 'id' => "produit-section-informations"))}
 {$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 {$form->select(array('name' => "catalogue[id_langues]", 'label' => $dico->t('Langue'), 'options' => $catalogue->langues()))}
 {$form->select(array('name' => "catalogue[type]", 'label' => $dico->t('Type'), 'options' => array(1 => $dico->t('Online'), 2 => $dico->t('Offline')) ))}
 {$form->select(array('name' => "catalogue[statut]", 'label' => $dico->t('Statut'), 'options' => array($dico->t('Desactive'), $dico->t('Active') )))}
+{$form->select(array('name' => "catalogue[export_frequency]", 'options' => $auto, 'label' => "Exporter ce catalogue", 'description' => "Vous pouvez faire des exports manuels ou réexporter automatiquement ce catalogue à intervalles de temps réguliers"))}
 {$form->fieldset_end()}
 HTML;
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
@@ -193,9 +200,10 @@ HTML;
 	if ($export = $catalogue->get_export()) {
 		switch ($export['etat']) {
 			case "built" :
+				$mode = $export['auto'] ? "automatique" : "manuel";
 				$date = date("d/m/Y H:i:s", $export['date_export']);
 				$main .= <<<HTML
-<p>Dernier export : {$date}</p>
+<p>Dernier export : {$date} ($mode)</p>
 <div class="buttons">
 	<ul class="buttons_actions">
 		<li>{$page->l($dico->t('Télécharger'), $config->get("medias_url")."exports/catalogues/".$export['fichier'])}</li>
@@ -205,7 +213,7 @@ HTML;
 {$export_configuration}
 <div class="buttons">
 	<ul class="buttons_actions">
-		<li>{$form->input(array('type' => "submit", 'name' => "export", 'value' => $dico->t('Réexporter') ))}</li>
+		<li>{$form->input(array('type' => "submit", 'name' => "export", 'value' => $dico->t('Exporter') ))}</li>
 	</ul>
 </div>
 HTML;

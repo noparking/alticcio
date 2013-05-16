@@ -450,3 +450,15 @@ SQL;
 		}
 	}
 }
+
+function update_18($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_catalogues` ADD `export_frequency` INT NOT NULL 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_exports_catalogues` ADD `auto` INT NOT NULL 
+SQL;
+	$update->sql->query($q);
+}
