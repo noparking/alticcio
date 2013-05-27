@@ -239,7 +239,7 @@ SQL;
 			if (strpos($key, "phrase_") === 0) {
 				foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
 					if ($phrase_url_key) {
-						$code_url = $phrase_url_key;
+						$code_url = $this->normalize($phrase_url_key);
 					}
 					else if ($value) {
 						$code_url = $this->create_by_name($data['phrases'][$value][$lang]);
@@ -254,7 +254,7 @@ SQL;
 							'id_langues' => $object->get_id_langues($lang),
 						));
 					}
-					if (!$phrase_url_key) {
+					if ($phrase_url_key != $code_url) {
 						$save_again = true;
 						$data['phrases'][$key][$lang] = $code_url;
 					}
