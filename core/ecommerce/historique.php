@@ -15,8 +15,9 @@ class Historique {
 	}
 
 	public function store($item) {
-		$_SESSION['historiques'][$this->historique] = array_diff($_SESSION['historiques'][$this->historique], array($item));
-		$_SESSION['historiques'][$this->historique][] = $item;
+		$key = md5(serialize($item));
+		unset($_SESSION['historiques'][$this->historique][$key]);
+		$_SESSION['historiques'][$this->historique][$key] = $item;
 	}
 
 	public function get($number) {
