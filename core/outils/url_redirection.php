@@ -117,6 +117,7 @@ SQL;
 	}
 
 	public function long2short($code_url, $num_section = 1) {
+		$code_url = addslashes($code_url);
 		$q = <<<SQL
 SELECT u1.id FROM dt_url_redirections AS u1
 INNER JOIN dt_url_redirections AS u2 ON u1.id_langues = u2.id_langues AND u1.`table` = u2.`table` AND u1.variable = u2.variable 
