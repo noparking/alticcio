@@ -704,6 +704,98 @@ HTML;
 		
 		return $this->render_element($params);
 	}
+
+	public function googlemap($params) {
+		if ($this->in_form && $this->form_count != $this->step) return "";
+		
+		$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
+		$id = $params['id'] = isset($params['id']) ? $params['id'] : $this->id_by_name($name);
+		$class = $this->form_class."-input ".$this->form_class."-input-googlemap";
+		if (isset($params['class'])) {
+			$class .= " ".$params['class'];
+		}
+		$params['class'] = $class;
+		$lat = $this->get_value($params, $params['name']."[lat]");
+		$lng = $this->get_value($params, $params['name']."[lng]");
+		
+		$params['field'] = <<<HTML
+<input type="hidden" name="{$name}[lat]" id="{$id}-lat" value="{$lat}" />
+<input type="hidden" name="{$name}[lng]" id="{$id}-lng" value="{$lng}" />
+<div id="{$id}" class="{$class}"></div>
+<script>
+if (maps == undefined) {
+	var maps = [];
+}
+google.maps.event.addDomListener(window, 'load', function() {
+	var mapOptions = {
+		center: new google.maps.LatLng({$lat}, {$lng}),
+		zoom: {$params['zoom']},
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	maps['{$id}'] = new google.maps.Map(document.getElementById('{$id}'), mapOptions);
+	
+	google.maps.event.addListener(maps['{$id}'], 'center_changed', function() {
+		var center = maps['{$id}'].getCenter();
+		$('#{$id}-lat').val(center.lat());
+		$('#{$id}-lng').val(center.lng());
+  	});
+});
+</script>
+HTML;
+		
+		return $this->render_element($params);
+	}
+
+	public function googleaddress($params) {
+		if ($this->in_form && $this->form_count != $this->step) return "";
+		
+		$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
+		$id = $params['id'] = isset($params['id']) ? $params['id'] : $this->id_by_name($name);
+		$class = $this->form_class."-input ".$this->form_class."-input-googlemap";
+		if (isset($params['class'])) {
+			$class .= " ".$params['class'];
+		}
+		$params['class'] = $class;
+		$error = isset($params['error']) ? addslashes($params['error']) : "Error";
+		
+		$value = htmlspecialchars($this->get_value($params, $name));
+
+		$map_id = $this->id_by_name($params['map']);
+		
+		$params['field'] = <<<HTML
+<input type="text" name="{$name}" id="{$id}" value="{$value}" />
+<input type="submit" name="{$name}-ok" id="{$id}-ok" value="OK" />
+<script>
+if (geocoder == undefined) {
+	var geocoder = new google.maps.Geocoder();
+}
+$('#{$id}').keypress(function(event) {
+	if (event.which == 13) {
+		event.preventDefault();
+		$('#{$id}-ok').click();
+	}
+});
+$('#{$id}-ok').click(function() {
+	var address = $("#{$id}").val();
+	geocoder.geocode({address : address}, function(result, status) {
+		if (status != "OK") {
+			alert('{$error}');
+		}
+		else {
+			var lat = result[0].geometry.location.lat();
+			var lng = result[0].geometry.location.lng();
+			$('#{$map_id}-lat').val(lat);
+			$('#{$map_id}-lng').val(lng);
+			maps['{$map_id}'].setCenter(new google.maps.LatLng(lat, lng));
+		}
+	});
+	return false;
+});
+</script>
+HTML;
+		
+		return $this->render_element($params);
+	}
 	
 	public function reset() {
 		$this->step = 1;
