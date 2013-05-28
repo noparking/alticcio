@@ -291,6 +291,7 @@ SQL;
 		$q = <<<SQL
 SELECT DISTINCT(a.id), a.id_types_attributs, ph.phrase AS nom
 FROM dt_sku_variantes AS sv
+INNER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1
 INNER JOIN dt_sku_attributs AS sa ON sa.id_sku = sv.id_sku
 INNER JOIN dt_attributs AS a ON a.id = sa.id_attributs
 INNER JOIN dt_applications_attributs AS aa ON aa.id_attributs = a.id AND aa.filtre = 1
