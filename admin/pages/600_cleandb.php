@@ -2,7 +2,8 @@
 /*
  * Configuration
  */
-$config->core_include("outils/mysql", "outils/langue");
+$config->core_include("outils/mysql", "outils/langue", "outils/phrase");
+$config->core_include("produit/sku", "produit/produit", "produit/attribut");
 
 $sql = new Mysql($config->db());
 $langue = new Langue($sql);
@@ -84,6 +85,62 @@ HTML;
 
 
 /*
+ * **************  FONCTIONS
+ */
+function create_table_admin($tab_lines, $ctrl) {
+	$html = <<<HTML
+<form name="upd_datas" action="" method="post">
+	<fieldset>
+	<legend></legend>
+	<select name="operation" class="">
+		<option value="">...</option>
+		<option value="delete">Supprimer</option>
+		<option value="disable">Désactiver</option>
+		<option value="change1">Modifier Famille de vente</option>
+	</select>
+	<input type="submit" class="" name="valider" value="valider" />
+	<input type="hidden" name="ctrl" value="$ctrl" />
+	<table name="" class="" >
+	<caption>test</caption>
+	<thead>
+		<tr>
+			<th>id</th>
+			<th>designation</th>
+			<th>statut</th>
+			<th>voir</th>
+		</tr>
+	</thead>
+	<tbody>
+HTML;
+
+	foreach($tab_lines as $line) {
+		$html .= <<<HTML
+<tr>
+	<td><input type="checkbox" name="ref[]" value="{$line['id']}" /></td>
+	<td>{$line['designation']}</td>
+	<td>{$line['statut']}</td>
+	<td>voir</td>
+</tr>
+HTML;
+	}
+	
+	$html .= <<<HTML
+	</tbody>
+	</table>
+</form>
+HTML;
+	return $html;
+}
+
+
+
+
+
+
+
+
+
+/*
  * **************  DOUBLONS DES SKU
  * On contrôle s'il y a des doublons sku/ref_ultralog
  * Si oui, on propose un lien vers page 601 pour nettoyer la base
@@ -148,23 +205,45 @@ if (isset($_POST['ctrl']) AND $_POST['ctrl'] == "vide") {
  * On recherche les SKU orphelins (liés à aucun produit)
  */
 if (isset($_POST['ctrl']) AND $_POST['ctrl'] == "orphelinsku") {
+	
+	if (isset($_POST['ref'])) {
+		foreach($_POST['ref'] as $ref) {
+			switch($_POST['operation']) {
+				case "delete":
+					$langue = new Langue($sql);
+					$id_langues = $langue->id($config->get("langue"));
+					$phrase = new Phrase($sql);
+					$sku = new Sku($sql, $phrase, $id_langues);
+					$sku->load($ref);
+					$sku->id = ref;
+					$sku->delete();
+					break;
+			}
+		}
+		
+	}
+	echo 'bbb';
+	
 	$main .= '<h3>'.$dico->t('SkuOrphelins').'</h3>';
-	$main .= '<ul>';
-	$q = "SELECT s.id, v.id AS variantes, c.id AS composants, a.id AS accessoires 
+	//$main .= '<ul>';
+	$q = "SELECT s.id, s.ref_ultralog, s.actif, ph.phrase, v.id AS variantes, a.id AS accessoires 
 			FROM dt_sku AS s
+			INNER JOIN dt_phrases AS ph
+			ON ph.id = s.phrase_ultralog AND ph.id_langues = 1 
 			LEFT JOIN dt_sku_variantes AS v 
 			ON v.id_sku = s.id 
 			LEFT JOIN dt_sku_accessoires AS a 
-			ON a.id_sku = s.id
-			LEFT JOIN dt_sku_composants AS c 
-			ON c.id_sku = s.id ";
+			ON a.id_sku = s.id ";
 	$rs = $sql->query($q);
+	$tab_lines = array();
 	while($row = $sql->fetch($rs)) {
-		if ($row['variantes'] == NULL AND $row['composants'] == NULL AND $row['composants'] == NULL) {
-			$main .= '<li><a href="'.$url2->make("Produits", array("type" => "sku", "action" => "edit", "id" => $row["id"])).'">'.$row['id'].'</li>';
+		if ($row['variantes'] == NULL AND $row['accessoires'] == NULL) {
+			$tab_lines[] = array('id'=> $row["id"], "designation" => $row['phrase'].' (ref UL : '.$row['ref_ultralog'].')', "statut" => $row['actif']);
+			//$main .= '<li><a href="'.$url2->make("Produits", array("type" => "sku", "action" => "edit", "id" => $row["id"])).'">'.$row['id'].' '.$row['phrase'].' (ref UL : '.$row['ref_ultralog'].')</li>';
 		}
 	}
-	$main .= '</ul>';
+	//$main .= '</ul>';
+	$main .= create_table_admin($tab_lines, "orphelinsku");
 }
 
 
