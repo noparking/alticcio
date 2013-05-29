@@ -717,10 +717,15 @@ HTML;
 		$params['class'] = $class;
 		$lat = $this->get_value($params, $params['name']."[lat]");
 		$lng = $this->get_value($params, $params['name']."[lng]");
+		$zoom = $this->get_value($params, $params['name']."[zoom]");
+		$lat = $lat ? $lat : $params['lat'];
+		$lng = $lng ? $lng : $params['lng'];
+		$zoom = $zoom ? $zoom : $params['zoom'];
 		
 		$params['field'] = <<<HTML
 <input type="hidden" name="{$name}[lat]" id="{$id}-lat" value="{$lat}" />
 <input type="hidden" name="{$name}[lng]" id="{$id}-lng" value="{$lng}" />
+<input type="hidden" name="{$name}[zoom]" id="{$id}-zoom" value="{$zoom}" />
 <div id="{$id}" class="{$class}"></div>
 <script>
 if (maps == undefined) {
@@ -729,7 +734,7 @@ if (maps == undefined) {
 google.maps.event.addDomListener(window, 'load', function() {
 	var mapOptions = {
 		center: new google.maps.LatLng({$lat}, {$lng}),
-		zoom: {$params['zoom']},
+		zoom: {$zoom},
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	maps['{$id}'] = new google.maps.Map(document.getElementById('{$id}'), mapOptions);
@@ -738,6 +743,11 @@ google.maps.event.addDomListener(window, 'load', function() {
 		var center = maps['{$id}'].getCenter();
 		$('#{$id}-lat').val(center.lat());
 		$('#{$id}-lng').val(center.lng());
+  	});
+
+	google.maps.event.addListener(maps['{$id}'], 'zoom_changed', function() {
+		var zoom = maps['{$id}'].getZoom();
+		$('#{$id}-zoom').val(zoom);
   	});
 });
 </script>
@@ -761,6 +771,13 @@ HTML;
 		$value = htmlspecialchars($this->get_value($params, $name));
 
 		$map_id = $this->id_by_name($params['map']);
+
+		$zoom_code = "";
+		if (isset($params['zoom'])) {
+			$zoom_code = <<<HTML
+maps['{$map_id}'].setZoom({$params['zoom']});
+HTML;
+		}
 		
 		$params['field'] = <<<HTML
 <input type="text" name="{$name}" id="{$id}" value="{$value}" />
@@ -787,6 +804,7 @@ $('#{$id}-ok').click(function() {
 			$('#{$map_id}-lat').val(lat);
 			$('#{$map_id}-lng').val(lng);
 			maps['{$map_id}'].setCenter(new google.maps.LatLng(lat, lng));
+			{$zoom_code}
 		}
 	});
 	return false;
