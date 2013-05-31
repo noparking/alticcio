@@ -50,6 +50,6 @@ if ($id = $url0->get('id')) {
 
 	$titre_page = $values['titre'];
 
-	$main = '<section class="aide_texte">'.$values['texte'].'</section>';
+	$main = '<section class="aide_texte">'.nl2br($values['texte']).'</section>';
 }
 
