@@ -48,8 +48,11 @@ if ($id = $url0->get('id')) {
 	$blogpost->load($id);
 	$values = $blogpost->values;
 
-	$titre_page = $values['titre'];
+	//$titre_page = $values['titre'];
 
-	$main = '<section class="aide_texte">'.nl2br($values['texte']).'</section>';
+	$main = '<section class="aide_texte">
+				<h2>'.$values['titre'].'</h2>
+				<div>'.nl2br($values['texte']).'</div>
+			</section>';
 }
 
