@@ -16,7 +16,8 @@ $billets = $blog->billets($id_blogs, 10);
 
 $all_themes = DBTools::tree($blog->all_themes($id_blogs));
 
-$left = print_callback_tree($all_themes, "print_theme_or_billet");
+$aide_themes = print_callback_tree($all_themes, "print_theme_or_billet");
+$left = '<section class="aide_themes">'.$aide_themes.'</section>';
 
 function print_theme_or_billet($element) {
 	global $blogtheme, $url0;
@@ -24,7 +25,7 @@ function print_theme_or_billet($element) {
 	if (!count($element['children'])) { // on n'affiche pas les billets dans des thèmes ayant des sous-thèmes
 		$blogtheme->load($element['id']);
 		$links = "{$element['nom']}";
-		$links .= "<ul class='tree aide_themes'>";
+		$links .= "<ul class='tree'>";
 		foreach ($blogtheme->billets() as $billet) {
 			$links .= "<li class='tree'>";
 			$links .= "<a href='{$url0->make("current", array('id' => $billet['id']))}'>{$billet['titre']}</a>";
@@ -39,7 +40,7 @@ function print_theme_or_billet($element) {
 	}
 }
 
-$main = '';
+$main = '<section class="aide_texte"></section>';
 
 if ($id = $url0->get('id')) {
 	$config->core_include("blog/blogpost");
