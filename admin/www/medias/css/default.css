@@ -816,6 +816,6 @@ div.filter-actions a {
 /* Blog d'aide */
 .aide_themes { margin:10px 0; }
 .aide_themes ul { padding:0; margin:0; }
-.aide_themes ul li { list-style-type:none; padding:5px 10px; border-bottom:1px solid #CCC; }
+.aide_themes ul li ul li { list-style-type:none; padding:5px 10px; border-bottom:1px solid #CCC; }
 
 .aide_texte {}
