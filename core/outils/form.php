@@ -48,6 +48,7 @@ class Form {
 	private $form_validation = null;	
 	private $permissions = null;
 	private $permissions_object = null;
+	private $page = null;
 	
 	public function __construct($params = array()) {
 		$this->template = isset($params['template']) ? $params['template'] : $this->default_template();
@@ -67,6 +68,7 @@ class Form {
 		foreach ($this->actions as $action) {
 			unset($this->values[$action]);
 		}
+		$this->page = isset($params['page']) ? $params['page'] : null;
 		$this->required = isset($params['required']) ? $params['required'] : array();
 		$this->unregistered = isset($params['unregistered']) ? $params['unregistered'] : array();
 		$this->confirm = isset($params['confirm']) ? $params['confirm'] : array();
@@ -727,7 +729,8 @@ HTML;
 <input type="hidden" name="{$name}[lng]" id="{$id}-lng" value="{$lng}" />
 <input type="hidden" name="{$name}[zoom]" id="{$id}-zoom" value="{$zoom}" />
 <div id="{$id}" class="{$class}"></div>
-<script>
+HTML;
+		$script = <<<JAVASCRIPT
 if (maps == undefined) {
 	var maps = [];
 }
@@ -750,8 +753,17 @@ google.maps.event.addDomListener(window, 'load', function() {
 		$('#{$id}-zoom').val(zoom);
   	});
 });
+JAVASCRIPT;
+		if ($this->page === null) {
+			$params['field'] .= <<<HTML
+<script language="JavaScript" type="text/javascript">
+{$script}
 </script>
 HTML;
+		}
+		else {
+			$this->page->post_javascript[] = $script;
+		}
 		
 		return $this->render_element($params);
 	}
@@ -761,7 +773,7 @@ HTML;
 		
 		$name = $params['name'] = isset($params['name']) ? $params['name'] : "";
 		$id = $params['id'] = isset($params['id']) ? $params['id'] : $this->id_by_name($name);
-		$class = $this->form_class."-input ".$this->form_class."-input-googlemap";
+		$class = $this->form_class."-input ".$this->form_class."-input-googleaddress";
 		if (isset($params['class'])) {
 			$class .= " ".$params['class'];
 		}
@@ -780,9 +792,10 @@ HTML;
 		}
 		
 		$params['field'] = <<<HTML
-<input type="text" name="{$name}" id="{$id}" value="{$value}" />
-<input type="submit" name="{$name}-ok" id="{$id}-ok" value="OK" />
-<script>
+<input type="text" name="{$name}" id="{$id}" class="{$class}" value="{$value}" />
+<input type="submit" name="{$name}-ok" id="{$id}-ok" class="{$class}-ok" value="OK" />
+HTML;
+		$script = <<<JAVASCRIPT
 if (geocoder == undefined) {
 	var geocoder = new google.maps.Geocoder();
 }
@@ -809,8 +822,17 @@ $('#{$id}-ok').click(function() {
 	});
 	return false;
 });
+JAVASCRIPT;
+		if ($this->page === null) {
+			$params['field'] .= <<<HTML
+<script language="JavaScript" type="text/javascript">
+{$script}
 </script>
 HTML;
+		}
+		else {
+			$this->page->post_javascript[] = $script;
+		}
 		
 		return $this->render_element($params);
 	}
