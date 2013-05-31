@@ -24,7 +24,7 @@ function print_theme_or_billet($element) {
 	if (!count($element['children'])) { // on n'affiche pas les billets dans des thèmes ayant des sous-thèmes
 		$blogtheme->load($element['id']);
 		$links = "{$element['nom']}";
-		$links .= "<ul class='tree'>";
+		$links .= "<ul class='tree aide_themes'>";
 		foreach ($blogtheme->billets() as $billet) {
 			$links .= "<li class='tree'>";
 			$links .= "<a href='{$url0->make("current", array('id' => $billet['id']))}'>{$billet['titre']}</a>";
@@ -39,7 +39,7 @@ function print_theme_or_billet($element) {
 	}
 }
 
-$main = "";
+$main = '';
 
 if ($id = $url0->get('id')) {
 	$config->core_include("blog/blogpost");
@@ -49,5 +49,6 @@ if ($id = $url0->get('id')) {
 
 	$titre_page = $values['titre'];
 
-	$main = $values['texte'];
+	$main = '<section class="aide_texte">'.$values['texte'].'</section>';
 }
+
