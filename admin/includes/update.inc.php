@@ -462,3 +462,19 @@ ALTER TABLE `dt_exports_catalogues` ADD `auto` INT NOT NULL
 SQL;
 	$update->sql->query($q);
 }
+
+function update_19($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_devis_pose` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `num_commande` int(11) NOT NULL,
+  `num_devis` int(11) NOT NULL,
+  `type_pose` varchar(32) NOT NULL,
+  `champ` varchar(128) NOT NULL,
+  `valeur` text NOT NULL,
+  `date_creation` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->sql->query($q);
+}
