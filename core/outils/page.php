@@ -226,6 +226,10 @@ class Page {
 	}
 
 	function display($html, $tab) {
-		return str_replace("\n", "\n$tab", $html);	
+		return str_replace("[page-break-line]", "\n", str_replace("\n", "\n$tab", $html));	
+	}
+
+	function no_indentation($content) {
+		return str_replace("\n", "[page-break-line]", $content);
 	}
 }
