@@ -382,8 +382,13 @@ HTML;
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
 	$attribut = new Attribut($sql, $phrase, $id_langues);
+	$i = 0;
 	foreach ($application->attributs() as $attribut_id) {
-		$main .= $page->inc("snippets/attribut");
+		$main .= <<<HTML
+{$page->inc("snippets/attribut")}
+{$form->input(array('type' => "hidden", 'name' => "attributs_management[$attribut_id][classement]", 'value' => $i))}
+HTML;
+		$i++;
 	}
 	$main .= <<<HTML
 {$form->fieldset_end()}
