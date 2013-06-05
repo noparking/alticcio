@@ -84,4 +84,8 @@ abstract class Url {
 			call_user_func_array(array($this, 'always_redirect'), $args);
 		}
 	}
+
+	public function current() {
+		return "http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+	}
 }
