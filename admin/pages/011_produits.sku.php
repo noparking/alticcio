@@ -89,6 +89,8 @@ if ($form->is_submitted()) {
 	switch ($form->action()) {
 		case "translate":
 		case "filter":
+		case "pager":
+		case "reload":
 			break;
 		case "reset":
 			$form->reset();

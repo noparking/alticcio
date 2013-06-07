@@ -189,15 +189,8 @@ if ($form->is_submitted()) {
 		default :
 			if ($action == "edit" or $action == "create") {
 				foreach (array('composants', 'accessoires', 'variantes', 'complementaires', 'similaires') as $key) {
-					if (isset($data[$key])) {
-						$filter_name = "filter_$key";
-						$filter_selected = $$filter_name->selected();
-						foreach ($data[$key] as $element_id => $element) {
-							if (!in_array($element_id, $filter_selected)) {
-								unset($data[$key][$element_id]);
-							}
-						}
-					}
+					$filter_name = "filter_$key";
+					$$filter_name->clean_data($data, $key);
 				}
 				$id = $url_redirection->save_object($produit, $data, array('phrase_url_key' => 'phrase_nom'));
 				
