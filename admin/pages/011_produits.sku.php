@@ -82,7 +82,7 @@ if ($form->value('section')) {
 $traduction = $form->value("lang");
 
 $attribut_management_filter_pager_name = "attribut_management_sku";
-$attributs_table = $sku->attributs_table;
+$object = $sku;
 
 if ($form->is_submitted()) {
 	$data = $form->escaped_values();

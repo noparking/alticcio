@@ -3,7 +3,7 @@
 global $sql, $page, $attributs, $attribut, $attribut_id, $phrase, $form, $config, $displayed_lang, $id_langues;
 
 
-$attribut_management = new AttributManagement($sql, $phrase, $id_langues);
+$attribut_management = new AttributManagement($sql, null, $phrase, $id_langues);
 $attribut = new Attribut($sql, $phrase, $id_langues);
 $groupes = array();
 
