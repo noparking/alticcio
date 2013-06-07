@@ -52,7 +52,7 @@ SQL;
 				$csv[] = $nom_catalogue;
 				$csv[] = isset($this->num_pages[$csv[$this->id_produit]][$csv[$this->id_sku]]) ? $this->num_pages[$csv[$this->id_produit]][$csv[$this->id_sku]] : "";
 				$values[] = $csv;
-				if ($i % 5000 == 0) {
+				if ($i % 500 == 0) {
 					$this->insert_values($fields, $values);
 					$values = array();
 				}
