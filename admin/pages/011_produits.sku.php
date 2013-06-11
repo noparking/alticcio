@@ -55,6 +55,10 @@ $id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 $pays = new Pays($sql);
+
+$liste_pays = $pays->liste($id_langues);
+$selected_pays_id = $pays->get_id('code_iso', $url->get('pays'));
+
 $region = new Region($sql);
 $organisation = new Organisation($sql);
 $couleur = new Couleurs($sql);
@@ -131,6 +135,16 @@ if ($form->is_submitted()) {
 			break;
 		case "delete-prix-degressif" :
 			$sku->delete_prix_degressif($form->action_arg());
+			break;
+		case "add-ecotaxe" :
+			$id_catalogues = $form->action_arg();
+			$sku->add_ecotaxe($data, $id_catalogues);
+			$form->forget_value("new_ecotaxe[$id_catalogues][montant]");
+			$form->forget_value("new_ecotaxe[$id_catalogues][montant]");
+			$form->forget_value("new_ecotaxe[$id_catalogues][montant]");
+			break;
+		case "delete-ecotaxe" :
+			$sku->delete_ecotaxe($form->action_arg());
 			break;
 		case "duplicate" :
 			$id = $sku->duplicate($data);
@@ -310,6 +324,46 @@ HTML;
 	<td>{$prix_degressif['montant_ht']} €</td>
 	<td>{$prix_degressif['pourcentage']} %</td>
 	<td>{$form->input(array('type' => "submit", 'name' => "delete-prix-degressif[{$prix_degressif['id']}]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}</td>
+</tr>
+HTML;
+			}
+			$main .= <<<HTML
+</tbody>
+</table>
+HTML;
+		}
+		$main .= <<<HTML
+{$form->fieldset_end()}
+
+{$form->fieldset_start(array('legend' => $dico->t('Ecotaxe')." $nom_catalogue", 'class' => "produit-section produit-section-prix-$id_catalogues".$hidden['prix-'.$id_catalogues], 'id' => "produit-section-ecotaxe-$id_catalogues"))}
+{$form->fieldset_start(array('legend' => $dico->t('AjouterEcotaxe') ))}
+{$form->input(array('name' => "new_ecotaxe[$id_catalogues][montant]", 'label' => $dico->t('Montant'), 'class' => "little-text", 'template' => $template_inline))}
+{$form->select(array('name' => "new_ecotaxe[$id_catalogues][id_pays]", 'label' => $dico->t('Pays'), 'class' => "little-select", 'options' => $liste_pays, 'value' => $selected_pays_id, 'template' => $template_inline))}
+{$form->select(array('name' => "new_ecotaxe[$id_catalogues][id_familles_taxes]", 'label' => $dico->t('FamilleTaxes'), 'class' => "little-select", 'options' => $sku->get_familles_taxes($id_langues), 'value' => $selected_pays_id, 'template' => $template_inline))}
+{$form->input(array('type' => "submit", 'name' => "add-ecotaxe[$id_catalogues]", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_end()}
+HTML;
+		$ecotaxes = $sku->ecotaxes($id_langues, $id_catalogues);
+		if (count($ecotaxes)) {
+			$main .= <<<HTML
+<table id="ecotaxes">
+<thead>
+	<tr>
+		<th>{$dico->t('Montant')}</th>
+		<th>{$dico->t('Pays')}</th>
+		<th>{$dico->t('FamilleTaxes')}</th>
+		<td></td>
+	</tr>
+</thead>
+<tbody>
+HTML;
+			foreach ($ecotaxes as $ecotaxe) {
+				$main .= <<<HTML
+<tr>
+	<td>{$ecotaxe['montant']}</td>
+	<td>{$ecotaxe['pays']}</td>
+	<td>{$ecotaxe['famille_taxes']}</td>
+	<td>{$form->input(array('type' => "submit", 'name' => "delete-ecotaxe[{$ecotaxe['id']}]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}</td>
 </tr>
 HTML;
 			}

@@ -465,7 +465,7 @@ SQL;
 
 function update_19($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_devis_pose` (
+CREATE TABLE `dt_devis_pose` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `num_commande` int(11) NOT NULL,
   `num_devis` int(11) NOT NULL,
@@ -473,6 +473,31 @@ CREATE TABLE IF NOT EXISTS `dt_devis_pose` (
   `champ` varchar(128) NOT NULL,
   `valeur` text NOT NULL,
   `date_creation` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->sql->query($q);
+}
+
+function update_20($update) {
+	$q = <<<SQL
+CREATE TABLE `dt_ecotaxes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_sku` int(11) NOT NULL,
+  `id_pays` int(11) NOT NULL,
+  `id_familles_taxes` int(11) NOT NULL,
+  `id_catalogues` int(11) NOT NULL,
+  `montant` float NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_sku` (`id_sku`,`id_pays`,`id_familles_taxes`, `id_catalogues`)
+)
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+CREATE TABLE `dt_familles_taxes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `phrase_taxe` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 )
 SQL;

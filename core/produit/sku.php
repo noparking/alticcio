@@ -562,4 +562,77 @@ SQL;
 
 		return $produits;
 	}
+
+	public function get_familles_taxes($id_langues) {
+		$q = <<<SQL
+SELECT ft.id, p.phrase
+FROM dt_familles_taxes AS ft
+INNER JOIN dt_phrases AS p ON p.id = ft.phrase_taxe
+WHERE p.id_langues = {$id_langues}
+SQL;
+		$res = $this->sql->query($q);
+		$familles_taxes = array();
+		while ($row = $this->sql->fetch($res)) {
+			$familles_taxes[$row['id']] = $row['phrase'];
+		}
+
+		return $familles_taxes;
+	}
+
+	public function add_ecotaxe($data, $id_catalogues = 0) {
+		$ecotaxe = array(
+			'id_sku' => $data['sku']['id'],
+			'id_catalogues' => $id_catalogues,
+			'id_pays' => $data['new_ecotaxe'][$id_catalogues]['id_pays'],
+			'id_familles_taxes' => $data['new_ecotaxe'][$id_catalogues]['id_familles_taxes'],
+			'montant' => $data['new_ecotaxe'][$id_catalogues]['montant'],
+		);
+		$q = <<<SQL
+DELETE FROM dt_ecotaxes
+WHERE id_sku = {$ecotaxe['id_sku']}
+AND id_catalogues = {$id_catalogues}
+AND id_pays = {$ecotaxe['id_pays']}
+AND id_familles_taxes = {$ecotaxe['id_familles_taxes']}
+SQL;
+		$this->sql->query($q);
+
+		$values = array();
+		$fields = array();
+		foreach ($ecotaxe as $field => $value) {
+			$values[] = $value;
+			$fields[] = $field;
+		}
+		$q = "INSERT dt_ecotaxes (".implode(',', $fields).") VALUES ('".implode("','", $values)."')";
+		$this->sql->query($q);
+
+		return true;
+		
+	}
+
+	public function delete_ecotaxe($id) {
+		$q = <<<SQL
+DELETE FROM dt_ecotaxes
+WHERE id = {$id}
+SQL;
+		$this->sql->query($q);
+	}
+
+	public function ecotaxes($id_langues, $id_catalogues = 0) {
+		$q = <<<SQL
+SELECT e.id, e.montant, e.id_pays, e.id_familles_taxes, ph1.phrase AS pays, ph2.phrase AS famille_taxes FROM dt_ecotaxes AS e
+LEFT OUTER JOIN dt_pays AS p ON p.id = e.id_pays
+LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = p.phrase_nom AND ph1.id_langues = $id_langues
+LEFT OUTER JOIN dt_familles_taxes AS ft ON ft.id = e.id_familles_taxes
+LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = ft.phrase_taxe AND ph2.id_langues = $id_langues
+WHERE id_sku = {$this->id} AND id_catalogues = $id_catalogues
+SQL;
+		$res = $this->sql->query($q);
+
+		$ecotaxes = array();
+		while($row = $this->sql->fetch($res)) {
+			$ecotaxes[] = $row;
+		}
+
+		return $ecotaxes;
+	}
 }
