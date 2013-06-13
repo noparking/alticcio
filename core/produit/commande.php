@@ -40,8 +40,10 @@ SQL;
 		}
 		if (isset($data['produits'])) {
 			$montant = 0;
+			$id_sku_quantite = array();
 			foreach ($data['produits'] as $produit) {
-				$montant +=  $produit['prix_unitaire'] * $produit['quantite'];
+				$montant += $produit['prix_unitaire'] * $produit['quantite'];
+				$id_sku_quantite[$produit['id_sku']] = $produit['quantite'];
 			}
 			$frais_de_port = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
 			$data['commande']['montant'] = $montant;
@@ -50,6 +52,7 @@ SQL;
 				$tva = (float)$data['tva'] * ($montant + $frais_de_port) / 100;
 				$data['commande']['tva'] = round($tva, 2);
 			}
+			$data['commande']['ecotaxe'] = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
 		}
 
 		$id = parent::save($data);
@@ -196,6 +199,21 @@ SQL;
 		$row = $this->sql->fetch($res);
 		
 		return $row['forfait'];
+	}
+
+	public function ecotaxe($id_sku_quantite, $id_pays, $id_catalogues = 0) {
+		$liste_id_sku = implode(",", array_keys($id_sku_quantite));
+		$q = <<<SQL
+SELECT id_sku, montant FROM dt_ecotaxes
+WHERE id_sku IN ($liste_id_sku) AND id_pays = $id_pays AND id_catalogues = $id_catalogues
+SQL;
+		$res = $this->sql->query($q);
+		$ecotaxe = 0;
+		while ($row = $this->sql->fetch($res)) {
+			$ecotaxe += $row['montant'] * $id_sku_quantite[$row['id_sku']];
+		}
+		
+		return $ecotaxe;
 	}
 
 	public function produits() {
