@@ -502,9 +502,7 @@ CREATE TABLE `dt_familles_taxes` (
 )
 SQL;
 	$update->sql->query($q);
-}
 
-function update_21($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_commandes` ADD `ecotaxe` FLOAT NOT NULL AFTER `tva` 
 SQL;
@@ -512,6 +510,16 @@ SQL;
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_revisions` ADD `ecotaxe` FLOAT NOT NULL AFTER `tva` 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits` ADD `ecotaxe` FLOAT NOT NULL AFTER `prix_unitaire` 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits_revisions` ADD `ecotaxe` FLOAT NOT NULL AFTER `prix_unitaire` 
 SQL;
 	$update->sql->query($q);
 }

@@ -63,6 +63,7 @@ SQL;
 				if (in_array($id_commandes_produits, $keys)) {
 					$values = array();
 					$produit['id_commandes'] = $id;
+					$produit['ecotaxe'] = $this->ecotaxe(array($produit['id_sku'] => 1), $data['commande']['livraison_pays']);
 					foreach ($produit as $cle => $valeur) {
 						$values[] = "{$cle}='{$valeur}'";
 					}
@@ -75,6 +76,7 @@ SQL;
 					$fields = array();
 					$values = array();
 					$produit['id_commandes'] = $id;
+					$produit['ecotaxe'] = $this->ecotaxe(array($produit['id_sku'] => 1), $data['commande']['livraison_pays']);
 					foreach ($produit as $cle => $valeur) {
 						$fields[] = $cle;
 						$values[] = "'{$valeur}'";
