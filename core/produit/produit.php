@@ -348,6 +348,7 @@ INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = sa.id_sku AND sv.id_produits = 
 INNER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1 
 ORDER BY {$row2['field_value']} ASC
 SQL;
+echo $q;
 					}
 					break;
 				default : $q = false;
