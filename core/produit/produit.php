@@ -311,6 +311,7 @@ FROM dt_options_attributs AS oa
 INNER JOIN dt_phrases AS ph ON ph.id = oa.phrase_option AND ph.id_langues = {$id_langues}
 INNER JOIN dt_sku_attributs AS sa ON sa.phrase_valeur = oa.phrase_option AND sa.id_attributs = {$row['id']}
 INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = sa.id_sku AND sv.id_produits = {$this->id}
+INNER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1 
 WHERE oa.id_attributs = {$row['id']}
 ORDER by oa.classement ASC
 SQL;
