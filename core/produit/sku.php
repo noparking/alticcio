@@ -635,4 +635,15 @@ SQL;
 
 		return $ecotaxes;
 	}
+
+	public function ecotaxes_pour_qte($id_sku, $qte, $id_pays, $id_catalogues = 0) {
+		$q = <<<SQL
+SELECT SUM(montant) AS ecotaxe FROM dt_ecotaxes
+WHERE id_sku = $id_sku AND id_pays = $id_pays AND id_catalogues = $id_catalogues
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		return $qte * $row['ecotaxe'];
+	}
 }
