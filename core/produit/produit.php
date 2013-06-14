@@ -330,6 +330,7 @@ FROM {$row2['table_name']} AS t
 INNER JOIN dt_phrases AS ph ON ph.id = t.{$row2['field_label']} AND ph.id_langues = {$id_langues}
 INNER JOIN dt_sku_attributs AS sa ON sa.valeur_numerique = t.{$row2['field_value']} AND sa.id_attributs = {$row['id']}
 INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = sa.id_sku AND sv.id_produits = {$this->id}
+INNER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1 
 ORDER BY t.{$row2['field_value']} ASC
 SQL;
 					}
