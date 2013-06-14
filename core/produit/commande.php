@@ -46,13 +46,14 @@ SQL;
 				$id_sku_quantite[$produit['id_sku']] = $produit['quantite'];
 			}
 			$frais_de_port = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
+			$ecotaxe = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
 			$data['commande']['montant'] = $montant;
 			$data['commande']['frais_de_port'] = $frais_de_port;
+			$data['commande']['ecotaxe'] = $ecotaxe;
 			if (!isset($data['commande']['tva']) and isset($data['tva'])) {
-				$tva = (float)$data['tva'] * ($montant + $frais_de_port) / 100;
+				$tva = (float)$data['tva'] * ($montant + $frais_de_port + $ecotaxe) / 100;
 				$data['commande']['tva'] = round($tva, 2);
 			}
-			$data['commande']['ecotaxe'] = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
 		}
 
 		$id = parent::save($data);
