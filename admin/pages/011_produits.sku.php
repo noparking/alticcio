@@ -160,8 +160,10 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
-				$page->inc("snippets/attribut_management");
-				$filter_attributs_management->clean_data($data, 'attributs_management');
+				if ($action == "edit") {
+					$page->inc("snippets/attribut_management");
+					$filter_attributs_management->clean_data($data, 'attributs_management');
+				}
 				$id = $sku->save($data);
 				$form->reset();
 				if ($action != "edit") {
