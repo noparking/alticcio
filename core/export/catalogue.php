@@ -85,7 +85,7 @@ SQL;
 CREATE TABLE IF NOT EXISTS `catalogue` (
   $field_list
   PRIMARY KEY (`id_catalogue`,`id_produit`,`id_sku`)
-)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 SQL;
 		$this->sql_export->query($q);
 
