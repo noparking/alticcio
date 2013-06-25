@@ -205,12 +205,14 @@ SQL;
 	}
 
 	function save($data) {
-		$q = <<<SQL
+		if (isset($this->id) and $this->id) {
+			$q = <<<SQL
 DELETE FROM dt_exports_catalogues WHERE id_catalogues = {$this->id} AND auto <> 0
 SQL;
-		$this->sql->query($q);
+			$this->sql->query($q);
+		}
 
-		if ($data['catalogue']['export_frequency']) {
+		if (isset($data['catalogue']['export_frequency']) and $data['catalogue']['export_frequency']) {
 			$this->export($data, $data['catalogue']['export_frequency']);
 		}
 
