@@ -523,3 +523,20 @@ ALTER TABLE `dt_commandes_produits_revisions` ADD `ecotaxe` FLOAT NOT NULL AFTER
 SQL;
 	$update->sql->query($q);
 }
+
+function update_21($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_sku` CHANGE `ref_ultralog` `ref_ultralog` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_produits` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_gammes` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
+SQL;
+	$update->sql->query($q);
+}
