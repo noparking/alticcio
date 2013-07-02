@@ -6,41 +6,42 @@ $config->core_include("extranet/user", "outils/mysql", "outils/form");
 $page->template("simple");
 $page->css[] = $config->media("reporting.css");
 
-
-/*
- * On initialise la connexion MYSQL
- * On initialise la classe StatsContacts 
- */
 $sql = new Mysql($config->db());
 
-/*
- * Stats par semaine
- * les dates : d0 = lundi dernier, d1 = le lundi d'avant et d2 = le lundi d'avant avant
- */
-/*
-$d0 = strtotime('Last sunday');
-$d1 = $d0 - 604800;
-$d2 = $d0 - 1209600;
 
-function calculer($date_debut, $date_fin, $champ) {
-	global $sql;
-	if (!empty($champ)) {
-		$q = "SELECT SUM(".$champ.") AS NUM ";
+/*
+ * Mesure de la satisfaction :
+ * Si la réponse d'un sondage comprend que des notes de 3 et/ou 4, on le considère comme satisfait
+ */
+$q = "SELECT * FROM dt_sondage_satisfaction WHERE satisfait = 0";
+$rs = $sql->query($q);
+while($row = $sql->fetch($rs)) {
+	if ($row['q1'] >= 3 AND $row['q2'] >= 3 AND $row['q3'] >= 3 AND $row['q4'] >= 3 AND $row['q5'] >= 3 AND $row['q6'] >= 3 AND $row['q7'] >= 3) {
+		$q1 = "UPDATE dt_sondage_satisfaction SET satisfait = 1 WHERE id = ".$row['id'];
+		$rs1 = $sql->query($q1);
 	}
-	else {
-		$q = "SELECT COUNT(*) AS NUM ";
-	}
-	$q .= "	FROM dt_sondage_satisfaction 
-			WHERE date_reponse >= ".$date_debut." 
-			AND date_reponse <= ".$date_fin." ";
-	$rs = $sql->query($q);
-	$row = $sql->fetch($rs);
-	return $row['NUM'];
 }
 
-$date_week1 = date('d/m',$d1);
-$date_week2 = date('d/m',$d0);
-*/
+
+/*
+ * Tableau du nombre de réponses par mois/année
+ */
+
+ 
+/*
+ * Tableau du % de satisfaits par mois/année
+ */
+
+
+/*
+ * Podium des questions pour le dernier mois
+ */
+
+
+
+
+
+
 
 
 
@@ -83,6 +84,7 @@ function evolution($note_now, $note_prev) {
 /* 
  * Valeurs renvoyées dans le template
  */
+/*
 $titre_page = $dico->t("ReportingSatisfaction");
 
 
@@ -210,5 +212,5 @@ HTML;
 
 $right = "";
 
-
+*/
 ?>
