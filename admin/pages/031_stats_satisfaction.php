@@ -13,7 +13,6 @@ $menu->current('main/stats/satisfaction');
 
 /*
  * On initialise la connexion MYSQL
- * On initialise la classe StatsContacts 
  */
 $sql = new Mysql($config->db());
 
@@ -30,6 +29,20 @@ $months = array(	"01" => $dico->t('MoisJanvier'),
 					"11" => $dico->t('MoisNovembre'),
 					"12" => $dico->t('MoisDecembre') );
 
+/*
+ * Mesure de la satisfaction :
+ * Si la réponse d'un sondage comprend que des notes de 3 et/ou 4, on le considère comme satisfait
+ */
+$q = "SELECT * FROM dt_sondage_satisfaction WHERE satisfait = 0";
+$rs = $sql->query($q);
+while($row = $sql->fetch($rs)) {
+	if ($row['q1'] >= 3 AND $row['q2'] >= 3 AND $row['q3'] >= 3 AND $row['q4'] >= 3 AND $row['q5'] >= 3 AND $row['q6'] >= 3 AND $row['q7'] >= 3) {
+		$q1 = "UPDATE dt_sondage_satisfaction SET satisfait = 1 WHERE id = ".$row['id'];
+		$rs1 = $sql->query($q1);
+	}
+}					
+										
+					
 $form = new Form(array(
 	'id' => "form-search-satisfaction",
 	'class' => "form-search-satisfaction",
@@ -45,6 +58,15 @@ function moyenne($note, $nbre, $sur) {
 		return "-";
 	}
 }
+function pourcentage_satisfait($nb_satisfait, $nb_total) {
+	if ($nb_total > 0) {
+		return round((($nb_satisfait*100)%$nb_total),1).'%';
+	}
+	else {
+		return "";
+	}
+}
+
 
 $html_results = "";
 if ($form->is_submitted() and $form->validate()) {
@@ -53,6 +75,7 @@ if ($form->is_submitted() and $form->validate()) {
 	$html_results .= '<tr>';
 	$html_results .= '<th>'.$dico->t('Mois').'</th>';
 	$html_results .= '<th>'.$dico->t('NbreReponses').'</th>';
+	$html_results .= '<th>'.$dico->t('PrctSatisfait').'</th>';
 	$html_results .= '<th>'.$dico->t('QuestionAccueil').'</th>';
 	$html_results .= '<th>'.$dico->t('QuestionReponses').'</th>';
 	$html_results .= '<th>'.$dico->t('QuestionPrix').'</th>';
@@ -76,6 +99,7 @@ if ($form->is_submitted() and $form->validate()) {
 		$q6 = 0;
 		$q7 = 0;
 		$note = 0;
+		$satisfait = 0;
 		$i = 0;
 		while ($row = $sql->fetch($rs)) {
 			$q1 = $q1 + $row['q1'];
@@ -86,6 +110,7 @@ if ($form->is_submitted() and $form->validate()) {
 			$q6 = $q6 + $row['q6'];
 			$q7 = $q7 + $row['q7'];
 			$note = $note + $row['scoring'];
+			$satisfait = $satisfait + $row['satisfait'];
 			if (!empty($row['commentaires'])) {
 				$date_comment = date('d M Y', $row['date_reponse']);
 				$html_comments = <<<HTML
@@ -102,6 +127,7 @@ HTML;
 		$html_results .= '<tr>';
 		$html_results .= '<td>'.$month.'</td>';
 		$html_results .= '<td>'.$nbre_reponses.'</td>';
+		$html_results .= '<td>'.pourcentage_satisfait($satisfait, $nbre_reponses).'</td>';
 		$html_results .= '<td style="text-align:center;">'.moyenne($q1, $nbre_reponses, 4).'</td>';
 		$html_results .= '<td style="text-align:center;">'.moyenne($q2, $nbre_reponses, 4).'</td>';
 		$html_results .= '<td style="text-align:center;">'.moyenne($q3, $nbre_reponses, 4).'</td>';
