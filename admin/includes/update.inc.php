@@ -547,3 +547,46 @@ ALTER TABLE `dt_sku` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
 SQL;
 	$update->sql->query($q);
 }
+
+function update_23($update) {
+	$q = <<<SQL
+SHOW TABLES
+SQL;
+	$res = $update->sql->query($q);
+	while ($row = $update->sql->fetch($res)) {
+		$table = array_pop($row);
+		$q = <<<SQL
+DESCRIBE $table
+SQL;
+		$res2 = $update->sql->query($q);
+		while ($row2 = $update->sql->fetch($res2)) {
+			if ($row2['Null'] == "NO" and $row2['Default'] == null) {
+				$default_value = null;
+				preg_match("/([^(]*)/", $row2['Type'], $matches);
+				switch ($matches[1]) {
+					case 'int': 
+					case 'tinyint': 
+					case 'decimal':
+					case 'float':
+					case 'year':
+						$default_value = 0;
+						break;
+					case 'varchar':
+					case 'text':
+					case 'longtext':
+					case 'tinytext':
+					case 'char':
+					case 'longblob':
+						$default_value = "''";
+						break;
+				}
+				if ($default_value !== null) {
+					$q = <<<SQL
+ALTER TABLE `$table` CHANGE `{$row2['Field']}` `{$row2['Field']}` {$row2['Type']} NOT NULL DEFAULT $default_value
+SQL;
+					$update->sql->query($q);
+				}
+			}
+		}
+	}
+}
