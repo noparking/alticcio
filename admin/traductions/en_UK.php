@@ -112,6 +112,7 @@ $t['DonneesAjoutees'] = "Datas have been recorded.";
 $t['DonneesExistent'] = "These datas exist yet.";
 $t['DonneesUpdated'] = "Datas have been updated.";
 $t['Dupliquer'] = "Duplicate";
+$t['EchantillonDisponible'] = "Sample available";
 $t['EcoLabel'] = "Eco label";
 $t['EditerCampagneEmailing'] = "Edit an emailing campaign";
 $t['EditerBillet'] = "Edit blog post";

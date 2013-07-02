@@ -150,6 +150,7 @@ $t['DoublonsSKU'] = "Doublons SKU/Ultralog";
 $t['DoublonsSkuUltralog'] = "Il existe %nbre% doublons de références ultralog.";
 $t['DuoCouleurs'] = "Duo de couleurs";
 $t['Dupliquer'] = "Dupliquer";
+$t['EchantillonDisponible'] = "Échantillon disponible";
 $t['EcoLabel'] = "Eco label";
 $t['EditerApplication'] = "Éditer une application";
 $t['EditerAttribut'] = "Éditer un attribut";

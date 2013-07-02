@@ -540,3 +540,10 @@ ALTER TABLE `dt_gammes` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET latin1 COLL
 SQL;
 	$update->sql->query($q);
 }
+
+function update_22($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_sku` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
+SQL;
+	$update->sql->query($q);
+}
