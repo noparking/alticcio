@@ -375,6 +375,7 @@ $t['Personnalisation'] = "Personnalisation";
 $t['PictosVente'] = "Pictos vente";
 $t['Poids'] = "Poids";
 $t['PoidsNecessaire'] = "Poids nécessaire";
+$t['PrctSatisfait'] = "% Satisfait";
 $t['PremiereLigneNomColonne'] = "La première ligne n'est pas comptabilisée, elle sert de nom de colonne";
 $t['Presentation'] = "Présentation";
 $t['Prix'] = "Prix";
