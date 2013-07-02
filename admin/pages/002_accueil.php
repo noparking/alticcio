@@ -9,9 +9,6 @@ $main = <<<HTML
 HTML;
 
 $right = <<<RIGHT
-<ul>
-	<li>{$page->l($dico->t("ReportingSatisfaction"), $url->make("ReportingSatisfaction"))}</li>
-</ul>
 RIGHT;
 
 ?>
