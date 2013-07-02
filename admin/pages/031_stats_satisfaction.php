@@ -143,7 +143,8 @@ if ($form->is_submitted() and $form->validate()) {
 	$q1 = "SELECT commentaires, date_reponse, num_cde
 			FROM dt_sondage_satisfaction
 			WHERE commentaires != '' AND date_reponse > ".$debut_annee."
-				AND date_reponse < ".$fin_annee." AND langue = '".$langue_form."'";
+				AND date_reponse < ".$fin_annee." AND langue = '".$langue_form."'
+			ORDER BY date_reponse DESC ";
 	$rs1 = $sql->query($q1);
 	$html_results .= '<div class="commentaires_sondages">';
 	while($row1 = $sql->fetch($rs1)) {
