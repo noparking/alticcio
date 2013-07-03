@@ -560,8 +560,9 @@ DESCRIBE $table
 SQL;
 		$res2 = $update->sql->query($q);
 		while ($row2 = $update->sql->fetch($res2)) {
-			if ($row2['Null'] == "NO" and $row2['Default'] == null) {
+			if ($row2['Null'] == "NO" and $row2['Default'] == null and $row2['Extra'] != "auto_increment") {
 				$default_value = null;
+				$null = false;
 				preg_match("/([^(]*)/", $row2['Type'], $matches);
 				switch ($matches[1]) {
 					case 'int': 
@@ -572,17 +573,25 @@ SQL;
 						$default_value = 0;
 						break;
 					case 'varchar':
+					case 'char':
+						$default_value = "''";
+						break;
 					case 'text':
 					case 'longtext':
 					case 'tinytext':
-					case 'char':
 					case 'longblob':
-						$default_value = "''";
+						$null = true;
 						break;
 				}
 				if ($default_value !== null) {
 					$q = <<<SQL
 ALTER TABLE `$table` CHANGE `{$row2['Field']}` `{$row2['Field']}` {$row2['Type']} NOT NULL DEFAULT $default_value
+SQL;
+					$update->sql->query($q);
+				}
+				else if ($null) {
+					$q = <<<SQL
+ALTER TABLE `$table` CHANGE `{$row2['Field']}` `{$row2['Field']}` {$row2['Type']} NULL
 SQL;
 					$update->sql->query($q);
 				}
