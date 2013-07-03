@@ -497,7 +497,6 @@ if ($action == "create" or $action == "edit") {
 {$form->date(array('name' => "sku[date_fin]", 'label' => $dico->t('DateFinVente') ))}
 {$form->input(array('name' => "sku[phrase_path]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_path]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
-{$form->input(array('name' => "sku[echantillon]", 'label' => $dico->t('EchantillonDisponible'), 'type' => "checkbox"))}
 {$form->fieldset_end()}
 HTML;
 }

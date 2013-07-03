@@ -519,6 +519,7 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "produit[id_gammes]", 'label' => $dico->t('Gamme'), 'options' => $produit->gammes()))}
 {$form->select(array('name' => "produit[offre]", 'label' => $dico->t('Offre'), 'options' => $offres))}
 {$form->select(array('name' => "produit[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $produit->recyclage($id_langues) ))}
+{$form->input(array('name' => "produit[echantillon]", 'label' => $dico->t('EchantillonDisponible'), 'type' => "checkbox"))}
 {$form->input(array('name' => "produit[phrase_url_key]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_url_key]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "produit[phrase_avantages_produit]", 'type' => "hidden"))}

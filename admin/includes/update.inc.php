@@ -599,3 +599,14 @@ SQL;
 		}
 	}
 }
+
+function update_24($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_sku` DROP `echantillon` 
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
+ALTER TABLE `dt_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
+SQL;
+	$update->sql->query($q);
+}
