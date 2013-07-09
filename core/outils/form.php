@@ -49,6 +49,7 @@ class Form {
 	private $permissions = null;
 	private $permissions_object = null;
 	private $page = null;
+	private $rendered = array();
 	
 	public function __construct($params = array()) {
 		$this->template = isset($params['template']) ? $params['template'] : $this->default_template();
@@ -1203,6 +1204,10 @@ HTML;
 	}
 
 	private function render_element($params) {
+		if (isset($params['if_not_yet_rendered']) and $params['if_not_yet_rendered'] and in_array($params['name'], $this->rendered)) {
+			return "";
+		}
+
 		if (in_array($params['name'], $this->required)) {
 			$this->required_fields[] = $params['name'];
 		}
@@ -1230,6 +1235,8 @@ HTML;
 		$html = str_replace("#{field}", $params['field'].$unit, $html);
 		$html = str_replace("#{description}", isset($params['description']) ? $params['description'] : "", $html);
 		$html = str_replace("#{errors}", $errors, $html);
+
+		$this->rendered[] = $params['name'];
 
 		return $html;
 	}

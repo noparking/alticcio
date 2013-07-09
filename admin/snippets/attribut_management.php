@@ -54,7 +54,3 @@ if (isset($attribut_management_selected)) {
 $attribut_management->all_attributs($filter);
 echo $page->inc("snippets/filter-form");
 
-foreach ($filter->selected() as $selected_attribut) {
-	echo $form->hidden(array('name' => "attributs_management[$selected_attribut][classement]", 'forced_default' => true));
-	echo $form->hidden(array('name' => "attributs_management[$selected_attribut][groupe]", 'forced_default' => true));
-}

@@ -68,4 +68,10 @@ SQL;
 
 		return $versions;
 	}
+
+	function svn_up() {
+		$dir = dirname(__FILE__)."/../../../";
+		system("svn up $dir");
+	}
 }
+

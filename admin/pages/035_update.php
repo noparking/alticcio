@@ -19,6 +19,7 @@ if ($form->is_submitted()) {
 	$data = $form->escaped_values();
 	$update->version = $data['version_actuelle'];
 	$update->execute($data['nouvelle_version']);
+	$update->svn_up();
 
 	$message = <<<HTML
 <p class="message">Mis à jour à la version {$update->version}</p>
