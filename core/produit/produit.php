@@ -547,8 +547,10 @@ SQL;
 			return array();
 		}
 		$q = <<<SQL
-SELECT id_sku, classement FROM $table WHERE id_produits = {$this->id}
-ORDER BY classement ASC
+SELECT t.id_sku, t.classement FROM $table AS t
+INNER JOIN dt_sku AS s ON s.id = t.id_sku
+WHERE t.id_produits = {$this->id}
+ORDER BY t.classement ASC
 SQL;
 		$res = $this->sql->query($q);
 
