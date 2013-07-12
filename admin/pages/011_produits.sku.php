@@ -267,8 +267,8 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	foreach ($filter_attributs_management->selected() as $selected_attribut) {
-		$main .= $form->input(array('name' => "attributs_management[$selected_attribut][classement]", 'if_not_yet_rendered' => true));
-		$main .= $form->input(array('name' => "attributs_management[$selected_attribut][groupe]", 'if_not_yet_rendered' => true));
+		$main .= $form->hidden(array('name' => "attributs_management[$selected_attribut][classement]", 'if_not_yet_rendered' => true));
+		$main .= $form->hidden(array('name' => "attributs_management[$selected_attribut][groupe]", 'if_not_yet_rendered' => true));
 	}
 
 	$attributs = $sku->attributs('grouped');
