@@ -610,3 +610,78 @@ ALTER TABLE `dt_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
 SQL;
 	$update->sql->query($q);
 }
+
+function update_25($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_types_documents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+INSERT INTO dt_types_documents (code)
+VALUES ('guide'), ('book'), ('catalogue'), ('film')
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_documents` ADD `id_types_documents` INT NOT NULL ,
+ADD INDEX ( `id_types_documents` )
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_documents` SET id_types_documents = 1 WHERE type_documents = 'guide'
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_documents` SET id_types_documents = 2 WHERE type_documents = 'book'
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_documents` SET id_types_documents = 3 WHERE type_documents = 'catalogue'
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_documents` SET id_types_documents = 4 WHERE type_documents = 'film'
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_documents` DROP `type_documents`
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_documents_produits` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_documents` int(11) NOT NULL,
+  `id_produits` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_documents` (`id_documents`),
+  KEY `id_produits` (`id_produits`)
+)
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_documents_gammes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_documents` int(11) NOT NULL,
+  `id_gammes` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_documents` (`id_documents`),
+  KEY `id_gammes` (`id_gammes`)
+)
+SQL;
+	$update->sql->query($q);
+}
+

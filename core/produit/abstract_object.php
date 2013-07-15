@@ -8,6 +8,7 @@ abstract class AbstractObject {
 	public $type;
 	public $table;
 	public $images_table;
+	public $documents_table;
 	public $phrase_fields = array();
 	public $values;
 
@@ -117,6 +118,10 @@ SQL;
 		$images = $this->images();
 		foreach ($images as $image) {
 			$this->delete_image($data, $image['id']);
+		}
+		$documents = $this->documents();
+		foreach ($documents as $document) {
+			$this->delete_document($data, $document['id']);
 		}
 
 		$q = "DELETE FROM {$this->table} WHERE id = {$this->id}";
@@ -294,6 +299,76 @@ SQL;
 		return $images; 
 	}
 
+	public function add_document($data, $files_dirs) {
+		$fichier = "";
+		$vignette = "";
+		foreach($files_dirs as $type => $file_dir) { // type = fichier ou vignette
+			$file = $file_dir['file'];
+			$dir = $file_dir['dir'];
+			$$type = $file['name'];
+			move_uploaded_file($file['tmp_name'], $dir.$file['name']);
+		}
+
+		$id_field = $this->id_field();
+		$q = <<<SQL
+UPDATE {$this->documents_table} SET classement = classement + 1
+WHERE {$id_field} = {$data[$this->type]['id']}
+AND classement >= {$data['new_document']['classement']}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+INSERT INTO dt_documents (fichier, vignette)
+VALUES ('$fichier', '$vignette')
+SQL;
+		$this->sql->query($q);
+		$id_documents = $this->sql->insert_id();
+
+		$q = <<<SQL
+INSERT INTO {$this->documents_table} ({$id_field}, id_documents, classement)
+VALUES ('{$data[$this->type]['id']}', $id_documents, '{$data['new_document']['classement']}')
+SQL;
+		$this->sql->query($q);
+
+		$data_document['document'][$id_documents] = $data['new_document'];
+		unset($data_document['document'][$id_documents]['classement']);
+
+		$this->save_data($data_document, 'document', 'dt_documents');
+	}
+
+	public function delete_document($data, $id) {
+		$id_field = $this->id_field();
+		$q = <<<SQL
+UPDATE {$this->documents_table} SET classement = classement - 1
+WHERE {$id_field} = {$data[$this->type]['id']}
+AND classement > {$data['document'][$id]['classement']}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM {$this->documents_table} WHERE id = {$id}
+SQL;
+		$this->sql->query($q);
+	}
+
+	public function documents() {
+		$documents = array();
+
+		if (isset($this->documents_table) and $this->documents_table and isset($this->id) and $this->id) {
+			$id_field = $this->id_field();
+			$q = <<<SQL
+SELECT * FROM {$this->documents_table} WHERE {$id_field} = {$this->id} ORDER BY classement
+SQL;
+			$res = $this->sql->query($q);
+			
+			while ($row = $this->sql->fetch($res)) {
+				$documents[$row['id']] = $row;
+			}
+		}
+
+		return $documents;
+	}
+
 	public function vignette() {
 		foreach ($this->images() as $image) {
 			if ($image['vignette']) {
@@ -303,14 +378,14 @@ SQL;
 		return false;
 	}
 
-	public function new_classement() {
+	public function new_classement($table = "images_table") {
 		if (!isset($this->id) or !$this->id) {
 			return 1;
 		}
 
 		$id_field = $this->id_field();
 		$q = <<<SQL
-SELECT MAX(classement) max_classement FROM {$this->images_table} 
+SELECT MAX(classement) max_classement FROM {$this->$table} 
 WHERE {$id_field} = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
@@ -318,6 +393,30 @@ SQL;
 		$row = $this->sql->fetch($res);
 
 		return $row["max_classement"] + 1;
+	}
+
+	public function types_documents() {
+		$langues = array();
+		$q = <<<SQL
+SELECT id, code FROM dt_types_documents
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$langues[$row['id']] = $row['code'];
+		}
+		return $langues;
+	}
+
+	public function langues() {
+		$langues = array();
+		$q = <<<SQL
+SELECT id AS id_langues, code_langue FROM dt_langues
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$langues[$row['id_langues']] = $row['code_langue'];
+		}
+		return $langues;
 	}
 
 	public function get_id_langues($code_langue) {

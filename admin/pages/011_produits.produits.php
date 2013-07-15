@@ -49,11 +49,13 @@ $form = new Form(array(
 		"cancel",
 		"add-image",
 		"delete-image",
+		"add-document",
+		"delete-document",
 		"duplicate",
 	),
 	'permissions' => $user->perms(),
 	'permissions_object' => "produit",
-	'files' => array("new_image_file", "new_gabarit_file"),
+	'files' => array("new_image_file", "new_document_file", "new_document_vignette", "new_gabarit_file"),
 ));
 
 $filter_schema_sku = array(
@@ -173,6 +175,21 @@ if ($form->is_submitted()) {
 		case "delete-image" :
 			$produit->delete_image($data, $form->action_arg());
 			break;
+		case "add-document" :
+			if ($file = $form->value('new_document_file')) {
+				$dir = $config->get("medias_path")."www/medias/docs/";
+				$files_dirs["fichier"] = array('file' => $file, 'dir' => $dir);
+				if ($file = $form->value('new_document_vignette')) {
+					$dir = $config->get("medias_path")."www/medias/images/documents/";
+					$files_dirs["vignette"] = array('file' => $file, 'dir' => $dir);
+				}
+				$produit->add_document($data, $files_dirs);
+			}
+			$form->forget_value("new_document");
+			break;
+		case "delete-document" :
+			$produit->delete_document($data, $form->action_arg());
+			break;
 		case "add-gabarit" :
 			if ($file = $form->value('new_gabarit_file')) {
 				$dir = $config->get("medias_path")."www/medias/gabarits/";
@@ -227,6 +244,8 @@ if ($action == 'edit') {
 	$form->default_values['produit'] = $produit->values;
 	$images = $produit->images();
 	$form->default_values['image'] = $images;
+	$documents = $produit->documents();
+	$form->default_values['documents'] = $documents;
 	$form->default_values['attributs'] = $produit->attributs();
 	$form->default_values['phrases'] = $phrase->get($produit->phrases());
 	$composants = $produit->composants();
@@ -278,6 +297,7 @@ if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'images' => $dico->t('Images'),
+		'documents' => $dico->t('Documents'),
 		'attributs' => $dico->t('Attributs'),
 		'personnalisation' => $dico->t('Personnalisation'),
 		'variantes' => $dico->t('Declinaisons'),
@@ -300,6 +320,78 @@ if ($action == "edit") {
 {$form->input(array('type' => "submit", 'name' => "add-image", 'value' => $dico->t('Ajouter') ))}
 <p class="message">{$dico->t('AttentionSuppressionImage')}</p>
 <p class="lien_photomail"><a href="mailto:{$config->get("photomail_email")}?Subject=prod= {$id}">{$dico->t('AjouterImagePhotomail')}</a></p>
+{$form->fieldset_end()}
+HTML;
+
+	if (count($images)) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('LesImages'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-images"))}
+<table class="sortable" id="images">
+<thead>
+<tr>
+	<th>{$dico->t('Ordre')}</th>
+	<th>{$dico->t('Apercu')}</th>
+	<th>{$dico->t('TexteAlternatif')}</th>
+	<th>{$dico->t('Visibilite')}</th>
+	<th>{$dico->t('Diaporama')}</th>
+	<th>{$dico->t('Vignette')}</th>
+	<th>Image HD</th>
+	<td></td>
+</tr>
+</thead>
+<tbody>
+HTML;
+		$form_template = $form->template;
+		$form->template = "#{field}";
+		$images_rows = array();
+		$hd_extensions = $dico->d('hd_extensions');
+		foreach ($images as $image) {
+			$order = $form->value("images[{$image['id']}]") !== null ? $form->value("images[{$image['id']}][classement]") : $image['classement'];
+			$style_hd = $image['hd_extension'] ? '' : 'style="display:none;"';
+			$images_rows[$order] = <<<HTML
+<tr>
+	<td class="drag-handle"></td>
+	<td><img class="produit-image" src="{$config->core_media("produits/".$image['ref'])}" /></td>
+	<td>
+		{$form->input(array('name' => "image[".$image['id']."][phrase_legende]", 'type' => "hidden"))}
+		{$form->input(array('name' => "phrases[image][".$image['id']."][phrase_legende]", 'items' => $displayed_lang))}
+	</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][affichage]", 'type' => "checkbox", 'checked' => $image['affichage']))}</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][diaporama]", 'type' => "checkbox", 'checked' => $image['diaporama']))}</td>
+	<td>{$form->input(array('name' => "image[".$image['id']."][vignette]", 'type' => "checkbox", 'checked' => $image['vignette']))}</td>
+	<td>
+		{$form->select(array('name' => "image[".$image['id']."][hd_extension]", 'options' => $hd_extensions))}
+		<input class="nom_hd" name="{$produit->image_hd($image['id'])}" {$style_hd} value="{$produit->image_hd($image['id'])}.{$image['hd_extension']}" readonly="readonly" />
+	</td>
+	<td>
+		{$form->input(array('name' => "image[".$image['id']."][classement]", 'type' => "hidden", 'forced_value' => $order))}
+		{$form->input(array('type' => "submit", 'name' => "delete-image[".$image['id']."]", 'class' => "delete", 'value' => "Supprimer"))}
+	</td>
+</tr>
+HTML;
+		}
+		ksort($images_rows);
+		$main .= implode("\n", $images_rows);
+		$form->template = $form_template;
+		$main .= <<<HTML
+</tbody>
+</table>
+{$form->fieldset_end()}
+HTML;
+	}
+
+	// Documents
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('AjouterUnDocument'), 'class' => "produit-section produit-section-documents".$hidden['documents'], 'id' => "produit-section-documents-new"))}
+{$form->input(array('type' => "file", 'name' => "new_document_file", 'label' => $dico->t('Document') ))}
+{$form->input(array('type' => "file", 'name' => "new_document_vignette", 'label' => $dico->t('DocumentVignette') ))}
+{$form->input(array('name' => "new_document[classement]", 'type' => "hidden", 'forced_value' => $produit->new_classement("documents_table")))}
+{$form->input(array('type' => "text", 'name' => "new_document[titre]", 'label' => $dico->t('Titre')))}
+{$form->select(array('name' => "new_document[id_langues]", 'label' => $dico->t("Langue"), 'options' => $produit->langues()))}
+{$form->select(array('name' => "new_document[id_types_documents]", 'label' => $dico->t("TypeDocuments"), 'options' => $produit->types_documents()))}
+{$form->input(array('type' => "checkbox", 'name' => "new_document[actif]", 'label' => $dico->t('Active')))}
+{$form->input(array('type' => "checkbox", 'name' => "new_document[public]", 'label' => $dico->t('Public')))}
+{$form->input(array('type' => "submit", 'name' => "add-document", 'value' => $dico->t('Ajouter') ))}
 {$form->fieldset_end()}
 HTML;
 

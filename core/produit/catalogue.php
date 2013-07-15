@@ -53,18 +53,6 @@ SQL;
 		return $row['code_langue'];
 	}
 
-	public function langues() {
-		$langues = array();
-		$q = <<<SQL
-SELECT id AS id_langues, code_langue FROM dt_langues
-SQL;
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$langues[$row['id_langues']] = $row['code_langue'];
-		}
-		return $langues;
-	}
-
 	public function add_categorie($data) {
 		$fields = array();
 		$values = array();

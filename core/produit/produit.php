@@ -8,6 +8,7 @@ class Produit extends AbstractObject {
 	public $table = "dt_produits";
 	public $id_field = "id_produits";
 	public $images_table = "dt_images_produits";
+	public $documents_table = "dt_documents_produits";
 	public $attributs_table = "dt_produits_attributs";
 	public $phrase_fields = array(
 		'phrase_nom',
