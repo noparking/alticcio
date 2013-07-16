@@ -26,7 +26,7 @@ $id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$gamme = new Gamme($sql, $phrase, $id_langues);
+$object = $gamme = new Gamme($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
 
@@ -58,8 +58,18 @@ if ($id = $url2->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-gamme-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "cancel", "add-image", "delete-image", "add-attribut", "delete-attribut"),
-	'files' => array("new_image_file"),
+	'actions' => array(
+		"save",
+		"delete",
+		"cancel",
+		"add-image",
+		"delete-image",
+		"add-document",
+		"delete-document",
+		"add-attribut",
+		"delete-attribut",
+	),
+	'files' => array("new_image_file", "new_document_file", "new_document_vignette"),
 ));
 
 $section = "presentation";
@@ -100,6 +110,21 @@ if ($form->is_submitted()) {
 		case "delete-image" :
 			$gamme->delete_image($data, $form->action_arg());
 			break;
+		case "add-document" :
+			if ($file = $form->value('new_document_file')) {
+				$dir = $config->get("medias_path")."www/medias/docs/";
+				$files_dirs["fichier"] = array('file' => $file, 'dir' => $dir);
+				if ($file = $form->value('new_document_vignette')) {
+					$dir = $config->get("medias_path")."www/medias/images/documents/";
+					$files_dirs["vignette"] = array('file' => $file, 'dir' => $dir);
+				}
+				$gamme->add_document($data, $files_dirs);
+			}
+			$form->forget_value("new_document");
+			break;
+		case "delete-document" :
+			$gamme->delete_document($data, $form->action_arg());
+			break;
 		default :
 			if ($action == "edit" or $action == "create") {
 				if ($action == "edit") {
@@ -126,7 +151,10 @@ else if ($action == 'edit') {
 
 if ($action == 'edit') {
 	$form->default_values['gamme'] = $gamme->values;
-	$form->default_values['image'] = $gamme->images();
+	$images = $gamme->images();
+	$form->default_values['image'] = $images;
+	$documents = $gamme->documents();
+	$form->default_values['document'] = $documents;
 	$form->default_values['phrases'] = $phrase->get($gamme->phrases());
 	$form->default_values['attributs_management'] = $gamme->attributs_management();
 	$form->default_values['attributs'] = $gamme->attributs();
@@ -166,6 +194,7 @@ if ($action == "edit") {
 		'attributs_management' => $dico->t('AttributsManagement'),
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
+		'documents' => $dico->t('Documents'),
 		'produits' => $dico->t('Produits'),
 	);
 	// variable $hidden mise à jour dans ce snippet
@@ -215,7 +244,6 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
-	$images = $gamme->images();
 	if (count($images)) {
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('LesImages'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-images"))}
@@ -273,11 +301,12 @@ HTML;
 HTML;
 	}
 
+	// Documents
+	$main .= $page->inc("snippets/documents");
+
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')));
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));
-}
 
-if ($action == "edit") {
 	$pager = new Pager($sql, array(20, 30, 50, 100, 200));
 	$filter = new Filter($pager, array(
 		'id' => array(

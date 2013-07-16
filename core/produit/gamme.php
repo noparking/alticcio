@@ -8,6 +8,7 @@ class Gamme extends AbstractObject {
 	public $table = "dt_gammes";
 	public $id_field = "id_gammes";
 	public $images_table = "dt_images_gammes";
+	public $documents_table = "dt_documents_gammes";
 	public $attributs_table = "dt_gammes_attributs";
 	public $phrase_fields = array(
 		'phrase_nom',

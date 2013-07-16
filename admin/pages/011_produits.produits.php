@@ -29,7 +29,7 @@ $id_langues = $langue->id($config->get("langue"));
 
 $phrase = new Phrase($sql);
 
-$produit = new Produit($sql, $phrase, $id_langues);
+$object = $produit = new Produit($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
 
@@ -245,7 +245,7 @@ if ($action == 'edit') {
 	$images = $produit->images();
 	$form->default_values['image'] = $images;
 	$documents = $produit->documents();
-	$form->default_values['documents'] = $documents;
+	$form->default_values['document'] = $documents;
 	$form->default_values['attributs'] = $produit->attributs();
 	$form->default_values['phrases'] = $phrase->get($produit->phrases());
 	$composants = $produit->composants();
