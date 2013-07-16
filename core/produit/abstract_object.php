@@ -202,15 +202,17 @@ SQL;
 	}
 
 	public function save_documents($data) {
-		foreach ($data['document'] as $id_documents => $document_data) {
-			$q = <<<SQL
+		if (isset($data['document'])) {
+			foreach ($data['document'] as $id_documents => $document_data) {
+				$q = <<<SQL
 UPDATE {$this->documents_table} SET classement = {$document_data['classement']} 
 WHERE {$this->id_field} = {$data[$this->type]['id']} AND id_documents = $id_documents
 SQL;
-			$this->sql->query($q);
-			unset($data['document'][$id_documents]['classement']);
+				$this->sql->query($q);
+				unset($data['document'][$id_documents]['classement']);
+			}
+			$this->save_data($data, 'document', 'dt_documents');
 		}
-		$this->save_data($data, 'document', 'dt_documents');
 	}
 
 	public function save_data($data, $key, $table) {
