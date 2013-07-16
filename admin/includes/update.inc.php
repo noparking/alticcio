@@ -659,6 +659,19 @@ SQL;
 	$update->sql->query($q);
 
 	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_documents_sku` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_documents` int(11) NOT NULL,
+  `id_sku` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_documents` (`id_documents`),
+  KEY `id_sku` (`id_sku`)
+)
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_documents_produits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_documents` int(11) NOT NULL,

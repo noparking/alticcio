@@ -8,6 +8,7 @@ class Sku extends AbstractObject {
 	public $table = "dt_sku";
 	public $id_field = "id_sku";
 	public $images_table = "dt_images_sku";
+	public $documents_table = "dt_documents_sku";
 	public $attributs_table = "dt_sku_attributs";
 	public $phrase_fields = array('phrase_ultralog', 'phrase_commercial', 'phrase_path');
 

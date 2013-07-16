@@ -74,8 +74,19 @@ if ($id = $url2->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-sku-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "reset", "add-image", "delete-image", "add-prix-degressif", "delete-prix-degressif", "duplicate"),
-	'files' => array("new_image_file", "new_gabarit_file"),
+	'actions' => array(
+		"save",
+		"delete",
+		"reset",
+		"add-image",
+		"delete-image",
+		"add-document",
+		"delete-document",
+		"add-prix-degressif",
+		"delete-prix-degressif",
+		"duplicate",
+	),
+	'files' => array("new_image_file", "new_document_file", "new_document_vignette", "new_gabarit_file"),
 	'date_format' => $dico->d('FormatDate'),
 ));
 
@@ -114,6 +125,21 @@ if ($form->is_submitted()) {
 			break;
 		case "delete-image" :
 			$sku->delete_image($data, $form->action_arg());
+			break;
+		case "add-document" :
+			if ($file = $form->value('new_document_file')) {
+				$dir = $config->get("medias_path")."www/medias/docs/";
+				$files_dirs["fichier"] = array('file' => $file, 'dir' => $dir);
+				if ($file = $form->value('new_document_vignette')) {
+					$dir = $config->get("medias_path")."www/medias/images/documents/";
+					$files_dirs["vignette"] = array('file' => $file, 'dir' => $dir);
+				}
+				$sku->add_document($data, $files_dirs);
+			}
+			$form->forget_value("new_document");
+			break;
+		case "delete-document" :
+			$sku->delete_document($data, $form->action_arg());
 			break;
 		case "add-gabarit" :
 			if ($file = $form->value('new_gabarit_file')) {
@@ -186,7 +212,10 @@ else if ($action == 'edit') {
 
 if ($action == 'edit') {
 	$form->default_values['sku'] = $sku->values;
-	$form->default_values['image'] = $sku->images();
+	$images = $sku->images();
+	$form->default_values['image'] = $images;
+	$documents = $sku->documents();
+	$form->default_values['document'] = $documents;
 	$form->default_values['phrases'] = $phrase->get($sku->phrases());
 	$form->default_values['prix'] = $sku->prix_catalogues();
 	$form->default_values['attributs_management'] = $sku->attributs_management();
@@ -227,6 +256,7 @@ if ($action == "edit") {
 		'attributs_management' => $dico->t('AttributsManagement'),
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
+		'documents' => $dico->t('Documents'),
 		'produits' => $dico->t('Produits'),
 	);
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
@@ -451,6 +481,9 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	}
+
+	// Documents
+	$main .= $page->inc("snippets/documents");
 
 	$produit = new Produit($sql);
 	$main .= <<<HTML
