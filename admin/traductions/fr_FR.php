@@ -254,6 +254,7 @@ $t['LegendeCalculVent'] = "Pour information, les poids des bases ne comprennent 
 <br/>Les cases vertes désignent les vents pour lesquels la base est conseillée. Les cases rouges désignent les utilisations déconseillées.
 Le poids indiqué dans les cases de couleur correspond au poids recommandé pour la base.";
 $t['LesImages'] = "Les images";
+$t['LesDocuments'] = "Les documents";
 $t['Libelle'] = "Libellé";
 $t['Lien'] = "Lien";
 $t['Liste'] = "Liste";
@@ -473,6 +474,7 @@ $t['Table'] = "Table";
 $t['Taille'] = "Taille";
 $t['TaillesPavillons'] = "Tailles des pavillons";
 $t['TailleReelle'] = "Taille Réelle";
+$t['Telecharger'] = "Télécharger";
 $t['TelechargerBatchs'] = "Télécharger des batchs";
 $t['TemplateHTML'] = "Template HTML";
 $t['Texte'] = "Texte";

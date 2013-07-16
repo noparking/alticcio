@@ -73,6 +73,7 @@ abstract class AbstractObject {
 				$this->sql->query($q);
 			}
 			$this->save_images($data);
+			$this->save_documents($data);
 		}
 		else {
 			$fields = array();
@@ -198,6 +199,18 @@ SQL;
 				}
 			}
 		}
+	}
+
+	public function save_documents($data) {
+		foreach ($data['document'] as $id_documents => $document_data) {
+			$q = <<<SQL
+UPDATE {$this->documents_table} SET classement = {$document_data['classement']} 
+WHERE {$this->id_field} = {$data[$this->type]['id']} AND id_documents = $id_documents
+SQL;
+			$this->sql->query($q);
+			unset($data['document'][$id_documents]['classement']);
+		}
+		$this->save_data($data, 'document', 'dt_documents');
 	}
 
 	public function save_data($data, $key, $table) {
@@ -346,7 +359,12 @@ SQL;
 		$this->sql->query($q);
 
 		$q = <<<SQL
-DELETE FROM {$this->documents_table} WHERE id = {$id}
+DELETE FROM {$this->documents_table} WHERE id_documents = {$id}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_documents WHERE id = {$id}
 SQL;
 		$this->sql->query($q);
 	}
@@ -357,7 +375,9 @@ SQL;
 		if (isset($this->documents_table) and $this->documents_table and isset($this->id) and $this->id) {
 			$id_field = $this->id_field();
 			$q = <<<SQL
-SELECT * FROM {$this->documents_table} WHERE {$id_field} = {$this->id} ORDER BY classement
+SELECT * FROM {$this->documents_table} AS dt
+INNER JOIN 	dt_documents AS d ON d.id = dt.id_documents
+WHERE {$id_field} = {$this->id} ORDER BY classement
 SQL;
 			$res = $this->sql->query($q);
 			
