@@ -981,4 +981,91 @@ SQL;
 
 		return $designations;
 	}
+
+	function phrases_dynamiques() {
+		$phrases = $this->phrase->get($this->phrases());
+
+		$phrases = $this->substitution_descriptions($phrases);
+		$phrases = $this->substitution_attributs($phrases);
+
+		return $phrases;
+	}
+
+	function substitution_descriptions($phrases) {
+		$tokens = array();
+
+		$q = <<<SQL
+SELECT ph1.phrase AS description, ph2.phrase AS description_courte, l.code_langue FROM dt_applications AS a
+INNER JOIN dt_produits AS p ON p.id_applications = a.id AND p.id = {$this->id}
+INNER JOIN dt_phrases AS ph1 ON ph1.id = a.phrase_description
+INNER JOIN dt_langues AS l ON l.id = ph1.id_langues
+INNER JOIN dt_phrases AS ph2 ON ph2.id = a.phrase_description_courte AND ph2.id_langues = l.id
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			foreach (array('description', 'description_courte') as $field) {
+				$tokens[$field][$row['code_langue']] = $row[$field];
+			}
+		}
+
+		return $this->substitutions_tokens($phrases, $tokens);
+	}
+
+	function substitution_attributs($phrases) {
+		$tokens = array();
+
+		$q = <<<SQL
+SELECT  a.ref, pa.valeur_numerique, ph.phrase, l.code_langue, ar.field_label, ar.table_name, ar.field_value
+FROM dt_attributs AS a
+INNER JOIN dt_produits_attributs AS pa ON pa.id_attributs = a.id AND id_produits = {$this->id}
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pa.phrase_valeur
+LEFT OUTER JOIN dt_langues AS l ON l.id = ph.id_langues
+LEFT OUTER JOIN dt_attributs_references AS ar ON ar.id_attributs = pa.id_attributs
+WHERE a.ref <> ''
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			if ($row['table_name'] and $row['field_label'] and $row['field_value']) {
+				if (strpos($row['field_label'], "phrase_") === 0) {
+					$q = <<<SQL
+SELECT ph.phrase AS label, l.code_langue FROM {$row['table_name']} AS t
+INNER JOIN dt_phrases AS ph ON t.{$row['field_label']} = ph.id
+INNER JOIN dt_langues AS l ON l.id = ph.id_langues
+WHERE t.{$row['field_value']} = {$row['valeur_numerique']}
+SQL;
+				}
+				else {
+					if ($row['field_value'][0] != ucfirst($row['field_value'][0])) {
+						$row['field_value'] = "t.".$row['field_value'];
+					}
+					if ($row['field_label'][0] != ucfirst($row['field_label'][0])) {
+						$row['field_label'] = "t.".$row['field_label'];
+					}
+					$q = <<<SQL
+SELECT {$row['field_label']} AS label FROM {$row['table_name']} AS t
+WHERE {$row['field_value']} = {$row['valeur_numerique']}
+SQL;
+				}
+				$res2 = $this->sql->query($q);
+				while ($row2 = $this->sql->fetch($res2)) {
+					if (isset($row2['code_langue'])) {
+						$tokens[$row['ref']][$row2['code_langue']] = $row2['label'];
+					}
+					else {
+						$tokens[$row['ref']] = $row2['label'];
+					}
+				}
+			}
+			else {
+				if ($row['phrase']) {
+					$tokens[$row['ref']][$row['code_langue']] = $row['phrase'];
+				}
+				else {
+					$tokens[$row['ref']] = $row['valeur_numerique'];
+				}
+			}
+		}
+
+		return $this->substitutions_tokens($phrases, $tokens);
+	}
 }
