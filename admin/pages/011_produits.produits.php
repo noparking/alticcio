@@ -11,7 +11,6 @@ $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
 $page->javascript[] = $config->core_media("jquery.form.js");
 $page->javascript[] = $config->core_media("jquery.dteditor.js");
-$page->javascript[] = $url->make("DTEditor");
 $page->css[] = $config->media("dteditor.css");
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
@@ -39,6 +38,8 @@ if ($id = $url2->get('id')) {
 	$application = new Application($sql, $phrase, $id_langues);
 	$application->load($produit->values['id_applications']);
 }
+
+$page->javascript[] = $url->make("DTEditorTokens")."?id_produits=$id";
 
 $form = new Form(array(
 	'id' => "form-edit-produit-$id",
@@ -548,9 +549,9 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "produit[phrase_avantages_produit]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_avantages_produit]", 'label' => $dico->t('AvantagesProduit'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_description_courte]", 'type' => "hidden"))}
-{$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor"))}
+{$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens-description_courte"))}
 {$form->input(array('name' => "produit[phrase_description]", 'type' => "hidden"))}
-{$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor"))}
+{$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens-description"))}
 {$form->input(array('name' => "produit[phrase_entretien]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_entretien]", 'label' => $dico->t('ConseilsEntretien'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_mode_emploi]", 'type' => "hidden"))}

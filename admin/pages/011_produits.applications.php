@@ -9,6 +9,10 @@ $config->core_include("outils/filter", "outils/pager");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
+$page->javascript[] = $config->core_media("jquery.dteditor.js");
+$page->javascript[] = $config->core_media("jquery-ui.tooltip.min.js");
+$page->css[] = $config->core_media("jquery-ui.tooltip.css");
+$page->css[] = $config->media("dteditor.css");
 
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
@@ -49,6 +53,8 @@ $action = $url2->get('action');
 if ($id = $url2->get('id')) {
 	$application->load($id);
 }
+
+$page->javascript[] = $url->make("DTEditorTokens")."?id_applications=$id";
 
 $form = new Form(array(
 	'id' => "form-edit-application-$id",
@@ -229,6 +235,7 @@ if ($action == "create" or $action == "edit") {
 		'presentation' => $dico->t('Presentation'),
 		'attributs' => $dico->t('Attributs'),
 		'produits' => $dico->t('Produits'),
+		'descriptions' => $dico->t('DescriptionsAuto'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
@@ -262,6 +269,13 @@ HTML;
 	}
 	$main .= <<<HTML
 {$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('DescriptionsAutoProduits'), 'class' => "produit-section produit-section-descriptions".$hidden['descriptions'], 'id' => "produit-section-descriptions"))}
+{$form->input(array('name' => "application[phrase_produit_description_courte]", 'type' => "hidden"))}
+{$form->textarea(array('name' => "phrases[phrase_produit_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens"))}
+{$form->input(array('name' => "application[phrase_produit_description]", 'type' => "hidden"))}
+{$form->textarea(array('name' => "phrases[phrase_produit_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens"))}
+{$form->fieldset_end()}
+
 HTML;
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')));
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser')));

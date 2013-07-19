@@ -698,3 +698,10 @@ SQL;
 	$update->sql->query($q);
 }
 
+function update_26($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_applications` ADD `phrase_produit_description` INT NOT NULL DEFAULT '0',
+ADD `phrase_produit_description_courte` INT NOT NULL DEFAULT '0'
+SQL;
+	$update->sql->query($q);
+}

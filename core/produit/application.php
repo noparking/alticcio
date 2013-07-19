@@ -11,6 +11,8 @@ class Application extends AbstractObject {
 		'phrase_description_courte',
 		'phrase_description',
 		'phrase_url_key',
+		'phrase_produit_description_courte',
+		'phrase_produit_description',
 	);
 
 	public function liste(&$filter = null, $select_options = false) {
@@ -68,6 +70,35 @@ SQL;
 		$liste = array();
 		while ($row = $this->sql->fetch($res)) {
 			$liste[] = $row['id'];
+		}
+		
+		return $liste;
+	}
+
+	public function tokens_attributs($id_langues = 0) {
+		$application_id = isset($this->id) ? $this->id : 0;
+		if ($id_langues) {
+			$q = <<<SQL
+SELECT a.ref, ph.phrase AS nom FROM dt_attributs AS a
+INNER JOIN dt_applications_attributs AS aa ON aa.id_attributs = a.id AND aa.id_applications = $application_id
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = a.phrase_nom
+WHERE a.ref <> ''
+ORDER BY aa.classement
+SQL;
+		}
+		else {
+			$q = <<<SQL
+SELECT a.ref, a.ref AS nom FROM dt_attributs AS a
+INNER JOIN dt_applications_attributs AS aa ON aa.id_attributs = a.id AND aa.id_applications = $application_id
+WHERE a.ref <> ''
+ORDER BY aa.classement
+SQL;
+		}
+		$res = $this->sql->query($q);
+
+		$liste = array();
+		while ($row = $this->sql->fetch($res)) {
+			$liste[$row['ref']] = $row['nom'];
 		}
 		
 		return $liste;

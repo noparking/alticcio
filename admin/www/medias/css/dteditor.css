@@ -16,9 +16,15 @@ ul.dteditor-ctl li {
 	display: inline;
 	padding: 0 5px;
 }
+.dteditor-token {
+	border-bottom: 1px dotted;
+	display: inline-block;
+	margin: 5px 0;
+	cursor: pointer;
+}
 #main fieldset.dteditor-zone {
-		margin:0;
-	}
+	margin:0;
+}
 #main fieldset .dteditor-zone fieldset {
 		margin:0;
 		border:1px solid #B2C8CE;
