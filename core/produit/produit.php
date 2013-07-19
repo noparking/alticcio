@@ -997,14 +997,16 @@ SQL;
 		$q = <<<SQL
 SELECT ph1.phrase AS description, ph2.phrase AS description_courte, l.code_langue FROM dt_applications AS a
 INNER JOIN dt_produits AS p ON p.id_applications = a.id AND p.id = {$this->id}
-INNER JOIN dt_phrases AS ph1 ON ph1.id = a.phrase_description
-INNER JOIN dt_langues AS l ON l.id = ph1.id_langues
-INNER JOIN dt_phrases AS ph2 ON ph2.id = a.phrase_description_courte AND ph2.id_langues = l.id
+LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = a.phrase_produit_description
+LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = a.phrase_produit_description_courte AND ph2.id_langues = ph1.id_langues
+LEFT OUTER JOIN dt_langues AS l ON l.id = ph1.id_langues
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			foreach (array('description', 'description_courte') as $field) {
-				$tokens[$field][$row['code_langue']] = $row[$field];
+				if ($row['code_langue']) {
+					$tokens[$field][$row['code_langue']] = $row[$field];
+				}
 			}
 		}
 
