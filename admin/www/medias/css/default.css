@@ -817,10 +817,10 @@ div.filter-actions a {
 
 
 /* Blog d'aide */
-.aide_themes { margin:10px 0; }
+.aide_themes { margin:10px 0; padding:5px; background-color:#C4DFF0; border:1px solid #FFF; }
 .aide_themes ul { padding:0; margin:0; list-style-type:none; }
 .aide_themes ul li ul li { padding:5px 10px; }
 .aide_themes a { text-decoration:none;color:#666; }
 
 .aide_texte {}
-.aide_texte h2 { color:#1D81BF; margin:10px 0; padding:0; font-size:16px; border:0; }
+.aide_texte h3 { color:#1D81BF; margin:10px 0; padding:0; font-size:16px; border:0; }
