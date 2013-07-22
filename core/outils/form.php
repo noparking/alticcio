@@ -92,7 +92,7 @@ class Form {
 			if (isset($_POST['checkboxes']) and is_array($_POST['checkboxes'])) {
 				foreach($_POST['checkboxes'] as $checkbox) {
 					if (!$this->value($checkbox, $post)) {
-						$this->set_value($checkbox, null);
+						$this->set_value($checkbox, 0);
 					}
 				}
 			}
