@@ -11,6 +11,12 @@ array_unshift($page->css, $config->media("default.css"));
 
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->media("menu.js");
+$page->javascript[] = $config->media("main.js");
+$page->jsvars[] = array(
+	"dico" => $dico->export(array(
+		'SauvegardeEnCours',	
+	)),
+);
 
 $header_stats = "";
 

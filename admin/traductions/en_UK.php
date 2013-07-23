@@ -317,6 +317,7 @@ $t['RetourListeStats'] = "Back to the analytics";
 $t['Role'] = "Role";
 $t['Roles'] = "Roles";
 $t['RolesAPI'] = "API roles";
+$t['SauvegardeEnCours'] = "Saving, please wait...";
 $t['Sauvegarder'] = "Save";
 $t['SchemaDB'] = "Architecture";
 $t['SelectFichier'] = "Select a file : ";

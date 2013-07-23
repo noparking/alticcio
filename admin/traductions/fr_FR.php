@@ -442,6 +442,7 @@ $t['RetourListeStats'] = "Retour aux statistiques";
 $t['Role'] = "Rôle";
 $t['Roles'] = "Rôles";
 $t['Satisfaction'] = "Satisfaction";
+$t['SauvegardeEnCours'] = "Sauvegarde en cours...";
 $t['Sauvegarder'] = "Sauvegarder";
 $t['SchemaDB'] = "Schéma";
 $t['SelectAnnee'] = "Sélectionnez une année : ";

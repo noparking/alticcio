@@ -824,3 +824,7 @@ div.filter-actions a {
 
 .aide_texte {}
 .aide_texte h3 { color:#1D81BF; margin:10px 0; padding:0; font-size:16px; border:0; }
+
+
+/* Message de sauvegarde */
+.saving { border: 5px solid #aa3300; background-color: #ffaaaa; font-size: 24px; position: fixed; padding: 20px; width: 400px; top: 50%; left: 50%; margin-top: -50px; margin-left: -200px; }
