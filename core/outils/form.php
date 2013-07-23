@@ -455,10 +455,11 @@ class Form {
 		}
 		$fields = array();
 
+		$readonly = (isset($params['readonly']) and $params['readonly']) ? ' readonly="readonly"': "";
 		if ($is_permitted = $this->is_permitted('textarea', $params)) {
 			$permitted = "";
 		}
-		else{
+		else if (!$readonly) {
 			$permitted = ' readonly="readonly"';
 		}
 
@@ -475,7 +476,7 @@ class Form {
 			$params['class'] = $class;
 			$value = htmlspecialchars($this->get_value($params, $name));
 			
-			$fields[] = '<textarea name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.'>'.$value.'</textarea>'.$item_label;
+			$fields[] = '<textarea name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$readonly.$permitted.'>'.$value.'</textarea>'.$item_label;
 		}
 		$params['field'] .= implode("</li><li>", $fields);
 		if (count($items) > 1) {
