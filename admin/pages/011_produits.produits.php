@@ -262,6 +262,11 @@ if ($action == 'edit') {
 	$personnalisation = $produit->personnalisation();
 	$form->default_values['personnalisation'] = $personnalisation;
 }
+if (isset($application)) {
+	$phrases_applications = $phrase->get($application->phrases());
+	$phrases_applications = $produit->substitution_attributs($phrases_applications);
+	$form->default_values['phrases_application'] = $phrases_applications;
+}
 
 $form_start = $form->form_start();
 
@@ -523,6 +528,7 @@ HTML;
 }
 
 if ($action == "create" or $action == "edit") {
+	
 	$offres = array(
 		0 => "...",
 		1 => $dico->t('GammeEssentiel'),
@@ -550,8 +556,10 @@ if ($action == "create" or $action == "edit") {
 {$form->textarea(array('name' => "phrases[phrase_avantages_produit]", 'label' => $dico->t('AvantagesProduit'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_description_courte]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_description_courte]", 'label' => $dico->t('DescriptionCourte'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens-description_courte"))}
+{$form->textarea(array('name' => "phrases_application[phrase_produit_description_courte]", 'label' => $dico->t("DescriptionAuto")." (".$dico->t('DescriptionCourte').")", 'items' => $displayed_lang, 'readonly' => true))}
 {$form->input(array('name' => "produit[phrase_description]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor dteditor-tokens-description"))}
+{$form->textarea(array('name' => "phrases_application[phrase_produit_description]", 'label' => $dico->t("DescriptionAuto")." (".$dico->t('Description').")", 'items' => $displayed_lang, 'readonly' => true))}
 {$form->input(array('name' => "produit[phrase_entretien]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_entretien]", 'label' => $dico->t('ConseilsEntretien'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_mode_emploi]", 'type' => "hidden"))}
