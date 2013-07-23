@@ -570,7 +570,12 @@ SQL;
 			if (strpos($nom_phrase, "phrase_") === 0) {
 				foreach ($textes_phrase as $lang => $phrase) {
 					foreach ($tokens as $token => $value) {
-						$replacement = (is_array($value) and isset($value[$lang])) ? $value[$lang] : $value;
+						if (is_array($value)) {
+							$replacement = isset($value[$lang]) ? $value[$lang] : "";
+						}
+						else {
+							$replacement = $value;
+						}
 						$phrase = str_replace("%$token", $replacement, $phrase);
 						$phrase = str_replace("{".$token."}", $replacement, $phrase);
 						$phrases_substituees[$nom_phrase][$lang] = str_replace("%$token", $replacement, $phrase);
