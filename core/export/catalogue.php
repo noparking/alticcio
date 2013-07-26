@@ -1,16 +1,12 @@
 <?php
 
-class ExportCatalogue {
+require_once "abstract_export.php";
 
-	public $sql;
-	public $sql_export;
+class ExportCatalogue extends AbstractExport {
+
 	public $excluded;
 	public $num_pages;
-
-	public function __construct($sql, $sql_export) {
-		$this->sql = $sql;
-		$this->sql_export = $sql_export;
-	}
+	public $export_table = "catalogue";
 
 	public function export($config, $id_catalogues) {
 		$q = <<<SQL
@@ -82,7 +78,7 @@ SQL;
 			}
 		}
 		$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `catalogue` (
+CREATE TABLE IF NOT EXISTS `{$this->export_table}` (
   $field_list
   PRIMARY KEY (`id_catalogue`,`id_produit`,`id_sku`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
@@ -99,36 +95,10 @@ SQL;
 		}
 
 		$q = <<<SQL
-DELETE FROM catalogue WHERE catalogue = '$catalogue'
+DELETE FROM `{$this->export_table}` WHERE catalogue = '$catalogue'
 SQL;
 		$this->sql_export->query($q);
 
 		$this->excluded = $excluded;
-	}
-
-	function insert_values($fields, $values) {
-		$fields_list = array();
-		foreach ($fields as $i => $field) {
-			if (!in_array($i, $this->excluded)) {
-				$fields_list[] = $field;
-			}
-		}
-		$fields_list = implode(",", $fields_list);
-
-		$values_list = array();
-		foreach ($values as $value) {
-			$value_list = array();
-			foreach ($value as $i => $data) {
-				if (!in_array($i, $this->excluded)) {
-					$value_list[] = addslashes($data);
-				}
-			}
-			$values_list[] = "('".implode("','", $value_list)."')";
-		}
-		$values_list = implode(",", $values_list);
-		$q = <<<SQL
-INSERT INTO catalogue ($fields_list) VALUES $values_list
-SQL;
-		$this->sql_export->query($q);
 	}
 }

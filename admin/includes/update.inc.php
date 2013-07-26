@@ -705,3 +705,14 @@ ADD `phrase_produit_description_courte` INT NOT NULL DEFAULT '0'
 SQL;
 	$update->sql->query($q);
 }
+
+function update_27($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_exports_produits` (
+  `id_produits` int(11) NOT NULL,
+  `date_export` int(11) NOT NULL,
+  PRIMARY KEY (`id_produits`)
+)
+SQL;
+	$update->sql->query($q);
+}
