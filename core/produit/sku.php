@@ -282,7 +282,7 @@ SQL;
 			$prix = $row['montant_ht'];
 		}
 
-		return $prix ? $prix : $this->prix_unitaire_min(0);
+		return $prix ? $prix : ($id_catalogues ? $this->prix_unitaire_min(0) : 0);
 	}
 
 	public function prix_pour_qte($id_sku, $qte, $id_catalogues = 0) {
