@@ -905,7 +905,8 @@ HTML;
 		if ($values === null) {
 			$values = $this->values;
 		}
-		array_walk_recursive($values, array(__CLASS__, "addslashes"));
+		$function = @mysql_ping() ? "mysql_real_escape_string" : "addslashes";
+		array_walk_recursive($values, array(__CLASS__, $function));
 		
 		return $values;
 	}
