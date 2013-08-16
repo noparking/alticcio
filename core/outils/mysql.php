@@ -55,6 +55,35 @@ class Mysql {
 		}
 		return $q_limit;
 	}
+
+    function quote($value) {
+        $type = gettype($value);
+        switch ($type) {
+            case 'boolean':
+                $value = (int) $value;
+                break;
+            case 'NULL':
+                $value = 'NULL';
+                break;
+            case 'string':
+                $value = "'".mysql_real_escape_string($value)."'";
+                break;
+        }
+        return $value;
+    }
+
+	function file($file) {
+		$queries = file_get_contents($file);
+		$queries = preg_replace("/^--(.*)$/m", "", $queries);
+		$queries = preg_replace("/^\/\*(.*)\*\/;$/m", "", $queries);
+		$queries = str_replace(";\n", "MYSQL_QUERY_END", $queries);
+		$queries = str_replace("\n", " ", $queries);
+		foreach(explode("MYSQL_QUERY_END", $queries) as $q) {
+			if ($q = trim($q)) {
+				$this->query($q);
+			}
+		}
+	}
 }
 
 ?>
