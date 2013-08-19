@@ -915,6 +915,10 @@ HTML;
 		$item = addslashes($item);
 	}
 
+	static function mysql_real_escape_string(&$item) {
+		$item = mysql_real_escape_string($item);
+	}
+
 	public function escaped_values() {
 		return $this->escape_values($this->values);
 	}
