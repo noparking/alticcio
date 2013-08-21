@@ -10,10 +10,25 @@ if (!file_exists($dump_file)) {
 }
 
 include dirname(__FILE__)."/../includes/config.php";
+include dirname(__FILE__)."/../includes/update.inc.php";
 
-$config->core_include("outils/mysql");
+$config->core_include("outils/mysql", "database/database", "outils/update");
 
-$q = file_get_contents($dump_file);
+$sql = new MySQL($config->db());
+$database = new Database($sql);
 
-$sql->query($q);
+$update = new Update($sql);
 
+$sql->file($dump_file);
+
+foreach (scandir(dirname(__FILE__)."/init") as $file) {
+	if (substr($file, -4) == ".php") {
+		$table = substr($file, 0, -4);
+		include dirname(__FILE__)."/init/".$file;
+		foreach ($$table as $record) {
+			$database->insert($table, $record);
+		}
+	}
+}
+
+$database->insert("dt_infos", array('champ' => "version", "valeur" => $update->last_version()));
