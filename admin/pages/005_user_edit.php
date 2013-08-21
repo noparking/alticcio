@@ -10,20 +10,7 @@ $user = new User($sql);
 
 $blog = new Blog($sql);
 
-/*
- * on récupère les données de l'utilisateur
- */
 $id_user = $url->get("id");
-if ($id_user > 0) {
-	$user_data = $user->load(array('id' => $id_user));
-}
-else {
-	$user_data = array('login'=>"","password"=>"","email"=>"","acces"=>"","id_groupes_users"=>"");
-	$id_user = 0;
-}
-$user_profils = $user->list_profils();
-$user_langues = $user->list_langues();
-
 
 /*
  * On initialise le formulaire
@@ -79,6 +66,20 @@ if ($form->is_submitted() and $form->validate()) {
 else {
 	$form->reset();
 }
+
+
+/*
+ * on récupère les données de l'utilisateur
+ */
+if ($id_user > 0) {
+	$user_data = $user->load(array('id' => $id_user));
+}
+else {
+	$user_data = array('login'=>"","password"=>"","email"=>"","acces"=>"","id_groupes_users"=>"");
+	$id_user = 0;
+}
+$user_profils = $user->list_profils();
+$user_langues = $user->list_langues();
 
 
 /*
