@@ -17,9 +17,9 @@ $config->core_include("outils/mysql", "database/database", "outils/update");
 $sql = new MySQL($config->db());
 $database = new Database($sql);
 
-$update = new Update($sql);
-
 $sql->file($dump_file);
+
+$update = new Update($sql);
 
 foreach (scandir(dirname(__FILE__)."/init") as $file) {
 	if (substr($file, -4) == ".php") {
@@ -31,4 +31,4 @@ foreach (scandir(dirname(__FILE__)."/init") as $file) {
 	}
 }
 
-$database->insert("dt_infos", array('champ' => "version", "valeur" => $update->last_version()));
+$sql->query("UPDATE dt_infos SET valeur = {$update->last_version()} WHERE champ = 'version'");
