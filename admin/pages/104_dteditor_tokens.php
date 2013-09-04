@@ -1,7 +1,6 @@
 <?php
 
 $page->template('javascript');
-# TODO $title = str_replace("\n", "<br>", "<h1>Toto</h1>\ntralala");
 
 include(dirname(__FILE__)."/100_dteditor.php");
 
@@ -41,7 +40,7 @@ if (isset($_GET['id_produits']) and $_GET['id_produits']) {
 	$tokens_description[] = array(
 		'token' => "description",
 		'button' => $dico->t("DescriptionAuto"),
-		'title' => str_replace("\n", "<br>", $phrases['phrase_produit_description'][$code_langue]),
+		'title' => str_replace("\n", "<br>", get_phrase($phrases, 'phrase_produit_description', $code_langue)),
 	);
 	$tokens_list_description = json_encode($tokens_description);
 
@@ -49,7 +48,7 @@ if (isset($_GET['id_produits']) and $_GET['id_produits']) {
 	$tokens_description_courte[] = array(
 		'token' => "description_courte",
 		'button' => $dico->t("DescriptionAuto"),
-		'title' => str_replace("\n", "<br>", $phrases['phrase_produit_description_courte'][$code_langue]),
+		'title' => str_replace("\n", "<br>", get_phrase($phrases, 'phrase_produit_description_courte', $code_langue)),
 	);
 	$tokens_list_description_courte = json_encode($tokens_description_courte);
 
@@ -79,5 +78,9 @@ $(document).ready(function () {
 });
 
 JAVASCRIPT;
+}
+
+function get_phrase($phrases, $phrase, $code_langue) {
+	return isset($phrases[$phrase][$code_langue]) ? $phrases[$phrase][$code_langue] : "";
 }
 
