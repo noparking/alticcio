@@ -5,7 +5,7 @@ require_once dirname(__FILE__)."/simpletest_table_tester.php";
 
 include dirname(__FILE__)."/../../../admin/includes/config.inc.php";
 
-$config['db_database'] = "doublet_test";
+$config['db_database'] = "alticcio_test";
 
 include dirname(__FILE__)."/../../outils/config.php";
 
