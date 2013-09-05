@@ -121,32 +121,49 @@ class Dico {
 	
 	private function add_terms($terms) {
 		if (is_array($terms)) {
-			$this->terms = array_merge($this->terms, $terms);
+			$this->terms = $this->merge_values($this->terms, $terms);
 		}
 	}
 	
 	private function add_reverted_terms($terms) {
 		if (is_array($terms)) {
-			$this->reverted_terms = array_merge($this->reverted_terms, array_flip($terms));
+			$this->reverted_terms = $this->merge_values($this->reverted_terms, array_flip($terms));
 		}
 	}
 	
 	private function add_default_terms($terms) {
 		if (is_array($terms)) {
-			$this->default_terms = array_merge($this->default_terms, $terms);
+			$this->default_terms = $this->merge_values($this->default_terms, $terms);
 		}
 	}
 	
 	private function add_data($data) {
 		if (is_array($data)) {
-			$this->data = array_merge($this->data, $data);
+			$this->data = $this->merge_values($this->data, $data);
 		}
 	}
 	
 	private function add_default_data($data) {
 		if (is_array($data)) {
-			$this->default_data = array_merge($this->default_data, $data);
+			$this->default_data = $this->merge_values($this->default_data, $data);
 		}
+	}
+
+	private function merge_values($values, $new_values) {
+		foreach ($new_values as $key => $value) {
+			if (isset($values[$key])) {
+				if (is_array($value) and is_array($values[$key])) {
+					$values[$key] = $this->merge_values($values[$key], $value);
+				}
+				else {
+					$values[$key] = $value;
+				}
+			}
+			else {
+				$values[$key] = $value;
+			}
+		}
+		return $values;
 	}
 }
 

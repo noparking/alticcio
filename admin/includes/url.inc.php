@@ -14,6 +14,8 @@ class DefaultUrl extends Url {
 			$dico = new Dico($langue."_".$pays);
 			$dico->add(dirname(__FILE__)."/../core/traductions");
 			$dico->add(dirname(__FILE__)."/../traductions");
+			$dico->add(dirname(__FILE__)."/../../../core/traductions");
+			$dico->add(dirname(__FILE__)."/../../../admin/traductions");
 			$dicos[$langue."_".$pays] = $dico;
 		}
 		else {
@@ -22,13 +24,18 @@ class DefaultUrl extends Url {
 		
 		static $pages = null;
 		if ($pages === null) {
-			$files = scandir(dirname(__FILE__)."/../pages");
-			foreach ($files as $file) {
-				if (preg_match("/^(\d+)([^\.]*)\.php$/", $file, $matches)) {
-					$number = $matches[1];
-					$page = str_replace("_", "", $matches[2]);
-					$pages[strtolower($page)] = (int)$number;
-					$pages[(int)$number] = strtolower($page);
+			$pages_dirs = array(
+				dirname(__FILE__)."/../pages",
+				dirname(__FILE__)."/../../../admin/pages",
+			);
+			foreach ($pages_dirs as $dir) {
+				foreach (scandir($dir) as $file) {
+					if (preg_match("/^(\d+)([^\.]*)\.php$/", $file, $matches)) {
+						$number = $matches[1];
+						$page = str_replace("_", "", $matches[2]);
+						$pages[strtolower($page)] = (int)$number;
+						$pages[(int)$number] = strtolower($page);
+					}
 				}
 			}
 		}
