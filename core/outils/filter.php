@@ -347,11 +347,17 @@ HTML;
 					}
 				}
 			}
-			return $form->$method($params);
+			$return = $form->$method($params);
 		}
 		else {
-			return $valeur;
+			$return = $valeur;
 		}
+
+		if (isset($this->elements[$cle]['template'])) {
+			$return = str_replace("{{$cle}}", $return, $this->elements[$cle]['template']);
+		}
+
+		return $return;
 	}
 
 	public function value($cle, $valeur) {
@@ -361,6 +367,10 @@ HTML;
 		if (isset($this->elements[$cle]['type']) and substr($this->elements[$cle]['type'], 0, 4) == "date") {
 			$format = isset($this->elements[$cle]['format']) ? $this->elements[$cle]['format'] : "d/m/Y";
 			$valeur = date($format, $valeur);
+		}
+
+		if (isset($this->elements[$cle]['template'])) {
+			$valeur = str_replace("{{$cle}}", $valeur, $this->elements[$cle]['template']);
 		}
 		
 		return $valeur;
@@ -405,7 +415,6 @@ HTML;
 				}
 			}
 		}
-		
 		if (isset($filter['values'])) {
 			foreach ($filter['values'] as $cle => $valeur) {
 				if ($valeur !== "") {
