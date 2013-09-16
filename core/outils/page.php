@@ -27,14 +27,16 @@ class Page {
 			$dirs[] = str_replace("/alticcio/", "/", $this->base_path."pages"); 
 		}
 		foreach ($dirs as $dir) {
-			foreach (scandir($dir) as $page) {
-				if (preg_match("/^(\d+)([^.]*)\.php$/", $page, $matches)) {
-					$key = strtolower(str_replace("_", "", $matches[2]));
-					$pages[(int)$matches[1]] = $pages[$key] = "pages/".$page;
-				}
-				else {
-					$key = strtolower(str_replace("_", "", str_replace(".php", "", preg_replace("/^page_/", "", $page))));
-					$pages[$key] = "pages/".$page;
+			if (is_dir($dir)) {
+				foreach (scandir($dir) as $page) {
+					if (preg_match("/^(\d+)([^.]*)\.php$/", $page, $matches)) {
+						$key = strtolower(str_replace("_", "", $matches[2]));
+						$pages[(int)$matches[1]] = $pages[$key] = "pages/".$page;
+					}
+					else {
+						$key = strtolower(str_replace("_", "", str_replace(".php", "", preg_replace("/^page_/", "", $page))));
+						$pages[$key] = "pages/".$page;
+					}
 				}
 			}
 		}

@@ -29,12 +29,14 @@ class DefaultUrl extends Url {
 				dirname(__FILE__)."/../../../admin/pages",
 			);
 			foreach ($pages_dirs as $dir) {
-				foreach (scandir($dir) as $file) {
-					if (preg_match("/^(\d+)([^\.]*)\.php$/", $file, $matches)) {
-						$number = $matches[1];
-						$page = str_replace("_", "", $matches[2]);
-						$pages[strtolower($page)] = (int)$number;
-						$pages[(int)$number] = strtolower($page);
+				if (is_dir($dir)) {
+					foreach (scandir($dir) as $file) {
+						if (preg_match("/^(\d+)([^\.]*)\.php$/", $file, $matches)) {
+							$number = $matches[1];
+							$page = str_replace("_", "", $matches[2]);
+							$pages[strtolower($page)] = (int)$number;
+							$pages[(int)$number] = strtolower($page);
+						}
 					}
 				}
 			}
