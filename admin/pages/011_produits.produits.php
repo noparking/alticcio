@@ -149,7 +149,7 @@ $traduction = $form->value("lang");
 
 $messages = array();
 
-if ($form->is_submitted()) {
+if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escaped_values();
 	switch ($form->action()) {
 		case "translate":

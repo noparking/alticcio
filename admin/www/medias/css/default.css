@@ -454,6 +454,9 @@ span label.form-edit-input-submit {
 form .min_field {
 	width:40%;
 }
+.form-error, .form-edit-error {
+	color: red;
+}
 
 /* Thèmes billets de blog */
 .nomblog {

@@ -83,7 +83,7 @@ $messages = array();
 $attribut_management_filter_pager_name = "attribut_management_gamme";
 $object = $gamme;
 
-if ($form->is_submitted()) {
+if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escape_values();
 	switch ($form->action()) {
 		case "translate":

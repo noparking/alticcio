@@ -99,7 +99,7 @@ $traduction = $form->value("lang");
 $attribut_management_filter_pager_name = "attribut_management_sku";
 $object = $sku;
 
-if ($form->is_submitted()) {
+if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escaped_values();
 	switch ($form->action()) {
 		case "translate":

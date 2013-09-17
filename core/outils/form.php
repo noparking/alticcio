@@ -10,6 +10,7 @@ class Form {
 	public $error_message_confirm = 'Le champ "#{name}" n\'a pas été confirmé.';
 	public $error_message_validate = 'Le champ "#{name}" n\'est pas valide.';
 	public $error_message_captcha = 'Le captcha a mal été saisi.';
+	public $error_message_upload = array(); // voir constructeur
 	public $fields_error_messages = array();
 	public $recaptcha_public = "";
 	public $recaptcha_private = "";
@@ -52,6 +53,9 @@ class Form {
 	private $rendered = array();
 	
 	public function __construct($params = array()) {
+		$this->error_message_upload[UPLOAD_ERR_INI_SIZE] = "Le fichier dépasse la taille autorisée (".ini_get('upload_max_filesize').")";
+		$this->error_message_upload['default'] = 'Erreur pendant le téléchargement du fichier.';
+
 		$this->template = isset($params['template']) ? $params['template'] : $this->default_template();
 	
 		$this->form_id = isset($params['id']) ? $params['id'] : "form";
@@ -997,6 +1001,7 @@ HTML;
 		$result &= $this->validate_captcha();
 		$result &= $this->validate_recaptcha();
 		$result &= $this->validate_on_validation();
+		$result &= $this->validate_upload();
 		$this->form_validation = $result;
 
 		return $result;
@@ -1102,6 +1107,36 @@ HTML;
 				}
 				else {
 					$message = $this->error_message_validate;
+				}
+				$error = str_replace("#{name}", $field, $message);
+				$this->errors[] = $error;
+				$this->fields_errors[$field][] = $error;
+				$this->invalid[$field] = 1;
+				$result = false;
+			}
+		}
+		return $result;
+	}
+
+	private function validate_upload() {
+		$result = true;
+		foreach($this->filefields as $field) {
+			if (isset($_FILES[$field]['error']) and $_FILES[$field]['error'] and $_FILES[$field]['error'] != 4) {
+				$code = $_FILES[$field]['error'];
+				if (isset($this->fields_error_messages[$field]['upload'][$code])) {
+					$message = $this->fields_error_messages[$field]['upload'][$code];
+				}
+				else if(isset($this->fields_error_messages[$field]['upload']['default'])) {
+					$message = $this->fields_error_messages[$field]['upload']['default'];
+				}
+				else if (isset($this->fields_error_messages[$field]['upload'])) {
+					$message = $this->fields_error_messages[$field]['upload'];
+				}
+				else if (isset($this->error_message_upload[$code])) {
+					$message = $this->error_message_upload[$code];
+				}
+				else {
+					$message = $this->error_message_upload['default'];
 				}
 				$error = str_replace("#{name}", $field, $message);
 				$this->errors[] = $error;
