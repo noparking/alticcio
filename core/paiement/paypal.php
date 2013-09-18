@@ -8,18 +8,25 @@ class Paypal {
 	);
 
 	private $config;
+	private $shop;
 	private $serveur;
 	private $notify_url;
 
-	public function __construct($config) {
+	public function __construct($config, $api_key = 0) {
 		$paiement =  $config->get('paiement');
+		$this->shop = $config->get('shop') ? $config->get('shop') : "000";
+		$this->api_key = sprintf("%04d", $api_key);
 		$this->config = isset($paiement['paypal']) ? $paiement['paypal'] : array();
 		$env = isset($this->config['environnement']) ? $this->config['environnement'] : "test";
 		$this->serveur = isset($this->serveurs[$env]) ? $this->serveurs[$env] : $this->serveurs['test'];
-		$this->notify_url = "http://".$_SERVER['SERVER_NAME'].$config->get('base_url')."backend/paypal.php";
 	}
 	
-	public function form($commande, $target = "_self", $debug = false) {
+	public function form($data, $target = "_self", $debug = false) {
+		$amount = number_format($data['amount'], 2, ".", "");
+		$currency_code = isset($data['currency_code']) ? $data['currency_code'] : "EUR";
+		$invoice = $data['invoice'].$this->shop.$this->api_key;
+		$name = (isset($data['name']) ? $data['name'] : "").$invoice;
+		
 		$form_class = $debug ? "lastform" : "lastform autosubmit";
 		$bouton = $debug ? '<input type="submit" name="bouton" value="OK" />' : "";
 		$form = <<<HTML
@@ -27,19 +34,16 @@ class Paypal {
 {$this->input("cmd", "_cart", $debug)}
 {$this->input("upload", "1", $debug)}
 {$this->input("business", $this->config['business'], $debug)}
-{$this->input("currency_code", "EUR", $debug)}
+{$this->input("currency_code", $currency_code, $debug)}
 {$this->input("charset", "utf-8", $debug)}
 {$this->input("notify_url", $this->notify_url, $debug)}
+{$this->input("item_name_1", $name, $debug)}
+{$this->input("amount_1", $amount, $debug)}
+{$this->input("invoice", $invoice, $debug)}
+{$this->input("return", $data['return'], $debug)}
+{$this->input("cancel_return", $data['cancel_return'], $debug)}
+{$this->input("notify_url", $data['notify_url'], $debug)}
 HTML;
-		$i = 1;
-		foreach ($commande->produits() as $produit) {
-			$form .= <<<HTML
-{$this->input("item_name_$i", $produit['nom'], $debug)}
-{$this->input("amount_$i", $produit['prix_unitaire'], $debug)}
-{$this->input("quantity_$i", $produit['quantite'], $debug)}
-HTML;
-			$i++;
-		}
 		return $form.<<<HTML
 {$bouton}
 </form>
