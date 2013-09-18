@@ -68,7 +68,7 @@ HTML;
 		$curl = curl_init();
  
 		curl_setopt($curl, CURLOPT_URL, $this->serveur);
-		curl_setopt($curl,CURLOPT_POST, count($data + 1));
+		curl_setopt($curl,CURLOPT_POST, count($data) + 1);
 		curl_setopt($curl,CURLOPT_POSTFIELDS, $postfields);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
