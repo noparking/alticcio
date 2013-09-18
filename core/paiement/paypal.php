@@ -57,4 +57,25 @@ HTML;
 {$label}<input type="{$type}" name="{$name}" value="{$value}" />
 HTML;
 	}
+
+	public function check($data) {
+		$postfields = array("cmd=_notify-validate");
+		foreach ($data as $key => $value) {
+			$postfields[] = "$key=$value";
+		}
+ 		$postfields = implode("&", $postfields);
+ 
+		$curl = curl_init();
+ 
+		curl_setopt($curl, CURLOPT_URL, $this->serveur);
+		curl_setopt($curl,CURLOPT_POST, count($data + 1));
+		curl_setopt($curl,CURLOPT_POSTFIELDS, $postfields);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+		$result = curl_exec($curl);
+		
+		curl_close($curl);
+
+		return ($result == "VERIFIED");
+	}
 }
