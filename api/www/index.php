@@ -34,18 +34,20 @@ $api->errors(array(
 
 $data = $api->execute();
 
-include dirname(__FILE__)."/../pages/page.php";
+$include_path = dirname(__FILE__)."/../";
+
+include include_path("pages/page.php");
 
 if (isset($_GET['format']) and !isset($data['error'])) {
-	$format = include_path("formats/{$_GET['format']}");
-	if (file_exists($format)) {
+	$format = "formats/{$_GET['format']}";
+	if (file_exists(include_path($format))) {
 		$theme = isset($_GET['theme']) ? $_GET['theme'] : "default";
 		$file = "$format/$theme/{$api->func()}.php";
-		if (!file_exists($file)) {
+		if (!file_exists(include_path($file))) {
 			$file = "$format/default/{$api->func()}.php";
 		}
-		if (file_exists($file)) {
-			include $file;
+		if (file_exists(include_path($file))) {
+			include include_path($file);
 		}
 	}
 }
@@ -62,10 +64,11 @@ else {
 }
 
 function include_path($path) {
-	if (file_exists(dirname(__FILE__)."/../../../api/".$path)) {
-		return dirname(__FILE__)."/../../../api/".$path;
+	global $include_path;
+	if (file_exists($include_path."../../api/".$path)) {
+		return $include_path."../../api/".$path;
 	}
 	else {
-		return dirname(__FILE__)."/../".$path;
+		return $include_path.$path;
 	}
 }
