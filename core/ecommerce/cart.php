@@ -19,14 +19,26 @@ class Cart {
 			$_SESSION['cart']['personnalisations'] = array();
 		}
 	}
+
+	public function is_sample($id) {
+		return isset($_SESSION['cart']['samples'][$id]);
+	}
 	
-	public function add($id_produits, $id_sku, $qte) {
+	public function add($id_produits, $id_sku, $qte, $sample = false) {
+		$id = "$id_produits-$id_sku";
+		
+		if ($sample) {
+			$_SESSION['cart']['samples'][$id] = true;
+		}
+		else {
+			unset($_SESSION['cart']['samples'][$id]);
+		}
+
 		if ($qte < 0) {
 			return false;
 		}
 
 		$this->set_token();
-		$id = "$id_produits-$id_sku";
 		$key = $id;
 
 		if (isset($_SESSION['cart']['items'][$id])) {
