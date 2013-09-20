@@ -150,7 +150,7 @@ SQL;
 		return $blogs;
 	}
 
-	function billets($id_blogs, $nb) {
+	function billets($id_blogs, $nb, $offset = 0) {
 		$date_affichage = time();
 		$q = <<<SQL
 SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url
@@ -159,7 +159,7 @@ INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
 INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs
 WHERE b.affichage = 1 AND b.date_affichage <= {$date_affichage} AND bltb.id_blogs = $id_blogs
 ORDER BY b.date_affichage DESC
-LIMIT 0, $nb
+LIMIT $offset, $nb
 SQL;
 		$billets = array();
 		$res = $this->sql->query($q);
@@ -168,5 +168,19 @@ SQL;
 		}
 		
 		return $billets;
+	}
+
+	function nb_billets($id_blogs) {
+		$date_affichage = time();
+		$q = <<<SQL
+SELECT COUNT(DISTINCT(b.id)) AS nb FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
+INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs
+WHERE b.affichage = 1 AND b.date_affichage <= {$date_affichage} AND bltb.id_blogs = $id_blogs
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+		
+		return $row['nb'];
 	}
 }
