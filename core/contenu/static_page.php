@@ -51,6 +51,7 @@ WHERE id = $id
 HTML;
 		$res = $this->sql->query($q);
 		$this->values = $this->sql->fetch($res);
+		$this->id = $id;
 		
 		return $this->values; 
 	}

@@ -292,4 +292,13 @@ SQL;
 		
 		return $id_saved;
 	}
+
+	public function delete_object($object, $data) {
+		$q = <<<SQL
+DELETE FROM dt_url_redirections WHERE `table` = '{$object->table}' AND variable = {$object->id}
+SQL;
+		$this->sql->query($q);
+
+		return $object->delete($data);
+	}
 }

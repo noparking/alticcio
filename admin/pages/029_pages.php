@@ -83,7 +83,7 @@ if ($form->is_submitted()) {
 	$data = $form->escaped_values();
 	switch ($form->action()) {
 		case "delete":
-			if ($static_page->delete($data)) {
+			if ($url_redirection->delete_object($static_page, $data)) {
 				$form->reset();
 				$url->redirect("current", array('action' => "", 'id' => ""));
 			}
