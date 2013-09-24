@@ -124,6 +124,7 @@ HTML;
 {$form->input(array('name' => "produits[$key][nom]", 'label' => "Nom"))}
 {$form->input(array('name' => "produits[$key][prix_unitaire]", 'label' => "Prix unitaire"))}
 {$form->input(array('name' => "produits[$key][quantite]", 'label' => "Quantite"))}
+{$form->select(array('name' => "produits[$key][echantillon]", 'label' => "Echantillon", 'options' => array("non", "oui")))}
 {$form->textarea(array('name' => "produits[$key][personnalisation_texte]", 'label' => "Texte perso"))}
 {$form->input(array('name' => "produits[$key][personnalisation_fichier]", 'label' => "Fichier perso"))}
 {$form->input(array('name' => "produits[$key][personnalisation_nom_fichier]", 'label' => "Nom fichier perso"))}

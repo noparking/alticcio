@@ -716,3 +716,15 @@ CREATE TABLE IF NOT EXISTS `dt_exports_produits` (
 SQL;
 	$update->sql->query($q);
 }
+
+function update_28($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `quantite` 
+SQL;
+	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits_revisions` ADD `echantillon` TINYINT( 1 )  NOT NULL DEFAULT '0' AFTER `quantite` 
+SQL;
+	$update->sql->query($q);
+}
