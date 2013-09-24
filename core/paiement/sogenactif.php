@@ -106,7 +106,7 @@ class Sogenactif {
 				echo " API call error.\n";
 				echo "Error message :  $error\n";
 
-				return false
+				return false;
 			}
 			else {
 				return $data;
