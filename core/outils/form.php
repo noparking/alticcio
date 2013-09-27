@@ -35,6 +35,7 @@ class Form {
 	private $errors = array();
 	private $values;
 	private $checkboxes;
+	private $multiple_values;
 	private $step;
 	private $form_count = 0;
 	private $steps_number;
@@ -65,6 +66,7 @@ class Form {
 		$this->method = isset($params['method']) ? $params['method'] : "post";
 		$this->values = isset($_SESSION['form_values'][$this->form_id]) ? $_SESSION['form_values'][$this->form_id] : array();
 		$this->checkboxes = isset($_SESSION['form_checkboxes'][$this->form_id]) ? $_SESSION['form_checkboxes'][$this->form_id] : array();
+		$this->multiple_values = isset($_SESSION['form_multiple_values'][$this->form_id]) ? $_SESSION['form_multiple_values'][$this->form_id] : array();
 		if (isset($params['actions'])) {
 			foreach($params['actions'] as $cle => $action) {
 				$this->actions[] = $action;
@@ -91,6 +93,13 @@ class Form {
 					unset($post['checkboxes']);
 				}
 				$_SESSION['form_checkboxes'][$this->form_id] = $this->checkboxes;
+			}
+			if (isset($post['multiple_values'])) {
+				foreach ($post['multiple_values'] as $key => $value) {
+					$this->multiple_values[$key] = $value;
+					unset($post['multiple_values']);
+				}
+				$_SESSION['form_multiple_values'][$this->form_id] = $this->multiple_values;
 			}
 			$this->values = $this->merge_values($this->values, $post);
 			if (isset($_POST['checkboxes']) and is_array($_POST['checkboxes'])) {
@@ -132,11 +141,18 @@ class Form {
 		}
 	}
 
-	private function merge_values($values, $post) {
+	public function merge_values($values, $post, $forget_multiple_values = true) {
+		if ($forget_multiple_values) {
+			foreach ($this->multiple_values as $value_name) {
+				if ($this->value($value_name, $post) !== null) {
+					$this->forget_value($value_name, $values);
+				}
+			}
+		}
 		foreach ($post as $key => $value) {
 			if (isset($values[$key])) {
 				if (is_array($value) and is_array($values[$key])) {
-					$values[$key] = $this->merge_values($values[$key], $value);
+					$values[$key] = $this->merge_values($values[$key], $value, false);
 				}
 				else {
 					$values[$key] = $value;
@@ -516,7 +532,9 @@ class Form {
 			$permitted = ' disabled="disabled"';
 		}
 
+		$hiddenfield = "";
 		if (isset($params['multiple']) and $params['multiple']) {
+			$hiddenfield = '<input type="hidden" name="multiple_values[]" value="'.substr($name, 0, -2).'" />'; // onretire les [] à la fin du nom
 			$multiple = " multiple";
 			$class .= " multiselect";
 			if (is_array($value)) {
@@ -551,7 +569,7 @@ class Form {
 			}
     		$params['field'] .= '>'.$valeur.'</option>';
    		 }
-		$params['field'] .= '</select>';
+		$params['field'] .= '</select>'.$hiddenfield;
 		return $this->render_element($params);
 	}
 	
@@ -869,8 +887,8 @@ HTML;
 		return isset($_SESSION['form_values'][$this->form_id]);
 	}
  
-	public function forget_value($value) {
-		$this->set_value($value, null);
+	public function forget_value($value, &$values = "default") {
+		$this->set_value($value, null, $values);
 	}
 
 	public function error($message, $field = null) {
