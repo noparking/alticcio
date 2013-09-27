@@ -361,7 +361,10 @@ HTML;
 	}
 
 	public function value($cle, $valeur) {
-		if (isset($this->elements[$cle]['options'][$valeur])) {
+		if (isset($this->elements[$cle]['values'][$valeur])) {
+			$valeur = $this->elements[$cle]['values'][$valeur];
+		}
+		else if (isset($this->elements[$cle]['options'][$valeur])) {
 			$valeur = $this->elements[$cle]['options'][$valeur];
 		}
 		if (isset($this->elements[$cle]['type']) and substr($this->elements[$cle]['type'], 0, 4) == "date") {

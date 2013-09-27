@@ -70,7 +70,8 @@ $filter_schema_produits = array(
 		'title' => $dico->t('Gamme'),
 		'type' => 'select',
 		'field' => 'pr.id_gammes',
-		'options' => $categorie->gammes(), 
+		'values' => array(0 => ""),
+		'options' => $categorie->gammes(),
 	),
 	'classement' => array(
 		'title' => $dico->t('Classement'),
