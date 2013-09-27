@@ -66,6 +66,12 @@ $filter_schema_produits = array(
 		'type' => 'contain',
 		'field' => 'ph.phrase',
 	),
+	'gamme' => array(
+		'title' => $dico->t('Gamme'),
+		'type' => 'select',
+		'field' => 'pr.id_gammes',
+		'options' => $categorie->gammes(), 
+	),
 	'classement' => array(
 		'title' => $dico->t('Classement'),
 		'type' => 'between',

@@ -350,7 +350,7 @@ HTML;
 			$return = $form->$method($params);
 		}
 		else {
-			$return = $valeur;
+			$return = $this->value($cle, $valeur);
 		}
 
 		if (isset($this->elements[$cle]['template'])) {

@@ -325,7 +325,7 @@ HTML;
 			'field' => 'ph.phrase',
 		),
 		'actif' => array(
-			'title' => $dico->t('Nom'),
+			'title' => $dico->t('Actif'),
 			'type' => 'select',
 			'options' => array(1 => "Oui", 0 => "Non"),
 		),
