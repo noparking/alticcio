@@ -728,3 +728,10 @@ ALTER TABLE `dt_commandes_produits_revisions` ADD `echantillon` TINYINT( 1 )  NO
 SQL;
 	$update->sql->query($q);
 }
+
+function update_29($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_attributs` CHANGE `ref` `ref` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
+SQL;
+	$update->sql->query($q);
+}
