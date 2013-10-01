@@ -735,3 +735,10 @@ ALTER TABLE `dt_attributs` CHANGE `ref` `ref` VARCHAR( 60 ) CHARACTER SET latin1
 SQL;
 	$update->sql->query($q);
 }
+
+function update_30($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_types_documents` CHANGE `code` `code` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
+SQL;
+	$update->sql->query($q);
+}
