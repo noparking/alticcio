@@ -745,6 +745,10 @@ SQL;
 
 function update_31($update) {
 	$q = <<<SQL
+ALTER TABLE `dt_factures_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `quantite` 
+SQL;
+	$update->sql->query($q);
+	$q = <<<SQL
 ALTER TABLE `dt_factures` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `tva` 
 SQL;
 	$update->sql->query($q);
