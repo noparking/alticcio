@@ -594,6 +594,18 @@ switch($action) {
 				'type' => 'contain',
 				'field' => 'ph.phrase',
 			),
+			'gamme' => array(
+				'title' => $dico->t('Gamme'),
+				'type' => 'contain',
+				'field' => 'ph.phrase',
+			),
+			'gamme' => array(
+				'title' => $dico->t('Gamme'),
+				'type' => 'select',
+				'field' => 'pr.id_gammes',
+				'values' => array(0 => ""),
+				'options' => $produit->gammes(),
+			),
 			'actif' => array(
 				'title' => $dico->t('Active'),
 				'type' => 'select',

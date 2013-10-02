@@ -27,7 +27,7 @@ class Produit extends AbstractObject {
 
 	public function liste(&$filter = null) {
 		$q = <<<SQL
-SELECT pr.id, pr.ref, ph.phrase, pr.actif FROM dt_produits AS pr
+SELECT pr.id, pr.ref, ph.phrase, pr.id_gammes AS gamme, pr.actif FROM dt_produits AS pr
 LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND id_langues = {$this->langue}
 SQL;
 		if ($filter === null) {
