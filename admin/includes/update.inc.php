@@ -748,4 +748,9 @@ function update_31($update) {
 ALTER TABLE `dt_factures` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `tva` 
 SQL;
 	$update->sql->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_factures_produits` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `prix_unitaire` 
+SQL;
+	$update->sql->query($q);
 }
