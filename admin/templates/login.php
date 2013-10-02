@@ -1,5 +1,7 @@
 <?php
-
+if (!isset($code_google)) {
+	$code_google = '<!-- Google -->';
+}
 /*
  * HTML de la page
  */
@@ -31,6 +33,7 @@ $html_page = <<<HTML
 	</div>
 	{$page->my_javascript()}
 	{$page->javascript()}
+     {$code_google}
 </body>
 </html>
 HTML;

@@ -18,6 +18,9 @@ $page->jsvars[] = array(
 	)),
 );
 
+if (!isset($code_google)) {
+	$code_google = '<!-- Google -->';
+}
 $header_stats = "";
 
 if (!isset($right)) {
@@ -125,6 +128,7 @@ $html_page = <<<HTML
 	{$page->my_javascript()}
 	{$page->javascript()}
 	{$page->my_javascript("post")}
+	{$code_google}
 </body>
 </html>
 HTML;
