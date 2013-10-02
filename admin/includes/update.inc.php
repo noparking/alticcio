@@ -742,3 +742,10 @@ ALTER TABLE `dt_types_documents` CHANGE `code` `code` VARCHAR( 60 ) CHARACTER SE
 SQL;
 	$update->sql->query($q);
 }
+
+function update_31($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_factures` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `tva` 
+SQL;
+	$update->sql->query($q);
+}
