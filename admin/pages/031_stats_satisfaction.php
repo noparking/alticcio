@@ -3,6 +3,7 @@
  * On inclue les librairies nécessaires
  */
 $config->core_include("extranet/user", "outils/mysql", "outils/form");
+$config->core_include("stats/statsatifaction");
 $page->css[] = $config->media("sondages.css");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
@@ -16,6 +17,8 @@ $menu->current('main/stats/satisfaction');
  */
 $sql = new Mysql($config->db());
 
+$stat = new StatSatisfaction($sql);
+
 $form = new Form(array(
 	'id' => "form-search-satisfaction",
 	'class' => "form-search-satisfaction",
@@ -23,22 +26,23 @@ $form = new Form(array(
 ));
 
 $months = array(	"01" => $dico->t('MoisJanvier'),
-					"02" => $dico->t('MoisFevrier'),
-					"03" => $dico->t('MoisMars'),
-					"04" => $dico->t('MoisAvril'),
-					"05" => $dico->t('MoisMai'),
-					"06" => $dico->t('MoisJuin'),
-					"07" => $dico->t('MoisJuillet'),
-					"08" => $dico->t('MoisAout'),
-					"09" => $dico->t('MoisSeptembre'),
-					"10" => $dico->t('MoisOctobre'),
-					"11" => $dico->t('MoisNovembre'),
-					"12" => $dico->t('MoisDecembre') );
+				"02" => $dico->t('MoisFevrier'),
+				"03" => $dico->t('MoisMars'),
+				"04" => $dico->t('MoisAvril'),
+				"05" => $dico->t('MoisMai'),
+				"06" => $dico->t('MoisJuin'),
+				"07" => $dico->t('MoisJuillet'),
+				"08" => $dico->t('MoisAout'),
+				"09" => $dico->t('MoisSeptembre'),
+				"10" => $dico->t('MoisOctobre'),
+				"11" => $dico->t('MoisNovembre'),
+				"12" => $dico->t('MoisDecembre') );
 
 
 /*
  * Fonctions de traitement
- */				
+ */
+/*
 function moyenne($note, $nbre, $sur) {
 	if ($note > 0) {
 		$moyenne = $note/$nbre;
@@ -56,12 +60,13 @@ function pourcentage_satisfait($nb_satisfait, $nb_total) {
 		return "";
 	}
 }					
-
+*/
 	
 /*
  * Mesure de la satisfaction :
  * Si la réponse d'un sondage comprend que des notes de 3 et/ou 4, on le considère comme satisfait
  */
+/*
 $q = "SELECT * FROM dt_sondage_satisfaction WHERE satisfait = 0";
 $rs = $sql->query($q);
 while($row = $sql->fetch($rs)) {
@@ -70,11 +75,12 @@ while($row = $sql->fetch($rs)) {
 		$rs1 = $sql->query($q1);
 	}
 }					
-
+*/
 
 /*
  * Traitement des résultats après envoi du formulaire
  */
+/*
 $html_results = "";
 if ($form->is_submitted() and $form->validate()) {
 	$datas = $form->values();
@@ -160,6 +166,64 @@ else {
 	$datas['annee'] = "";
 	$datas['langue'] = "";
 }
+*/
+
+
+
+// on contrôle que tous les enregistrements sont tous ok.
+$stat->check_satisfaction();
+
+
+// on prépare les données, une fois le formulaire retourné
+$html_results = "";
+if ($form->is_submitted() and $form->validate()) {
+	$datas = $form->values();
+	$resultats = $stat->resultats($datas['langue'], $datas['annee'], 0);
+	$commentaires = $stat->commentaires($datas['langue'], $datas['annee'], 0);
+	$html_results .= '<table>';
+	$html_results .= '<tr>';
+	$html_results .= '<th>'.$dico->t('Mois').'</th>';
+	$html_results .= '<th>'.$dico->t('NbreReponses').'</th>';
+	$html_results .= '<th>'.$dico->t('PrctSatisfait').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionAccueil').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionReponses').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionPrix').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionEmballage').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionLivraison').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionPose').'</th>';
+	$html_results .= '<th>'.$dico->t('QuestionProduit').'</th>';
+	$html_results .= '<th>'.$dico->t('NoteGlobale').'</th>';
+	$html_results .= '</tr>';
+	foreach($resultats as $resultat) {
+		$html_results .= '<tr>';
+		$html_results .= '<td>'.$resultat['mois'].'</td>';
+		$html_results .= '<td>'.$resultat['total'].'</td>';
+		$html_results .= '<td>'.$resultat['tx_satisfait'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q1'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q2'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q3'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q7'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q4'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q5'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_q6'].'</td>';
+		$html_results .= '<td style="text-align:center;">'.$resultat['moy_scoring'].'</td>';
+		$html_results .= '</tr>';
+	}
+	$html_results .= '<table>';
+	$html_results .= '<div class="commentaires_sondages">';
+	foreach($commentaires as $commentaire) {
+		$html_results .= '<dl>';
+		$html_results .= '<dt>'.$commentaire['date'].' - '.$dico->t('Commande').' '.$commentaire['cde'].'</dt>';
+		$html_results .= '<dd>'.$commentaire['texte'].'</dd>';
+		$html_results .= '</dl>';
+	}
+	$html_results .= '</div>';
+}
+else {
+	$datas['annee'] = "";
+	$datas['langue'] = "";
+}
+
 
 
 /* 
