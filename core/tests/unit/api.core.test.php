@@ -412,7 +412,7 @@ class TestOfApi extends UnitTestCase {
 		$admin->add_key_rule($key_id, "GET", "*", "allow");
 		$_SERVER['REQUEST_METHOD'] = "GET";
 		$_SERVER['REQUEST_URI'] = "testapi/justforlog";
-		$_SERVER['REMOTE_ADDR'] = "88.191.66.116";
+		$_SERVER['REMOTE_ADDR'] = "37.59.55.124";
 		$_GET = array('key' => $key);
 		$api->prepare();
 		$this->assertTrue($api->check_ip());
@@ -423,7 +423,7 @@ class TestOfApi extends UnitTestCase {
 		$response = $api->execute();
 		$this->assertEqual($response['error'], 106);
 
-		$admin->update_key($key_id, array('ip' => "88.191.66.116"));
+		$admin->update_key($key_id, array('ip' => "37.59.55.124"));
 		$api->prepare();
 		$this->assertTrue($api->check_ip());
 	}
@@ -442,18 +442,18 @@ class TestOfApi extends UnitTestCase {
 		$admin->add_key_rule($key_id, "GET", "*", "allow");
 		$_SERVER['REQUEST_METHOD'] = "GET";
 		$_SERVER['REQUEST_URI'] = "testapi/justforlog";
-		$_SERVER['REMOTE_ADDR'] = "88.191.66.116";
+		$_SERVER['REMOTE_ADDR'] = "37.59.55.124";
 		$_GET = array('key' => $key);
 		$api->prepare();
 		$this->assertTrue($api->check_domain());
 		$api->prepare();
-		$this->assertEqual($api->get("ip"), "");
+		$this->assertEqual($api->info("ip"), "");
 
 		$admin->update_key($key_id, array('domain' => "noparking.net"));
 		$api->prepare();
 		$this->assertTrue($api->check_domain());
 		$api->prepare();
-		$this->assertEqual($api->get("ip"), "88.191.66.116");
+		$this->assertEqual($api->info("ip"), "37.59.55.124");
 
 		$admin->update_key($key_id, array('domain' => "google.fr"));
 		$api->prepare();
@@ -461,7 +461,7 @@ class TestOfApi extends UnitTestCase {
 		$response = $api->execute();
 		$this->assertEqual($response['error'], 107);
 		$api->prepare();
-		$this->assertEqual($api->get("ip"), "");
+		$this->assertEqual($api->info("ip"), "");
 
 		$admin->update_key($key_id, array('domain' => "noparking.net"));
 		$admin->update_key($key_id, array('ip' => "111.222.333.444"));
@@ -552,5 +552,6 @@ class TestOfApi extends UnitTestCase {
 		$response = $api->execute();
 		$this->assertEqual($response, 123456);
 	}
+
 }
 

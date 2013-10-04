@@ -9,7 +9,7 @@ class API_Forfait {
 	function __construct($api) {
 		$this->api = $api;
 		$this->sql = $api->sql;
-		$this->language = $api->get('language');
+		$this->language = $api->info('language');
 	}
 
 	function table() {

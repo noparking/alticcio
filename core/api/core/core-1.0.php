@@ -19,24 +19,61 @@ class API {
 
 	public $sql;
 
-	public function __construct($table_prefix = "", $sql = null) {
+	private $params;
+
+	public function __construct($table_prefix = "", $sql = null, $params = array()) {
 		$this->table_prefix = $table_prefix;
 		$this->sql = $sql;
+		$this->params = $params;
 	}
 
 	private function table($name) {
 		return $this->table_prefix.$name;
 	}
 
-	public function prepare($base_url = "") {
+	private function base_url() {
+		return isset($this->params['base_url']) ? $this->params['base_url'] : "";
+	}
+
+	private function param($param) {
+		if (isset($_GET[$param])) {
+			return $_GET[$param];
+		}
+		else if (isset($this->params[$param])) {
+			return $this->params[$param];
+		}
+		else {
+			return "";
+		}
+	}
+
+	public function get($uri) {
+		$this->prepare($this->base_url(), "get", $uri);
+		return $this->execute();
+	}
+
+	public function post($uri, $post) {
+		$this->prepare($this->base_url(), "post", $uri, $post);
+		return $this->execute();
+	}
+
+	public function prepare($base_url = "", $method = null, $uri = null, $post = null) {
+		if ($method === null) {
+			$method = $_SERVER['REQUEST_METHOD'];
+		}
+		if ($uri === null) {
+			$uri = $_SERVER['REQUEST_URI'];
+		}
+		$this->post = ($post === null) ? $_POST : $post;
+
 		$this->key_id = null;
 		$this->key_roles = array();
 		$this->key_enabled = false;
 		$this->key_infos = array();
 
-		$this->request = trim(preg_replace("/\?(.*)$/", "", preg_replace("!^$base_url!", "", $_SERVER['REQUEST_URI'])), "/");
+		$this->request = trim(preg_replace("/\?(.*)$/", "", preg_replace("!^$base_url!", "", $uri)), "/");
 		$elements = explode("/", $this->request);
-		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
+		$this->method = strtolower($method);
 		array_unshift($elements, $this->method);
 
 		$func = implode("_", $elements);
@@ -49,11 +86,11 @@ class API {
 
 		$this->ip = $_SERVER['REMOTE_ADDR'];
 
-		$this->tracked = isset($_GET['track']) ? $_GET['track'] : "";
+		$this->tracked = $this->param('track');
 		
-		$this->widget_id = isset($_GET['widget']) ? $_GET['widget'] : 0;
+		$this->widget_id = $this->param('widget');
 
-		$this->key = isset($_GET['key']) ? $_GET['key'] : "";
+		$this->key = $this->param('key');
 		$q = <<<SQL
 SELECT * FROM {$this->table('keys')} WHERE `key` = '{$this->key}'
 SQL;
@@ -89,7 +126,7 @@ SQL;
 		return $this->key;
 	}
 
-	public function get($info) {
+	public function info($info) {
 		return isset($this->key_infos[$info]) ? $this->key_infos[$info]: null;
 	}
 
@@ -234,7 +271,11 @@ SQL;
 			$data = $this->error(105);
 		}
 		else {
-			$args = array_merge(array($this), $this->args);
+			$args = array($this);
+			if ($this->method == "post") {
+				$args[] = $this->post;
+			}
+			$args = array_merge($args, $this->args);
 			$data = call_user_func_array($this->func, $args);
 		}
 		$this->log(isset($data['error']) ? $data['error'] : 0);

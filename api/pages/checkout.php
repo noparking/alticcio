@@ -11,7 +11,7 @@ $phrase = new Phrase($sql);
 $pays = new Pays($sql);
 $liste_pays = $pays->liste(1, 'id');
 
-$lang = $api->get("language");
+$lang = $api->info("language");
 $produit = new Produit($sql, $phrase);
 $sku = new Sku($sql, $phrase);
 $panier = new Panier($sql);
@@ -91,7 +91,7 @@ if ($form->is_submitted()) {
 		if ($data['same_address']) {
 			$data['facturation'] = $data['livraison'];
 		}
-		if ($api->get('name') == "handisport" and !strpos($data['commande']['email'], "@handisport.org")) {
+		if ($api->info('name') == "handisport" and !strpos($data['commande']['email'], "@handisport.org")) {
 			$errors[] = "Votre adresse email doit appartenir au domaine handisport.org pour pouvoir passer commande.";
 		}
 		switch ($form->action()) {
@@ -130,7 +130,7 @@ if ($form->is_submitted()) {
 				switch ($data['commande']['paiement']) {
 					case 'cb' :
 						$step = "paiement_cic";
-						$cic = new CIC($config, $api->get('id'));
+						$cic = new CIC($config, $api->info('id'));
 						break;
 					case 'paypal' :
 						$step = "paiement_paypal";
@@ -240,7 +240,7 @@ HTML;
 
 		$subject = "Merci pour votre commande";
 
-		$emails = explode("\n", $api->get('emails'));
+		$emails = explode("\n", $api->info('emails'));
 		$headers = "From: ".$emails[0]."\r\n"; 
 		$headers .= "Content-Type: text/html; charset=utf-8\r\n"; 
 		$headers .= "Reply-to:".$emails[0]."\r\n";

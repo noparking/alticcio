@@ -52,7 +52,7 @@ $liste_produit_vu = implode("</td><td>", $data['viewed']);
 $liste_produit_commande = implode("</td><td>", $data['ordered']);
 
 $jq['html'] = <<<HTML
-<h2>{$phrases['phrase_nom'][$api->get('language')]} ({$data['year']})</h2>
+<h2>{$phrases['phrase_nom'][$api->info('language')]} ({$data['year']})</h2>
 <table class="doublet-stats-table">
 <tr><td>Vues totales</td><td>{$data['total_viewed']}</td></tr>
 <tr><td>Commandes totales</td><td>{$data['total_ordered']}</td></tr>

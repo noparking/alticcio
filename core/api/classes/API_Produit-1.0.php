@@ -9,7 +9,7 @@ class API_Produit {
 
 	function __construct($api) {
 		$this->sql = $api->sql;
-		$this->language = $api->get('language');
+		$this->language = $api->info('language');
 		$q = "SELECT id FROM dt_langues WHERE code_langue = '{$this->language}'";
 		$res = mysql_query($q);
 		$row = mysql_fetch_assoc($res);

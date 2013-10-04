@@ -9,7 +9,7 @@ class API_Catalogue {
 	function __construct($api) {
 		$this->api = $api;
 		$this->sql = $api->sql;
-		$this->language = $api->get('language');
+		$this->language = $api->info('language');
 	}
 
 	function all() {
@@ -27,7 +27,7 @@ SQL;
 	}
 
 	function id() {
-		$name = $this->api->get("name");
+		$name = $this->api->info("name");
 		$q = <<<SQL
 SELECT id FROM dt_catalogues WHERE nom LIKE '$name'
 SQL;
