@@ -22,6 +22,11 @@ class TestOfApi extends UnitTestCase {
 		foreach ($tables as $table) {
 			mysql_query("TRUNCATE TABLE $table");	
 		}
+		$_GET = array();
+		$_POST = array();
+		$_SERVER['REQUEST_METHOD'] = "";
+		$_SERVER['REQUEST_URI'] = "";
+		$_SERVER['REQUEST_TIME'] = time();
 	}
 
 	function test_errors() {
@@ -553,5 +558,69 @@ class TestOfApi extends UnitTestCase {
 		$this->assertEqual($response, 123456);
 	}
 
+	function test_post_request() {
+		function post_testapi_post($api, $post, $key) {
+			return $post[$key];
+		}
+
+		$api = new API("api_");
+		$admin = new API_Admin("api_");
+
+		$key_id = $admin->add_key();
+		$data = $admin->key_data($key_id);
+		$key = $data['key'];
+		$admin->add_key_rule($key_id, "POST", "*", "allow");
+		$_SERVER['REQUEST_METHOD'] = "POST";
+		$_SERVER['REQUEST_URI'] = "testapi/post/toto";
+		$_GET = array('key' => $key);
+		$_POST = array('toto' => "TOTO", 'titi' => "TITI");
+		$api->prepare();
+		$response = $api->execute();
+
+		$this->assertEqual($response, "TOTO");
+
+		$this->assertEqual($api->func(), "post_testapi_post");
+
+		$this->assertEqual($api->args(), array("toto"));
+	}
+
+	function test_post_with_php() {
+		$admin = new API_Admin("api_");
+
+		$key_id = $admin->add_key();
+		$data = $admin->key_data($key_id);
+		$key = $data['key'];
+		$admin->add_key_rule($key_id, "POST", "*", "allow");
+
+		$api = new API("api_", array('key' => $key));
+		$uri = "testapi/post/titi";
+		$post = array('toto' => "TOTO", 'titi' => "TITI");
+		$response = $api->post($uri, $post);
+
+		$this->assertEqual($response, "TITI");
+
+		$this->assertEqual($api->func(), "post_testapi_post");
+
+		$this->assertEqual($api->args(), array("titi"));
+	}
+
+	function test_get_with_php() {
+		$admin = new API_Admin("api_");
+
+		$key_id = $admin->add_key();
+		$data = $admin->key_data($key_id);
+		$key = $data['key'];
+		$admin->add_key_rule($key_id, "GET", "*", "allow");
+
+		$api = new API("api_", array('key' => $key));
+		$uri = "testapi";
+		$response = $api->get($uri);
+
+		$this->assertEqual($response, 42);
+
+		$this->assertEqual($api->func(), "get_testapi");
+
+		$this->assertEqual($api->args(), array());
+	}
 }
 

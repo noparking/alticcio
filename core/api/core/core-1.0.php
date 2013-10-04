@@ -17,13 +17,10 @@ class API {
 
 	private $table_prefix;
 
-	public $sql;
-
 	private $params;
 
-	public function __construct($table_prefix = "", $sql = null, $params = array()) {
+	public function __construct($table_prefix = "", $params = array()) {
 		$this->table_prefix = $table_prefix;
-		$this->sql = $sql;
 		$this->params = $params;
 	}
 
@@ -231,7 +228,11 @@ SQL;
 
 	public function check_function_args() {
 		$rf = new ReflectionFunction($this->func);
-		return $rf->getNumberOfRequiredParameters() <= count($this->args) + 1;
+		$nb_args = 1;
+		if ($this->method == "post") {
+			$nb_args++;
+		}
+		return $rf->getNumberOfRequiredParameters() <= count($this->args) + $nb_args;
 	}
 
 	public function check_permission() {
