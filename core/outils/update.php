@@ -7,6 +7,8 @@ class Update {
 	public $version = 0;
 	public $errors = array();
 
+	private $v;
+
 	function __construct($sql) {
 		$this->sql = $sql;
 		$q = <<<SQL
@@ -38,13 +40,14 @@ SQL;
 		$nouvelle_version = $this->version;
 		ksort($this->maj);
 		foreach ($this->maj as $version => $function) {
+			$this->v = $version;
 			if ($version > $this->version and ($version_limite === null or $version <= $version_limite)) {
 				$nouvelle_version = $version;
 				try {
 					$function($this);
 				}
 				catch (Exception $e) {
-					$this->errors[$version] = $e->getMessage();
+					$this->set_error($version, $e->getMessage());
 				}
 			}
 		}
@@ -55,6 +58,26 @@ SQL;
 			$this->sql->query($q);
 			$this->version = $nouvelle_version;
 		}
+	}
+
+	function set_error($version, $message) {
+		if (isset($this->errors[$version])) {
+			$this->errors[$version] .= "\n".$message;
+		}
+		else {
+			$this->errors[$version] = "\n".$message;
+		}
+	}
+
+	function query($q) {
+		$return = false;
+		try {
+			$return = $this->sql->query($q);
+		}
+		catch (Exception $e) {
+			$this->set_error($this->v, $e->getMessage());
+		}
+		return $return;
 	}
 
 	function last_version() {

@@ -25,7 +25,7 @@ CREATE TABLE `dt_commandes_produits_revisions` (
   UNIQUE KEY `revision` (`revision`,`id_commandes_produits`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE `dt_commandes_revisions` (
@@ -76,7 +76,7 @@ CREATE TABLE `dt_commandes_revisions` (
   UNIQUE KEY `revision` (`revision`,`id_commandes`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_2($update) {
@@ -128,7 +128,7 @@ CREATE TABLE `dt_factures` (
   KEY `id_api_keys` (`id_api_keys`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE `dt_factures_produits` (
@@ -150,7 +150,7 @@ CREATE TABLE `dt_factures_produits` (
   KEY `id_sku` (`id_sku`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;	
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_3($update) {
@@ -162,19 +162,19 @@ CREATE TABLE `dt_users_password` (
 		PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_4($update) {
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE  `dt_commandes_revisions` CHANGE  `paiement`  `paiement` ENUM(  'cheque',  'mandat',  'facture',  'cb',  'paypal',  'devis',  'manuel' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_5($update) {
@@ -189,7 +189,7 @@ CREATE TABLE `dt_clients` (
   KEY `login` (`login`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE `dt_clients_password` (
@@ -199,25 +199,25 @@ CREATE TABLE `dt_clients_password` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;	
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_6($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `classement` INT NOT NULL;
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `classement` INT NOT NULL;
 SQL;
 
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_7($update) {
@@ -226,7 +226,7 @@ ALTER TABLE `dt_gammes` ADD `phrase_description_courte` INT NOT NULL ,
 ADD `phrase_url_key` INT NOT NULL ,
 ADD `ref` VARCHAR( 20 ) NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_8($update) {
@@ -243,7 +243,7 @@ CREATE TABLE `dt_gammes_attributs` (
   KEY `id_gammes` (`id_gammes`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_9($update) {
@@ -263,7 +263,7 @@ CREATE TABLE `dt_images_gammes` (
   KEY `phrase_legende` (`phrase_legende`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_10($update) {
@@ -275,11 +275,11 @@ CREATE TABLE `dt_attributs_valeurs` (
   PRIMARY KEY (`id_attributs`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `type_valeur` VARCHAR( 32 ) NOT NULL AFTER `id_attributs`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_11($update) {
@@ -289,92 +289,92 @@ ADD `phrase_description_courte` INT( 11 ) NOT NULL ,
 ADD `phrase_description` INT( 11 ) NOT NULL ,
 ADD `phrase_url_key` INT( 11 ) NOT NULL
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_12($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_users` ADD `id_langues` INT NOT NULL
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_13($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id` ) 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_phrases` ADD INDEX ( `id_langues` )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_14($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_groupes_users` ADD `perm` LONGTEXT NOT NULL
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 };
 
 function update_15($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_attributs_valeurs` ADD `valeur_libre` TEXT NOT NULL
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_gammes_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_matieres_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `valeur_libre` TEXT NOT NULL AFTER `phrase_valeur`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_16($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_produits_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_produits`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_sku_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_sku`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_gammes_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_gammes`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_produits_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_sku_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_gammes_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE `dt_groupes_attributs` (
@@ -383,7 +383,7 @@ CREATE TABLE `dt_groupes_attributs` (
   PRIMARY KEY (`id`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_17($update) {
@@ -406,27 +406,27 @@ CREATE TABLE `{$table}_management` (
   KEY `{$id_field}` (`{$id_field}`)
 )
 SQL;
-		$update->sql->query($q);
+		$update->query($q);
 
 		$q = <<<SQL
 UPDATE $table SET type_valeur = 'valeur_numerique'
 SQL;
-		$update->sql->query($q);
+		$update->query($q);
 
 		$q = <<<SQL
 UPDATE $table SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> ''
 SQL;
-		$update->sql->query($q);
+		$update->query($q);
 
 		$q = <<<SQL
 UPDATE $table SET type_valeur = 'valeur_libre' WHERE valeur_libre <> ''
 SQL;
-		$update->sql->query($q);
+		$update->query($q);
 		
 		$q = <<<SQL
 SELECT * FROM $table 
 SQL;
-		$res = $update->sql->query($q);
+		$res = $update->query($q);
 	
 		$i = 1;
 		$values = array();
@@ -437,7 +437,7 @@ SQL;
 				$q = <<<SQL
 INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
 SQL;
-				$update->sql->query($q);
+				$update->query($q);
 				$values = array();
 			}
 			$i++;
@@ -446,7 +446,7 @@ SQL;
 			$q = <<<SQL
 INSERT INTO {$table}_management (id_attributs, $id_field, classement) VALUES $values 
 SQL;
-			$update->sql->query($q); // insertion de ce qui reste
+			$update->query($q); // insertion de ce qui reste
 		}
 	}
 }
@@ -455,12 +455,12 @@ function update_18($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_catalogues` ADD `export_frequency` INT NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_exports_catalogues` ADD `auto` INT NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_19($update) {
@@ -476,7 +476,7 @@ CREATE TABLE `dt_devis_pose` (
   PRIMARY KEY (`id`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_20($update) {
@@ -492,7 +492,7 @@ CREATE TABLE `dt_ecotaxes` (
   KEY `id_sku` (`id_sku`,`id_pays`,`id_familles_taxes`, `id_catalogues`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE `dt_familles_taxes` (
@@ -501,64 +501,64 @@ CREATE TABLE `dt_familles_taxes` (
   PRIMARY KEY (`id`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes` ADD `ecotaxe` FLOAT NOT NULL AFTER `tva` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_revisions` ADD `ecotaxe` FLOAT NOT NULL AFTER `tva` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_produits` ADD `ecotaxe` FLOAT NOT NULL AFTER `prix_unitaire` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_produits_revisions` ADD `ecotaxe` FLOAT NOT NULL AFTER `prix_unitaire` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_21($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_sku` CHANGE `ref_ultralog` `ref_ultralog` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_produits` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_gammes` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_22($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_sku` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_23($update) {
 	$q = <<<SQL
 SHOW TABLES
 SQL;
-	$res = $update->sql->query($q);
+	$res = $update->query($q);
 	while ($row = $update->sql->fetch($res)) {
 		$table = array_pop($row);
 		$q = <<<SQL
 DESCRIBE $table
 SQL;
-		$res2 = $update->sql->query($q);
+		$res2 = $update->query($q);
 		while ($row2 = $update->sql->fetch($res2)) {
 			if ($row2['Null'] == "NO" and $row2['Default'] == null and $row2['Extra'] != "auto_increment") {
 				$default_value = null;
@@ -587,13 +587,13 @@ SQL;
 					$q = <<<SQL
 ALTER TABLE `$table` CHANGE `{$row2['Field']}` `{$row2['Field']}` {$row2['Type']} NOT NULL DEFAULT $default_value
 SQL;
-					$update->sql->query($q);
+					$update->query($q);
 				}
 				else if ($null) {
 					$q = <<<SQL
 ALTER TABLE `$table` CHANGE `{$row2['Field']}` `{$row2['Field']}` {$row2['Type']} NULL
 SQL;
-					$update->sql->query($q);
+					$update->query($q);
 				}
 			}
 		}
@@ -604,11 +604,11 @@ function update_24($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_sku` DROP `echantillon` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 	$q = <<<SQL
 ALTER TABLE `dt_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_25($update) {
@@ -619,44 +619,44 @@ CREATE TABLE IF NOT EXISTS `dt_types_documents` (
   PRIMARY KEY (`id`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 INSERT INTO dt_types_documents (code)
 VALUES ('guide'), ('book'), ('catalogue'), ('film')
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_documents` ADD `id_types_documents` INT NOT NULL ,
 ADD INDEX ( `id_types_documents` )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_documents` SET id_types_documents = 1 WHERE type_documents = 'guide'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_documents` SET id_types_documents = 2 WHERE type_documents = 'book'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_documents` SET id_types_documents = 3 WHERE type_documents = 'catalogue'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 UPDATE `dt_documents` SET id_types_documents = 4 WHERE type_documents = 'film'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_documents` DROP `type_documents`
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_documents_sku` (
@@ -669,7 +669,7 @@ CREATE TABLE IF NOT EXISTS `dt_documents_sku` (
   KEY `id_sku` (`id_sku`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_documents_produits` (
@@ -682,7 +682,7 @@ CREATE TABLE IF NOT EXISTS `dt_documents_produits` (
   KEY `id_produits` (`id_produits`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_documents_gammes` (
@@ -695,7 +695,7 @@ CREATE TABLE IF NOT EXISTS `dt_documents_gammes` (
   KEY `id_gammes` (`id_gammes`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_26($update) {
@@ -703,7 +703,7 @@ function update_26($update) {
 ALTER TABLE `dt_applications` ADD `phrase_produit_description` INT NOT NULL DEFAULT '0',
 ADD `phrase_produit_description_courte` INT NOT NULL DEFAULT '0'
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_27($update) {
@@ -714,47 +714,47 @@ CREATE TABLE IF NOT EXISTS `dt_exports_produits` (
   PRIMARY KEY (`id_produits`)
 )
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_28($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `quantite` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_commandes_produits_revisions` ADD `echantillon` TINYINT( 1 )  NOT NULL DEFAULT '0' AFTER `quantite` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_29($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_attributs` CHANGE `ref` `ref` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_30($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_types_documents` CHANGE `code` `code` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
 
 function update_31($update) {
 	$q = <<<SQL
 ALTER TABLE `dt_factures_produits` ADD `echantillon` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `quantite` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 	$q = <<<SQL
 ALTER TABLE `dt_factures` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `tva` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 
 	$q = <<<SQL
 ALTER TABLE `dt_factures_produits` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTER `prix_unitaire` 
 SQL;
-	$update->sql->query($q);
+	$update->query($q);
 }
