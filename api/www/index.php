@@ -10,7 +10,7 @@ $sql = new Mysql($config->db());
 $langue = new Langue($sql);
 $id_langues = $langue->id($config->get("langue"));
 
-$api = new API("api_");
+$api = new API("api_", $sql);
 
 $api->prepare($config->get("base_url"));
 

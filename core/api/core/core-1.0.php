@@ -19,8 +19,11 @@ class API {
 
 	private $params;
 
-	public function __construct($table_prefix = "", $params = array()) {
+	public $sql;
+
+	public function __construct($table_prefix = "", $sql = null, $params = array()) {
 		$this->table_prefix = $table_prefix;
+		$this->sql = $sql;
 		$this->params = $params;
 	}
 
