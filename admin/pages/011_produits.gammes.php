@@ -131,12 +131,16 @@ if ($form->is_submitted() and $form->validate()) {
 					$page->inc("snippets/attribut_management");
 					$filter_attributs_management->clean_data($data, 'attributs_management');
 				}
-				$id = $url_redirection->save_object($gamme, $data, array('phrase_url_key' => 'phrase_nom'));
-				$form->reset();
-				if ($action != "edit") {
-					$url2->redirect("current", array('action' => "edit", 'id' => $id));
+				if ($id = $url_redirection->save_object($gamme, $data, array('phrase_url_key' => 'phrase_nom'))) {
+					$form->reset();
+					if ($action != "edit") {
+						$url2->redirect("current", array('action' => "edit", 'id' => $id));
+					}
+					$gamme->load($id);
 				}
-				$gamme->load($id);
+				else {
+					$messages[] = '<p class="message_error">'."Le code URL est déjà utilisé !".'</p>';	
+				}
 			}
 			break;
 	}
