@@ -4,6 +4,8 @@ class UrlRedirection {
 
 	private $sql;
 	private $nb_sections;
+
+	public $automatic = true;
 	
 	public function __construct($sql, $nb_sections = 1) {
 		$this->sql = $sql;
@@ -234,16 +236,41 @@ SQL;
 
 		$object->load($id_saved);
 
-		$save_again = false;
-		$data2 = array();
-		foreach ($url_key_fields as $key => $value) {
-			if (strpos($key, "phrase_") === 0) {
-				foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
-					if ($phrase_url_key) {
-						$code_url = $this->normalize($phrase_url_key);
+		if ($this->automatic) {
+			$save_again = false;
+			$data2 = array();
+			foreach ($url_key_fields as $key => $value) {
+				if (strpos($key, "phrase_") === 0) {
+					foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
+						if ($phrase_url_key) {
+							$code_url = $this->normalize($phrase_url_key);
+						}
+						else if ($value) {
+							$code_url = $this->create_by_name($data['phrases'][$value][$lang]);
+						}
+						else {
+							$code_url = "";
+						}
+						if ($code_url) {
+							$this->save($code_url, array(
+								'table' => $object->table,
+								'variable' => $id_saved,
+								'id_langues' => $object->get_id_langues($lang),
+							));
+						}
+						if ($phrase_url_key != $code_url) {
+							$save_again = true;
+							$data2['phrases'][$key][$lang] = $code_url;
+							$data2[$object->type][$key] = $data[$object->type][$key];
+						}
+					}
+				}
+				else {
+					if ($data[$object->type][$key]) {
+						$code_url = $data[$object->type][$key];
 					}
 					else if ($value) {
-						$code_url = $this->create_by_name($data['phrases'][$value][$lang]);
+						$code_url = $this->create_by_name($data[$object->type][$value]);
 					}
 					else {
 						$code_url = "";
@@ -252,43 +279,21 @@ SQL;
 						$this->save($code_url, array(
 							'table' => $object->table,
 							'variable' => $id_saved,
-							'id_langues' => $object->get_id_langues($lang),
+							'id_langues' => $object->values['id_langues'],
 						));
 					}
-					if ($phrase_url_key != $code_url) {
+					if (!$data[$object->type][$key]) {
 						$save_again = true;
-						$data2['phrases'][$key][$lang] = $code_url;
+						$data2[$object->type][$key] = $code_url;
 					}
 				}
 			}
-			else {
-				if ($data[$object->type][$key]) {
-					$code_url = $data[$object->type][$key];
-				}
-				else if ($value) {
-					$code_url = $this->create_by_name($data[$object->type][$value]);
-				}
-				else {
-					$code_url = "";
-				}
-				if ($code_url) {
-					$this->save($code_url, array(
-						'table' => $object->table,
-						'variable' => $id_saved,
-						'id_langues' => $object->values['id_langues'],
-					));
-				}
-				if (!$data[$object->type][$key]) {
-					$save_again = true;
-					$data2[$object->type][$key] = $code_url;
-				}
-			}
-		}
 
-		if ($save_again) {
-			$data2[$object->type]['id'] = $id_saved;
-			$object->save($data2);
-			$object->load($id_saved);
+			if ($save_again) {
+				$data2[$object->type]['id'] = $id_saved;
+				$object->save($data2);
+				$object->load($id_saved);
+			}
 		}
 		
 		return $id_saved;

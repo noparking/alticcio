@@ -29,6 +29,9 @@ $phrase = new Phrase($sql);
 $object = $gamme = new Gamme($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
+if ($config->get("no_automatic_url")) {
+	$url_redirection->automatic = false;
+}
 
 $pager_gammes = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter_gammes = new Filter($pager_gammes, array(

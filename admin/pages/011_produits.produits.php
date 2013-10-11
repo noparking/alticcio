@@ -31,6 +31,9 @@ $phrase = new Phrase($sql);
 $object = $produit = new Produit($sql, $phrase, $id_langues);
 
 $url_redirection = new UrlRedirection($sql);
+if ($config->get("no_automatic_url")) {
+	$url_redirection->automatic = false;
+}
 
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
