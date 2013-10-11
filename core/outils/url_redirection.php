@@ -235,6 +235,7 @@ SQL;
 		$object->load($id_saved);
 
 		$save_again = false;
+		$data2 = array();
 		foreach ($url_key_fields as $key => $value) {
 			if (strpos($key, "phrase_") === 0) {
 				foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
@@ -256,7 +257,7 @@ SQL;
 					}
 					if ($phrase_url_key != $code_url) {
 						$save_again = true;
-						$data['phrases'][$key][$lang] = $code_url;
+						$data2['phrases'][$key][$lang] = $code_url;
 					}
 				}
 			}
@@ -279,14 +280,14 @@ SQL;
 				}
 				if (!$data[$object->type][$key]) {
 					$save_again = true;
-					$data[$object->type][$key] = $code_url;
+					$data2[$object->type][$key] = $code_url;
 				}
 			}
 		}
 
 		if ($save_again) {
-			$data[$object->type]['id'] = $id_saved;
-			$object->save($data);
+			$data2[$object->type]['id'] = $id_saved;
+			$object->save($data2);
 			$object->load($id_saved);
 		}
 		
