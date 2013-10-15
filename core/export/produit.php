@@ -12,36 +12,38 @@ class ExportProduit extends AbstractExport {
 		$fields = $this->fields();
 		$this->prepare($fields, $produits);
 
-		$ids_produits = array();
-		$value_list = array();
-		foreach($produits as $produit_data) {
-			$ids_produits[] = $produit_data['id'];
-			$value_list[] = "({$produit_data['id']}, {$date_export})";
-		}
-		$ids_produits_list = implode(",", $ids_produits);
+		if (count($produits)) {
+			$ids_produits = array();
+			$value_list = array();
+			foreach($produits as $produit_data) {
+				$ids_produits[] = $produit_data['id'];
+				$value_list[] = "({$produit_data['id']}, {$date_export})";
+			}
+			$ids_produits_list = implode(",", $ids_produits);
 
-		$q = <<<SQL
+			$q = <<<SQL
 DELETE FROM dt_exports_produits WHERE id_produits IN ($ids_produits_list) 
 SQL;
-		$this->sql->query($q);
+			$this->sql->query($q);
 
-		$values_list = implode(",", $value_list); 
-		$q = <<<SQL
+			$values_list = implode(",", $value_list); 
+			$q = <<<SQL
 INSERT INTO dt_exports_produits (id_produits, date_export) VALUES $values_list
 SQL;
-		$this->sql->query($q);
+			$this->sql->query($q);
 
-		$values = array();
-		$i = 1;
-		foreach ($this->data($produits) as $data) {
-			$values[] = $data;
-			if ($i % 500 == 0) {
-				$this->insert_values($fields, $values);
-				$values = array();
+			$values = array();
+			$i = 1;
+			foreach ($this->data($produits) as $data) {
+				$values[] = $data;
+				if ($i % 500 == 0) {
+					$this->insert_values($fields, $values);
+					$values = array();
+				}
+				$i++;
 			}
-			$i++;
+			$this->insert_values($fields, $values);
 		}
-		$this->insert_values($fields, $values);
 	}
 
 	public function fields() {
@@ -172,6 +174,24 @@ SQL;
 
 	public function produits_a_exporter() {
 		$q = <<<SQL
+SELECT DISTINCT(id_produit) FROM {$this->export_table}
+SQL;
+		$already_exported_products = array();
+		$res = $this->sql_export->query($q);
+		while ($row = $this->sql_export->fetch($res)) {
+			$already_exported_products[] = $row['id_produit'];
+		}
+		if (count($already_exported_products)) {
+			$already_exported_products = implode(",", $already_exported_products);
+			$old_date_export = time() - 3600;
+
+			$q = <<<SQL
+DELETE FROM dt_exports_produits WHERE id_produits NOT IN ($already_exported_products) AND date_export < $old_date_export
+SQL;
+			$this->sql->query($q);
+		}
+
+		$q = <<<SQL
 SELECT p.id, ep.date_export, p.date_modification AS dm1,
 MAX(s1.date_modification) AS dm2, MAX(s2.date_modification) AS dm3
 FROM dt_produits AS p
@@ -219,16 +239,18 @@ CREATE TABLE IF NOT EXISTS `{$this->export_table}` (
 SQL;
 		$this->sql_export->query($q);
 
-		$ids_produits = array();
-		foreach($produits as $produit_data) {
-			$ids_produits[] = $produit_data['id'];
-		}
-		$ids_produits_list = implode(",", $ids_produits);
+		if (count($produits)) {
+			$ids_produits = array();
+			foreach($produits as $produit_data) {
+				$ids_produits[] = $produit_data['id'];
+			}
+			$ids_produits_list = implode(",", $ids_produits);
 
-		$q = <<<SQL
+			$q = <<<SQL
 DELETE FROM `{$this->export_table}` WHERE id_produit IN ($ids_produits_list)
 SQL;
-		$this->sql_export->query($q);
+			$this->sql_export->query($q);
+		}
 	}
 
 	function max_images() {
