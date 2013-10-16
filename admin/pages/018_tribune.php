@@ -12,9 +12,6 @@ $page->javascript[] = $config->core_media("filter-edit.js");
 $page->javascript[] = $config->media("tribune.js");
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'projet', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 $page->css[] = $config->media("tribune.css");
 

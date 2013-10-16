@@ -51,6 +51,8 @@ $dico->add(dirname(__FILE__)."/../../core/traductions");
 $dico->add(dirname(__FILE__)."/../traductions");
 $dico->add(dirname(__FILE__)."/../../../admin/traductions");
 
+$page->dico = $dico;
+
 $menus_edited = array();
 if (file_exists(dirname(__FILE__)."/../../../admin/includes/menu_edited.php")) {
 	include dirname(__FILE__)."/../../../admin/includes/menu_edited.php";

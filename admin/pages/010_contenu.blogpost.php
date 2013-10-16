@@ -26,9 +26,6 @@ $page->javascript[] = $url->make("DTEditor");
 $page->css[] = $config->media("dteditor.css");
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 /*

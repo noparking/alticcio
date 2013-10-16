@@ -10,6 +10,8 @@ class Page {
 	public $post_javascript = array();
 	public $my_css = array();
 	public $jsvars = array();
+	public $jsdico = array();
+	public $dico = null;
 	private $page;
 	private $base_path;
 	private $default_404;
@@ -147,6 +149,14 @@ class Page {
 	}
 	
 	public function jsvars($tab = "") {
+		if ($this->dico !== null) {
+			$dico = array();
+			foreach ($this->jsdico as $jsdico) {
+				$dico = array_merge($dico, $jsdico); 
+			}
+			$this->jsvars[] = array('dico' => $this->dico->export($dico)); 
+		}
+
 		$jsvars = '<script language="JavaScript" type="text/javascript">'."\n";
 		
 		foreach ($this->jsvars as $vars) {

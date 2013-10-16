@@ -8,9 +8,6 @@ $page->inc("snippets/date-input");
 $page->javascript[] = $config->media("produit.js");
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $page->css[] = $config->media("produit.css");

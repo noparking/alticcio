@@ -14,11 +14,6 @@ $page->javascript[] = $config->core_media("jquery.form.js");
 $page->javascript[] = $config->core_media("jquery.dteditor.js");
 $page->javascript[] = $url->make("DTEditor");
 $page->css[] = $config->media("dteditor.css");
-$page->jsvars[] = array(
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
-);
 
 $page->css[] = $config->media("produit.css");
 

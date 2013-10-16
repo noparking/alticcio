@@ -10,11 +10,6 @@ $config->base_include("functions/tree");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("confirm.js");
 $page->javascript[] = $config->media("blog.js");
-$page->jsvars[] = array(
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
-);
 
 $sql = new Mysql($config->db());
 $blog = new Blog($sql);

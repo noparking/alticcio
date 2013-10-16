@@ -14,9 +14,6 @@ $page->javascript[] = $config->core_media("jquery.dteditor.js");
 $page->css[] = $config->media("dteditor.css");
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $page->css[] = $config->media("produit.css");

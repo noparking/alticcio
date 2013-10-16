@@ -6,12 +6,7 @@ $config->core_include("api/admin");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("confirm.js");
-$page->jsvars[] = array(
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',
-		'ConfirmerChangement',
-	)),
-);
+$page->jsdico[] = array('ConfirmerChangement');
 
 $sql = new Mysql($config->db());
 $admin = new API_Admin("api_");

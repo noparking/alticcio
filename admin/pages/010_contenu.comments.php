@@ -11,9 +11,6 @@ $page->javascript[] = $config->core_media("confirm.js");
 $page->inc("snippets/date-input");
 $page->jsvars[] = array(
 	"edit_url" => $url4->make("current", array('action' => "edit", 'id' => "")),
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $titre_page = $dico->t('Commentaires');

@@ -12,9 +12,6 @@ $page->javascript[] = $config->media("produit.js");
 
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $page->css[] = $config->media("produit.css");

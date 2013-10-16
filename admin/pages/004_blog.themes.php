@@ -11,9 +11,6 @@ $page->javascript[] = $config->core_media("confirm.js");
 $page->javascript[] = $config->media("blog.js");
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('type' => "themes", 'action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $sql = new Mysql($config->db());

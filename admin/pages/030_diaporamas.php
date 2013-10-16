@@ -19,9 +19,6 @@ $page->css[] = $config->core_media("colorbox.css");
 $page->css[] = $config->media("dteditor.css");
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
-	"dico" => $dico->export(array(
-		'ConfirmerSuppression',	
-	)),
 );
 
 $page->css[] = $config->media("produit.css");
