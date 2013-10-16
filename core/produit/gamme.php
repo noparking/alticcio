@@ -48,12 +48,12 @@ SQL;
 	}
 	
 	public function delete($data) {
-		parent::delete($data);
-
 		$q = <<<SQL
-DELETE FROM dt_gammes_attributs WHERE id_gamme = {$this->id}
+DELETE FROM dt_gammes_attributs WHERE id_gammes = {$data['gamme']['id']}
 SQL;
 		$this->sql->query($q);
+
+		return parent::delete($data);
 	}
 	
 	public function all_attributs($option = "") {
