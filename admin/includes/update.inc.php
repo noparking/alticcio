@@ -758,3 +758,32 @@ ALTER TABLE `dt_factures_produits` ADD `ecotaxe` FLOAT NOT NULL DEFAULT '0' AFTE
 SQL;
 	$update->query($q);
 }
+
+function update_32($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_boutiques` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(60) NOT NULL,
+  `id_catalogues` int(11) NOT NULL,
+  `id_api_keys` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_catalogues` (`id_catalogues`,`id_api_keys`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_boutiques_data` (
+  `id_boutiques` int(11) NOT NULL DEFAULT '0',
+  `data_key` varchar(64) NOT NULL DEFAULT '',
+  `data_value` text,
+  PRIMARY KEY (`id_boutiques`,`data_key`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_frais_port` CHANGE `id_catalogues` `id_boutiques` INT( 11 ) NOT NULL DEFAULT '0'
+SQL;
+	$update->query($q);
+}

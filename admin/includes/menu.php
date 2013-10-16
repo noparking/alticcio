@@ -238,6 +238,11 @@ $menus = array(
 				//'url' => $url->make("Database"),
 				'level' => 90,
 				'items' => array(
+					'boutiques' => array(
+						'label' => "Boutiques",
+						'url' => $url->make("Boutiques"),
+						'level' => 99,
+					),
 					'users' => array(
 						'label' => $dico->t("Utilisateurs"),
 						'url' => $url->make("userlist"),

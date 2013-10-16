@@ -403,6 +403,7 @@ $d['pages'] = array(
 	'login' => "login",
 	'accueil' => "home",
 	'userlist' => "users",
+	'boutiques' => "shops",
 	'batch' => "batch",
 	'blog' => "blog",
 	'useredit' => "users",

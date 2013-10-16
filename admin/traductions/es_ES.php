@@ -535,6 +535,7 @@ $d['pages'] = array(
 	'login' => "connexion",
 	'accueil' => "accueil",
 	'userlist' => "utilisateurs",
+	'boutiques' => "shops",
 	'batch' => "batch",
 	'blog' => "blog",
 	'useredit' => "utilisateurs",
