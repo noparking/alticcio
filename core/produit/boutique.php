@@ -80,8 +80,10 @@ SQL;
 				}
 			}
 		}
-		if ($data['boutique']['new_data_key'] !== "" and $data['boutique']['new_data_value'] !== "") {
-			$boutique_data[$data['boutique']['new_data_key']] = $data['boutique']['new_data_value'];
+		if (isset($data['boutique']['new_data_key']) and isset($data['boutique']['new_data_value'])) {
+			if ($data['boutique']['new_data_key'] !== "" and $data['boutique']['new_data_value'] !== "") {
+				$boutique_data[$data['boutique']['new_data_key']] = $data['boutique']['new_data_value'];
+			}
 		}
 		unset($data['boutique']['data']);
 		unset($data['boutique']['new_data_key']);
@@ -94,16 +96,18 @@ DELETE FROM dt_boutiques_data WHERE id_boutiques = {$this->id}
 SQL;
 		$this->sql->query($q);
 
-		$values = array();
-		foreach ($boutique_data as $key => $value) {
-			$values[] = "({$this->id}, '$key', '$value')";
-		}
-		$values_list = implode(",", $values);
+		if (count($boutique_data)) {
+			$values = array();
+			foreach ($boutique_data as $key => $value) {
+				$values[] = "({$this->id}, '$key', '$value')";
+			}
+			$values_list = implode(",", $values);
 
-		$q = <<<SQL
+			$q = <<<SQL
 INSERT INTO dt_boutiques_data (id_boutiques, data_key, data_value) VALUES $values_list
 SQL;
-		$this->sql->query($q);
+			$this->sql->query($q);
+		}
 		
 		return $this->id;
 	}

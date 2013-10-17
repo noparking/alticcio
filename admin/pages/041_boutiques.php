@@ -148,6 +148,10 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "boutique[id_catalogues]", 'label' => $dico->t('Catalogue'), 'options' => $boutique->catalogues()))}
 {$form->select(array('name' => "boutique[id_api_keys]", 'label' => $dico->t('UtilisateurAPI'), 'options' => $boutique->api_keys()))}
 {$form->fieldset_end()}
+HTML;
+}
+if ($action == "edit") {
+	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Parametres'), 'class' => "produit-section produit-section-parametres".$hidden['parametres'], 'id' => "produit-section-parametres"))}
 HTML;
 	foreach ($boutique->values['data'] as $data_key => $data_value) {
