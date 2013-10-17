@@ -120,4 +120,29 @@ SQL;
 
 		return parent::delete($data);
 	}
+
+	function find_and_load($name) {
+		$q = <<<SQL
+SELECT id FROM dt_boutiques WHERE nom = '$name'
+SQL;
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
+			return $this->load($row['id']);
+		}
+		else {
+			return false;
+		}
+	}
+
+	function api_key() {
+		$id_api_keys = (int)$this->values['id_api_keys'];
+		$q = <<<SQL
+SELECT `key` FROM api_keys WHERE id = {$id_api_keys}
+SQL;
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
+			return $row['key'];
+		}
+		return "";
+	}
 }
