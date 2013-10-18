@@ -26,12 +26,12 @@ SQL;
 		return $liste_pays;
 	}
 	
-	public function forfaits($id_catalogues = 0){
+	public function forfaits($id_boutiques = 0){
 		$q = <<<SQL
 SELECT fp.id_pays, fp.methode, fp.prix_min, fp.forfait, ph.phrase FROM dt_frais_port AS fp
 INNER JOIN dt_phrases AS ph
 ON fp.phrase_info = ph.id
-WHERE fp.id_langues = {$this->id_langues} AND fp.id_catalogues = $id_catalogues 
+WHERE fp.id_langues = {$this->id_langues} AND fp.id_boutiques = $id_boutiques 
 ORDER BY fp.prix_min ASC
 SQL;
 		$forfaits = array();
@@ -65,12 +65,12 @@ SQL;
 		return $forfaits;
 	}
 
-	public function forfait ($montant, $id_pays, $id_catalogues = 0) {
+	public function forfait ($montant, $id_pays, $id_boutiques = 0) {
 		$q = <<<SQL
 SELECT forfait FROM dt_frais_port WHERE prix_min <= $montant 
 AND id_langues = {$this->id_langues}
 AND id_pays = $id_pays
-AND id_catalogues = $id_catalogues
+AND id_boutiques = $id_boutiques
 ORDER BY prix_min DESC LIMIT 1
 SQL;
 		$res = $this->sql->query($q);
@@ -79,11 +79,11 @@ SQL;
 		return $row['forfait'];
 	}
 	
-	function check($data, $id_catalogues = 0){
+	function check($data, $id_boutiques = 0){
 		$id_pays = $data['commande']['livraison_pays'];
 		$q = <<<SQL
 SELECT methode from dt_frais_port
-WHERE id_langues = {$this->id_langues} AND id_pays = {$id_pays} AND id_catalogues = $id_catalogues
+WHERE id_langues = {$this->id_langues} AND id_pays = {$id_pays} AND id_boutiques = $id_boutiques
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
