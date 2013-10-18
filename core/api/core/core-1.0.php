@@ -60,12 +60,12 @@ class API {
 		return $this->execute();
 	}
 
-	public function post($uri, $post) {
-		$this->prepare($this->base_url(), "post", $uri, $post);
+	public function post($uri, $post = null, $files = null) {
+		$this->prepare($this->base_url(), "post", $uri, $post, $files);
 		return $this->execute();
 	}
 
-	public function prepare($base_url = "", $method = null, $uri = null, $post = null) {
+	public function prepare($base_url = "", $method = null, $uri = null, $post = null, $files = null) {
 		if ($method === null) {
 			$method = $_SERVER['REQUEST_METHOD'];
 		}
@@ -73,6 +73,7 @@ class API {
 			$uri = $_SERVER['REQUEST_URI'];
 		}
 		$this->post = ($post === null) ? $_POST : $post;
+		$this->files = ($files === null) ? $_FILES : $files;
 
 		$this->key_id = null;
 		$this->key_roles = array();
