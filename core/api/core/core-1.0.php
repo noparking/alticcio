@@ -10,7 +10,15 @@ class API {
 	private $func;
 	private $args;
 
-	private $errors = array();
+	private $errors = array(
+		101 => "Clé incorrecte",
+		102 => "Cette clé est désactivée",
+		103 => "Cette fonctionnalité n'est pas disponible",
+		104 => "Cette fonctionnalité n'est pas autorisée",
+		105 => "Paramètre(s) manquant(s) pour cette fonctionnalité",
+		106 => "IP non autorisée",
+		107 => "Domaine non autorisé",
+	);
 	private $request = "";
 	private $method;
 	private $ip;
