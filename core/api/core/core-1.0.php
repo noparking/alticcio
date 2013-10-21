@@ -285,9 +285,6 @@ SQL;
 		}
 		else {
 			$args = array($this);
-			if ($this->method == "post") {
-				$args[] = $this->post;
-			}
 			$args = array_merge($args, $this->args);
 			$data = call_user_func_array($this->func, $args);
 		}
