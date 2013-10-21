@@ -61,24 +61,24 @@ class API_Cart {
 			'nom_fichier' => "",
 		);
 		
-		if (isset($_POST['perso_texte'])) {
-			$perso['texte'] = $_POST['perso_texte'];
+		if (isset($this->api->post['perso_texte'])) {
+			$perso['texte'] = $this->api->post['perso_texte'];
 			$key .= $perso['texte'];;
 		}
 		
-		if (isset($_POST['perso_objet'])) {
-			$perso['objet'] = $_POST['perso_objet'];
+		if (isset($this->api->post['perso_objet'])) {
+			$perso['objet'] = $this->api->post['perso_objet'];
 			$key .= $perso['objet'];
 		}
 
-		if (isset($_FILES['perso_fichier']) and $_FILES['perso_fichier']['error'] == UPLOAD_ERR_OK) {
-			$uploads_dir = $this->config->get("medias_path")."/files/personnalisations/";
-			$tmp_name = $_FILES['perso_fichier']['tmp_name'];
-			$original_name = $_FILES['perso_fichier']['name'];
+		if (isset($this->api->files['perso_fichier']) and $this->api->files['perso_fichier']['error'] == UPLOAD_ERR_OK) {
+			$uploads_dir = $this->api->post['perso_fichier_path'];
+			$tmp_name = $this->api->files['perso_fichier']['tmp_name'];
+			$original_name = $this->api->files['perso_fichier']['name'];
 			preg_match("/(\.[^\.]*)$/", $original_name, $matches);
 			$ext = $matches[1];
 			$name = md5_file($tmp_name).$ext;
-			move_uploaded_file($tmp_name, "$uploads_dir/$name");
+			move_uploaded_file($tmp_name, $uploads_dir.$name);
 			$perso['fichier'] = $name;
 			$perso['nom_fichier'] = $original_name;
 			$key .= $name.$original_name;
