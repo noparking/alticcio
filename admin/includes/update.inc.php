@@ -787,3 +787,15 @@ ALTER TABLE `dt_frais_port` CHANGE `id_catalogues` `id_boutiques` INT( 11 ) NOT 
 SQL;
 	$update->query($q);
 }
+
+function update_33($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes` ADD `notification` INT NOT NULL 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_revisions` ADD `notification` INT NOT NULL 
+SQL;
+	$update->query($q);
+}
