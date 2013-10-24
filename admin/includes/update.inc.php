@@ -783,7 +783,7 @@ SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-ALTER TABLE `dt_frais_port` CHANGE `id_catalogues` `id_boutiques` INT( 11 ) NOT NULL DEFAULT '0'
+ALTER TABLE `dt_frais_port` ADD `id_boutiques` INT( 11 ) NOT NULL DEFAULT '0' AFTER id
 SQL;
 	$update->query($q);
 }
