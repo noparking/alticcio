@@ -17,15 +17,29 @@ class API_Admin {
 	}
 
 	public function add_key($params = array()) {
-		foreach (array('name', 'table_name', 'table_id_name', 'id_table', 'language', 'key', 'domain') as $attr) {
-			$$attr = isset($params[$attr]) ? $params[$attr] : "";
+		$fields = array();
+		$values = array(); 
+		foreach (array('name', 'table_name', 'table_id_name', 'id_table', 'language', 'key', 'domain') as $field) {
+			if (isset($params[$field])) {
+				$fields[] = "`$field`";
+				$values[] = "'{$params[$field]}'";
+			}
 		}
 		if (!isset($params['key'])) {
-			$key = $this->generate_key();
+			$fields[] = "`key`";
+			$values[] = "'{$this->generate_key()}'";
 		}
+
+		$fields[] = "`date_creation`";
+		$values[] = $_SERVER['REQUEST_TIME'];
+
+		$fields[] = "`active`";
+		$values[] = 1;
+
+		$fields_list = implode(",", $fields);
+		$values_list = implode(",", $values);
 		$q = <<<SQL
-INSERT INTO {$this->table('keys')} (`key`, `name`, `table_name`, `table_id_name`, `id_table`, `language`, `date_creation`, `active`, `domain`)
-VALUES ('$key', '$name', '$table_name', '$table_id_name', '$id_table', '$language', {$_SERVER['REQUEST_TIME']}, TRUE, '$domain')
+INSERT INTO {$this->table('keys')} ($fields_list) VALUES ($values_list)
 SQL;
 		mysql_query($q);
 
