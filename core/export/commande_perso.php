@@ -30,6 +30,7 @@ class ExportCommandePerso extends AbstractExport {
 			'id_commande',
 			'id_produit',
 			'id_sku',
+			'code_famille_vente',
 			'ref',
 			'nom',
 			'quantite',
@@ -59,10 +60,12 @@ SQL;
 	public function cmds_perso_a_exporter($date_export) {
 		$time_last_commande = $this->time_last_commande();
 		$q = <<<SQL
-SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, cp.ref, cp.nom, cp.quantite,
+SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
 cp.personnalisation_texte, cp.personnalisation_fichier, c.date_commande
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
+INNER JOIN dt_sku AS s ON s.id = cp.id_sku
+INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
 WHERE (cp.personnalisation_texte <> "" OR cp.personnalisation_fichier <> "")
 SQL;
 		if ($time_last_commande) {
@@ -76,6 +79,7 @@ SQL;
 				'id_commande' => $row['id_commandes'],
 				'id_produit' => $row['id_produits'],
 				'id_sku' => $row['id_sku'],
+				'code_famille_vente' => $row['code'],
 				'ref' => $row['ref'],
 				'nom' => $row['nom'],
 				'quantite' => $row['quantite'],
@@ -85,6 +89,7 @@ SQL;
 				'date_commande' => date("Y-m-d", $row['date_commande']),
 				'time_export' => $date_export,
 				'date_export' => date("Y-m-d", $date_export),
+				'bat' => "",
 			);
 		}
 
@@ -94,7 +99,7 @@ SQL;
 	public function prepare($fields) {
 		$field_list = "";
 		foreach ($fields as $field) {
-			if (in_array($field, array("id", "id_commande", "id_produit", "id_sku", "quantite", "time_commande", "time_export"))) {
+			if (in_array($field, array("id", "id_commande", "id_produit", "id_sku", "code_famille_vente", "quantite", "time_commande", "time_export"))) {
 				$field_list .= "`$field` int(11) NOT NULL,";
 			}
 			else if (in_array($field, array("date_commande", "date_export"))) {
