@@ -39,6 +39,7 @@ class ExportCommandePerso extends AbstractExport {
 			'date_commande',
 			'time_export',
 			'date_export',
+			'bat',
 		);
 
 		return $fields;
