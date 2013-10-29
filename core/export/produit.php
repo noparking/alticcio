@@ -6,11 +6,40 @@ class ExportProduit extends AbstractExport {
 
 	public $export_table = "fiches_produits";
 
+	private $applications = array();
+
+	public function __construct($sql, $sql_export) {
+		parent::__construct($sql, $sql_export);
+		$q = <<<SQL
+SELECT a.id, ph.phrase, ph.id_langues
+FROM dt_applications AS a
+INNER JOIN dt_phrases AS ph ON ph.id = a.phrase_nom
+SQL;
+		$res = $this->sql->query($q);
+		$this->applications = array();
+		while ($row = $this->sql->fetch($res)) {
+			$this->applications[$row['id']][$row['id_langues']] = $row['phrase'];
+		}
+	}
+
 	public function export() {
 		$date_export = time();
-		$produits = $this->produits_a_exporter();
 		$fields = $this->fields();
-		$this->prepare($fields, $produits);
+		$this->prepare($fields);
+
+		$produits = $this->produits_a_exporter();
+		if (count($produits)) {
+			$ids_produits = array();
+			foreach($produits as $produit_data) {
+				$ids_produits[] = $produit_data['id'];
+			}
+			$ids_produits_list = implode(",", $ids_produits);
+
+			$q = <<<SQL
+DELETE FROM `{$this->export_table}` WHERE id_produit IN ($ids_produits_list)
+SQL;
+			$this->sql_export->query($q);
+		}
 
 		if (count($produits)) {
 			$ids_produits = array();
@@ -50,6 +79,8 @@ SQL;
 		$fields = array(
 			'id_langue',
 			'code_langue',
+			'id_application',
+			'application',
 			'id_produit',
 			'offre',
 			'recyclage',
@@ -100,18 +131,23 @@ SQL;
 
 		$data_lignes = array();
 		$couples = array();
+
+
 		
 		foreach ($this->langues() as $id_langues => $code_langue) {
 			foreach ($produits as $data) { 	
 				$produit->load($data['id']);
 				$produit_values = $produit->values;
 				$produit_phrases = $produit->phrases_dynamiques();
+				$classement = 0;
 				foreach (array('variante' => "variantes", 'accessoire' => "accessoires") as $type_sku => $method) {
 					$notes_prix = array();
 					if ($produit_values['id_types_produits'] == 2) {
 						$notes_prix['perso'] = "perso";
 					}
+					$classement = 0; # supprimer cette ligne pour un classement global
 					foreach ($produit->$method() as $variante) {
+						$classement += 1;
 						if (!isset($couples[$data['id']][$variante['id_sku']])) {
 							$couples[$data['id']][$variante['id_sku']] = true;
 							$sku->load($variante['id_sku']);
@@ -121,6 +157,8 @@ SQL;
 							$data_ligne = array(
 								$id_langues,
 								$code_langue,
+								$produit_values['id_applications'],
+								$this->application($produit_values['id_applications'], $id_langues),
 								$produit_values['id'],
 								$produit_values['offre'],
 								$this->recyclage($produit_values['id_recyclage']),
@@ -137,7 +175,7 @@ SQL;
 							$nom_sku = (isset($sku_phrases['phrase_commercial'][$code_langue]) and $sku_phrases['phrase_commercial'][$code_langue]) ? 'phrase_commercial' : 'phrase_ultralog';
 							$data_ligne = array_merge($data_ligne, array(
 								$type_sku,
-								$variante['classement'],
+								$classement,
 								$sku_values['id'],
 								$sku_values['ref_ultralog'],
 								$this->phrase($nom_sku, $sku_phrases, $code_langue),
@@ -220,7 +258,7 @@ SQL;
 		return $produits;
 	}
 
-	public function prepare($fields, $produits) {
+	public function prepare($fields) {
 		$field_list = "";
 		foreach ($fields as $i => $field) {
 			if ($field != "id_produit" and $field != "id_sku" and $field != "id_langue") {
@@ -238,19 +276,6 @@ CREATE TABLE IF NOT EXISTS `{$this->export_table}` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 SQL;
 		$this->sql_export->query($q);
-
-		if (count($produits)) {
-			$ids_produits = array();
-			foreach($produits as $produit_data) {
-				$ids_produits[] = $produit_data['id'];
-			}
-			$ids_produits_list = implode(",", $ids_produits);
-
-			$q = <<<SQL
-DELETE FROM `{$this->export_table}` WHERE id_produit IN ($ids_produits_list)
-SQL;
-			$this->sql_export->query($q);
-		}
 	}
 
 	function max_images() {
@@ -404,7 +429,7 @@ SQL;
 						$valeur .= " {$attr['unite']}";
 					}
 				}
-				$attributs[] = $phrases['attributs'][$attr['id_attributs']][$code_langue]." : ".trim($valeur);
+				$attributs[] = $phrases['attributs'][$attr['id_attributs']][$code_langue]." :\t".trim($valeur);
 			}
 		}
 		return implode($separator, $nb === null ? $attributs : array_slice($attributs, 0, $nb));
@@ -432,6 +457,10 @@ SQL;
 			case 10 : return 5;
 			default : return 1;
 		}
+	}
+
+	function application($id_applications, $id_langues) {
+		return isset($this->applications[$id_applications][$id_langues]) ? $this->applications[$id_applications][$id_langues] : "";
 	}
 }
 
