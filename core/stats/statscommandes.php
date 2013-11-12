@@ -6,15 +6,16 @@
 
 class StatsCommandes {
 	
-	public function __construct($sql = null, $dico) {
+	public function __construct($sql = null, $dico = null, $shop = 0) {
 		$this->sql = $sql;
 		$this->dico = $dico;
+		$this->shop = (int)$shop;
 	}
 	
 	public function nombre_commandes_par_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, COUNT(*) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = 3 AND id_api_keys = 0
+				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = {$this->shop} AND id_api_keys = 0
 				GROUP BY annee, mois ";
 		$rs = $this->sql->query($q);
 		$tab = array();
@@ -29,7 +30,7 @@ class StatsCommandes {
 				FROM dt_commandes_produits AS cp
 				INNER JOIN dt_commandes AS c
 				ON cp.id_commandes = c.id  
-				AND (c.paiement != 'refuse' OR c.paiement != 'annule') AND c.shop = 3 AND c.id_api_keys = 0
+				AND (c.paiement != 'refuse' OR c.paiement != 'annule') AND c.shop = {$this->shop} AND c.id_api_keys = 0
 				GROUP BY cp.id_commandes, c.annee, c.mois ";
 		$rs = $this->sql->query($q);
 		$tab = array();
@@ -42,7 +43,7 @@ class StatsCommandes {
 	public function chiffre_affaires_par_annee_mois() {
 		$q = "SELECT DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%Y') AS annee, DATE_FORMAT(FROM_UNIXTIME(c.date_commande), '%m') AS mois, SUM(c.montant) AS total
 				FROM dt_commandes as c
-				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = 3 AND id_api_keys = 0
+				WHERE (c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule') AND shop = {$this->shop} AND id_api_keys = 0
 				GROUP BY annee, mois";
 		$rs = $this->sql->query($q);
 		$tab = array();
@@ -56,7 +57,7 @@ class StatsCommandes {
 		$q = "SELECT DATE_FORMAT( FROM_UNIXTIME( c.date_commande ) , '%Y' ) AS annee, DATE_FORMAT( FROM_UNIXTIME( c.date_commande ) , '%m' ) AS mois, SUM( c.montant ) AS total, COUNT( * ) AS nbre
 				FROM dt_commandes AS c
 				WHERE ( c.paiement_statut != 'refuse' AND c.paiement_statut != 'annule' )
-				AND shop =3
+				AND shop = {$this->shop}
 				AND id_api_keys =0
 				GROUP BY annee, mois";
 		$rs = $this->sql->query($q);

@@ -15,7 +15,7 @@ $menu->current('main/stats/commandes');
  * On initialise la classe StatsContacts 
  */
 $sql = new Mysql($config->db());
-$stats = new StatsCommandes($sql, $dico);
+$stats = new StatsCommandes($sql, $dico, $congig->get("main_shop"));
 
 $titre_page = $dico->t("StatsCommandes");
 
