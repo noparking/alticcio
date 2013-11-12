@@ -65,7 +65,7 @@ SQL;
 			$i = 1;
 			foreach ($this->data($produits) as $data) {
 				$values[] = $data;
-				if ($i % 500 == 0) {
+				if ($i % 200 == 0) {
 					$this->insert_values($fields, $values);
 					$values = array();
 				}
