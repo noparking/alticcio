@@ -140,7 +140,7 @@ else if ($action == "edit-rules") {
 	if ($form->is_submitted()) {
 		$data = $form->escape_values();
 		$rule = $data['rule'];
-		$admin->add_key_rule($key_id, $rule['method'], $rule['uri'], $rule['type']);
+		$admin->add_key_rule($key_id, $rule['method'], $rule['uri'], $rule['type'], $rule['log']);
 		$form->reset();
 	}
 
@@ -151,6 +151,7 @@ else if ($action == "edit-rules") {
 		<th>{$dico->t('Methode')}</th>
 		<th>{$dico->t('Uri')}</th>
 		<th>{$dico->t('Type')}</th>
+		<th>{$dico->t('Logs')}</th>
 		<th>{$dico->t('Actions')}</th>
 	</tr>
 HTML;
@@ -159,11 +160,13 @@ HTML;
 			"<a class=\"confirm-delete\" href=\"{$url->make("current", array('action' => "delete-rule", 'id' => $rule['id']))}\">{$dico->t("Supprimer")}</a>",
 		);
 		$actions = implode('</td><td class="align_center">', $actions);
+		$logs = $rule['log'] ? "Yes" : "No";
 		$main .= <<<HTML
 	<tr>
 		<td>{$rule['method']}</td>
 		<td>{$rule['uri']}</td>
 		<td>{$rule['type']}</td>
+		<td>{$logs}</td>
 		<td class="align_center">$actions</td>
 	</tr>
 HTML;
@@ -188,11 +191,16 @@ HTML;
 		"deny" => "Deny",
 		"allow" => "Allow",
 	);
+	$log = array(
+		1 => "Yes",
+		0 => "No",
+	);
 	$main .= <<<HTML
 {$form->fieldset_start($dico->t('AjouterUneRegle'))}
 {$form->select(array('name' => "rule[method]", 'label' => $dico->t('Methode'), 'options' => $methods))}
 {$form->input(array('name' => "rule[uri]", 'label' => $dico->t('Uri')))}
 {$form->select(array('name' => "rule[type]", 'label' => $dico->t('Acces'), 'options' => $acces))}
+{$form->select(array('name' => "rule[log]", 'label' => $dico->t('Logs'), 'options' => $log))}
 {$form->input(array('name' => "add-rule", 'type' => "submit", 'value' => $dico->t("Ajouter")))}
 {$form->fieldset_end()}
 HTML;
