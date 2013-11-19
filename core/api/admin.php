@@ -134,10 +134,10 @@ SQL;
 		return $keys;
 	}
 
-	public function add_key_rule($key_id, $method, $uri, $type) {
+	public function add_key_rule($key_id, $method, $uri, $type, $log = 1) {
 		$q = <<<SQL
-INSERT INTO {$this->table('keys_rules')} (`method`, `uri`, `type`, `id_key`)
-VALUES ('$method', '$uri', '$type', $key_id)
+INSERT INTO {$this->table('keys_rules')} (`method`, `uri`, `type`, `id_key`, `log`)
+VALUES ('$method', '$uri', '$type', $key_id, $log)
 SQL;
 		mysql_query($q);
 
@@ -251,7 +251,7 @@ SQL;
 
 	public function role_rules($role_id) {
 		$q = <<<SQL
-SELECT id, method, uri, type
+SELECT id, method, uri, type, log
 FROM {$this->table('roles_rules')} 
 WHERE id_role = $role_id 
 ORDER BY method ASC, uri ASC
@@ -264,12 +264,12 @@ SQL;
 		return $rules;
 	}
 
-	public function add_role_rule($role_id, $method, $uri, $type) {
+	public function add_role_rule($role_id, $method, $uri, $type, $log = 1) {
 		$roles_ids = array_keys($this->roles());
 		if (in_array($role_id, $roles_ids)) {
 			$q = <<<SQL
-INSERT INTO {$this->table('roles_rules')} (`method`, `uri`, `type`, `id_role`)
-VALUES ('$method', '$uri', '$type', $role_id)
+INSERT INTO {$this->table('roles_rules')} (`method`, `uri`, `type`, `id_role`, `log`)
+VALUES ('$method', '$uri', '$type', $role_id, $log)
 SQL;
 			mysql_query($q);
 

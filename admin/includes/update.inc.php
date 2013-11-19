@@ -819,3 +819,15 @@ UPDATE `dt_commandes_revisions` SET notification = 1, id_langues = 1
 SQL;
 	$update->query($q);
 }
+
+function update_34($update) {
+	$q = <<<SQL
+ALTER TABLE `api_keys_rules` ADD `log` TINYINT NOT NULL DEFAULT '1'
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `api_roles_rules` ADD `log` TINYINT NOT NULL DEFAULT '1'
+SQL;
+	$update->query($q);
+}
