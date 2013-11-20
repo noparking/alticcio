@@ -261,6 +261,20 @@ SQL;
 		}
 	}
 
+	public function check_log() {
+		switch ($this->key_log()) {
+			case 1 : return true;
+			case -1: return false;
+			case 0 :
+				if ($this->role_log() == 1) {
+					return true;
+				}
+				else {
+					return false;
+				}
+		}
+	}
+
 	public function execute() {
 		if (!$this->check_key()) {
 			$data = $this->error(101);
@@ -288,7 +302,9 @@ SQL;
 			$args = array_merge($args, $this->args);
 			$data = call_user_func_array($this->func, $args);
 		}
-		$this->log(isset($data['error']) ? $data['error'] : 0);
+		if ($this->check_log()) {
+			$this->log(isset($data['error']) ? $data['error'] : 0);
+		}
 
 		return $data;
 	}
@@ -417,6 +433,46 @@ SQL;
 			}
 		}
 		return $permission;
+	}
+
+	private function key_log() {
+		$applied_rule = "*";
+		$log = 0;
+		foreach ($this->key_rules() as $rule) {
+			if (strtolower($rule['method']) == $this->method) {
+				if (API_Rule::apply($this->request, $rule['uri'])) {
+					if (API_Rule::over($rule['uri'], $applied_rule)) {
+						$applied_rule = $rule['uri'];
+						$log = $rule['log'] ? 1 : -1;
+					}
+					else if ($applied_rule == $rule['uri']) {
+						$log = $rule['log'] ? 1 : -1;
+					}
+				}
+			}
+		}
+		return $log;
+	}
+
+	private function role_log() {
+		$applied_rule = "*";
+		$log = 0;
+		foreach ($this->key_roles() as $role) {
+			foreach ($this->role_rules($role) as $rule) {
+				if (strtolower($rule['method']) == $this->method) {
+					if (API_Rule::apply($this->request, $rule['uri'])) {
+						if (API_Rule::over($rule['uri'], $applied_rule)) {
+							$applied_rule = $rule['uri'];
+							$log = $rule['log'] ? 1 : -1;
+						}
+						else if ($applied_rule == $rule['uri']) {
+							$log = $rule['log'] ? 1 : -1;
+						}
+					}
+				}
+			}
+		}
+		return $log;
 	}
 
 	public function track($action, $item = 0) {
