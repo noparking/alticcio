@@ -20,19 +20,8 @@ class API_Cart {
 		}
 	}
 
-	public function is_sample($id) {
-		return isset($_SESSION['cart']['samples'][$id]);
-	}
-	
 	public function add($id_produits, $id_sku, $qte, $sample = false) {
 		$id = "$id_produits-$id_sku";
-		
-		if ($sample) {
-			$_SESSION['cart']['samples'][$id] = true;
-		}
-		else {
-			unset($_SESSION['cart']['samples'][$id]);
-		}
 
 		if ($qte < 0) {
 			return false;
@@ -40,15 +29,20 @@ class API_Cart {
 
 		$this->set_token();
 		$key = $id;
+		
+		if ($sample) {
+			$key .= "[sample]";
+		}
 
-		if (isset($_SESSION['cart']['items'][$id])) {
-			$_SESSION['cart']['items'][$id]['qte'] += $qte;
+		if (isset($_SESSION['cart']['items'][$key])) {
+			$_SESSION['cart']['items'][$key]['qte'] += $qte;
 		}
 		else {
-			$_SESSION['cart']['items'][$id] = array(
+			$_SESSION['cart']['items'][$key] = array(
 				'qte' => $qte,
 				'id_produits' => $id_produits,
 				'id_sku' => $id_sku,
+				'sample' => $sample,
 			);
 		}
 
@@ -59,6 +53,7 @@ class API_Cart {
 			'texte' => "",
 			'fichier' => "",
 			'nom_fichier' => "",
+			'sample' => $sample,
 		);
 		
 		if (isset($this->api->post['perso_texte'])) {
@@ -101,9 +96,13 @@ class API_Cart {
 		$qte = 0;
 		$id_produits = $_SESSION['cart']['personnalisations'][$perso]['id_produits'];
 		$id_sku = $_SESSION['cart']['personnalisations'][$perso]['id_sku'];
+		$sample = $_SESSION['cart']['personnalisations'][$perso]['sample'];
 		$id = "$id_produits-$id_sku";
+		if ($sample) {
+			$id .= "[sample]";
+		}
 		foreach ($_SESSION['cart']['personnalisations'] as $p) {
-			if ($p['id_sku'] == $id_sku and $p['id_produits'] == $id_produits) {
+			if ($p['id_sku'] == $id_sku and $p['id_produits'] == $id_produits and $p['sample'] == $sample) {
 				$qte += $p['qte'];
 			}
 		}
@@ -115,7 +114,11 @@ class API_Cart {
 		$qte = $_SESSION['cart']['personnalisations'][$perso]['qte'];
 		$id_produits = $_SESSION['cart']['personnalisations'][$perso]['id_produits'];
 		$id_sku = $_SESSION['cart']['personnalisations'][$perso]['id_sku'];
+		$sample = $_SESSION['cart']['personnalisations'][$perso]['sample'];
 		$id = "$id_produits-$id_sku";
+		if ($sample) {
+			$id .= "[sample]";
+		}
 		unset($_SESSION['cart']['personnalisations'][$perso]);
 		$_SESSION['cart']['items'][$id]['qte'] -= $qte;
 		if ($_SESSION['cart']['items'][$id]['qte'] == 0) {
@@ -123,8 +126,11 @@ class API_Cart {
 		}
 	}
 
-	public function qte_min_to_add($id_produits, $id_sku, $qte_min, $colisage = 0) {
+	public function qte_min_to_add($id_produits, $id_sku, $qte_min, $colisage = 0, $sample = false) {
 		$id = "$id_produits-$id_sku";
+		if ($sample) {
+			$id .= "[sample]";
+		}
 		if (isset($_SESSION['cart']['items'][$id])) {
 			$qte_min = max(1, $qte_min - $_SESSION['cart']['items'][$id]['qte']);
 		}
@@ -208,6 +214,7 @@ SQL;
 				'personnalisation_texte' => $perso['texte'],
 				'personnalisation_fichier' => $perso['fichier'],
 				'personnalisation_nom_fichier' => $perso['nom_fichier'],
+				'echantillon' => $perso['sample'],
 			);
 			if (isset($perso['objet'])) {
 				$array['personnalisation_objet'] = $perso['objet'];
