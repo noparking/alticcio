@@ -844,13 +844,12 @@ SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-ALTER TABLE `dt_sku` ADD `step_commande` FLOAT NOT NULL DEFAULT '1' AFTER `min_commande` 
+ALTER TABLE `dt_sku` CHANGE `min_commande` `min_commande` FLOAT NOT NULL DEFAULT '1'
 SQL;
 	$update->query($q);
 
-
 	$q = <<<SQL
-ALTER TABLE `dt_sku` CHANGE `min_commande` `min_commande` FLOAT NOT NULL DEFAULT '1'
+ALTER TABLE `dt_sku` CHANGE `colisage` `colisage` FLOAT NOT NULL DEFAULT '1'
 SQL;
 	$update->query($q);
 }
