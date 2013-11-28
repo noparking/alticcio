@@ -842,4 +842,15 @@ SQL;
 ALTER TABLE `dt_commandes_produits_revisions` CHANGE `quantite` `quantite` FLOAT( 11 ) NOT NULL DEFAULT '0'
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_sku` ADD `step_commande` FLOAT NOT NULL DEFAULT '1' AFTER `min_commande` 
+SQL;
+	$update->query($q);
+
+
+	$q = <<<SQL
+ALTER TABLE `dt_sku` CHANGE `min_commande` `min_commande` FLOAT NOT NULL DEFAULT '1'
+SQL;
+	$update->query($q);
 }
