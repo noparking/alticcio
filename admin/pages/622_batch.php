@@ -6,6 +6,13 @@ $config->core_include("outils/form", "outils/mysql", "outils/phrase", "outils/la
 $dirname = dirname(__FILE__).'/../traductions/';
 $main_lg = 'fr_FR';
 
+function nettoyage($chaine) {
+	return str_replace('"','',$chaine);
+}
+function prix($chaine) {
+	return str_replace(',','.',$chaine);
+}
+
 $sql = new Mysql($config->db());
 $langue = new Langue($sql);
 $id_langue = $langue->id($config->get("langue"));
@@ -17,10 +24,11 @@ $form = new Form(array(
 ));
 
 $liste_types_batchs = array(	0 => "...",
-								1 => $dico->t('BatchProduitsApplications'),
-								2 => $dico->t('BatchSkuAttributs'),
-								3 => $dico->t('BatchCreationSku'),
-							);
+						1 => $dico->t('BatchProduitsApplications'),
+						2 => $dico->t('BatchSkuAttributs'),
+						3 => $dico->t('BatchCreationSku'),
+						4 => $dico->t('BatchDegressifs'),
+					);
 							
 $html = "";
 if ($form->is_submitted()) {
@@ -41,15 +49,15 @@ if ($form->is_submitted()) {
 						switch($data['nom_batch']) {
 							case 1:
 								list($id_produits,$id_applications) = explode(";", $line);
-								$id_applications = str_replace("\"", "", $id_applications);
-								$id_produits = str_replace("\"", "", $id_produits);
+								$id_applications = nettoyage($id_applications);
+								$id_produits = nettoyage($id_produits);
 								$q = "UPDATE dt_produits SET id_applications = ".$id_applications." WHERE id = ".$id_produits;
 								break;
 							case 2: 
 								list($id_sku,$id_attributs,$valeur_num) = explode(";", $line);
-								$id_sku = str_replace("\"", "", $id_sku);
-								$id_attributs = str_replace("\"", "", $id_attributs);
-								$valeur_num = str_replace("\"", "", $valeur_num);
+								$id_sku = nettoyage($id_sku);
+								$id_attributs = nettoyage($id_attributs);
+								$valeur_num = nettoyage($valeur_num);
 								// on contrôle si l'attribut du sku existe et dans ce cas on update
 								$q1 = "SELECT id FROM dt_sku_attributs WHERE id_attributs = ".$id_attributs." AND id_sku = ".$id_sku." ";
 								$rs1 = $sql->query($q1);
@@ -62,12 +70,12 @@ if ($form->is_submitted()) {
 								break;
 							case 3:
 								list($ref, $designation, $fam, $sfam, $ssfam, $prix) = explode(";", $line);
-								$ref = str_replace("\"", "", $ref);
-								$designation = str_replace("\"", "", $designation);
-								$fam = str_replace("\"", "", $fam);
-								$sfam = str_replace("\"", "", $sfam);
-								$ssfam = str_replace("\"", "", $ssfam);
-								$prix = str_replace("\"", "", $prix);
+								$ref = nettoyage($ref);
+								$designation = nettoyage($designation);
+								$fam = nettoyage($fam);
+								$sfam = nettoyage($sfam);
+								$ssfam = nettoyage($ssfam);
+								$prix = nettoyage($prix);
 								$q1 = "SELECT id FROM dt_sku WHERE ref_ultralog = '".$ref."' ";
 								$rs1 = $sql->query($q1);
 								if (mysql_num_rows($rs1) == 0) {
@@ -85,10 +93,37 @@ if ($form->is_submitted()) {
 									$q4 = "INSERT INTO dt_sku SET id='', ref_ultralog=".$ref.", phrase_ultralog = ".($rowph['id']+1).", id_familles_vente = ".$row2['id'].", date_creation = ".time().", date_modification = ".time().", actif = 1";
 									$rs4 = $sql->query($q4);
 									$new_sku = mysql_insert_id();
-
 									// on intégre le prix
 									$q5 = "INSERT INTO dt_prix SET id='', id_sku = ".$new_sku.", montant_ht = '".$prix."', franco = 1";
 									$rs5 = $sql->query($q5);
+								}
+								break;
+							case 4:
+								$liste_prix = explode(";", $line);
+								$total_prix = count($liste_prix);
+								$q1 = "SELECT id FROM dt_sku WHERE ref_ultralog = '".nettoyage($liste_prix[0])."' ";
+								$rs1 = $sql->query($q1);
+								$row1 = $sql->fetch($rs1);
+								if (mysql_num_rows($rs1) > 0) {
+									// on met à jour le prix unitaire
+									$q2 = "UPDATE dt_prix SET montant_ht = '".nettoyage(prix($liste_prix[4]))."', franco=".nettoyage($liste_prix[2])." WHERE id_sku = ".$row1['id']." AND id_catalogues = ".nettoyage($liste_prix[1])." ";
+									$rs2 = $sql->query($q2);
+									// on supprime les anciens dégressifs
+									$q3 = "DELETE FROM dt_prix_degressifs WHERE id_sku = ".$row1['id']." AND id_catalogues = ".nettoyage($liste_prix[1])." ";
+									$rs3 = $sql->query($q3);
+									// on intègre les nouveaux dégressifs
+									for($i=5; $i<=$total_prix; $i++) {
+										if (!empty($liste_prix[$i]) AND  $liste_prix[$i] > 1) {
+											$q4 = "INSERT INTO dt_prix_degressifs SET id_sku =".$row1['id'].",
+													id_catalogues = ".nettoyage($liste_prix[1]).",
+													quantite = ".nettoyage($liste_prix[$i]).",
+													montant_ht = '".nettoyage(prix($liste_prix[$i+1]))."',
+													pourcentage = '".(100-(round(nettoyage(($liste_prix[$i+1]*100)/$liste_prix[4]),2)))."' ";
+											//echo $q4.'<br/>';
+											$rs4 = $sql->query($q4);
+										}
+										$i = $i+1;
+									}
 								}
 								break;
 							default: 
@@ -96,7 +131,6 @@ if ($form->is_submitted()) {
 						}
 						if (!empty($q)) {
 							$sql->query($q);
-							
 						}
 					}
 					$n++;
@@ -136,6 +170,7 @@ $html
 	<p>{$dico->t('BatchProduitsApplications')} :<strong> id_produits; id_applications</strong></p>
 	<p>{$dico->t('BatchSkuAttributs')} : <strong>id_sku; id_attributs; valeur_numerique</strong></p>
 	<p>{$dico->t('BatchCreationSku')} : <strong>ref_ultralog; designation; fam; sfam; ssfam; prix</strong></p>
+	<p>{$dico->t('BatchDegressifs')} : <strong>ref_ultralog; id_catalogues; franco; qte1; prix1; qte2; prix2; ...</strong></p>
 </div>
 HTML;
 

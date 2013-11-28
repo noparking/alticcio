@@ -46,6 +46,7 @@ $t['Auteur'] = "Auteur";
 $t['AvantagesProduit'] = "Le + produit";
 $t['BatchCreationSku'] = "Batch pour créer des SKU";
 $t['BatchDB'] = "Batchs de données";
+$t['BatchDegressifs'] = "Batch pour importer prix dégressifs";
 $t['BatchProduitsApplications'] = "Batch pour déterminer une application à un produit";
 $t['BatchSkuAttributs'] = "Batch pour associer un attribut à un SKU";
 $t['BasePoidsOk'] = "La base choisie convient pour cette utilisation avec son poids de %poids kg ";
