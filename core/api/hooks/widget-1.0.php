@@ -47,3 +47,12 @@ function get_widget_stats($api) {
 	}
 	return $ret;
 }
+
+function get_widget_eboutique($api) {
+	$ret = array();
+	$api->track("visit");
+	$boutique = new API_Boutique($api);
+	$ret['settings'] = $boutique->settings();
+
+	return $ret;
+}
