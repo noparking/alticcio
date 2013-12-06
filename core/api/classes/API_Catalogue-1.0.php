@@ -5,11 +5,13 @@ class API_Catalogue {
 	private $api;
 	private $sql;
 	private $language;
+	private $id;
 
-	function __construct($api) {
+	function __construct($api, $id = null) {
 		$this->api = $api;
 		$this->sql = $api->sql;
 		$this->language = $api->info('language');
+		$this->id = $id;
 	}
 
 	function all() {
@@ -27,12 +29,20 @@ SQL;
 	}
 
 	function id() {
+		if ($this->id !== null) {
+			return $this->id ? $this->id : false;
+		}
+
+# Cette partie concerne l'ancien widget ou lien entre clé API et id_catalogues
+# reposait sur une convention de nommage
+# Désormais, on utilise la table dt_boutiques
 		$name = $this->api->info("name");
 		$q = <<<SQL
 SELECT id FROM dt_catalogues WHERE nom LIKE '$name'
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
+			$this->id = $row['id'];
 			return $row['id'];
 		}
 		else {

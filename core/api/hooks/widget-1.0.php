@@ -54,5 +54,18 @@ function get_widget_eboutique($api) {
 	$boutique = new API_Boutique($api);
 	$ret['settings'] = $boutique->settings();
 
+	$catalogue = new API_Catalogue($api, $boutique->id_catalogues());
+
+	if ($id_catalogue = $catalogue->id()) {
+		$categories = $catalogue->tree($id_catalogue);
+		$ret['catalogue']['nb'] = count($categories);
+		$ret['catalogue']['categories'] = $categories;
+		$ret['catalogue']['home'] =  $catalogue->home($id_catalogue);
+		return $ret;
+	}
+	else {
+		return $api->error(304); // Aucun catalogue accessible
+	}
+
 	return $ret;
 }
