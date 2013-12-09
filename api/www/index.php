@@ -2,13 +2,18 @@
 
 include dirname(__FILE__)."/../includes/config.php";
 
-$config->core_include("api/api", "outils/mysql", "outils/phrase", "outils/langue");
+$config->core_include("api/api", "outils/mysql", "outils/phrase", "outils/langue", "outils/dico");
 $config->core_include("produit/produit");
 
 $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
-$id_langues = $langue->id($config->get("langue"));
+$code_langue = $config->get("langue");
+$id_langues = $langue->id($code_langue);
+
+$dico = new Dico($code_langue);
+$dico->add($config->get("base_path")."/core/traductions");
+$dico->add($config->get("base_path")."/traductions");
 
 $api = new API("api_", $sql);
 
@@ -71,4 +76,35 @@ function include_path($path) {
 	else {
 		return $include_path.$path;
 	}
+}
+
+
+// Gestion des widgets
+
+function widget($w) {
+	global $widget, $config, $dico;
+
+	$widget = $w;
+
+	$dico->add($config->get("base_path")."/www/widgets/$widget/traductions");
+}
+
+function widget_html($html, $vars = array()) {
+	global $widget, $config;
+
+	$html = file_get_contents($config->get("base_path")."/www/widgets/$widget/html/$html.html");
+
+	foreach ($vars as $key => $value) {
+		$html = str_replace("{".$key."}", $value, $html);
+	}
+
+	$html = preg_replace_callback("/\{dico:([^\}]+)\}/", "dico_preg_replace_callback", $html);
+
+	return $html;
+}
+
+function dico_preg_replace_callback($matches) {
+	global $dico;
+
+	return $dico->t($matches[1]);
 }
