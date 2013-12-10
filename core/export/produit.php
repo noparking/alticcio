@@ -288,7 +288,7 @@ SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
 
-		return $this->max_images = $row['nb_images'];
+		return $this->max_images = min(14, $row['nb_images']);
 	}
 
 	function images($produit, $max_images) {
@@ -316,7 +316,7 @@ SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
 
-		return $this->max_prix = $row['nb_prix'];
+		return $this->max_prix = min(7, $row['nb_prix']);
 	}
 
 	function prix($sku, $max_prix, $id_catalogues) {
