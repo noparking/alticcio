@@ -36,6 +36,7 @@ function get_catalogue_category($api, $id_category, $prices = "HT", $limit = 0, 
 	if ($name = $catalogue->categorie_name($id_category)) {
 		$api->track("category", $id_category);
 		$ret = $catalogue->produits($id_category, $limit, $offset);
+		$ret['id'] = $id_category;
 		$ret['bloc'] = $catalogue->bloc($id_category);
 		$ret['name'] = $name;
 		$ret['prices'] = $prices;
