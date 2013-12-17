@@ -99,6 +99,8 @@ function widget_html($html, $vars = array()) {
 	}
 
 	$html = preg_replace_callback("/\{dico:([^\}]+)\}/", "dico_preg_replace_callback", $html);
+	$html = preg_replace("/\s+/", " ", $html);
+	$html = str_replace("> <", "><", $html);
 
 	return $html;
 }
