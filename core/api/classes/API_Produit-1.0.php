@@ -78,6 +78,20 @@ SQL;
 
 		$produits = implode(",", array_merge($complementaires, $similaires));
 		if ($produits) {
+			$images_produits = array();
+			$q = <<<SQL
+SELECT id_produits, ref, vignette FROM dt_images_produits
+WHERE id_produits IN ($produits)
+ORDER BY classement ASC
+SQL;
+			$res = mysql_query($q);
+			while ($row = mysql_fetch_assoc($res)) {
+				$images_produits[$row['id_produits']]['images'][] = $row['ref'];
+				if ($row['vignette']) {
+					$images_produits[$row['id_produits']]['thumbnail'] = $row['ref'];
+				}
+			}
+
 			$q = <<<SQL
 SELECT pr.id, pr.ref, ph.phrase FROM dt_produits AS pr
 LEFT OUTER JOIN dt_phrases AS ph ON pr.phrase_nom = ph.id AND ph.id_langues = {$this->id_langues}
@@ -89,6 +103,8 @@ SQL;
 					'id' => $row['id'],
 					'ref' => $row['ref'],
 					'name' => $row['phrase'],
+					'thumbnail' => isset($images_produits[$row['id']]['thumbnail']) ? $images_produits[$row['id']]['thumbnail'] : "",
+					'images' => isset($images_produits[$row['id']]['images']) ? $images_produits[$row['id']]['images'] : array(),
 				);
 			}
 		}
