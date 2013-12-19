@@ -105,6 +105,12 @@ function widget_html($html, $vars = array()) {
 	return $html;
 }
 
+function widget_image($image) {
+	global $widget, $config;
+
+	return "http://".$_SERVER['HTTP_HOST'].$config->get("base_url")."widgets/$widget/images/$image";
+}
+
 function dico_preg_replace_callback($matches) {
 	global $dico;
 
