@@ -102,7 +102,7 @@ class Dico {
 		if ($prix == 0 and $alt !== null) {
 			return $alt;
 		}
-		$data = $this->data['prix'];
+		$data = $this->d('prix');
 		$montant = number_format($prix * $data['facteur'], $data['decimals'], $data['dec_point'], $data['thousands_sep']);
 		return str_replace(" ", "&nbsp;", str_replace("{devise}", $data['devise'], str_replace("{montant}", $montant, $data['format']))).$suffix;
 	}
