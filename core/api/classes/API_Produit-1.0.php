@@ -23,7 +23,7 @@ class API_Produit {
 		$produit = new Produit($this->sql, $phrase, $lang);
 
 		$produit->load($id_produits);
-		$this->phrases = $phrase->get($produit->phrases());
+		$this->phrases = $produit->phrases_dynamiques();
 
 		$infos = array(
 			'id' => $id_produits,
@@ -46,7 +46,7 @@ class API_Produit {
 		if (!$produit->load($id_produits)) {
 			return false;
 		}
-		$this->phrases = $phrase->get($produit->phrases());
+		$this->phrases = $produit->phrases_dynamiques();
 
 		$variantes = array_keys($produit->variantes());
 		$accessoires = array_keys($produit->accessoires());
@@ -115,11 +115,48 @@ SQL;
 				$images[] = $image['ref'];
 			}
 		}
+
+		$attributs = array();
+		foreach ($produit->attributs_data() as $attribut_data) {
+			$attribut = $attribut_data[0]; // On ne gère pas les valeurs multiples
+			$id_attributs = $attribut['id_attributs'];
+			$name = isset($this->phrases['attributs'][$id_attributs][$this->language]) ? $this->phrases['attributs'][$id_attributs][$this->language] : "";
+			switch ($attribut['type_valeur']) {
+				case "phrase_valeur":
+					if (is_array($attribut['phrase_valeur'])) {
+						$value = array();
+						foreach ($this->phrases['valeurs_attributs'][$id_attributs][0] as $v) {
+							$value[] = $v[$this->language];
+						}
+					}
+					else {
+						$value = isset($this->phrases['valeurs_attributs'][$id_attributs][0][$this->language]) ? $this->phrases['valeurs_attributs'][$id_attributs][0][$this->language] : "";
+					}
+					break;
+				default:
+					$value = $attribut[$attribut['type_valeur']];
+			}
+			$attributs[] = array(
+				'name' => $name,
+				'value' => $value,
+				'unit' => $attribut['unite'],
+				'type' => $attribut['id_types_attributs'],
+				'flags' => array(
+					'fiche_technique' => $attribut['fiche_technique'],
+					'pictos_vente' => $attribut['pictos_vente'],
+					'top' => $attribut['top'],
+					'comparatif' => $attribut['comparatif'],
+					'filtre' => $attribut['filtre'],
+				),
+			);
+		}
+
 		$fiche = array(
 			'id' => $id_produits,
 			'name' => $this->get_phrase('nom'),
 			'thumbnail' => $produit->vignette(),
 			'images' => $images,
+			'attributs' => $attributs,
 			'description' => $this->get_phrase('description'),
 			'variants' => $this->get_infos($variantes, $infos_skus),
 			'accessories' => $this->get_infos($accessoires, $infos_skus),
