@@ -163,6 +163,7 @@ SQL;
 			'components' => $this->get_infos($composants, $infos_skus),
 			'complementary' => $this->get_infos($complementaires, $infos_produits),
 			'similar' => $this->get_infos($similaires, $infos_produits),
+			'filtered_variants' => $produit->attributs_filtre($this->id_langues),
 		);
 
 		return $fiche;
