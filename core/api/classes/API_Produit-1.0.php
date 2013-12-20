@@ -93,7 +93,7 @@ SQL;
 			}
 
 			$q = <<<SQL
-SELECT pr.id, pr.ref, ph.phrase FROM dt_produits AS pr
+SELECT pr.id, pr.ref, ph.phrase, pr.id_types_produits FROM dt_produits AS pr
 LEFT OUTER JOIN dt_phrases AS ph ON pr.phrase_nom = ph.id AND ph.id_langues = {$this->id_langues}
 WHERE pr.id IN ($produits) AND pr.actif = 1
 SQL;
@@ -164,6 +164,7 @@ SQL;
 			'complementary' => $this->get_infos($complementaires, $infos_produits),
 			'similar' => $this->get_infos($similaires, $infos_produits),
 			'filtered_variants' => $produit->attributs_filtre($this->id_langues),
+			'customizable' => ($produit->values['id_types_produits'] == 2),
 		);
 
 		return $fiche;
