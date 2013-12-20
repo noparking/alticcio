@@ -92,12 +92,23 @@ function widget($w) {
 function widget_html($html, $vars = array()) {
 	global $widget, $config;
 
-	$html = file_get_contents($config->get("base_path")."/www/widgets/$widget/html/$html.html");
+	if (!$html) {
+		return "";
+	}
+
+	$file = $config->get("base_path")."/www/widgets/$widget/html/$html.html";
+	if (file_exists($file)) {
+		$html = file_get_contents($file);
+	}
+	else {
+		return "no file $file";
+	}
 
 	foreach ($vars as $key => $value) {
 		$html = str_replace("{".$key."}", $value, $html);
 	}
 
+	$html = preg_replace_callback("/\{html:([^\}]+)\}/", "html_preg_replace_callback", $html);
 	$html = preg_replace_callback("/\{dico:([^\}]+)\}/", "dico_preg_replace_callback", $html);
 	$html = preg_replace("/\s+/", " ", $html);
 	$html = str_replace("> <", "><", $html);
@@ -115,4 +126,10 @@ function dico_preg_replace_callback($matches) {
 	global $dico;
 
 	return $dico->t($matches[1]);
+}
+
+function html_preg_replace_callback($matches) {
+	global $dico;
+
+	return widget_html($matches[1]);
 }
