@@ -165,6 +165,7 @@ SQL;
 			'similar' => $this->get_infos($similaires, $infos_produits),
 			'filtered_variants' => $produit->attributs_filtre($this->id_langues),
 			'customizable' => ($produit->values['id_types_produits'] == 2),
+			'customization' => $produit->personnalisation(),
 		);
 
 		return $fiche;
