@@ -64,3 +64,8 @@ function get_catalogue_commande($api, $token) {
 	$catalogue = new API_Catalogue($api);
 	return $catalogue->commande($token);
 }
+
+function get_catalogue_prix($api, $id_sku, $qte) {
+	$produit = new API_Produit($api);
+	return $produit->prix($id_sku, $qte);
+}

@@ -5,15 +5,17 @@ class API_Produit {
 	private $sql;
 	private $language;
 	private $id_langues;
+	private $id_pays;
 	private $phrases;
 
 	function __construct($api) {
 		$this->sql = $api->sql;
 		$this->language = $api->info('language');
-		$q = "SELECT id FROM dt_langues WHERE code_langue = '{$this->language}'";
+		$q = "SELECT id, id_pays FROM dt_langues WHERE code_langue = '{$this->language}'";
 		$res = mysql_query($q);
 		$row = mysql_fetch_assoc($res);
 		$this->id_langues = $row['id'];
+		$this->id_pays = $row['id_pays'];
 	}
 
 	// Informations globales
@@ -164,6 +166,7 @@ SQL;
 			'complementary' => $this->get_infos($complementaires, $infos_produits),
 			'similar' => $this->get_infos($similaires, $infos_produits),
 			'filtered_variants' => $produit->attributs_filtre($this->id_langues),
+			'attributs_variants' => $produit->variantes_filtre(),
 			'customizable' => ($produit->values['id_types_produits'] == 2),
 			'customization' => $produit->personnalisation(),
 		);
@@ -217,5 +220,35 @@ SQL;
 		$row = mysql_fetch_assoc($res);
 
 		return $row['libelle'];
+	}
+	
+	public function prix($id_sku, $qte) {
+		require_once dirname(__FILE__)."/../../produit/sku.php";
+
+		$sku = new Sku($this->sql);
+		$sku->load($id_sku);
+
+		$ecotaxes = array();
+		foreach ($sku->ecotaxes($this->id_langues) as $ecotaxe) {
+			if ($ecotaxe['id_pays'] == $this->id_pays) {
+				$ecotaxes[] = $ecotaxe;
+			}
+		}
+
+		$prix = $sku->prix();
+		$franco = $prix['franco'];
+
+		$price = array(
+			'id_sku' => $id_sku,
+			'prix_ht' => $sku->prix_unitaire_pour_qte($id_sku, $qte),
+			'unite_vente' => $sku->unite_vente($this->id_langues, $id_sku),
+			'qte' => $qte,
+			'qte_min' => $sku->values['min_commande'],
+			'colisage' => $sku->values['colisage'],
+			'franco' => $franco,
+			'ecotaxes' => $ecotaxes,
+		);
+
+		return $price;
 	}
 }
