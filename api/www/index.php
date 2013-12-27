@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include dirname(__FILE__)."/../includes/config.php";
 
 $config->core_include("api/api", "outils/mysql", "outils/phrase", "outils/langue", "outils/dico");
