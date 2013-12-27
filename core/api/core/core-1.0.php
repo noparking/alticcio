@@ -175,6 +175,10 @@ SQL;
 		return $this->args;
 	}
 
+	public function arg($arg) {
+		return isset($this->args[$arg]) ? $this->args[$arg] : "";
+	}
+
 	public function errors($errors) {
 		foreach ($errors as $code => $message) {
 			$this->errors[$code] = $message;
