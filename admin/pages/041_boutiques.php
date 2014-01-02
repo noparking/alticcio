@@ -156,14 +156,14 @@ if ($action == "edit") {
 HTML;
 	foreach ($boutique->values['data'] as $data_key => $data_value) {
 			$main .= <<<HTML
-{$form->input(array('name' => "boutique[data][$data_key]", 'label' => $data_key))}
+{$form->textarea(array('name' => "boutique[data][$data_key]", 'label' => $data_key))}
 HTML;
 
 	}
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('NouveauParametre'), 'class' => "produit-section produit-section-parametres".$hidden['parametres'], 'id' => "produit-section-parametres"))}
 {$form->input(array('name' => "boutique[new_data_key]", 'label' => $dico->t("Nom")))}
-{$form->input(array('name' => "boutique[new_data_value]", 'label' => $dico->t("Valeur")))}
+{$form->textarea(array('name' => "boutique[new_data_value]", 'label' => $dico->t("Valeur")))}
 {$form->fieldset_end()}
 {$form->fieldset_end()}
 
