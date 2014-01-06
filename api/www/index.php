@@ -1,5 +1,7 @@
 <?php
 
+header("Access-Control-Allow-Origin: http://".$_SERVER['REMOTE_ADDR']);
+header("Access-Control-Allow-Credentials: true");
 session_start();
 
 include dirname(__FILE__)."/../includes/config.php";
