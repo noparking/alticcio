@@ -55,6 +55,13 @@ function get_widget_eboutique($api) {
 	$ret['settings'] = $boutique->settings();
 
 	$catalogue = new API_Catalogue($api, $boutique->id_catalogues());
+	
+	$cart = new API_Cart($api);
+	$cart_number = 0;
+	foreach ($cart->items() as $item) {
+		$cart_number += $item['qte'];
+	}
+	$ret['cart_number'] = $cart_number;
 
 	if ($id_catalogue = $catalogue->id()) {
 		$categories = $catalogue->tree($id_catalogue);
