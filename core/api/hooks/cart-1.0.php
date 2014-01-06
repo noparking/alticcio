@@ -37,6 +37,16 @@ function post_cart_add() {
 	return $ret;
 }
 
+
+function get_cart_content() {
+	$args = func_get_args();
+	$api = array_shift($args);
+
+	$cart = new API_Cart($api);
+
+	return $cart->personnalisations();
+}
+
 function get_cart_livraison() {
 	$args = func_get_args();
 	$api = array_shift($args);
