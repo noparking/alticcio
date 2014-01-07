@@ -54,7 +54,19 @@ function get_cart_content() {
 
 	$cart = new API_Cart($api);
 
-	return $cart->personnalisations();
+	if ($cart->is_empty()) {
+		$ret = array(
+			'empty' => true,
+			'products' => array(),
+			'total_ht' => 0,
+		);
+	}
+	else {
+		$ret = $cart->content();
+		$ret['empty'] = false;
+	}
+
+	return $ret;
 }
 
 function get_cart_livraison() {

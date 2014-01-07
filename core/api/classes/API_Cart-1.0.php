@@ -4,6 +4,7 @@ class API_Cart {
 
 	private $api;
 	private $sql;
+	private $id_langues;
 
 	public function __construct($api) {
 		$this->api = $api;
@@ -19,6 +20,33 @@ class API_Cart {
 		if (!isset($_SESSION['cart'][$this->key]['personnalisations']) or !is_array($_SESSION['cart'][$this->key]['personnalisations'])) {
 			$_SESSION['cart'][$this->key]['personnalisations'] = array();
 		}
+	}
+
+	private function id_langues() {
+		if (!isset($this->id_langues)) {
+			$q = <<<SQL
+SELECT id FROM dt_langues WHERE code_langue = '{$this->api->info('language')}'
+SQL;
+			$res = $this->sql->query($q);
+			$row = $this->sql->fetch($res);
+			$this->id_langues = $row['id'];
+		}
+
+		return $this->id_langues;
+	}
+
+	private function id_pays() {
+		if (!isset($this->id_pays)) {
+			$code_iso = substr($this->api->info('language'), -2);
+			$q = <<<SQL
+SELECT id FROM dt_pays WHERE code_iso = '$code_iso'
+SQL;
+			$res = $this->sql->query($q);
+			$row = $this->sql->fetch($res);
+			$this->id_pays = $row['id'];
+		}
+
+		return $this->id_pays;
 	}
 
 	public function add($id_produits, $id_sku, $qte, $sample = false) {
@@ -257,5 +285,127 @@ SQL;
 
 	public function token() {
 		return $_SESSION['cart'][$this->key]['token'];
+	}
+
+	public function content() {
+
+		// TODO : voir pour le pays de livraison
+		$id_pays = $this->id_pays();
+
+		$produits_personnalises = array();
+		$noms = array();
+		$refs = array();
+		$vignettes = array();
+		$prix_degressifs = array();
+		$qtes_min = array();
+		$colisages = array();
+		$sku_ids = array();
+		$produits_ids = array();
+		$francos = array();
+		$ecotaxes = array();
+		$personnalisations = $this->personnalisations();
+		foreach ($personnalisations as $perso) {
+			if (!in_array($perso['id_sku'], $sku_ids)) {
+				$sku_ids[] = $perso['id_sku'];
+				$produits_ids[] = $perso['id_produits'];
+			}
+		}
+		$sku_ids = implode(",", $sku_ids);
+		$produits_ids = implode(",", $produits_ids);
+		$q = <<<SQL
+SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.montant_ht, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = {$this->id_langues()}
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = {$this->id_langues()}
+LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = 0
+WHERE s.id IN ($sku_ids)
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$noms[$row['id']] = $row['phrase_commercial'] ? $row['phrase_commercial'] : $row['phrase_ultralog'];
+			$refs[$row['id']] = $row['ref_ultralog'];
+			$prix_degressifs[$row['id']][1] = $row['montant_ht'];
+			$qtes_min[$row['id']] = $row['min_commande'];
+			$colisages[$row['id']] = $row['colisage'];
+			$francos[$row['id']] = $row['franco'];
+		}
+
+		$q = <<<SQL
+SELECT id_sku, montant_ht, quantite FROM dt_prix_degressifs
+WHERE id_sku IN ($sku_ids) AND id_catalogues = 0
+ORDER BY quantite ASC
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$prix_degressifs[$row['id_sku']][$row['quantite']] = $row['montant_ht'];
+		}
+
+		$q = <<<SQL
+SELECT id_produits, ref FROM dt_images_produits WHERE id_produits IN ($produits_ids) AND vignette = 1
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$vignettes[$row['id_produits']] = $row['ref'];
+		}
+
+		$q = <<<SQL
+SELECT e.id, e.id_sku, e.montant, e.id_pays, e.id_familles_taxes, ph1.phrase AS pays, ph2.phrase AS famille_taxes FROM dt_ecotaxes AS e
+LEFT OUTER JOIN dt_pays AS p ON p.id = e.id_pays
+LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = p.phrase_nom AND ph1.id_langues = {$this->id_langues()}
+LEFT OUTER JOIN dt_familles_taxes AS ft ON ft.id = e.id_familles_taxes
+LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = ft.phrase_taxe AND ph2.id_langues = {$this->id_langues()}
+WHERE id_sku IN ($sku_ids) AND id_catalogues = 0 AND id_pays = $id_pays
+SQL;
+		$res = $this->sql->query($q);
+		while($row = $this->sql->fetch($res)) {
+			$ecotaxes[$row['id_sku']][] = $row;
+		}
+
+		$total_ht = 0;
+		$ecotaxes_total = 0;
+		$ecotaxes_pays = array();
+		foreach ($personnalisations as $key => $perso) {
+			$id_sku = $perso['id_sku'];
+			$id_produits = $perso['id_produits'];
+			$prix_unitaire = $prix_degressifs[$id_sku][1];
+			foreach ($prix_degressifs[$id_sku] as $qte => $prix) {
+				if ($qte <= $perso['qte']) {
+					$prix_unitaire = $prix;
+				}
+			}
+			$ecotaxes_montant = 0;
+			
+			if (isset($ecotaxes[$id_sku])) {
+				foreach ($ecotaxes[$id_sku] as $ecotaxe) {
+					$ecotaxes_montant += $ecotaxe['montant'];
+					$ecotaxes_pays[$ecotaxe['pays']] = $ecotaxe['pays'];
+					$ecotaxes_total += $ecotaxes_montant;
+				}
+			}
+			$prix = ($prix_unitaire + $ecotaxes_montant) * $perso['qte'];
+			$total_ht += $prix;
+			$produits_personnalises[] = array(
+				'id' => $id_sku,
+				'id_produits' => $id_produits,
+				'nom' => $noms[$id_sku],
+				'ref' => $refs[$id_sku],
+				'vignette' => isset($vignettes[$id_produits]) ? $vignettes[$id_produits] : "",
+				'texte' => $perso['texte'],
+				'fichier' => $perso['fichier'],
+				'nom_fichier' => $perso['nom_fichier'],
+				'qte' => $perso['qte'],
+				'prix' => $prix,
+				'prix_unitaire' => $prix_unitaire,
+				'perso' => $key,
+				'qte_min' => $qtes_min[$id_sku],
+				'colisage' => $colisages[$id_sku],
+				'franco' => $francos[$id_sku],
+				'ecotaxe' => $ecotaxes_montant,
+			);
+		}
+
+		return array(
+			'products' => $produits_personnalises,
+			'total_ht' => $total_ht,
+		);
 	}
 }
