@@ -29,6 +29,8 @@ class API {
 
 	public $sql;
 
+	public $config = array();
+
 	public function __construct($table_prefix = "", $sql = null, $params = array()) {
 		$this->table_prefix = $table_prefix;
 		$this->sql = $sql;

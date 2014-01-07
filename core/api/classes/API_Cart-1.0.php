@@ -67,7 +67,7 @@ class API_Cart {
 		}
 
 		if (isset($this->api->files['perso_fichier']) and $this->api->files['perso_fichier']['error'] == UPLOAD_ERR_OK) {
-			$uploads_dir = $this->api->post['perso_fichier_path'];
+			$uploads_dir = $this->api->config['perso_fichier_path'];
 			$tmp_name = $this->api->files['perso_fichier']['tmp_name'];
 			$original_name = $this->api->files['perso_fichier']['name'];
 			preg_match("/(\.[^\.]*)$/", $original_name, $matches);
