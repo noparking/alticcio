@@ -25,6 +25,10 @@ function post_cart_add() {
 	$cart = new API_Cart($api);
 	call_user_func_array(array($cart, "add") ,$args);
 
+	return cart_number($cart);
+}
+
+function cart_number($cart) {
 	$cart_number = 0;
 	foreach ($cart->items() as $item) {
 		$cart_number += $item['qte'];
@@ -37,6 +41,12 @@ function post_cart_add() {
 	return $ret;
 }
 
+function get_cart_remove($api, $perso) {
+	$cart = new API_Cart($api);
+	$cart->remove($perso);
+	
+	return cart_number($cart);
+}
 
 function get_cart_content() {
 	$args = func_get_args();
