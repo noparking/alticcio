@@ -7,16 +7,17 @@ class API_Cart {
 
 	public function __construct($api) {
 		$this->api = $api;
+		$this->key = $api->key();
 		$this->sql = $api->sql;
 
-		if (!isset($_SESSION['cart']) or !is_array($_SESSION['cart'])) {
-			$_SESSION['cart'] = array();
+		if (!isset($_SESSION['cart'][$this->key]) or !is_array($_SESSION['cart'][$this->key])) {
+			$_SESSION['cart'][$this->key] = array();
 		}
-		if (!isset($_SESSION['cart']['items']) or !is_array($_SESSION['cart']['items'])) {
-			$_SESSION['cart']['items'] = array();
+		if (!isset($_SESSION['cart'][$this->key]['items']) or !is_array($_SESSION['cart'][$this->key]['items'])) {
+			$_SESSION['cart'][$this->key]['items'] = array();
 		}
-		if (!isset($_SESSION['cart']['personnalisations']) or !is_array($_SESSION['cart']['personnalisations'])) {
-			$_SESSION['cart']['personnalisations'] = array();
+		if (!isset($_SESSION['cart'][$this->key]['personnalisations']) or !is_array($_SESSION['cart'][$this->key]['personnalisations'])) {
+			$_SESSION['cart'][$this->key]['personnalisations'] = array();
 		}
 	}
 
@@ -34,11 +35,11 @@ class API_Cart {
 			$key .= "[sample]";
 		}
 
-		if (isset($_SESSION['cart']['items'][$key])) {
-			$_SESSION['cart']['items'][$key]['qte'] += $qte;
+		if (isset($_SESSION['cart'][$this->key]['items'][$key])) {
+			$_SESSION['cart'][$this->key]['items'][$key]['qte'] += $qte;
 		}
 		else {
-			$_SESSION['cart']['items'][$key] = array(
+			$_SESSION['cart'][$this->key]['items'][$key] = array(
 				'qte' => $qte,
 				'id_produits' => $id_produits,
 				'id_sku' => $id_sku,
@@ -80,11 +81,11 @@ class API_Cart {
 		}
 		$key = md5($key);
 
-		if (isset($_SESSION['cart']['personnalisations'][$key])) {
-			$_SESSION['cart']['personnalisations'][$key]['qte'] += $qte;
+		if (isset($_SESSION['cart'][$this->key]['personnalisations'][$key])) {
+			$_SESSION['cart'][$this->key]['personnalisations'][$key]['qte'] += $qte;
 		}
 		else {
-			$_SESSION['cart']['personnalisations'][$key] = $perso;
+			$_SESSION['cart'][$this->key]['personnalisations'][$key] = $perso;
 		}
 		
 		return $key;
@@ -92,37 +93,37 @@ class API_Cart {
 
 	public function update($perso, $qte) {
 		$this->set_token();
-		$_SESSION['cart']['personnalisations'][$perso]['qte'] = $qte;
+		$_SESSION['cart'][$this->key]['personnalisations'][$perso]['qte'] = $qte;
 		$qte = 0;
-		$id_produits = $_SESSION['cart']['personnalisations'][$perso]['id_produits'];
-		$id_sku = $_SESSION['cart']['personnalisations'][$perso]['id_sku'];
-		$sample = $_SESSION['cart']['personnalisations'][$perso]['sample'];
+		$id_produits = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_produits'];
+		$id_sku = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_sku'];
+		$sample = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['sample'];
 		$id = "$id_produits-$id_sku";
 		if ($sample) {
 			$id .= "[sample]";
 		}
-		foreach ($_SESSION['cart']['personnalisations'] as $p) {
+		foreach ($_SESSION['cart'][$this->key]['personnalisations'] as $p) {
 			if ($p['id_sku'] == $id_sku and $p['id_produits'] == $id_produits and $p['sample'] == $sample) {
 				$qte += $p['qte'];
 			}
 		}
-		$_SESSION['cart']['items'][$id]['qte'] = $qte;
+		$_SESSION['cart'][$this->key]['items'][$id]['qte'] = $qte;
 	}
 
 	public function remove($perso) {
 		$this->set_token();
-		$qte = $_SESSION['cart']['personnalisations'][$perso]['qte'];
-		$id_produits = $_SESSION['cart']['personnalisations'][$perso]['id_produits'];
-		$id_sku = $_SESSION['cart']['personnalisations'][$perso]['id_sku'];
-		$sample = $_SESSION['cart']['personnalisations'][$perso]['sample'];
+		$qte = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['qte'];
+		$id_produits = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_produits'];
+		$id_sku = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_sku'];
+		$sample = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['sample'];
 		$id = "$id_produits-$id_sku";
 		if ($sample) {
 			$id .= "[sample]";
 		}
-		unset($_SESSION['cart']['personnalisations'][$perso]);
-		$_SESSION['cart']['items'][$id]['qte'] -= $qte;
-		if ($_SESSION['cart']['items'][$id]['qte'] == 0) {
-			unset($_SESSION['cart']['items'][$id]);
+		unset($_SESSION['cart'][$this->key]['personnalisations'][$perso]);
+		$_SESSION['cart'][$this->key]['items'][$id]['qte'] -= $qte;
+		if ($_SESSION['cart'][$this->key]['items'][$id]['qte'] == 0) {
+			unset($_SESSION['cart'][$this->key]['items'][$id]);
 		}
 	}
 
@@ -131,8 +132,8 @@ class API_Cart {
 		if ($sample) {
 			$id .= "[sample]";
 		}
-		if (isset($_SESSION['cart']['items'][$id])) {
-			$qte_min = max(1, $qte_min - $_SESSION['cart']['items'][$id]['qte']);
+		if (isset($_SESSION['cart'][$this->key]['items'][$id])) {
+			$qte_min = max(1, $qte_min - $_SESSION['cart'][$this->key]['items'][$id]['qte']);
 		}
 		if ($colisage) {
 			$qte_min = ceil($qte_min / $colisage) * $colisage;
@@ -142,26 +143,26 @@ class API_Cart {
 	}
 
 	public function emptycart() {
-		$_SESSION['cart']['items'] = array();
-		$_SESSION['cart']['personnalisations'] = array();
+		$_SESSION['cart'][$this->key]['items'] = array();
+		$_SESSION['cart'][$this->key]['personnalisations'] = array();
 		$this->set_token();
 	}
 
 	public function is_empty() {
-		return count($_SESSION['cart']['items']) == 0;
+		return count($_SESSION['cart'][$this->key]['items']) == 0;
 	}
 
 	public function items() {
-		return $_SESSION['cart']['items'];
+		return $_SESSION['cart'][$this->key]['items'];
 	}
 
 	public function personnalisations() {
-		return $_SESSION['cart']['personnalisations'];
+		return $_SESSION['cart'][$this->key]['personnalisations'];
 	}
 
 	public function check_franco($id_catalogues = 0) {
 		$sku_ids = array();
-		foreach ($_SESSION['cart']['items'] as $item) {
+		foreach ($_SESSION['cart'][$this->key]['items'] as $item) {
 			$sku_ids[] = $item['id_sku'];
 		}
 		$liste_id_sku = implode(",", $sku_ids);
@@ -184,7 +185,7 @@ SQL;
 		$produits = array();
 		$data = array();
 		$sku_ids = array();
-		foreach ($_SESSION['cart']['items'] as $item) {
+		foreach ($_SESSION['cart'][$this->key]['items'] as $item) {
 			$sku_ids[] = $item['id_sku'];
 		}
 		if (count($sku_ids) == 0) {
@@ -202,7 +203,7 @@ SQL;
 			$data[$row['id']]['nom'] = addslashes($row['phrase_commercial'] ? $row['phrase_commercial'] : $row['phrase_ultralog']);
 			$data[$row['id']]['ref'] = $row['ref_ultralog'];
 		}
-		foreach ($_SESSION['cart']['personnalisations'] as $perso) {
+		foreach ($_SESSION['cart'][$this->key]['personnalisations'] as $perso) {
 			$id_sku = $perso["id_sku"];
 			$array = array(
 				'id_produits' => $perso["id_produits"],
@@ -251,10 +252,10 @@ SQL;
 
 	public function set_token() {
 		$token = substr(uniqid("", true), 0, 16);
-		$_SESSION['cart']['token'] = $token;
+		$_SESSION['cart'][$this->key]['token'] = $token;
 	}
 
 	public function token() {
-		return $_SESSION['cart']['token'];
+		return $_SESSION['cart'][$this->key]['token'];
 	}
 }
