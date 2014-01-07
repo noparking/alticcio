@@ -58,7 +58,7 @@ class API_Cart {
 		
 		if (isset($this->api->post['perso_texte'])) {
 			$perso['texte'] = $this->api->post['perso_texte'];
-			$key .= $perso['texte'];;
+			$key .= $perso['texte'];
 		}
 		
 		if (isset($this->api->post['perso_objet'])) {

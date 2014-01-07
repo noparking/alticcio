@@ -20,6 +20,7 @@ $dico->add($config->get("base_path")."/core/traductions");
 $dico->add($config->get("base_path")."/traductions");
 
 $api = new API("api_", $sql);
+$api->config['perso_fichier_path'] = $config->get("medias_path")."files/personnalisations/";
 
 $api->prepare($config->get("base_url"));
 
