@@ -1,6 +1,7 @@
 <?php
 
-header("Access-Control-Allow-Origin: http://".$_SERVER['REMOTE_ADDR']);
+$origin = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+header("Access-Control-Allow-Origin: http://$origin");
 header("Access-Control-Allow-Credentials: true");
 session_start();
 
