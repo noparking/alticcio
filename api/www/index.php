@@ -1,8 +1,9 @@
 <?php
 
-$origin = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
-header("Access-Control-Allow-Origin: http://$origin");
-header("Access-Control-Allow-Credentials: true");
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+	header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
+	header("Access-Control-Allow-Credentials: true");
+}
 session_start();
 
 include dirname(__FILE__)."/../includes/config.php";
