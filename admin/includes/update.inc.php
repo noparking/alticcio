@@ -853,3 +853,10 @@ ALTER TABLE `dt_sku` CHANGE `colisage` `colisage` FLOAT NOT NULL DEFAULT '1'
 SQL;
 	$update->query($q);
 }
+
+function update_36($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_produits` ADD `date_creation` INT( 11 ) NOT NULL DEFAULT '0' AFTER `phrase_meta_keywords`
+SQL;
+	$update->query($q);
+}
