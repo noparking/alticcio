@@ -53,7 +53,9 @@ abstract class AbstractObject {
 	}
 
 	public function save($data) {
-		if (isset($data[$this->type]['id'])) {
+		$force_insert = (isset($data['force_insert']) and $data['force_insert']);
+
+		if (isset($data[$this->type]['id']) and !$force_insert) {
 			$id = $data[$this->type]['id'];
 
 			$values = array();
@@ -91,7 +93,7 @@ abstract class AbstractObject {
 				$q = "INSERT INTO {$this->table} (".implode(",", $fields).") VALUES (".implode(",", $values).")";
 				$this->sql->query($q);
 			}
-			$id = $this->sql->insert_id();
+			$id = isset($data[$this->type]['id']) ? $data[$this->type]['id'] : $this->sql->insert_id();
 		}
 		if (isset($data['site_tiers'])) {
 			$site = $data['site_tiers']['site'];
