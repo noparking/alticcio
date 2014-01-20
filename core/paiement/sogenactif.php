@@ -15,7 +15,7 @@ class Sogenactif {
 		$parm = " merchant_id=".$this->config['merchant_id'];
 		$parm .= " merchant_country=fr";
 		$parm .= " amount=".floor($data['montant'] * 100);
-		$parm .= " language=fr";
+		$parm .= " language=".$data['lgue'];
 		$parm .= " customer_email=".$data['mail'];
 		$parm .= " caddie=".$reference;
 		$parm .= " currency_code=978";
