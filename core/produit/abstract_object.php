@@ -52,6 +52,16 @@ abstract class AbstractObject {
 		return $this->save($data);
 	}
 
+	public function is_number($number) {
+		if (preg_match("/^\d+$/", $number)) {
+			return true;
+		}
+		if (preg_match("/^\d+\.\d+$/", $number)) {
+			return true;
+		}
+		return false;
+	}
+
 	public function save($data) {
 		$force_insert = (isset($data['force_insert']) and $data['force_insert']);
 
@@ -87,7 +97,7 @@ abstract class AbstractObject {
 					}
 				}
 				$fields[] = $field;
-				$values[] = "'$value'";
+				$values[] = $this->is_number($value) ? $value : "'$value'";
 			}
 			if (count($fields)) {
 				$q = "INSERT INTO {$this->table} (".implode(",", $fields).") VALUES (".implode(",", $values).")";
