@@ -3,6 +3,7 @@
 class Mysql {
 	
 	private $db;
+	private $types;
 	
 	public function __construct($params) {
 		$server = isset($params['server']) ? $params['server'] : "localhost";
@@ -71,6 +72,26 @@ class Mysql {
         }
         return $value;
     }
+
+	function quote_string($table, $field, $value) {
+		if (!isset($this->types[$table])) {
+			$q = "SHOW COLUMNS FROM $table";
+			$res = $this->query($q);
+			while ($row = $this->fetch($res)) {
+				$this->types[$table][$row['Field']] = strtoupper($row['Type']);
+			}
+		}
+
+		if (isset($this->types[$table][$field])) {
+			foreach (array('CHAR', 'VARCHAR', 'BINARY', 'VARBINARY', 'BLOB', 'TEXT', 'ENUM', 'SET') as $type) {
+				if (strpos($this->types[$table][$field], $type) === 0) {
+					return "'$value'";
+				}
+			}
+		}
+
+		return $value ? $value : 0;
+	}
 
 	function file($file) {
 		$queries = file_get_contents($file);
