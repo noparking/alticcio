@@ -141,6 +141,10 @@ SQL;
 		return isset($this->key_infos[$info]) ? $this->key_infos[$info]: null;
 	}
 
+	public function set_info($info, $value) {
+		$this->key_infos[$info] = $value;
+	}
+
 	public function vocabulary() {
 		$q = <<<SQL
 SELECT term_key, term_value FROM {$this->table('keys_vocabulary')} WHERE id_key = {$this->key_id}
