@@ -65,7 +65,7 @@ class Message {
 		$date_envoi = time();
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$version = $this->version;
-		$profil = isset($data['profil']) ? $data['profil'] : "";
+		$profil = isset($data['profil']) ? $data['profil'] : 0;
 		$siret = isset($data['siret']) ? $data['siret'] : "";
 		$organisme = isset($data['organisme']) ? $data['organisme'] : "";
 		$civilite = isset($data['civilite']) ? $data['civilite'] : "M";
