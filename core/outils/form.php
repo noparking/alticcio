@@ -212,6 +212,11 @@ class Form {
 		return false;
 	}
   }
+
+  public function first() {
+    $this->step = 1;
+	$_SESSION['form_values'][$this->form_id]['step'] = $this->step;
+  }
   
   public function previous() {
   	if ($this->step > 1) {
