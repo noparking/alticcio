@@ -77,11 +77,6 @@ class API {
 		$this->post = ($post === null) ? $_POST : $post;
 		$this->files = ($files === null) ? $_FILES : $files;
 
-		$this->key_id = null;
-		$this->key_roles = array();
-		$this->key_enabled = false;
-		$this->key_infos = array();
-
 		$this->request = trim(preg_replace("/\?(.*)$/", "", preg_replace("!^$base_url!", "", $uri)), "/");
 		$elements = explode("/", $this->request);
 		$this->method = strtolower($method);
@@ -101,34 +96,40 @@ class API {
 		
 		$this->widget_id = $this->param('widget');
 
-		$this->key = $this->param('key');
-		$q = <<<SQL
+		if (!$this->key) {
+			$this->key_id = null;
+			$this->key_roles = array();
+			$this->key_enabled = false;
+			$this->key_infos = array();
+
+			$this->key = $this->param('key');
+			$q = <<<SQL
 SELECT * FROM {$this->table('keys')} WHERE `key` = '{$this->key}'
 SQL;
-		$res = mysql_query($q);
+			$res = mysql_query($q);
 
-		if ($row = mysql_fetch_assoc($res)) {
-			$this->key_infos = $row;
-			$this->key_id = $row['id'];
-			if ($row['active']) {
-				$this->key_enabled = true;
+			if ($row = mysql_fetch_assoc($res)) {
+					$this->key_infos = $row;
+				$this->key_id = $row['id'];
+				if ($row['active']) {
+					$this->key_enabled = true;
+				}
 			}
-		}
-		if ($this->key_id === null) {
-			$this->key = null;
-		}
+			if ($this->key_id === null) {
+				$this->key = null;
+			}
 
-		$this->key_roles = array();
-		if ($this->key_id) {
-		$q = <<<SQL
+			if ($this->key_id) {
+				$q = <<<SQL
 SELECT ar.id, ar.name FROM {$this->table('roles')} as ar
 INNER JOIN {$this->table('keys_roles')} AS akr ON akr.id_role = ar.id
 WHERE akr.id_key = {$this->key_id}
 SQL;
-			$res = mysql_query($q);
+				$res = mysql_query($q);
 
-			while ($row = mysql_fetch_assoc($res)) {
-				$this->key_roles[$row['id']] = $row['name'];
+				while ($row = mysql_fetch_assoc($res)) {
+					$this->key_roles[$row['id']] = $row['name'];
+				}
 			}
 		}
 	}
