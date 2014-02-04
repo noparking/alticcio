@@ -28,7 +28,7 @@ HTML;
 			$langue = $langues[$document['id_langues']];
 			$type_document = $types_documents[$document['id_types_documents']];
 			$order = $form->value("documents[{$document['id']}]") !== null ? $form->value("documents[{$document['id']}][classement]") : $document['classement'];
-			$documents_rows[$order] = <<<HTML
+			$documents_rows[$order][] = <<<HTML
 <tr>
 	<td class="drag-handle"></td>
 	<td><img class="produit-image" src="{$config->core_media("documents/".$document['vignette'])}" /></td>
@@ -46,7 +46,13 @@ HTML;
 HTML;
 		}
 		ksort($documents_rows);
-		$main .= implode("\n", $documents_rows);
+		$flat_documents_rows = array();
+		foreach ($documents_rows as $docs) {
+			foreach ($docs as $doc) {
+				$flat_documents_rows[] = $doc;
+			}
+		}
+		$main .= implode("\n", $flat_documents_rows);
 		$form->template = $form_template;
 		$main .= <<<HTML
 </tbody>
