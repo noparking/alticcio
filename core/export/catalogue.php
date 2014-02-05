@@ -41,7 +41,7 @@ SQL;
 				$csv[] = "catalogue";
 				$csv[] = "num_pages";
 				$fields = $csv;
-				$this->prepare($fields, $nom_catalogue);
+				$this->prepare($fields, $id_catalogues);
 			}
 			else {
 				$csv[] = $id_catalogues;
@@ -60,7 +60,7 @@ SQL;
 		fclose($file);
 	}
 
-	function prepare($fields, $catalogue) {
+	function prepare($fields, $id_catalogues) {
 		$field_list = "";
 		$excluded = array();
 		foreach ($fields as $i => $field) {
@@ -95,7 +95,7 @@ SQL;
 		}
 
 		$q = <<<SQL
-DELETE FROM `{$this->export_table}` WHERE catalogue = '$catalogue'
+DELETE FROM `{$this->export_table}` WHERE id_catalogue = '$id_catalogues'
 SQL;
 		$this->sql_export->query($q);
 
