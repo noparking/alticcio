@@ -4,13 +4,12 @@ class Sogenactif {
 
 	public function __construct($config, $api_key = 0) {
 		$paiement = $config->get('paiement');
-		$this->shop = $config->get('shop') ? $config->get('shop') : "000";
 		$this->api_key = sprintf("%04d", $api_key);
 		$this->config = isset($paiement['sogenactif']) ? $paiement['sogenactif'] : array();
 	}
 
 	public function form($data) {
-		$reference = $data['reference'].$this->shop.$this->api_key;
+		$reference = $data['reference'].$this->api_key;
 		$html = "";
 		$parm = " merchant_id=".$this->config['merchant_id'];
 		$parm .= " merchant_country=fr";
