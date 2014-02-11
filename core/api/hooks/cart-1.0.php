@@ -47,6 +47,13 @@ function get_cart_remove($api, $perso) {
 	return cart_number($cart);
 }
 
+function get_cart_update($api, $perso, $qte) {
+	$cart = new API_Cart($api);
+	$cart->update($perso, $qte);
+	
+	return cart_number($cart);
+}
+
 function get_cart_content() {
 	$args = func_get_args();
 	$api = array_shift($args);
