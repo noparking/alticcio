@@ -311,6 +311,13 @@ SQL;
 			}
 		}
 		$sku_ids = implode(",", $sku_ids);
+		if (!$sku_ids) {
+			$this->emptycart();
+			return array(
+				'products' => array(),
+				'total_ht' => 0,
+			);
+		}
 		$produits_ids = implode(",", $produits_ids);
 		$q = <<<SQL
 SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.montant_ht, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
