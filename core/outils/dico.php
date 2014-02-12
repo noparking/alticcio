@@ -98,6 +98,14 @@ class Dico {
 		return $term;
 	}
 
+	public function translate($text) {
+		return preg_replace_callback("/\{dico:([^\}]+)\}/", array($this, "translate_callback"), $text);
+	}
+
+	private function translate_callback($matches) {
+		return $this->t($matches[1]);
+	}
+
 	public function prix($prix, $suffix = "", $alt = null) {
 		if ($prix == 0 and $alt !== null) {
 			return $alt;
