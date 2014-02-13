@@ -182,11 +182,11 @@ class Database {
 				foreach ($value as $langue => $phrase) {
 					$phrase = addslashes($phrase);
 					$timestamp = time();
+
 					$q = "DELETE FROM dt_phrases WHERE id = $id_phrases AND id_langues = $langue";
 					$this->sql->query($q);
-					if ($phrase) {
-						$q = "INSERT INTO dt_phrases (id, phrase, id_langues, date_creation, date_update) VALUES ($id_phrases, '$phrase', $langue, $timestamp, $timestamp)";
-					}
+
+					$q = "INSERT INTO dt_phrases (id, phrase, id_langues, date_creation, date_update) VALUES ($id_phrases, '$phrase', $langue, $timestamp, $timestamp)";
 					$this->sql->query($q);
 				}
 				$values[] = $field."=$id_phrases";
