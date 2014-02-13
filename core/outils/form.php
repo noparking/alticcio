@@ -1199,6 +1199,16 @@ HTML;
 		return $result;
 	}
 
+	private function validate_list($field, $params) {
+		$value = $this->value($field);
+		if ($value == "") { // c'est required qui teste la présence du champs
+			return true;
+		}
+		else {
+			return in_array($value, $params[0]);
+		}
+	}
+
 	private function validate_email($field) {
 		$value = $this->value($field);
 		if ($value == "") { // c'est required qui teste la présence du champs
