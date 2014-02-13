@@ -860,3 +860,15 @@ ALTER TABLE `dt_produits` ADD `date_creation` INT( 11 ) NOT NULL DEFAULT '0' AFT
 SQL;
 	$update->query($q);
 }
+
+function update_37($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes` ADD `id_boutiques` INT NOT NULL DEFAULT '0' AFTER `id_api_keys` 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+	ALTER TABLE `dt_commandes_revisions` ADD `id_boutiques` INT NOT NULL DEFAULT '0' AFTER `id_api_keys` 
+SQL;
+	$update->query($q);
+}
