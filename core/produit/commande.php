@@ -47,7 +47,8 @@ SQL;
 			}
 			$data['commande']['montant'] = $montant;
 			if (!isset($data['commande']['frais_de_port'])) {
-				$data['commande']['frais_de_port'] = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays']);
+				$id_boutiques = isset($data['commande']['id_boutiques']) ? $data['commande']['id_boutiques'] : 0;
+				$data['commande']['frais_de_port'] = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays'], $id_boutiques);
 			}
 			$ecotaxe = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
 			$data['commande']['ecotaxe'] = $ecotaxe;
@@ -189,14 +190,15 @@ SQL;
 		return $row['montant'];
 	}
 
-	public function frais_de_port($montant = null, $id_langues = 1, $id_pays = 77) {
+	public function frais_de_port($montant = null, $id_langues = 1, $id_pays = 77, $id_boutiques = 0) {
 		if ($montant === null) {
 			$montant = $this->montant();
 		}
 		$q = <<<SQL
 SELECT forfait FROM dt_frais_port WHERE prix_min <= $montant 
 AND id_langues = $id_langues
-AND id_pays = $id_pays 
+AND id_pays = $id_pays
+AND id_boutiques = $id_boutiques
 ORDER BY prix_min DESC LIMIT 1
 SQL;
 		$res = $this->sql->query($q);
