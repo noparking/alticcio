@@ -160,7 +160,7 @@ class Database {
 				$value = $id_phrases;
 			}
 			$fields[] = $field;
-			$values[] = "'$value'";
+			$values[] = $this->sql->quote_string($table, $field, $value);
 		}
 		$q = "INSERT INTO $table (".implode(",", $fields).") VALUES (".implode(",", $values).")";
 		$this->sql->query($q);
