@@ -22,7 +22,8 @@ function post_cart_add() {
 	$api = array_shift($args);
 
 	$cart = new API_Cart($api);
-	call_user_func_array(array($cart, "add") ,$args);
+
+	call_user_func_array(array($cart, "add_safe") ,$args);
 
 	return cart_number($cart);
 }
@@ -49,7 +50,7 @@ function get_cart_remove($api, $perso) {
 
 function get_cart_update($api, $perso, $qte) {
 	$cart = new API_Cart($api);
-	$cart->update($perso, $qte);
+	$cart->update_safe($perso, $qte);
 	
 	return cart_number($cart);
 }
@@ -95,4 +96,11 @@ function post_cart_livraison() {
 
 function post_cart_checkout() {
 	return array();
+}
+
+function get_cart_safe_qte($api, $id_produits, $id_sku, $qte, $sample = false) {
+	$cart = new API_Cart($api);
+	list($less, $more) = $cart->safe_qte($id_produits, $id_sku, $qte, $sample);
+
+	return array('qte' => $qte, 'less' => $less, 'more' => $more);
 }

@@ -155,6 +155,46 @@ SQL;
 		}
 	}
 
+	public function add_safe($id_produits, $id_sku, $qte, $sample = false) {
+		list($less, $more) = $this->safe_qte($id_produits, $id_sku, $qte, $sample);
+
+		return $this->add($id_produits, $id_sku, $more, $sample);
+	}
+
+	public function update_safe($perso, $qte) {
+		$id_produits = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_produits'];
+		$id_sku = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['id_sku'];
+		$sample = $_SESSION['cart'][$this->key]['personnalisations'][$perso]['sample'];
+
+		$this->update($perso, 0);
+		list($less, $more) = $this->safe_qte($id_produits, $id_sku, $qte, $sample);
+
+		return $this->update($perso, $more);
+	}
+
+	public function safe_qte($id_produits, $id_sku, $qte, $sample = false) {
+		$q = <<<SQL
+SELECT colisage, min_commande FROM dt_sku WHERE id = $id_sku
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		$qte_min_to_add = $this->qte_min_to_add($id_produits, $id_sku, $row['min_commande'], $row['colisage'], $sample);
+		if ($qte < $qte_min_to_add) {
+			$qte = $qte_min_to_add;
+		}
+		if ($row['colisage']) {
+			$less = floor($qte / $row['colisage']) * $row['colisage'];
+			$more = ceil($qte / $row['colisage']) * $row['colisage'];
+		}
+		else {
+			$less = $qte;
+			$more = $qte;
+		}
+		
+		return array($less, $more);
+	}
+
 	public function qte_min_to_add($id_produits, $id_sku, $qte_min, $colisage = 0, $sample = false) {
 		$id = "$id_produits-$id_sku";
 		if ($sample) {
