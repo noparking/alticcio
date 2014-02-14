@@ -111,14 +111,14 @@ function widget_html($html, $vars = array()) {
 		return "no file $file";
 	}
 
-	foreach ($vars as $key => $value) {
-		$html = str_replace("{".$key."}", $value, $html);
-	}
-
 	$html = preg_replace_callback("/\{html:([^\}]+)\}/", "html_preg_replace_callback", $html);
 	$html = preg_replace_callback("/\{dico:([^\}]+)\}/", "dico_preg_replace_callback", $html);
 	$html = preg_replace("/\s+/", " ", $html);
 	$html = str_replace("> <", "><", $html);
+
+	foreach ($vars as $key => $value) {
+		$html = str_replace("{".$key."}", $value, $html);
+	}
 
 	return $html;
 }
