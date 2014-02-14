@@ -872,3 +872,17 @@ SQL;
 SQL;
 	$update->query($q);
 }
+
+function update_37($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_references_catalogues` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_sku` int(11) NOT NULL,
+  `id_catalogues` int(11) NOT NULL,
+  `reference` varchar(60) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_sku` (`id_sku`,`id_catalogues`)
+)
+SQL;
+	$update->query($q);
+}
