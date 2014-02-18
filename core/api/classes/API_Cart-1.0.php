@@ -327,10 +327,11 @@ SQL;
 		return $_SESSION['cart'][$this->key]['token'];
 	}
 
-	public function content() {
+	public function content($id_pays_livraison = null) {
 
-		// TODO : voir pour le pays de livraison
-		$id_pays = $this->id_pays();
+		if ($id_pays_livraison == null) {
+			$id_pays_livraison = $this->id_pays();
+		}
 
 		$produits_personnalises = array();
 		$noms = array();
@@ -400,7 +401,7 @@ LEFT OUTER JOIN dt_pays AS p ON p.id = e.id_pays
 LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = p.phrase_nom AND ph1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_familles_taxes AS ft ON ft.id = e.id_familles_taxes
 LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = ft.phrase_taxe AND ph2.id_langues = {$this->id_langues()}
-WHERE id_sku IN ($sku_ids) AND id_catalogues = 0 AND id_pays = $id_pays
+WHERE id_sku IN ($sku_ids) AND id_catalogues = 0 AND id_pays = $id_pays_livraison
 SQL;
 		$res = $this->sql->query($q);
 		while($row = $this->sql->fetch($res)) {
@@ -452,6 +453,7 @@ SQL;
 
 		return array(
 			'products' => $produits_personnalises,
+			'ecotaxes_pays' => $ecotaxes_pays,
 			'total_ht' => $total_ht,
 		);
 	}

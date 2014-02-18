@@ -65,13 +65,16 @@ function get_cart_content() {
 		$ret = array(
 			'empty' => true,
 			'products' => array(),
+			'cart_number' => 0,
 			'total_ht' => 0,
 		);
 	}
 	else {
-		$ret = $cart->content();
+		$ret = call_user_func_array(array($cart, "content") ,$args);
 		$ret['empty'] = false;
 	}
+
+	$ret += cart_number($cart);
 
 	return $ret;
 }
