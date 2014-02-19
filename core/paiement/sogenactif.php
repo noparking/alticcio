@@ -10,6 +10,7 @@ class Sogenactif {
 
 	public function form($data) {
 		$reference = $data['reference'].$this->api_key;
+		$transaction_id = $data['reference'] % 1000000;
 		$html = "";
 		$parm = " merchant_id=".$this->config['merchant_id'];
 		$parm .= " merchant_country=fr";
@@ -22,6 +23,7 @@ class Sogenactif {
 		$parm .= " cancel_return_url=".$data['cancel_return_url'];
 		$parm .= " automatic_response_url=".$data['automatic_response_url'];
 		$parm .= " pathfile=".$this->config['pathfile'];
+		$parm .= " transaction_id=".$transaction_id; 
 
 		$output = array();
 		$return_var = 0;
