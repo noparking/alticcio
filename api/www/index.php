@@ -4,6 +4,9 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 	header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
 	header("Access-Control-Allow-Credentials: true");
 }
+if (isset($_GET['session_id'])) {
+	session_id($_GET['session_id']);
+}
 session_start();
 
 include dirname(__FILE__)."/../includes/config.php";
