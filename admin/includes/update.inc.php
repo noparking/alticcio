@@ -873,7 +873,7 @@ SQL;
 	$update->query($q);
 }
 
-function update_37($update) {
+function update_38($update) {
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_references_catalogues` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
