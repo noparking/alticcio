@@ -121,7 +121,7 @@ SQL;
 		return $row['nb'];
 	}
 
-	public function duplicate() {
+	public function duplicate($data = null) {
 		$values = $this->values;
 		$data = array();
 		$data['catalogue']['nom'] = addslashes($values['nom']." (duplicated)");
