@@ -109,6 +109,21 @@ SQL;
 		return $categories;
 	}
 
+	public function sous_categories($nom) {
+		$categories = array();
+		$q = <<<SQL
+SELECT scat.id, scat.nom, scat.titre_url FROM dt_catalogues_categories AS scat
+INNER JOIN dt_catalogues_categories AS cat ON cat.id = scat.id_parent
+WHERE cat.id_catalogues = {$this->id} AND cat.nom = '$nom'
+ORDER BY scat.classement ASC
+SQL;
+		$res = $this->sql->query($q);
+		while($row = $this->sql->fetch($res)) {
+			$categories[] = $row;
+		}
+		return $categories;
+	}
+
 	public function nb_produits() {
 		$q = <<<SQL
 SELECT COUNT(DISTINCT(id_produits)) AS nb FROM dt_catalogues_categories_produits AS ccp
