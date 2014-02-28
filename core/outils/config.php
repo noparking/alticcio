@@ -135,8 +135,18 @@ class Config {
 		$this->vars[$var] = $value;
 	}
 	
-	public function get($var) {
-		return isset($this->vars[$var]) ? $this->vars[$var] : null;
+	public function get() {
+		$vars = $this->vars;
+		foreach (func_get_args() as $arg) {
+			if (is_array($vars) and isset($vars[$arg])) {
+				$vars = $vars[$arg];
+			}
+			else {
+				return null;
+			}
+		}
+		
+		return $vars;
 	}
 	
 	public function db($type = "") {
