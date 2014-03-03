@@ -208,6 +208,9 @@ SQL;
 	}
 
 	public function ecotaxe($id_sku_quantite, $id_pays, $id_catalogues = 0) {
+		if (!$id_sku_quantite) {
+			return 0;
+		}
 		$liste_id_sku = implode(",", array_keys($id_sku_quantite));
 		$q = <<<SQL
 SELECT id_sku, montant FROM dt_ecotaxes
