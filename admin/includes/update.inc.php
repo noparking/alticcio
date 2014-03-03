@@ -897,4 +897,9 @@ SQL;
 ALTER TABLE `dt_matieres` ADD `phrase_nom` INT( 11 ) NOT NULL DEFAULT '0' AFTER `ref_matiere`
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_matieres` ADD `date_modification` INT( 11 ) NOT NULL DEFAULT '0'
+SQL;
+	$update->query($q);
 }

@@ -255,6 +255,7 @@ SQL;
 	}
 
 	public function save($data) {
+		$data['matiere']['date_modification'] = $_SERVER['REQUEST_TIME'];
 		$id = parent::save($data);
 		if (isset($data['attributs'])) {
 			$q = <<<SQL
