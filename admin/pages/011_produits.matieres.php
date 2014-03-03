@@ -38,10 +38,10 @@ $filter = new Filter($pager, array(
 		'order' => 'DESC',
 		'field' => 'm.id',
 	),
-	'nom_matiere' => array(
-		'title' => $dico->t('Nom'),
+	'ref_matiere' => array(
+		'title' => $dico->t('Reference'),
 		'type' => 'contain',
-		'field' => 'm.nom_matiere',
+		'field' => 'm.ref_matiere',
 	),
 	'phrase' => array(
 		'title' => $dico->t('Type'),
@@ -254,7 +254,9 @@ HTML;
 if ($action == "create" or $action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "produit-section-presentation"))}
-{$form->input(array('name' => "matiere[nom_matiere]", 'label' => $dico->t('Nom') ))}
+{$form->input(array('name' => "matiere[ref_matiere]", 'label' => $dico->t('Reference') ))}
+{$form->input(array('name' => "matiere[phrase_nom]", 'type' => "hidden"))}
+{$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->select(array('name' => "matiere[id_familles_matieres]", 'label' => $dico->t('FamillesMatieres'), 'options' => $matiere->familles_matieres($id_langues) ))}
 {$form->select(array('name' => "matiere[id_ecolabels]", 'label' => $dico->t('EcoLabel'), 'options' => $matiere->ecolabels($id_langues) ))}
 {$form->select(array('name' => "matiere[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $matiere->recyclages($id_langues) ))}

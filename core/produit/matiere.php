@@ -7,11 +7,11 @@ class Matiere extends AbstractObject {
 	public $type = "matiere";
 	public $table = "dt_matieres";
 	public $images_table = "dt_images_matieres";
-	public $phrase_fields = array('phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
+	public $phrase_fields = array('phrase_nom', 'phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
 
 	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL
-SELECT m.id, m.nom_matiere, p.phrase 
+SELECT m.id, m.ref_matiere, p.phrase 
 FROM dt_matieres AS m
 LEFT OUTER JOIN dt_familles_matieres AS f ON f.id = m.id_familles_matieres 
 LEFT OUTER JOIN dt_phrases AS p ON p.id = f.phrase_nom AND p.id_langues = $id_langues

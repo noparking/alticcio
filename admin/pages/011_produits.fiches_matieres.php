@@ -109,7 +109,8 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "fiche[phrase_nom]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'class' => 'fiche-nom', 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->fieldset_start(array('legend' => "Variables", 'class' => "fiche-variables"))}
-\$nom_matiere 
+\$ref_matiere 
+\$nom 
 \$famille
 \$ecolabel
 \$recyclage

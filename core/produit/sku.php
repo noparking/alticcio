@@ -324,13 +324,13 @@ SQL;
 	}
 	
 	public function get_matieres() {
-		$q = "SELECT m.id, m.nom_matiere  
+		$q = "SELECT m.id, m.ref_matiere  
 				FROM dt_matieres AS m
-				ORDER BY m.nom_matiere ";
+				ORDER BY m.ref_matiere ";
 		$res = $this->sql->query($q);
 		$matieres = array('...');
 		while($row = $this->sql->fetch($res)) {
-			$matieres[$row['id']] = $row['nom_matiere'];
+			$matieres[$row['id']] = $row['ref_matiere'];
 		}
 		return $matieres;
 	}

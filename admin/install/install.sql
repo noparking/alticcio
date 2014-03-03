@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.32, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.35, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: doublet_test
+-- Host: localhost    Database: doublet_prod
 -- ------------------------------------------------------
--- Server version	5.5.32-0ubuntu0.12.04.1
+-- Server version	5.5.35-0ubuntu0.12.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -81,6 +81,7 @@ CREATE TABLE `api_keys_rules` (
   `uri` varchar(256) NOT NULL DEFAULT '',
   `type` enum('deny','allow') NOT NULL,
   `id_key` int(11) NOT NULL DEFAULT '0',
+  `log` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -145,6 +146,7 @@ CREATE TABLE `api_roles_rules` (
   `uri` varchar(256) NOT NULL DEFAULT '',
   `type` enum('deny','allow') NOT NULL,
   `id_role` int(11) NOT NULL DEFAULT '0',
+  `log` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -317,7 +319,7 @@ DROP TABLE IF EXISTS `dt_attributs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `dt_attributs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ref` varchar(32) NOT NULL DEFAULT '',
+  `ref` varchar(60) NOT NULL DEFAULT '',
   `phrase_nom` int(11) NOT NULL DEFAULT '0',
   `id_types_attributs` int(11) NOT NULL DEFAULT '0',
   `id_unites_mesure` int(11) NOT NULL DEFAULT '0',
@@ -491,6 +493,38 @@ CREATE TABLE `dt_blogs_themes_blogs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dt_boutiques`
+--
+
+DROP TABLE IF EXISTS `dt_boutiques`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dt_boutiques` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(60) NOT NULL,
+  `id_catalogues` int(11) NOT NULL,
+  `id_api_keys` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_catalogues` (`id_catalogues`,`id_api_keys`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dt_boutiques_data`
+--
+
+DROP TABLE IF EXISTS `dt_boutiques_data`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dt_boutiques_data` (
+  `id_boutiques` int(11) NOT NULL DEFAULT '0',
+  `data_key` varchar(64) NOT NULL DEFAULT '',
+  `data_value` text,
+  PRIMARY KEY (`id_boutiques`,`data_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `dt_catalogues`
 --
 
@@ -631,6 +665,7 @@ CREATE TABLE `dt_commandes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `shop` int(11) NOT NULL DEFAULT '0',
   `id_api_keys` int(11) NOT NULL DEFAULT '0',
+  `id_boutiques` int(11) NOT NULL DEFAULT '0',
   `token` varchar(16) NOT NULL DEFAULT '',
   `etat` int(11) NOT NULL DEFAULT '0',
   `montant` float NOT NULL DEFAULT '0',
@@ -668,6 +703,8 @@ CREATE TABLE `dt_commandes` (
   `paiement` enum('cheque','mandat','facture','cb','paypal','devis','manuel') NOT NULL,
   `paiement_statut` enum('attente','valide','refuse','annule','rembourse','test') NOT NULL,
   `commentaire` text,
+  `notification` int(11) NOT NULL DEFAULT '0',
+  `id_langues` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `token` (`token`),
   KEY `id_api_keys` (`id_api_keys`)
@@ -690,7 +727,8 @@ CREATE TABLE `dt_commandes_produits` (
   `nom` varchar(256) NOT NULL DEFAULT '',
   `prix_unitaire` float NOT NULL DEFAULT '0',
   `ecotaxe` float NOT NULL DEFAULT '0',
-  `quantite` int(11) NOT NULL DEFAULT '0',
+  `quantite` float NOT NULL DEFAULT '0',
+  `echantillon` tinyint(1) NOT NULL DEFAULT '0',
   `personnalisation_texte` text,
   `personnalisation_fichier` varchar(128) NOT NULL DEFAULT '',
   `personnalisation_nom_fichier` varchar(128) NOT NULL DEFAULT '',
@@ -720,7 +758,8 @@ CREATE TABLE `dt_commandes_produits_revisions` (
   `nom` varchar(256) NOT NULL DEFAULT '',
   `prix_unitaire` float NOT NULL DEFAULT '0',
   `ecotaxe` float NOT NULL DEFAULT '0',
-  `quantite` int(11) NOT NULL DEFAULT '0',
+  `quantite` float NOT NULL DEFAULT '0',
+  `echantillon` tinyint(1) NOT NULL DEFAULT '0',
   `personnalisation_texte` text,
   `personnalisation_fichier` varchar(128) NOT NULL DEFAULT '',
   `personnalisation_nom_fichier` varchar(128) NOT NULL DEFAULT '',
@@ -745,6 +784,7 @@ CREATE TABLE `dt_commandes_revisions` (
   `id_commandes` int(11) NOT NULL DEFAULT '0',
   `shop` int(11) NOT NULL DEFAULT '0',
   `id_api_keys` int(11) NOT NULL DEFAULT '0',
+  `id_boutiques` int(11) NOT NULL DEFAULT '0',
   `token` varchar(16) NOT NULL DEFAULT '',
   `etat` int(11) NOT NULL DEFAULT '0',
   `montant` float NOT NULL DEFAULT '0',
@@ -782,6 +822,8 @@ CREATE TABLE `dt_commandes_revisions` (
   `paiement` enum('cheque','mandat','facture','cb','paypal','devis','manuel') NOT NULL,
   `paiement_statut` enum('attente','valide','refuse','annule','rembourse','test') NOT NULL,
   `commentaire` text,
+  `notification` int(11) NOT NULL DEFAULT '0',
+  `id_langues` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `revision` (`revision`,`id_commandes`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -1055,6 +1097,20 @@ CREATE TABLE `dt_exports_catalogues` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dt_exports_produits`
+--
+
+DROP TABLE IF EXISTS `dt_exports_produits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dt_exports_produits` (
+  `id_produits` int(11) NOT NULL,
+  `date_export` int(11) NOT NULL,
+  PRIMARY KEY (`id_produits`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `dt_factures`
 --
 
@@ -1072,6 +1128,7 @@ CREATE TABLE `dt_factures` (
   `montant` float NOT NULL DEFAULT '0',
   `frais_de_port` float NOT NULL DEFAULT '0',
   `tva` float NOT NULL DEFAULT '0',
+  `ecotaxe` float NOT NULL DEFAULT '0',
   `nom` varchar(128) NOT NULL DEFAULT '',
   `prenom` varchar(128) NOT NULL DEFAULT '',
   `profil` tinyint(4) NOT NULL DEFAULT '0',
@@ -1124,7 +1181,9 @@ CREATE TABLE `dt_factures_produits` (
   `ref` varchar(20) NOT NULL DEFAULT '',
   `nom` varchar(256) NOT NULL DEFAULT '',
   `prix_unitaire` float NOT NULL DEFAULT '0',
+  `ecotaxe` float NOT NULL DEFAULT '0',
   `quantite` int(11) NOT NULL DEFAULT '0',
+  `echantillon` tinyint(1) NOT NULL DEFAULT '0',
   `personnalisation_texte` text,
   `personnalisation_fichier` varchar(128) NOT NULL DEFAULT '',
   `personnalisation_nom_fichier` varchar(128) NOT NULL DEFAULT '',
@@ -1278,6 +1337,7 @@ DROP TABLE IF EXISTS `dt_frais_port`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `dt_frais_port` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_boutiques` int(11) NOT NULL DEFAULT '0',
   `id_langues` int(11) NOT NULL DEFAULT '0',
   `id_pays` int(11) DEFAULT NULL,
   `id_catalogues` int(11) NOT NULL DEFAULT '0',
@@ -1681,7 +1741,8 @@ DROP TABLE IF EXISTS `dt_matieres`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `dt_matieres` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nom_matiere` varchar(70) NOT NULL DEFAULT '',
+  `ref_matiere` varchar(70) NOT NULL DEFAULT '',
+  `phrase_nom` int(11) NOT NULL DEFAULT '0',
   `phrase_description_courte` int(11) NOT NULL DEFAULT '0',
   `phrase_description` int(11) NOT NULL DEFAULT '0',
   `id_familles_matieres` int(11) NOT NULL DEFAULT '0',
@@ -2171,6 +2232,7 @@ CREATE TABLE `dt_produits` (
   `phrase_meta_title` int(11) NOT NULL DEFAULT '0',
   `phrase_meta_description` int(11) NOT NULL DEFAULT '0',
   `phrase_meta_keywords` int(11) NOT NULL DEFAULT '0',
+  `date_creation` int(11) NOT NULL DEFAULT '0',
   `date_modification` int(11) NOT NULL DEFAULT '0',
   `phrase_entretien` int(11) NOT NULL DEFAULT '0',
   `phrase_mode_emploi` int(11) NOT NULL DEFAULT '0',
@@ -2345,6 +2407,23 @@ CREATE TABLE `dt_recyclage` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dt_references_catalogues`
+--
+
+DROP TABLE IF EXISTS `dt_references_catalogues`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dt_references_catalogues` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_sku` int(11) NOT NULL,
+  `id_catalogues` int(11) NOT NULL,
+  `reference` varchar(60) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_sku` (`id_sku`,`id_catalogues`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `dt_regions`
 --
 
@@ -2445,8 +2524,8 @@ CREATE TABLE `dt_sku` (
   `id_ral` int(11) NOT NULL DEFAULT '0',
   `id_duo_couleurs` int(11) NOT NULL DEFAULT '0',
   `poids` decimal(8,2) NOT NULL DEFAULT '0.00',
-  `colisage` int(11) NOT NULL DEFAULT '0',
-  `min_commande` int(11) NOT NULL DEFAULT '1',
+  `colisage` float NOT NULL DEFAULT '1',
+  `min_commande` float NOT NULL DEFAULT '1',
   `phrase_ultralog` int(11) NOT NULL DEFAULT '0',
   `phrase_commercial` int(11) NOT NULL DEFAULT '0',
   `phrase_path` int(11) NOT NULL DEFAULT '0',
@@ -2752,7 +2831,7 @@ DROP TABLE IF EXISTS `dt_types_documents`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `dt_types_documents` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(20) NOT NULL DEFAULT '',
+  `code` varchar(60) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3018,4 +3097,4 @@ CREATE TABLE `temp_flags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-08-21 15:37:00
+-- Dump completed on 2014-03-03 12:32:00

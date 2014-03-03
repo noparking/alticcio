@@ -868,7 +868,7 @@ SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-	ALTER TABLE `dt_commandes_revisions` ADD `id_boutiques` INT NOT NULL DEFAULT '0' AFTER `id_api_keys` 
+ALTER TABLE `dt_commandes_revisions` ADD `id_boutiques` INT NOT NULL DEFAULT '0' AFTER `id_api_keys` 
 SQL;
 	$update->query($q);
 }
@@ -883,6 +883,18 @@ CREATE TABLE IF NOT EXISTS `dt_references_catalogues` (
   PRIMARY KEY (`id`),
   KEY `id_sku` (`id_sku`,`id_catalogues`)
 )
+SQL;
+	$update->query($q);
+}
+
+function update_39($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_matieres` CHANGE `nom_matiere` `ref_matiere` VARCHAR( 70 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_matieres` ADD `phrase_nom` INT( 11 ) NOT NULL DEFAULT '0' AFTER `ref_matiere`
 SQL;
 	$update->query($q);
 }
