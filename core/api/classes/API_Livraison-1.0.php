@@ -30,8 +30,7 @@ SQL;
 	public function forfaits($id_langues, $id_boutiques = 0){
 		$q = <<<SQL
 SELECT fp.id_pays, fp.methode, fp.prix_min, fp.forfait, ph.phrase FROM dt_frais_port AS fp
-INNER JOIN dt_phrases AS ph
-ON fp.phrase_info = ph.id
+LEFT OUTER JOIN dt_phrases AS ph ON fp.phrase_info = ph.id
 WHERE fp.id_langues = {$id_langues} AND fp.id_boutiques = $id_boutiques 
 ORDER BY fp.prix_min ASC
 SQL;
