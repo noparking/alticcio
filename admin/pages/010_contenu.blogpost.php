@@ -282,7 +282,7 @@ SQL;
 				'type' => 'contain',
 			),
 			'login' => array(
-				'field' => 'u.logn',
+				'field' => 'u.login',
 				'title' => $dico->t('Auteur'),
 				'type' => 'contain',
 			),
