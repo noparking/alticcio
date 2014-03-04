@@ -45,7 +45,7 @@ class API {
 		return isset($this->params['base_url']) ? $this->params['base_url'] : "";
 	}
 
-	private function param($param) {
+	public function param($param) {
 		if (isset($_GET[$param])) {
 			return $_GET[$param];
 		}
