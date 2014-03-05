@@ -215,11 +215,13 @@ SQL;
 			$this->sql->query($q);
 		}
 
+		$this->id = parent::save($data);
+
 		if (isset($data['catalogue']['export_frequency']) and $data['catalogue']['export_frequency']) {
 			$this->export($data, $data['catalogue']['export_frequency']);
 		}
 
-		return parent::save($data);
+		return $this->id;
 	}
 
 	function export($data = array(), $auto = 0) {
