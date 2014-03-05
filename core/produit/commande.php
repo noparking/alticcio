@@ -82,7 +82,7 @@ SQL;
 					$produit['ecotaxe'] = $this->ecotaxe(array($produit['id_sku'] => 1), $data['commande']['livraison_pays']);
 					foreach ($produit as $cle => $valeur) {
 						$fields[] = $cle;
-						$values[] = $this->sql->quote_string($this->table, $cle, $valeur);
+						$values[] = $this->sql->quote_string("dt_commandes_produits", $cle, $valeur);
 					}
 					$fields = implode(",", $fields);
 					$values = implode(",", $values);
