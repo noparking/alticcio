@@ -894,12 +894,47 @@ SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-ALTER TABLE `dt_matieres` ADD `phrase_nom` INT( 11 ) NOT NULL DEFAULT '0' AFTER `ref_matiere`
+UPDATE `dt_attributs_references` SET `field_label`='ref_matiere' WHERE `table_name`='dt_matieres' AND `field_label`='nom_matiere'
 SQL;
 	$update->query($q);
 
 	$q = <<<SQL
+ALTER TABLE `dt_matieres` ADD `phrase_nom` INT( 11 ) NOT NULL DEFAULT '0' AFTER `ref_matiere`
+SQL;
+	$update->query($q);
+}
+
+function update_40($update) {
+	$q = <<<SQL
 ALTER TABLE `dt_matieres` ADD `date_modification` INT( 11 ) NOT NULL DEFAULT '0'
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_exports_matieres` (
+  `id_matieres` int(11) NOT NULL,
+  `date_export` int(11) NOT NULL,
+  PRIMARY KEY (`id_matieres`)
+)
+SQL;
+	$update->query($q);
+}
+
+function update_41($update) {
+	$q = <<<SQL
+UPDATE `dt_matieres_attributs` SET phrase_valeur = valeur_numerique, valeur_numerique = 0
+WHERE id_attributs IN (SELECT id FROM dt_attributs WHERE id_types_attributs IN (5, 3))
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_matieres_attributs` ADD `type_valeur` ENUM( 'valeur_numerique', 'phrase_valeur', 'valeur_libre' ) NOT NULL AFTER `id_matieres`
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+UPDATE `dt_matieres_attributs` SET type_valeur = 'phrase_valeur' WHERE phrase_valeur <> 0
+SQL;
+	$update->query($q);
+
 }

@@ -267,10 +267,10 @@ SQL;
 			foreach ($data['attributs'] as $attribut_id => $valeurs) {
 				foreach ($valeurs as $classement => $valeur) { 
 					$type_valeur = "valeur_numerique";
-					if (isset($data['phrases']['attributs'][$attribut_id])) {
+					if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
 						$type_valeur = "phrase_valeur";
-						if (is_array($data['phrases']['attributs'][$attribut_id])) {
-							foreach ($data['phrases']['attributs'][$attribut_id] as $lang => $phrase) {
+						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
+							foreach	($data['phrases']['valeurs_attributs'][$attribut_id][0] as $lang => $phrase) {
 								$valeur = $this->phrase->save($lang, $phrase, $attribut);
 							}
 						}
@@ -279,8 +279,8 @@ SQL;
 						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
 					}
 					$q = <<<SQL
-INSERT INTO dt_matieres_attributs (id_attributs, id_matieres, $type_valeur, classement)
-VALUES ($attribut_id, $id, $valeur, $classement)
+INSERT INTO dt_matieres_attributs (id_attributs, id_matieres, type_valeur, $type_valeur, classement)
+VALUES ($attribut_id, $id, '$type_valeur', $valeur, $classement)
 SQL;
 					$this->sql->query($q);
 				}
