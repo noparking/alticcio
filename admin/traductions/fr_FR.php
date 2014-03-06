@@ -285,6 +285,7 @@ $t['ListeOfModelesFichesMatieres'] = "Liste des modèles de fiches matières";
 $t['ListeOfProduits'] = "Liste des produits";
 $t['ListeOfProduitsCategories'] = "Liste des produits de cette catégorie";
 $t['ListeOfProduitsComplementaires'] = "Liste des produits complémentaires";
+$t['ListeProduitsSeuls'] = "Liste des produits sans cross-selling";
 $t['ListeOfProduitsSimilaires'] = "Liste des produits similaires";
 $t['ListeOfRoles'] = "Liste des rôles d'API";
 $t['ListeOfSku'] = "Liste des SKU";
