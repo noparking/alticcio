@@ -131,14 +131,13 @@ SQL;
 
 		$data_lignes = array();
 		$couples = array();
-
-
 		
 		foreach ($this->langues() as $id_langues => $code_langue) {
 			foreach ($produits as $data) { 	
 				$produit->load($data['id']);
 				$produit_values = $produit->values;
 				$produit_phrases = $produit->phrases_dynamiques();
+				$produit_attributs_data = $produit->attributs_data();
 				$classement = 0;
 				foreach (array('variante' => "variantes", 'accessoire' => "accessoires") as $type_sku => $method) {
 					$notes_prix = array();
@@ -163,7 +162,7 @@ SQL;
 								$produit_values['offre'],
 								$this->recyclage($produit_values['id_recyclage']),
 								$this->phrase('phrase_nom', $produit_phrases, $code_langue),
-								$this->attributs($produit, $produit_phrases, $code_langue, "top"),
+								$this->attributs($produit_attributs_data, $produit_phrases, $code_langue, "top"),
 								$this->phrase('phrase_avantages_produit', $produit_phrases, $code_langue),
 								$this->phrase('phrase_description_courte', $produit_phrases, $code_langue),
 								$this->phrase('phrase_description', $produit_phrases, $code_langue),
@@ -193,11 +192,11 @@ SQL;
 								$this->ecotaxe($sku_values['id'], $id_catalogues),
 								implode(" ", $notes_prix),
 								"", // note personnalisation 
-								$this->attributs($produit, $produit_phrases, $code_langue, "top", 1),
-								$this->attributs($produit, $produit_phrases, $code_langue, "pictos_vente", 1),
+								$this->attributs($produit_attributs_data, $produit_phrases, $code_langue, "top", 1),
+								$this->attributs($produit_attributs_data, $produit_phrases, $code_langue, "pictos_vente", 1),
 								"http://www.doublet.com/".$url_redirection->long2short($this->phrase('phrase_url_key', $produit_phrases, $code_langue), $this->section($id_catalogues)),
 								$produit_values['nouveau'],
-								$this->attributs($produit, $produit_phrases, $code_langue, "fiche_technique"),
+								$this->attributs($produit_attributs_data, $produit_phrases, $code_langue, "fiche_technique"),
 								$produit_values['actif'],
 							));
 							$data_lignes[] = $data_ligne;
@@ -291,21 +290,6 @@ SQL;
 		return $this->max_images = min(14, $row['nb_images']);
 	}
 
-	function images($produit, $max_images) {
-		$images = array();
-		foreach ($produit->images() as $img) {
-			if ($img['affichage']) {
-				$images[] = $img['ref'];
-			}
-		}
-		$ret = array();
-		for ($i = 1; $i <= $max_images; $i++) {
-			$ret[] = isset($images[$i - 1]) ? $images[$i - 1] : "";
-		}
-
-		return $ret;
-	}
-
 	function max_prix() {
 		if (isset($this->max_prix)) {
 			return $this->max_prix;
@@ -343,23 +327,6 @@ SQL;
 		return $prix;
 	}
 
-	function langues() {
-		$q = <<<SQL
-SELECT id, code_langue FROM dt_langues
-SQL;
-		$res = $this->sql->query($q);
-		$langues = array();
-		while ($row = $this->sql->fetch($res)) {
-			$langues[$row['id']] = $row['code_langue'];
-		}
-
-		return $langues;
-	}
-
-	function phrase($field, $phrases, $code_langue) {
-		return isset($phrases[$field][$code_langue]) ? strip_tags($phrases[$field][$code_langue]) : "";
-	}
-
 	function recyclage($id_recyclage) {
 		if (isset($this->recyclages)) {
 			return isset($this->recyclages[$id_recyclage]) ? $this->recyclages[$id_recyclage] : "";
@@ -374,65 +341,6 @@ SQL;
 		}
 
 		return isset($this->recyclages[$id_recyclage]) ? $this->recyclages[$id_recyclage] : "";
-	}
-
-	function attributs($produit, $phrases, $code_langue, $type, $nb = null) {
-		$separator = "\n";
-		$attributs = array();
-		foreach ($produit->attributs_data() as $attr) {
-			$attr = $attr[0]; // On ne gère pas les valeurs multiples
-			if ($attr[$type]) {
-				if ($attr['phrase_valeur']) {
-					if (is_array($attr['phrase_valeur'])) {
-						$valeurs_unites = array();
-						foreach ($phrases['valeurs_attributs'][$attr['id_attributs']][0] as $v) {
-							$valeurs_unites[] = trim("{$v[$code_langue]} {$attr['unite']}");
-						}
-						$valeur = implode(", ", $valeurs_unites);
-					}
-					else {
-						$valeur = $phrases['valeurs_attributs'][$attr['id_attributs']][0][$code_langue];
-						$valeur .= " {$attr['unite']}";
-					}
-				}
-				else {
-					$choices = array(
-						0 => "N/A",		
-						1 => "Oui",
-						2 => "Non",
-					);
-					if (is_array($attr['valeur_numerique'])) {
-						$valeurs_unites = array();
-						foreach ($attr['valeur_numerique'] as $v) {
-							switch ($attr['id_types_attributs']) {
-								case 1:
-									$v = $choices[$v];
-									break;
-								case 2:
-									$v .= "/5";
-									break;
-							}
-							$valeurs_unites[] = trim("{$v} {$attr['unite']}");
-						}
-						$valeur = implode(", ", $valeurs_unites);
-					}
-					else {
-						$valeur = $attr['valeur_numerique'];
-						switch ($attr['id_types_attributs']) {
-							case 1:
-								$valeur = $choices[$valeur];
-								break;
-							case 2:
-								$valeur .= "/5";
-								break;
-						}
-						$valeur .= " {$attr['unite']}";
-					}
-				}
-				$attributs[] = $phrases['attributs'][$attr['id_attributs']][$code_langue]." :\t".trim($valeur);
-			}
-		}
-		return implode($separator, $nb === null ? $attributs : array_slice($attributs, 0, $nb));
 	}
 
 	function ecotaxe($id_sku, $id_catalogues) {

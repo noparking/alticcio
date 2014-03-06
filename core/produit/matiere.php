@@ -6,7 +6,9 @@ class Matiere extends AbstractObject {
 
 	public $type = "matiere";
 	public $table = "dt_matieres";
+	public $id_field = "id_matieres";
 	public $images_table = "dt_images_matieres";
+	public $attributs_table = "dt_matieres_attributs";
 	public $phrase_fields = array('phrase_nom', 'phrase_description_courte', 'phrase_description', 'phrase_entretien', 'phrase_marques_fournisseurs');
 
 	public function liste($id_langues, &$filter = null) {
@@ -127,15 +129,18 @@ SQL;
 	public function attributs_data() {
 		$attributs = array();
 		$q = <<<SQL
-SELECT a.phrase_nom, ma.id_attributs, ma.valeur_numerique, ma.phrase_valeur FROM dt_matieres_attributs AS ma
+SELECT a.phrase_nom, a.id_types_attributs, ma.id_attributs, um.unite, ma.type_valeur,
+	   ma.valeur_numerique, ma.phrase_valeur, ma.valeur_libre, ma.classement
+FROM dt_matieres_attributs AS ma
 INNER JOIN dt_matieres AS m ON ma.id_matieres = m.id
 INNER JOIN dt_attributs AS a ON a.id = ma.id_attributs
+LEFT OUTER JOIN dt_unites_mesure AS um ON um.id = a.id_unites_mesure
 WHERE ma.id_matieres = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
-			$attributs[] = $row;
+			$attributs[$row['id_attributs']][$row['classement']] = $row;
 		}
 
 		return $attributs;
@@ -257,35 +262,7 @@ SQL;
 	public function save($data) {
 		$data['matiere']['date_modification'] = $_SERVER['REQUEST_TIME'];
 		$id = parent::save($data);
-		if (isset($data['attributs'])) {
-			$q = <<<SQL
-DELETE FROM dt_matieres_attributs WHERE id_matieres = $id
-SQL;
-			$this->sql->query($q);
-
-			ksort($data['attributs']);
-			foreach ($data['attributs'] as $attribut_id => $valeurs) {
-				foreach ($valeurs as $classement => $valeur) { 
-					$type_valeur = "valeur_numerique";
-					if (isset($data['phrases']['valeurs_attributs'][$attribut_id])) {
-						$type_valeur = "phrase_valeur";
-						if (is_array($data['phrases']['valeurs_attributs'][$attribut_id])) {
-							foreach	($data['phrases']['valeurs_attributs'][$attribut_id][0] as $lang => $phrase) {
-								$valeur = $this->phrase->save($lang, $phrase, $attribut);
-							}
-						}
-					}
-					else {
-						$valeur = (float)str_replace(" ", "", str_replace(",", ".", $valeur));
-					}
-					$q = <<<SQL
-INSERT INTO dt_matieres_attributs (id_attributs, id_matieres, type_valeur, $type_valeur, classement)
-VALUES ($attribut_id, $id, '$type_valeur', $valeur, $classement)
-SQL;
-					$this->sql->query($q);
-				}
-			}
-		}
+		$this->save_attributs($data, $id);
 
 		if (isset($data['applications'])) {
 			$q = <<<SQL
@@ -353,9 +330,11 @@ SQL;
 		}
 		$ids['valeurs_attributs'] = array();
 		$attributs = $this->attributs_data();
-		foreach ($attributs as $attribut) {
-			if ($attribut['phrase_valeur']) {
-				$ids['valeurs_attributs'][$attribut['id_attributs']] = $attribut['phrase_valeur'];
+		foreach ($attributs as $data) {
+			foreach ($data as $classement => $attribut) {
+				if (isset($attribut['phrase_valeur']) and $attribut['phrase_valeur']) {
+					$ids['valeurs_attributs'][$attribut['id_attributs']][$classement] = $attribut['phrase_valeur'];
+				}
 			}
 		}
 		return $ids;
