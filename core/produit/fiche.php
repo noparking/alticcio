@@ -39,9 +39,9 @@ SQL;
 		return $liste;
 	}
 
-	public function modeles($lang) {
+	public function modeles($id_langues) {
 		$modeles = array();
-		foreach ($this->liste($lang) as $element) {
+		foreach ($this->liste($id_langues) as $element) {
 			$modeles[$element['id']] = $element['phrase'];
 		}
 
