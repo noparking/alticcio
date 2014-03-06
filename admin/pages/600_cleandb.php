@@ -26,6 +26,7 @@ $checked8 = "";
 $checked9 = "";
 $checked10 = "";
 $checked11 = "";
+$checked12 = "";
 if (isset($_POST['ctrl'])) {
 	switch($_POST['ctrl']) {
 		case "doublons":
@@ -61,6 +62,9 @@ if (isset($_POST['ctrl'])) {
 		case "produitsconfig":
 			$checked11 = ' checked="checked" ';
 			break;
+		case "produitseul":
+			$checked12 = ' checked="checked" ';
+			break;
 	}
 }
 $main = <<<HTML
@@ -78,6 +82,7 @@ $main = <<<HTML
 	<p><label for="ctrl"><input type="radio" name="ctrl" value="produitsstandard" $checked9 /> {$dico->t('ListeProduitsStandard')}</label></p>
 	<p><label for="ctrl"><input type="radio" name="ctrl" value="produitssurmesure" $checked10 /> {$dico->t('ListeProduitsSurMesure')}</label></p>
 	<p><label for="ctrl"><input type="radio" name="ctrl" value="produitsconfig" $checked11 /> {$dico->t('ListeProduitsConfigurables')}</label></p>
+	<p><label for="ctrl"><input type="radio" name="ctrl" value="produitseul" $checked12 /> {$dico->t('ListeProduitsSeuls')}</label></p>
 	<p><input type="submit" name="envoyer" value="{$dico->t('Envoyer')}" /></p>
 	</fieldset>
 </form>
@@ -475,6 +480,35 @@ if (isset($_POST['ctrl']) AND $_POST['ctrl'] == "produitsconfig") {
 	$main .= '<p class="message">'.$page->l($dico->t('ExportCSV'), $config->get('medias_url').'medias/docs/csv/'.$filename).'</p>';
 }
 
+
+
+/*
+ * **************  SKU SANS FAMILLE
+ * On recherche les sku avec une famille de vente à 0
+ */
+if (isset($_POST['ctrl']) AND $_POST['ctrl'] == "produitseul") {
+	$main .= '<h3>'.$dico->t('ListeProduitsSeuls').'</h3>';
+	$main .= '<ul>';
+	$q = "SELECT p.id, ph.phrase
+        FROM dt_produits AS p
+        INNER JOIN dt_phrases AS ph
+        ON ph.id = p.phrase_nom AND ph.id_langues = ".$id_langue." 
+        INNER JOIN dt_catalogues_categories_produits AS ccp
+        ON ccp.id_produits = p.id 
+        INNER JOIN dt_catalogues_categories AS cc
+        ON cc.id = ccp.id_catalogues_categories AND cc.id_catalogues = 34";
+	$rs = $sql->query($q);
+	while($row = $sql->fetch($rs)) {
+		$q2 = "SELECT id FROM dt_produits_complementaires WHERE id_produits = ".$row['id'];
+		$rs2 = $sql->query($q2);
+		$q3 = "SELECT id FROM dt_produits_similaires WHERE id_produits = ".$row['id'];
+		$rs3 = $sql->query($q3);
+		if (mysql_num_rows($rs2) == 0 AND mysql_num_rows($rs3) == 0) {
+			$main .= '<li><a href="'.$url2->make("Produits", array("type" => "produits", "action" => "edit", "id" => $row["id"])).'">'.$row['id'].' '.$row['phrase'].'</li>';
+		}
+	}
+	$main .= '</ul>';
+}
 
 /*
  * *******************  LISTE DES PRIX EN DOUBLE POUR UN MEME SKU
