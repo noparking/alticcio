@@ -238,7 +238,7 @@ SQL;
 
 		if ($this->automatic) {
 			$save_again = false;
-			$data2 = array();
+			$data2 = $data;
 			foreach ($url_key_fields as $key => $value) {
 				if (strpos($key, "phrase_") === 0) {
 					foreach ($data['phrases'][$key] as $lang => $phrase_url_key) {
