@@ -107,7 +107,7 @@ if ($form->is_submitted()) {
 				$data['blogpost']['id_users'] = $_SESSION['extranet']['user']['id'];
 				$id_billets = $url_redirection->save_object($blogpost, $data, array('titre_url' => "titre"));
 				if ($id_billets === false) {
-					$messages = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
+					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
 				else {
 					switch($id_billets) {
