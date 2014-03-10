@@ -31,10 +31,12 @@ abstract class AbstractExport {
 			$values_list[] = "('".implode("','", $value_list)."')";
 		}
 		$values_list = implode(",", $values_list);
-		$q = <<<SQL
+		if ($value_list) {
+			$q = <<<SQL
 INSERT INTO {$this->export_table} ($fields_list) VALUES $values_list
 SQL;
-		$this->sql_export->query($q);
+			$this->sql_export->query($q);
+		}
 	}
 
 	function langues() {
