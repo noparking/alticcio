@@ -31,7 +31,7 @@ abstract class AbstractExport {
 			$values_list[] = "('".implode("','", $value_list)."')";
 		}
 		$values_list = implode(",", $values_list);
-		if ($value_list) {
+		if ($values_list) {
 			$q = <<<SQL
 INSERT INTO {$this->export_table} ($fields_list) VALUES $values_list
 SQL;
