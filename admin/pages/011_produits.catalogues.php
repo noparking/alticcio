@@ -215,6 +215,17 @@ HTML;
 </div>
 HTML;
 				break;
+			case "error" :
+				$main .= <<<HTML
+<p class="message">L'export de ce catalogue a échoué.</p>
+<p class="message_error">{$export['error']}</p>
+<div class="buttons">
+	<ul class="buttons_actions">
+		<li>{$form->input(array('type' => "submit", 'name' => "export", 'value' => $dico->t('Exporter') ))}</li>
+	</ul>
+</div>
+HTML;
+				break;
 			default :
 				$main .= <<<HTML
 <p class="message">L'export de ce catalogue est en cours. Cette opération peut prendre quelques minutes.</p>

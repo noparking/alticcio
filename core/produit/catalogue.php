@@ -264,15 +264,16 @@ SQL;
 		return $exports;
 	}
 
-	function export_mark($id, $state, $no_date = false) {
+	function export_mark($id, $state, $no_date = false, $error = "") {
 		$date = time();
+		$error = addslashes($error);
 		if ($no_date) {
 			$q = <<<SQL
-UPDATE dt_exports_catalogues SET etat = '$state' WHERE id = $id
+UPDATE dt_exports_catalogues SET etat = '$state', error = '$error' WHERE id = $id
 SQL;
 		} else {
 			$q = <<<SQL
-UPDATE dt_exports_catalogues SET date_export = $date, etat = '$state' WHERE id = $id
+UPDATE dt_exports_catalogues SET date_export = $date, etat = '$state', error = '$error' WHERE id = $id
 SQL;
 		}
 		$this->sql->query($q);

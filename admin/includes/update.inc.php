@@ -938,3 +938,15 @@ SQL;
 	$update->query($q);
 
 }
+
+function update_42($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_exports_catalogues` ADD `error` TEXT NOT NULL
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_exports_catalogues` CHANGE `etat` `etat` ENUM( 'tobuild', 'building', 'built', 'error' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+SQL;
+	$update->query($q);
+}
