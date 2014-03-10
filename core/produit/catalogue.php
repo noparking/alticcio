@@ -235,7 +235,7 @@ SQL;
 		
 		$file = "catalogue_".preg_replace("/[^a-z0-9]+/", "_", strtolower($this->values['nom'])).$complement.".csv";
 		$q = <<<SQL
-INSERT INTO dt_exports_catalogues (id_catalogues, etat, fichier, date_export, data, auto) VALUES ({$this->id}, 'tobuild', '$file', $date, '$data', $auto)
+INSERT INTO dt_exports_catalogues (id_catalogues, etat, fichier, date_export, data, auto, error) VALUES ({$this->id}, 'tobuild', '$file', $date, '$data', $auto, '')
 SQL;
 		$this->sql->query($q);
 	}
