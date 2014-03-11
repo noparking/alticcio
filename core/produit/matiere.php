@@ -150,6 +150,7 @@ SQL;
 		$infos = array();
 		$phrases = $this->phrase->get($this->phrases());
 		foreach ($this->attributs_data() as $data) {
+			$data = $data[0]; // on ne gère pas les valeur multiples pour le moment
 			$attribut->load($data['id_attributs']);
 
 			$unites = $attribut->unites();
@@ -163,7 +164,8 @@ SQL;
 			
 
 			if ($data['phrase_valeur']) {
-				$valeur = $phrases['valeurs_attributs'][$data['id_attributs']][$langue];
+				$valeur =
+					$phrases['valeurs_attributs'][$data['id_attributs']][0][$langue];
 			}
 			else {
 				$valeur = $data['valeur_numerique'];

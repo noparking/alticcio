@@ -38,7 +38,7 @@ else {
 	$form->reset();
 }
 
-$modeles = $fiche->modeles($langue);
+$modeles = $fiche->modeles($id_langues);
 if (!isset($fiche_id)) {
 	$fiche_id = $url5->get('fiche_id');
 }
@@ -59,12 +59,12 @@ else {
 	$top = <<<HTML
 {$form->form_start()}
 <ul>
-<li>{$page->l($dico->t('Retour'), $url2->make("Produits", array("type" => "produits", "action"=>"edit", "id" => $id)))}</li>
+<li>{$page->l($dico->t('Retour'), $url2->make("Produits", array("type" => "matieres", "action"=>"edit", "id" => $id)))}</li>
 <li><a href="#" onclick="window.print();">Imprimer</a></li>
 <li>{$page->l("PDF", $url5->make("current", array("file" => "$file.pdf", "fiche_id" => $fiche_id)))}</li>
 <li>{$page->l("XML", $url5->make("current", array("file" => "$file.xml", "fiche_id" => $fiche_id)))}</li>
 </ul>
-{$form->select(array('name' => "fiche", 'options' => $fiche->modeles($langue), 'forced_value' => $fiche_id))}
+{$form->select(array('name' => "fiche", 'options' => $fiche->modeles($id_langues), 'forced_value' => $fiche_id))}
 {$form->input(array('type' => "submit", "name" => "action[select]", "value" => $dico->t('Ok') ))}
 {$form->form_end()}
 HTML;
