@@ -84,7 +84,7 @@ SQL;
 		global $dico;
 		$images = array();
 		foreach ($this->produit->images() as $img) {
-			$images[] = "http://".$_SERVER['HTTP_HOST'].$config->media("produits/".$img['ref']);
+			$images[] = $config->core_media("produits/".$img['ref']);
 		}
 
 		$liste_attributs = $this->produit->fiche_perso_attributs($this->attribut, $this->langue);
