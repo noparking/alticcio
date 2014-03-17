@@ -55,6 +55,12 @@ HTML;
 	}
 
 	public function check($data) {
+		$data_keys = array('MAC', 'TPE', 'date', 'montant', 'reference', 'texte-libre', 'code-retour', 'cvx', 'vld', 'brand', 'status3ds', 'numauto', 'motifrefus', 'originecb', 'bincb', 'hpancb', 'ipclient', 'originetr', 'veres', 'pares');
+		foreach ($data_keys as $key) {
+			if (!isset($data[$key])) {
+				$data[$key] = "";
+			}
+		}
 		$mac_string = <<<TEXT
 {$data['TPE']}*{$data['date']}*{$data['montant']}*{$data['reference']}*{$data['texte-libre']}*{$this->version}*{$data['code-retour']}*{$data['cvx']}*{$data['vld']}*{$data['brand']}*{$data['status3ds']}*{$data['numauto']}*{$data['motifrefus']}*{$data['originecb']}*{$data['bincb']}*{$data['hpancb']}*{$data['ipclient']}*{$data['originetr']}*{$data['veres']}*{$data['pares']}*
 TEXT;
