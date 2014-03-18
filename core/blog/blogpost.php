@@ -61,6 +61,10 @@ SQL;
 		$q = "SELECT * FROM dt_billets WHERE id = $id";
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
+
+		if (!$row) {
+			return false;
+		}
 		
 		foreach ($row as $key => $value) {
 			$this->values[$key] = $value;
@@ -76,6 +80,8 @@ SQL;
 		while ($row = $this->sql->fetch($res)) {
 			$this->themes[$row['id_themes_blogs']] = $row;
 		}
+
+		return $id;
 	}
 
 	private function transform_text($chaine) {
