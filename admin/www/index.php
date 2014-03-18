@@ -1,5 +1,10 @@
 <?php
 
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 200000);
+ini_set('session.cookie_lifetime', 2000000);
+
 session_start();
 header('Content-type: text/html; charset=UTF-8');
 date_default_timezone_set('Europe/Paris');
