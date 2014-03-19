@@ -25,6 +25,8 @@ abstract class Url {
 		$base = trim($this->base, "/");
 		$url = str_replace($base, "", str_replace("?".$_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']));
 		$url = trim($url, "/");
+		$url = str_replace("'", "", $url);
+		$url = str_replace('"', '', $url);
 		$elements = explode("/", $url, count($this->elements));
 		if (is_int($element)) {
 			return $elements[$element];
