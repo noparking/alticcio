@@ -41,6 +41,7 @@ if ($form->is_submitted()) {
 			if ($ext == ".csv") {
 				$file_name = 'batch_'.time().$ext;
 				move_uploaded_file($file['tmp_name'], $dir.$file_name);
+				chmod($dir.$file_name, 777);
 				$lines = file($dir.$file_name);
 				$n = 0;
 				foreach ($lines as $line) {
@@ -76,27 +77,27 @@ if ($form->is_submitted()) {
 								$sfam = nettoyage($sfam);
 								$ssfam = nettoyage($ssfam);
 								$prix = nettoyage($prix);
-								$q1 = "SELECT id FROM dt_sku WHERE ref_ultralog = '".$ref."' ";
-								$rs1 = $sql->query($q1);
-								if (mysql_num_rows($rs1) == 0) {
+								//$q1 = "SELECT id FROM dt_sku WHERE ref_ultralog = '".$ref."' ";
+								//$rs1 = $sql->query($q1);
+								//if (mysql_num_rows($rs1) == 0) {
 									// on récupère l'id de la famille de vente
 									$q2 = "SELECT id FROM dt_familles_ventes WHERE code = '".$fam.$sfam.$ssfam."' ";
 									$rs2 = $sql->query($q2);
 									$row2 = $sql->fetch($rs2);
-									// on récupère l'id phrase
+									//// on récupère l'id phrase
 									$qph = "SELECT id FROM dt_phrases ORDER BY id DESC LIMIT 1";
 									$rsph = $sql->query($qph);
 									$rowph = $sql->fetch($rsph);
 									$q3 = "INSERT INTO dt_phrases SET id=".($rowph['id']+1).", phrase = '".addslashes(strtolower($designation))."', id_langues = 1, date_creation = ".time().", date_update = ".time()." ";
 									$rs3 = $sql->query($q3);
-									// on intègre le sku 
-									$q4 = "INSERT INTO dt_sku SET id='', ref_ultralog=".$ref.", phrase_ultralog = ".($rowph['id']+1).", id_familles_vente = ".$row2['id'].", date_creation = ".time().", date_modification = ".time().", actif = 1";
+									//// on intègre le sku 
+									$q4 = "INSERT INTO dt_sku SET id='', ref_ultralog='".$ref."', phrase_ultralog = ".($rowph['id']+1).", id_familles_vente = ".$row2['id'].", date_creation = ".time().", date_modification = ".time().", actif = 1";
 									$rs4 = $sql->query($q4);
 									$new_sku = mysql_insert_id();
-									// on intégre le prix
-									$q5 = "INSERT INTO dt_prix SET id='', id_sku = ".$new_sku.", montant_ht = '".$prix."', franco = 1";
-									$rs5 = $sql->query($q5);
-								}
+									//// on intégre le prix
+									//$q5 = "INSERT INTO dt_prix SET id='', id_sku = ".$new_sku.", montant_ht = '".$prix."', franco = 1";
+									//$rs5 = $sql->query($q5);
+								//}
 								break;
 							case 4:
 								$liste_prix = explode(";", $line);
