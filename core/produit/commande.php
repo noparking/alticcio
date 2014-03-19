@@ -323,4 +323,9 @@ SQL;
 		}
 		return $revisions;
 	}
+
+	function ref() {
+		$ref = $this->values['id'].sprintf("%03d", $this->values['shop']).sprintf("%04d", $this->values["id_api_keys"]);
+		return $ref;
+	}
 }

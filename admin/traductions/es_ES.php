@@ -592,6 +592,7 @@ $d['pages'] = array(
     "statsshorturl" => "stats-short-url",
     "statscommandes" => "stats-commandes",
 	"commandes" => "commandes",
+	"impressioncommande" => "impression-commande",
 	"gammes" => "gammes",
 	"factures" => "factures",
 	"aide" => "aide",

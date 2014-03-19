@@ -239,6 +239,7 @@ $t['ImageEmailing'] = "Image de votre emailing";
 $t['Images'] = "Images";
 $t['ImpossibleAjoutPrixNul'] = "Impossible d'ajouter un prix dégressif car le prix de base est nul.";
 $t['Imprimer'] = "Imprimer";
+$t['ImprimerCommande'] = "Imprimer la commande";
 $t['Informations'] = "Informations";
 $t['IntroAdmin'] = "Bienvenue sur l'admin Alticcio.";
 $t['ItemsAjoutes'] = "items ont été enregistrés.";
@@ -619,6 +620,7 @@ $d['pages'] = array(
     "statsshorturl" => "stats-short-url",
     "statscommandes" => "stats-commandes",
 	"commandes" => "commandes",
+	"impressioncommande" => "impression-commande",
 	"gammes" => "gammes",
 	"factures" => "factures",
 	"aide" => "aide",
@@ -631,4 +633,13 @@ $d['hd_extensions'] = array(
 	'psd' => "Photoshop",
 	'eps' => "EPS",
 	'ai' => "Adobe Illustrator",
+);
+
+$d['prix'] = array(
+	'decimals' => 2,
+	'dec_point' => ",",
+	'thousands_sep' => " ",
+	'facteur' => 1,
+	'devise' => "€",
+	'format' => "{montant}&nbsp;{devise}",
 );

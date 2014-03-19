@@ -29,6 +29,7 @@ if ($action == "create" or $action == "edit") {
 }
 
 if ($action == "edit") {
+	$buttons[] = $page->l($dico->t('ImprimerCommande'), $url->make("ImpressionCommande", array('id' => $id)), "", "_blank");
 	$buttons[] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
