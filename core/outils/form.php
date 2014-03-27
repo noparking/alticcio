@@ -559,7 +559,7 @@ class Form {
 		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.$multiple.'>';
 		foreach ($options as $cle => $valeur) {
     		$params['field'] .= '<option value="'.$cle.'"';
-    		if ($value !== "" and ($value == $cle or (is_array($value) and in_array($cle, $value)))) {
+    		if ($value !== "" and ((string)$value == (string)$cle or (is_array($value) and in_array($cle, $value)))) {
 				$params['field'] .= ' selected="selected"';
 			}
 			if (isset($params['enable']) and 
