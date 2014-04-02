@@ -269,7 +269,7 @@ SQL;
 		return unserialize($this->values['infos']);
 	}
 
-	public function infos($infos) {
+	public function update_infos($infos) {
 		$this->update(array('commande' => array('infos' => serialize($infos)));
 	}
 	
