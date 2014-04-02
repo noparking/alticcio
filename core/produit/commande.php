@@ -264,6 +264,14 @@ SQL;
 		
 		return $liste;
 	}
+
+	public function infos() {
+		return unserialize($this->values['infos']);
+	}
+
+	public function infos($infos) {
+		$this->update(array('commande' => array('infos' => serialize($infos)));
+	}
 	
 	public function changer_etat($etat, $id = null) {
 		$old_id = false;

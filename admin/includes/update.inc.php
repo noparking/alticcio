@@ -950,3 +950,15 @@ ALTER TABLE `dt_exports_catalogues` CHANGE `etat` `etat` ENUM( 'tobuild', 'build
 SQL;
 	$update->query($q);
 }
+
+function update_43($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes` ADD `infos` TEXT NOT NULL 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_revisions` ADD `infos` TEXT NOT NULL 
+SQL;
+	$update->query($q);
+}
