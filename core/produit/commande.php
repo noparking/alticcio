@@ -270,7 +270,7 @@ SQL;
 	}
 
 	public function update_infos($infos) {
-		$this->update(array('commande' => array('infos' => serialize($infos)));
+		$this->update(array('commande' => array('infos' => serialize($infos))));
 	}
 	
 	public function changer_etat($etat, $id = null) {
