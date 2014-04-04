@@ -24,6 +24,7 @@ class Sogenactif {
 		$parm .= " automatic_response_url=".$data['automatic_response_url'];
 		$parm .= " pathfile=".$this->config['pathfile'];
 		$parm .= " transaction_id=".$transaction_id; 
+		$parm .= " order_id=".$data['reference']; 
 
 		$output = array();
 		$return_var = 0;
