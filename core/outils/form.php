@@ -52,6 +52,7 @@ class Form {
 	private $permissions_object = null;
 	private $page = null;
 	private $rendered = array();
+	private $trim = true;
 	
 	public function __construct($params = array()) {
 		$this->error_message_upload[UPLOAD_ERR_INI_SIZE] = "Le fichier dépasse la taille autorisée (".ini_get('upload_max_filesize').")";
@@ -75,6 +76,7 @@ class Form {
 		foreach ($this->actions as $action) {
 			unset($this->values[$action]);
 		}
+		$this->trim = isset($params['trim']) ? $params['trim'] : true;
 		$this->page = isset($params['page']) ? $params['page'] : null;
 		$this->required = isset($params['required']) ? $params['required'] : array();
 		$this->unregistered = isset($params['unregistered']) ? $params['unregistered'] : array();
@@ -138,6 +140,16 @@ class Form {
 		}
 		if (isset($params['permissions_object'])) {
 			$this->permissions_object = $params['permissions_object'];
+		}
+
+		if ($this->trim) {
+			array_walk_recursive($this->values, array($this, "trim_string"));
+		}
+	}
+
+	public function trim_string(&$value) {
+		if (is_string($value)) {
+			$value = trim($value);
 		}
 	}
 

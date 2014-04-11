@@ -189,9 +189,9 @@ class TestOfForm extends UnitTestCase {
 		$form = new Form(array('id' => "my-form"));
 
 		$this->assertEqual($form->value('box-on'), 1);
-		$this->assertNull($form->value('box-off'));
-		$this->assertEqual($form->value('boxes'), array('on' => 1, 'off' => null));
-		$this->assertEqual($form->value('empty'), array(0 => null, 1 => null));
+		$this->assertEqual($form->value('box-off'), 0);
+		$this->assertEqual($form->value('boxes'), array('on' => 1, 'off' => 0));
+		$this->assertEqual($form->value('empty'), array(0 => 0, 1 => 0));
 
 		$form->reset();
 	}
@@ -841,5 +841,33 @@ class TestOfForm extends UnitTestCase {
 			'name' => "phrases[phrase_nom]",
 		);
 		$this->assertTrue($form->is_permitted("text", $params));
+	}
+
+	function test_trim() {
+		$_POST = array(
+		'form-id' => "my-form",
+			'a' => array(
+				3 => "  aze  ",
+				4 => "  qsd  ",
+				),
+			42 => "  qsdqsd  ",
+		);
+		$form = new Form(array('id' => "my-form"));
+		$values = $form->values();
+		$this->assertEqual($values['a'][3], "aze");
+		$this->assertEqual($values['a'][4], "qsd");
+		$this->assertEqual($values[42], "qsdqsd");
+
+		$form = new Form(array('id' => "my-form", 'trim' => false));
+		$values = $form->values();
+		$this->assertEqual($values['a'][3], "  aze  ");
+		$this->assertEqual($values['a'][4], "  qsd  ");
+		$this->assertEqual($values[42], "  qsdqsd  ");
+
+		$form = new Form(array('id' => "my-form", 'trim' => true));
+		$values = $form->values();
+		$this->assertEqual($values['a'][3], "aze");
+		$this->assertEqual($values['a'][4], "qsd");
+		$this->assertEqual($values[42], "qsdqsd");
 	}
 }
