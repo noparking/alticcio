@@ -1,0 +1,87 @@
+body {
+    background-color:#EDEDED;
+    font-family: arial;
+    font-size: 12px;
+    color:#666;
+}
+#container {
+    width:810px;
+    margin:50px auto;
+    padding:0;
+}
+#recherche {
+    float:left;
+    width:390px;
+    margin:0;
+    padding:0;
+}
+#recherche fieldset {
+    border:0;
+}
+#recherche legend {
+    color:#008ECD;
+    font-weight:bold;
+}
+#recherche p {
+    clear:both;
+}
+#recherche p span.intitule {
+    text-align:left;
+    width: 120px;
+    float:left;
+}
+#recherche p span.valeur {
+    text-align:right;
+    width: 270px;
+    float:right;
+}
+#recherche p span.valeur select {
+    width:250px;
+}
+#recherche p input {
+    background-color:#008ECD;
+    padding:5px 10px;
+    color:#FFF;
+    text-align:center;
+}
+
+
+#resultat {
+    float:right;
+    width:410px;
+    margin:0;
+    padding:0;
+}
+#resultat ul {
+    margin:0;
+    padding:0;
+}
+#resultat ul li {
+    list-style-type: none;
+    margin:0;
+    padding:0;
+}
+#resultat dl {
+    margin:0;
+    width:390px;
+    padding:10px;
+    text-align:center;
+}
+#resultat dl dt {
+    font-size:46px;
+    margin:0;
+    padding:0;
+    color:#008ECD;
+    font-weight:bold;
+}
+#resultat dl dd {
+    font-size:14px;
+    margin:0;
+    padding:0;
+}
+#resultat p {
+    font-size:14px;
+    color:#000;
+    font-weight:bold;
+    text-align:center;
+}
