@@ -112,6 +112,11 @@ $menus = array(
 						'url' => $url->make("Comparatif"),
 						'level' => 70,
 					),
+                         'degressifs' => array(
+						'label' => $dico->t("Degressifs"),
+						'url' => $url->make("Degressifs"),
+						'level' => 70,
+					),
 				),
 			),
 			
