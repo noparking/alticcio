@@ -465,6 +465,7 @@ $d['pages'] = array(
 	"gammes" => "ranges",
 	"factures" => "invoices",
 	"aide" => "help",
+     "degressifs" => "degressifs",
 );
 
 $d['hd_extensions'] = array(
