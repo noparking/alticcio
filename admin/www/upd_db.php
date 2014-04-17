@@ -83,4 +83,7 @@ $sql = new Mysql($config->db());
 
 // Appelle le script pour nettoyer les derniers codes drapeaux
 //include dirname(__FILE__)."/../../../project/scripts/update_flags.php";
+
+// Appelle le script pour le routage catalogue collèges
+include dirname(__FILE__)."/../../../project/scripts/routage14.php";
 ?>
