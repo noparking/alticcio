@@ -19,6 +19,7 @@ class Application extends AbstractObject {
 		$q = <<<SQL
 SELECT a.id, p.phrase FROM dt_applications AS a
 LEFT OUTER JOIN dt_phrases AS p ON p.id = a.phrase_nom AND p.id_langues = {$this->langue}
+ORDER BY p.phrase ASC
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
