@@ -26,7 +26,7 @@ $form = new Form(array(
 ));
 
 $comparatif = "";
-$comparatif_csv = "";
+$comparatif_csv = array();
 
 if ($form->is_submitted()) {
 	$values = $form->escaped_values();
@@ -70,9 +70,30 @@ if ($form->is_submitted()) {
 <th><div style="width: 300px">Meta description</div></th>
 </tr>
 HTML;
-		$comparatif_csv = <<<CSV
-ID;Nom;Référence;Type;Statut;Gamme;Offre;Filière de recyclage;Intitulé de l'url;Description courte;Description;Conseil d'entretien;Mode d'emploi;Les + produit;Attributs;Déclinaisons;Accessoires;Produits complémentaires;Produits similaires;Meta title;Meta keywords;Meta description
-CSV;
+		$comparatif_csv[] = array(
+			"ID",
+			"Nom",
+			"Référence",
+			"Type",
+			"Statut",
+			"Gamme",
+			"Offre",
+			"Filière de recyclage",
+			"Intitulé de l'url",
+			"Description courte",
+			"Description",
+			"Conseil d'entretien",
+			"Mode d'emploi",
+			"Les + produit",
+			"Attributs",
+			"Déclinaisons",
+			"Accessoires",
+			"Produits complémentaires",
+			"Produits similaires",
+			"Meta title",
+			"Meta keywords",
+			"Meta description",
+		);
 		$types = $produit->types();
 		$gammes = $produit->gammes();
 		$offres = array(
@@ -97,46 +118,44 @@ CSV;
 			$meta_title = isset($phrases['phrase_meta_title']) ? $phrases['phrase_meta_title'][$config->get("langue")] : "";
 			$meta_keywords = isset($phrases['phrase_meta_keywords']) ? $phrases['phrase_meta_keywords'][$config->get("langue")] : "";
 			$meta_description = isset($phrases['phrase_meta_description']) ? $phrases['phrase_meta_description'][$config->get("langue")] : "";
-			$attributs_produit = $produit->attributs();
+			$attributs_data = $produit->attributs_data();
 			$attributs_application = $application->attributs();
 			$attributs = "<ul>";
 			foreach  ($attributs_application as $attribut_id) {
-				$attribut->load($attribut_id);
-				list($label) = $phrase->get(array($attribut->values['phrase_nom']));
-				switch ($attribut->type_attribut) {
-					case 'choice' :
-						switch ($attributs_produit[$attribut_id]) {
-							case 0 : $value = "N/A"; break;
-							case 1 : $value = "Oui"; break;
-							case 2 : $value = "Non"; break;
+				if (isset($attributs_data[$attribut_id])) {
+					$attribut_data = $attributs_data[$attribut_id][0]; // On ne gère pas les valeurs multiples
+					$nom = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
+					$unite = $attribut_data['unite'] ? $attribut_data['unite'] : "";
+					if ($attribut_data['phrase_valeur']) {
+						if (is_array($attribut_data['phrase_valeur'])) {
+							$valeurs_unites = array();
+							foreach ($phrases['valeurs_attributs'][$attribut_data['id_attributs']][0] as $v) {
+								$valeurs_unites[] = trim("{$v[$code_langue]} {$unite}");
+							}
+							$valeur = implode(", ", $valeurs_unites);
 						}
-						break;
-					case 'mark' :
-						$value = $attributs_produit[$attribut_id] ? $attributs_produit[$attribut_id] : "N/A";
-						break;
-					case 'text' :
-					case 'textarea' :
-						$value = isset($phrases['valeurs_attributs'][$attribut_id]) ? $phrases['valeurs_attributs'][$attribut_id][$config->get('langue')] : "";
-						break;
-					case 'select' :
-					case 'multiselect' :
-						$options = array();
-						$phrase_ids = array();
-						foreach ($attribut->options() as $option) {
-							$phrase_ids[$option['id']] = $option['phrase_option'];
+						else {
+							$valeur = $phrases['valeurs_attributs'][$attribut_data['id_attributs']][0][$code_langue];
+							$valeur .= " $unite";
 						}
-						$phrases_options = $phrase->get($phrase_ids);
-						foreach ($attribut->options() as $option) {
-							$options[$option['phrase_option']] = $phrases_options[$option['id']][$config->get('langue')];
+					}
+					else {
+						if (is_array($attribut_data['valeur_numerique'])) {
+							$valeurs_unites = array();
+							foreach ($attribut_data['valeur_numerique'] as $v) {
+								$v = format_valeur_numerique($v, $attribut_data['id_types_attributs']);
+								$valeurs_unites[] = trim("{$v} {$unite}");
+							}
+							$valeur = implode(", ", $valeurs_unites);
 						}
-						$value = $options[$attributs_produit[$attribut_id]];
-						break;
-					case 'number' :
-					default :
-						$value = $attributs_produit[$attribut_id];
-						break;
+						else {
+							$valeur = format_valeur_numerique($attribut_data['valeur_numerique'], $attribut_data['id_types_attributs']);
+							$valeur .= " $unite";
+						}
+					}
+					$value = trim($valeur);
+					$attributs .= "<li>$nom : $value</li>";
 				}
-				$attributs .= "<li>{$label[$config->get('langue')]} : $value</li>";
 			}
 			$attributs .= "</ul>";
 			
@@ -201,9 +220,30 @@ HTML;
 			foreach (array("description_courte", "description") as $var) {
 				$$var = str_replace(array(';', "\n", "\r"), array('', ' ', ' '), $$var);
 			}
-			$comparatif_csv .= "\n" . <<<CSV
-{$data['id']};{$nom};{$data['ref']};{$types[$data['id_types_produits']]};{$statut};{$gammes[$data['id_gammes']]};{$offres[$data['offre']]};{$recyclages[$data['id_recyclage']]};{$url_key};{$description_courte};{$description};{$entretien};{$mode_emploi};{$avantages_produit};{$attributs};{$declinaisons};{$accessoires};{$complementaires};{$similaires};{$meta_title};{$meta_keywords};{$meta_description}
-CSV;
+			$comparatif_csv[] = array(
+				$data['id'],
+				$nom,
+				$data['ref'],
+				$types[$data['id_types_produits']],
+				$statut,
+				$gammes[$data['id_gammes']],
+				$offres[$data['offre']],
+				$recyclages[$data['id_recyclage']],
+				$url_key,
+				$description_courte,
+				$description,
+				$entretien,
+				$mode_emploi,
+				$avantages_produit,
+				$attributs,
+				$declinaisons,
+				$accessoires,
+				$complementaires,
+				$similaires,
+				$meta_title,
+				$meta_keywords,
+				$meta_description,
+			);
 		}
 		$comparatif .= "</table>";
 		break;
@@ -216,7 +256,7 @@ CSV;
 <th>ID</th>
 <th>Nom</th>
 HTML;
-		$comparatif_csv .= "ID;Nom";
+		$comparatif_csv_line = array("ID", "Nom");
 		$attributs_application = $application->attributs();
 		foreach  ($attributs_application as $attribut_id) {
 			$attribut->load($attribut_id);
@@ -224,8 +264,9 @@ HTML;
 			$comparatif .= <<<HTML
 <th>{$label[$config->get('langue')]}</th>
 HTML;
-			$comparatif_csv .= ";{$label[$config->get('langue')]}";
+			$comparatif_csv_line[] = $label[$config->get('langue')];
 		}
+		$comparatif_csv[] = $comparatif_csv_line;
 		$comparatif .= "</tr>";
 		foreach ($produits as $id_produits) {
 			$produit->load($id_produits);
@@ -234,7 +275,7 @@ HTML;
 			$nom = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
 			$attributs_data = $produit->attributs_data();
 			$attributs = "";
-			$comparatif_csv .= "\n{$data['id']};{$nom}";
+			$comparatif_csv_line = array($data['id'], $nom);
 			foreach  ($attributs_application as $attribut_id) {
 				if (isset($attributs_data[$attribut_id])) {
 					$attribut_data = $attributs_data[$attribut_id][0]; // On ne gère pas les valeurs multiples
@@ -269,11 +310,11 @@ HTML;
 					}
 					$value = trim($valeur);
 					$attributs .= "<td>{$value}</td>";
-					$comparatif_csv .= ";{$value}";
+					$comparatif_csv_line[] = $value;
 				}
 				else {
 					$attributs .= "<td></td>";
-					$comparatif_csv .= ";";
+					$comparatif_csv_line[] = "";
 				}
 			}
 			$comparatif .= <<<HTML
@@ -283,6 +324,7 @@ HTML;
 $attributs
 </tr>
 HTML;
+			$comparatif_csv[] = $comparatif_csv_line;
 		}
 		$comparatif .= "</table>";
 		break;
@@ -292,7 +334,11 @@ HTML;
 		$file = str_replace("-", ".", $form->action());
 		header("Content-Type: text/csv");
 		header("Content-disposition: filename=$file");
-		echo $comparatif_csv;
+		$output = fopen('php://output', 'w');
+		foreach ($comparatif_csv as $comparatif_csv_line) {
+			fputcsv($output, $comparatif_csv_line);
+		}
+		fclose($output);
 		exit;
 	}
 }
