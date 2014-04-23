@@ -9,6 +9,7 @@ $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
 $id_langues = $langue->id($config->get("langue"));
+$code_langue = $config->get("langue");
 
 $phrase = new Phrase($sql);
 
@@ -231,53 +232,48 @@ HTML;
 			$phrases = $phrase->get($produit->phrases());
 			$data = $produit->values;
 			$nom = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
-			$attributs_produit = $produit->attributs();
+			$attributs_data = $produit->attributs_data();
 			$attributs = "";
 			$comparatif_csv .= "\n{$data['id']};{$nom}";
 			foreach  ($attributs_application as $attribut_id) {
-				if (isset($attributs_produit[$attribut_id])) {
-					$attribut->load($attribut_id);
-					switch ($attribut->type_attribut) {
-						case 'choice' :
-							switch ($attributs_produit[$attribut_id][0]) {
-								case 0 : $value = "N/A"; break;
-								case 1 : $value = "Oui"; break;
-								case 2 : $value = "Non"; break;
+				if (isset($attributs_data[$attribut_id])) {
+					$attribut_data = $attributs_data[$attribut_id][0]; // On ne gère pas les valeurs multiples
+					$nom = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
+					$unite = $attribut_data['unite'] ? $attribut_data['unite'] : "";
+					if ($attribut_data['phrase_valeur']) {
+						if (is_array($attribut_data['phrase_valeur'])) {
+							$valeurs_unites = array();
+							foreach ($phrases['valeurs_attributs'][$attribut_data['id_attributs']][0] as $v) {
+								$valeurs_unites[] = trim("{$v[$code_langue]} {$unite}");
 							}
-							break;
-						case 'mark' :
-							$value = $attributs_produit[$attribut_id][0] ? $attributs_produit[$attribut_id][0] : "N/A";
-							break;
-						case 'text' :
-						case 'textarea' :
-							$value = isset($phrases['valeurs_attributs'][$attribut_id][0]) ? $phrases['valeurs_attributs'][$attribut_id][0][$config->get('langue')] : "";
-							break;
-						case 'select' :
-						case 'multiselect' :
-							$options = array();
-							$phrase_ids = array();
-							foreach ($attribut->options() as $option) {
-								$phrase_ids[$option['id']] = $option['phrase_option'];
-							}
-							$phrases_options = $phrase->get($phrase_ids);
-							foreach ($attribut->options() as $option) {
-								$options[$option['phrase_option']] = $phrases_options[$option['id']][$config->get('langue')];
-							}
-							$value = array();
-							foreach ($attributs_produit[$attribut_id] as $option) {
-								$value[] = $options[$option];
-							}
-							break;
-						case 'number' :
-						default :
-							$value = $attributs_produit[$attribut_id][0];
-							break;
+							$valeur = implode(", ", $valeurs_unites);
+						}
+						else {
+							$valeur = $phrases['valeurs_attributs'][$attribut_data['id_attributs']][0][$code_langue];
+							$valeur .= " $unite";
+						}
 					}
-					if (is_array($value)) {
-						$value = implode(" ,", $value);
+					else {
+						if (is_array($attribut_data['valeur_numerique'])) {
+							$valeurs_unites = array();
+							foreach ($attribut_data['valeur_numerique'] as $v) {
+								$v = format_valeur_numerique($v, $attribut_data['id_types_attributs']);
+								$valeurs_unites[] = trim("{$v} {$unite}");
+							}
+							$valeur = implode(", ", $valeurs_unites);
+						}
+						else {
+							$valeur = format_valeur_numerique($attribut_data['valeur_numerique'], $attribut_data['id_types_attributs']);
+							$valeur .= " $unite";
+						}
 					}
-					$attributs .= "<td>$value</td>";
+					$value = trim($valeur);
+					$attributs .= "<td>{$value}</td>";
 					$comparatif_csv .= ";{$value}";
+				}
+				else {
+					$attributs .= "<td></td>";
+					$comparatif_csv .= ";";
 				}
 			}
 			$comparatif .= <<<HTML
@@ -319,3 +315,26 @@ $main .= $comparatif;
 
 $form_end = $form->form_end();
 
+function format_valeur_numerique($v, $id_types_attributs) {
+	global $config;
+
+	switch ($id_types_attributs) {
+		case 1 : 
+			$options = array(0 => "N/A", 1 => "Oui", 2 => "Non");
+			$v = $options[$v];
+			break;
+		case 2 :
+			if ($v == 0) {
+				$v = "N/A";
+			}
+			else {
+				$stars = "";
+				for ($i = 0; $i < $v; $i++) {
+					$stars .= "*";
+				}
+				$v = $stars;
+			}
+			break;
+	}
+	return $v;
+}
