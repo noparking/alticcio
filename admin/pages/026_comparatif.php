@@ -108,7 +108,7 @@ HTML;
 			$phrases = $phrase->get($produit->phrases());
 			$data = $produit->values;
 			$statut = $data['actif'] ? "actif" : "inactif";
-			$nom = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
+			$nom_produit = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
 			$url_key = isset($phrases['phrase_url_key']) ? $phrases['phrase_url_key'][$config->get("langue")] : "";
 			$description_courte = isset($phrases['phrase_description_courte']) ? $phrases['phrase_description_courte'][$config->get("langue")] : "";
 			$description = isset($phrases['phrase_description']) ? $phrases['phrase_description'][$config->get("langue")] : "";
@@ -124,7 +124,7 @@ HTML;
 			foreach  ($attributs_application as $attribut_id) {
 				if (isset($attributs_data[$attribut_id])) {
 					$attribut_data = $attributs_data[$attribut_id][0]; // On ne gère pas les valeurs multiples
-					$nom = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
+					$nom_attribut = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
 					$unite = $attribut_data['unite'] ? $attribut_data['unite'] : "";
 					if ($attribut_data['phrase_valeur']) {
 						if (is_array($attribut_data['phrase_valeur'])) {
@@ -154,7 +154,7 @@ HTML;
 						}
 					}
 					$value = trim($valeur);
-					$attributs .= "<li>$nom : $value</li>";
+					$attributs .= "<li>$nom_attribut : $value</li>";
 				}
 			}
 			$attributs .= "</ul>";
@@ -194,7 +194,7 @@ HTML;
 			$comparatif .= <<<HTML
 <tr>
 <td>{$page->l($data['id'], $url2->make("produits", array('type' => "produits", 'action' => 'edit', 'id' => $data['id'])))}</td>
-<td>{$page->l($nom, $url2->make("produits", array('type' => "produits", 'action' => 'edit', 'id' => $data['id'])))}</td>
+<td>{$page->l($nom_produit, $url2->make("produits", array('type' => "produits", 'action' => 'edit', 'id' => $data['id'])))}</td>
 <td>{$data['ref']}</td>
 <td>{$types[$data['id_types_produits']]}</td>
 <td>{$statut}</td>
@@ -222,7 +222,7 @@ HTML;
 			}
 			$comparatif_csv[] = array(
 				$data['id'],
-				$nom,
+				$nom_produit,
 				$data['ref'],
 				$types[$data['id_types_produits']],
 				$statut,
@@ -272,14 +272,14 @@ HTML;
 			$produit->load($id_produits);
 			$phrases = $phrase->get($produit->phrases());
 			$data = $produit->values;
-			$nom = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
+			$nom_produit = isset($phrases['phrase_nom']) ? $phrases['phrase_nom'][$config->get("langue")] : "";
 			$attributs_data = $produit->attributs_data();
 			$attributs = "";
-			$comparatif_csv_line = array($data['id'], $nom);
+			$comparatif_csv_line = array($data['id'], $nom_produit);
 			foreach  ($attributs_application as $attribut_id) {
 				if (isset($attributs_data[$attribut_id])) {
 					$attribut_data = $attributs_data[$attribut_id][0]; // On ne gère pas les valeurs multiples
-					$nom = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
+					$nom_attribut = $phrases['attributs'][$attribut_data['id_attributs']][$code_langue];
 					$unite = $attribut_data['unite'] ? $attribut_data['unite'] : "";
 					if ($attribut_data['phrase_valeur']) {
 						if (is_array($attribut_data['phrase_valeur'])) {
@@ -320,7 +320,7 @@ HTML;
 			$comparatif .= <<<HTML
 <tr>
 <td>{$data['id']}</td>
-<td>{$nom}</td>
+<td>{$nom_produit}</td>
 $attributs
 </tr>
 HTML;
