@@ -145,4 +145,8 @@ SQL;
 		}
 		return "";
 	}
+
+	function get_data($key) {
+		return isset($this->values['data'][$key]) ? $this->values['data'][$key] : null;
+	}
 }
