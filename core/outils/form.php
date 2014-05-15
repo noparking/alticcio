@@ -419,7 +419,7 @@ class Form {
 			}
 			$attr = "";
 			foreach ($params as $cle => $valeur) {
-				if (in_array($cle, array('min', 'max', 'step', 'switch'))) {
+				if (in_array($cle, array('min', 'max', 'step', 'switch', 'maxlength'))) {
 					$attr .= " $cle=\"$valeur\"";
 				}
 			}
