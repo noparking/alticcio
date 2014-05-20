@@ -217,10 +217,10 @@ if ($form->is_submitted() and $form->validate()) {
 				}
 				else if ($id > 0) {
 					$form->reset();
-				}
 
-				if ($action != "edit") {
-					$url2->redirect("current", array('action' => "edit", 'id' => $id));
+					if ($action != "edit") {
+						$url2->redirect("current", array('action' => "edit", 'id' => $id));
+					}
 				}
 			}
 			break;
