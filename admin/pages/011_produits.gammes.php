@@ -132,6 +132,7 @@ if ($form->is_submitted() and $form->validate()) {
 					$filter_attributs_management->clean_data($data, 'attributs_management');
 				}
 				if ($id = $url_redirection->save_object($gamme, $data, array('phrase_url_key' => 'phrase_nom'))) {
+					$gamme_saved = true; // used for hook
 					$form->reset();
 					if ($action != "edit") {
 						$url2->redirect("current", array('action' => "edit", 'id' => $id));
