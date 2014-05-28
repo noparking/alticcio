@@ -125,7 +125,7 @@ SQL;
 		}
 	}
 
-	function produits($id_categorie, $limit, $offset) {
+	function produits($id_categorie, $limit, $offset, $id_catalogue = 0) {
 		$produit = new API_Produit($this->api);
 		$id = (int)$id_categorie;
 		$q = <<<SQL
@@ -141,7 +141,7 @@ SQL;
 		$total = $this->sql->found_rows();
 		$produits = array();
 		while ($row = $this->sql->fetch($res)) {
-			$produits[] = $produit->infos($row['id']);
+			$produits[] = $produit->infos($row['id'], $id_catalogue);
 		}
 
 		return array('products' => $produits, 'nb' => count($produits), 'total' => (int)$total, 'limit' => (int)$limit, 'offset' => (int)$offset);

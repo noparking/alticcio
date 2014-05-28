@@ -19,7 +19,7 @@ class API_Produit {
 	}
 
 	// Informations globales
-	public function infos($id_produits) {
+	public function infos($id_produits, $id_catalogue = 0) {
 		$lang = $this->language;
 		$phrase = new Phrase($this->sql);
 		$produit = new Produit($this->sql, $phrase, $lang);
@@ -27,13 +27,17 @@ class API_Produit {
 		$produit->load($id_produits);
 		$this->phrases = $produit->phrases_dynamiques();
 
+		$price = $produit->prix_mini($id_catalogue);
+		if (!$price and $id_catalogue) {
+			$price = $produit->prix_mini();
+		}
 		$infos = array(
 			'id' => $id_produits,
 			'thumbnail' => $produit->vignette(),
 			'name' => $this->get_phrase('nom'),
 			'short_description' => $this->get_phrase('description_courte'),
 			'benefits' => $this->get_phrase('avantages_produit'),
-			'price' => $produit->prix_mini(),
+			'price' => $price,
 		);
 
 		return $infos;
@@ -222,7 +226,7 @@ SQL;
 		return $row['libelle'];
 	}
 	
-	public function prix($id_sku, $qte) {
+	public function prix($id_sku, $qte, $id_catalogue = 0) {
 		require_once dirname(__FILE__)."/../../produit/sku.php";
 
 		$sku = new Sku($this->sql);
@@ -235,12 +239,12 @@ SQL;
 			}
 		}
 
-		$prix = $sku->prix();
+		$prix = $sku->prix(null, $id_catalogue);
 		$franco = $prix['franco'];
 
 		$price = array(
 			'id_sku' => $id_sku,
-			'prix_ht' => $sku->prix_unitaire_pour_qte($id_sku, $qte),
+			'prix_ht' => $sku->prix_unitaire_pour_qte($id_sku, $qte, $id_catalogue),
 			'unite_vente' => $sku->unite_vente($this->id_langues, $id_sku),
 			'qte' => $qte,
 			'qte_min' => $sku->values['min_commande'],

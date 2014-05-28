@@ -65,6 +65,7 @@ function get_widget_eboutique($api) {
 
 	if ($id_catalogue = $catalogue->id()) {
 		$categories = $catalogue->tree($id_catalogue);
+		$ret['catalogue']['id'] = $id_catalogue;
 		$ret['catalogue']['nb'] = count($categories);
 		$ret['catalogue']['categories'] = $categories;
 		$ret['catalogue']['home'] =  $catalogue->home($id_catalogue);
