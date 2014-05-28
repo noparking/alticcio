@@ -5,6 +5,7 @@ class API_Cart {
 	private $api;
 	private $sql;
 	private $id_langues;
+	private $id_catalogues = 0;
 
 	public function __construct($api) {
 		$this->api = $api;
@@ -19,6 +20,9 @@ class API_Cart {
 		}
 		if (!isset($_SESSION['cart'][$this->key]['personnalisations']) or !is_array($_SESSION['cart'][$this->key]['personnalisations'])) {
 			$_SESSION['cart'][$this->key]['personnalisations'] = array();
+		}
+		if (isset($_SESSION['cart'][$this->key]['id_catalogues'])) {
+			$this->id_catalogues = $_SESSION['cart'][$this->key]['id_catalogues'];
 		}
 	}
 
@@ -228,7 +232,7 @@ SQL;
 		return $_SESSION['cart'][$this->key]['personnalisations'];
 	}
 
-	public function check_franco($id_catalogues = 0) {
+	public function check_franco() {
 		$sku_ids = array();
 		foreach ($_SESSION['cart'][$this->key]['items'] as $item) {
 			$sku_ids[] = $item['id_sku'];
@@ -237,7 +241,7 @@ SQL;
 		// S'il y a au moins 1 SKU franco = 0 ou montant_ht = 0
 		$q = <<<SQL
 SELECT * FROM dt_prix
-WHERE id_catalogues = $id_catalogues
+WHERE id_catalogues = $this->id_catalogues
 AND (franco = 0 OR montant_ht = 0) 
 AND id_sku IN ($liste_id_sku)
 SQL;
@@ -294,10 +298,10 @@ SQL;
 		return $produits;
 	}
 
-	public function prix_unitaire_pour_qte($id_sku, $qte, $id_catalogues = 0) {
+	public function prix_unitaire_pour_qte($id_sku, $qte) {
 		$q = <<<SQL
 SELECT MIN(montant_ht) AS prix FROM dt_prix_degressifs
-WHERE id_sku = $id_sku AND quantite <= $qte AND id_catalogues = $id_catalogues
+WHERE id_sku = $id_sku AND quantite <= $qte AND id_catalogues = {$this->id_catalogues}
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
@@ -308,7 +312,7 @@ SQL;
 		else {
 			$q = <<<SQL
 SELECT montant_ht FROM dt_prix
-WHERE id_sku = $id_sku AND id_catalogues = $id_catalogues
+WHERE id_sku = $id_sku AND id_catalogues = {$this->id_catalogues}
 SQL;
 			$res = $this->sql->query($q);
 			$row = $this->sql->fetch($res);
@@ -325,6 +329,11 @@ SQL;
 
 	public function token() {
 		return $_SESSION['cart'][$this->key]['token'];
+	}
+
+	public function catalogue($id_catalogues) {
+		$_SESSION['cart'][$this->key]['id_catalogues'] = $id_catalogues;
+		$this->id_catalogues = $id_catalogues;
 	}
 
 	public function content($id_pays_livraison = null) {
@@ -364,7 +373,7 @@ SQL;
 SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.montant_ht, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
 LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = {$this->id_langues()}
-LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = 0
+LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = {$this->id_catalogues}
 WHERE s.id IN ($sku_ids)
 SQL;
 		$res = $this->sql->query($q);
@@ -379,7 +388,7 @@ SQL;
 
 		$q = <<<SQL
 SELECT id_sku, montant_ht, quantite FROM dt_prix_degressifs
-WHERE id_sku IN ($sku_ids) AND id_catalogues = 0
+WHERE id_sku IN ($sku_ids) AND id_catalogues = {$this->id_catalogues}
 ORDER BY quantite ASC
 SQL;
 		$res = $this->sql->query($q);
@@ -401,7 +410,7 @@ LEFT OUTER JOIN dt_pays AS p ON p.id = e.id_pays
 LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = p.phrase_nom AND ph1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_familles_taxes AS ft ON ft.id = e.id_familles_taxes
 LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = ft.phrase_taxe AND ph2.id_langues = {$this->id_langues()}
-WHERE id_sku IN ($sku_ids) AND id_catalogues = 0 AND id_pays = $id_pays_livraison
+WHERE id_sku IN ($sku_ids) AND id_catalogues = {$this->id_catalogues} AND id_pays = $id_pays_livraison
 SQL;
 		$res = $this->sql->query($q);
 		while($row = $this->sql->fetch($res)) {
