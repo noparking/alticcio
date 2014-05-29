@@ -347,6 +347,7 @@ SQL;
 		$refs = array();
 		$vignettes = array();
 		$prix_degressifs = array();
+		$prix_catalogue = array(); // les prix sont ils spéciaux pour le catalogue ?
 		$qtes_min = array();
 		$colisages = array();
 		$sku_ids = array();
@@ -370,30 +371,34 @@ SQL;
 		}
 		$produits_ids = implode(",", $produits_ids);
 		$q = <<<SQL
-SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.montant_ht, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
+SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.id as px_id, px.montant_ht, px2.montant_ht AS montant_ht_default, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
 LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = {$this->id_catalogues}
+LEFT OUTER JOIN dt_prix AS px2 ON px2.id_sku = s.id AND px2.id_catalogues = 0
 WHERE s.id IN ($sku_ids)
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$noms[$row['id']] = $row['phrase_commercial'] ? $row['phrase_commercial'] : $row['phrase_ultralog'];
 			$refs[$row['id']] = $row['ref_ultralog'];
-			$prix_degressifs[$row['id']][1] = $row['montant_ht'];
+			$prix_catalogue[$row['id']] = $row['px_id'] ? $this->id_catalogues : 0;
+			$prix_degressifs[$row['id']][1] = $prix_catalogue[$row['id']] ? $row['montant_ht'] : $row['montant_ht_default'];
 			$qtes_min[$row['id']] = $row['min_commande'];
 			$colisages[$row['id']] = $row['colisage'];
 			$francos[$row['id']] = $row['franco'];
 		}
 
 		$q = <<<SQL
-SELECT id_sku, montant_ht, quantite FROM dt_prix_degressifs
-WHERE id_sku IN ($sku_ids) AND id_catalogues = {$this->id_catalogues}
+SELECT id_sku, montant_ht, quantite, id_catalogues FROM dt_prix_degressifs
+WHERE id_sku IN ($sku_ids) AND (id_catalogues = {$this->id_catalogues} OR id_catalogues = 0)
 ORDER BY quantite ASC
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$prix_degressifs[$row['id_sku']][$row['quantite']] = $row['montant_ht'];
+			if ($row['id_catalogues'] == $prix_catalogue[$row['id_sku']]) {
+				$prix_degressifs[$row['id_sku']][$row['quantite']] = $row['montant_ht'];
+			}
 		}
 
 		$q = <<<SQL
@@ -405,16 +410,18 @@ SQL;
 		}
 
 		$q = <<<SQL
-SELECT e.id, e.id_sku, e.montant, e.id_pays, e.id_familles_taxes, ph1.phrase AS pays, ph2.phrase AS famille_taxes FROM dt_ecotaxes AS e
+SELECT e.id, e.id_sku, e.montant, e.id_pays, e.id_familles_taxes, ph1.phrase AS pays, ph2.phrase AS famille_taxes, e.id_catalogues FROM dt_ecotaxes AS e
 LEFT OUTER JOIN dt_pays AS p ON p.id = e.id_pays
 LEFT OUTER JOIN dt_phrases AS ph1 ON ph1.id = p.phrase_nom AND ph1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_familles_taxes AS ft ON ft.id = e.id_familles_taxes
 LEFT OUTER JOIN dt_phrases AS ph2 ON ph2.id = ft.phrase_taxe AND ph2.id_langues = {$this->id_langues()}
-WHERE id_sku IN ($sku_ids) AND id_catalogues = {$this->id_catalogues} AND id_pays = $id_pays_livraison
+WHERE id_sku IN ($sku_ids) AND (id_catalogues = {$this->id_catalogues} OR id_catalogues = 0) AND id_pays = $id_pays_livraison
 SQL;
 		$res = $this->sql->query($q);
 		while($row = $this->sql->fetch($res)) {
-			$ecotaxes[$row['id_sku']][] = $row;
+			if ($row['id_catalogues'] == $prix_catalogue[$row['id_sku']]) {
+				$ecotaxes[$row['id_sku']][] = $row;
+			}
 		}
 
 		$total_ht = 0;
