@@ -550,6 +550,7 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "produit[offre]", 'label' => $dico->t('Offre'), 'options' => $offres))}
 {$form->select(array('name' => "produit[id_recyclage]", 'label' => $dico->t('FiliereRecyclage'), 'options' => $produit->recyclage($id_langues) ))}
 {$form->select(array('name' => "produit[echantillon]", 'label' => $dico->t('EchantillonDisponible'), 'options' => array(1 => $dico->t('Oui'), 0 => $dico->t('Non'))))}
+{$form->select(array('name' => "produit[delai_livraison]", 'label' => $dico->t('DelaiLivraison'), 'options' => $dico->d('delais_livraison')))}
 {$form->input(array('name' => "produit[phrase_url_key]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_url_key]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "produit[phrase_avantages_produit]", 'type' => "hidden"))}

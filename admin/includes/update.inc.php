@@ -962,3 +962,10 @@ ALTER TABLE `dt_commandes_revisions` ADD `infos` TEXT NOT NULL
 SQL;
 	$update->query($q);
 }
+
+function update_44($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_produits` ADD `delai_livraison` VARCHAR( 8 ) NOT NULL DEFAULT ''
+SQL;
+	$update->query($q);
+}

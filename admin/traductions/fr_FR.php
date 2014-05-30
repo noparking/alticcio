@@ -651,3 +651,13 @@ $d['prix'] = array(
 	'devise' => "€",
 	'format' => "{montant}&nbsp;{devise}",
 );
+
+$t['DelaiLivraison'] = "Délai de livraison";
+$d['delais_livraison'] = array(
+	'' => "...",
+	'< 1' => "Moins d’une semaine",
+	'2-3' => "Entre 2 et 3 semaines",
+	'3-4' => "Entre 3 et 4 semaines",
+	'4-6' => "Entre 4 et 6 semaines",
+	'> 6' => "Plus de 6 semaines",
+);
