@@ -38,6 +38,9 @@ SQL;
 		if (!isset($data['commande']['date_commande'])) {
 			$data['commande']['date_commande'] = $_SERVER['REQUEST_TIME'];
 		}
+		if (!isset($data['commande']['infos'])) {
+			$data['commande']['infos'] = "";
+		}
 		if (isset($data['produits'])) {
 			$montant = 0;
 			$id_sku_quantite = array();
