@@ -202,8 +202,8 @@ HTML;
 <table id="blocs">
 <thead>
 <tr>
-	<th>{$dico->t('Bloc')}</th>
 	<th>{$dico->t('Utilisation')}</th>
+	<th>{$dico->t('Bloc')}</th>
 	<td></td>
 </tr>
 </thead>
@@ -213,8 +213,8 @@ HTML;
 		foreach ($blocs as $id => $id_blocs) {
 			$main .= <<<HTML
 <tr>
-	<td>{$bloc_options[$id_blocs]}</td>
 	<td>{$utilisation}</td>
+	<td>{$bloc_options[$id_blocs]}</td>
 	<td>
 		{$form->input(array('type' => "submit", 'name' => "delete-bloc[{$id}]", 'class' => "delete", 'value' => "X"))}
 	</td>
@@ -227,8 +227,8 @@ HTML;
 </table>
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('AjouterUnBloc'), 'class' => "produit-section produit-section-blocs".$hidden['blocs'], 'id' => "produit-section-blocs-new"))}
-{$form->select(array('name' => "new_bloc[id_blocs]", 'label' => "Bloc associé", 'options' => $bloc_options))}
 {$form->input(array('type' => "text", 'name' => "new_bloc[utilisation]", 'label' => $dico->t('Utilisation')))}
+{$form->select(array('name' => "new_bloc[id_blocs]", 'label' => "Bloc associé", 'options' => $bloc_options))}
 {$form->input(array('type' => "submit", 'name' => "add-bloc", 'value' => $dico->t('Ajouter') ))}
 {$form->fieldset_end()}
 HTML;
