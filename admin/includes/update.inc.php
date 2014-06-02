@@ -969,3 +969,18 @@ ALTER TABLE `dt_produits` ADD `delai_livraison` VARCHAR( 8 ) NOT NULL DEFAULT ''
 SQL;
 	$update->query($q);
 }
+
+function update_45($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_catalogues_categories_blocs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_catalogues_categories` int(11) NOT NULL DEFAULT '0',
+  `id_blocs` int(11) NOT NULL DEFAULT '0',
+  `utilisation` VARCHAR(32) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `id_catalogues_categories` (`id_catalogues_categories`),
+  KEY `id_blocs` (`id_blocs`)
+)
+SQL;
+	$update->query($q);
+}

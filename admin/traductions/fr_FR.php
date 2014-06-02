@@ -20,6 +20,7 @@ $t['AjouterImagePhotomail'] = "Ajouter une image via Photomail";
 $t['AjouterPrixDegressif'] = "Ajouter un prix dégressif";
 $t['AjouterRoleApi'] = "Ajouter un rôle API";
 $t['AjouterUnAttribut'] = "Ajouter un attribut";
+$t['AjouterUnBloc'] = "Ajouter un bloc";
 $t['AjouterUnDocument'] = "Ajouter un document";
 $t['AjouterUneCampagneEmailing'] = "Ajouter une campagne d'emailing";
 $t['AjouterUneImage'] = "Ajouter une image";

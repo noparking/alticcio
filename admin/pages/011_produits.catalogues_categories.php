@@ -100,6 +100,13 @@ if ($form->is_submitted()) {
 			$form->reset();
 			$url2->redirect("current", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->id));
 			break;
+		case "add-bloc" :
+			$categorie->add_bloc($data);
+			$form->forget_value("new_bloc");
+			break;
+		case "delete-bloc" :
+			$categorie->delete_bloc($data, $form->action_arg());
+			break;
 		default :
 			if ($action == "edit") {
 				if ($form->validate()) {
@@ -143,11 +150,13 @@ $main = $page->inc("snippets/messages");
 $left = "";
 
 if ($action == "edit") {
+	$bloc_options = $categorie->bloc_options();
 	$titre_page = $dico->t('EditerCategorie')." # ID : ".$id;
 	$sections = array(
 		'informations' => $dico->t('Informations'),
 		'produits' => $dico->t('Produits'),
 		'referencement' => $dico->t('Referencement'),
+		'blocs' => $dico->t('Blocs'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
@@ -165,7 +174,7 @@ HTML;
 {$form->select(array('name' => "catalogue_categorie[id_parent]", 'label' => $dico->t('CategorieParent'), 'options' => $categories_options))}
 {$form->input(array('name' => "catalogue_categorie[classement]", 'label' => $dico->t('Classement') ))}
 {$form->select(array('name' => "catalogue_categorie[statut]", 'label' => $dico->t('Statut'), 'options' => array($dico->t('Desactive'), $dico->t('Active') )))}
-{$form->select(array('name' => "catalogue_categorie[id_blocs]", 'label' => "Bloc associé", 'options' => $categorie->bloc_options()))}
+{$form->select(array('name' => "catalogue_categorie[id_blocs]", 'label' => "Bloc associé", 'options' => $bloc_options))}
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
 <p>{$dico->t('ListeOfProduitsCategories')}</p>
@@ -187,6 +196,42 @@ HTML;
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
+
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Blocs'), 'class' => "produit-section produit-section-blocs".$hidden['blocs'], 'id' => "produit-section-blocs"))}
+<table id="blocs">
+<thead>
+<tr>
+	<th>{$dico->t('Bloc')}</th>
+	<th>{$dico->t('Utilisation')}</th>
+	<td></td>
+</tr>
+</thead>
+<tbody>
+HTML;
+	foreach ($categorie->blocs() as $utilisation => $blocs) {
+		foreach ($blocs as $id => $id_blocs) {
+			$main .= <<<HTML
+<tr>
+	<td>{$bloc_options[$id_blocs]}</td>
+	<td>{$utilisation}</td>
+	<td>
+		{$form->input(array('type' => "submit", 'name' => "delete-bloc[{$id}]", 'class' => "delete", 'value' => "X"))}
+	</td>
+</tr>
+HTML;
+		}
+	}
+	$main .= <<<HTML
+</tbody>
+</table>
+{$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('AjouterUnBloc'), 'class' => "produit-section produit-section-blocs".$hidden['blocs'], 'id' => "produit-section-blocs-new"))}
+{$form->select(array('name' => "new_bloc[id_blocs]", 'label' => "Bloc associé", 'options' => $bloc_options))}
+{$form->input(array('type' => "text", 'name' => "new_bloc[utilisation]", 'label' => $dico->t('Utilisation')))}
+{$form->input(array('type' => "submit", 'name' => "add-bloc", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_end()}
+HTML;
 }
 
 $form_end = $form->form_end();

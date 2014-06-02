@@ -200,4 +200,33 @@ SQL;
 
 		return $options;
 	}
+
+	public function blocs() {
+		$q = <<<SQL
+SELECT id, id_blocs, utilisation FROM dt_catalogues_categories_blocs WHERE id_catalogues_categories = {$this->id}
+ORDER BY utilisation ASC 
+SQL;
+		$res = $this->sql->query($q);
+		$blocs = array();
+		while ($row = $this->sql->fetch($res)) {
+			$blocs[$row['utilisation']][$row['id']] = $row['id_blocs'];
+		}
+
+		return $blocs;
+	}
+
+	public function add_bloc($data) {
+		$q = <<<SQL
+INSERT INTO dt_catalogues_categories_blocs (id_catalogues_categories, id_blocs, utilisation)
+VALUES ({$data['catalogue_categorie']['id']}, {$data['new_bloc']['id_blocs']}, '{$data['new_bloc']['utilisation']}')
+SQL;
+		$this->sql->query($q);
+	}
+
+	public function delete_bloc($data, $id) {
+		$q = <<<SQL
+DELETE FROM dt_catalogues_categories_blocs WHERE id = {$id}
+SQL;
+		$this->sql->query($q);
+	}
 }
