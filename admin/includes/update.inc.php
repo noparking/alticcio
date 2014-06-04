@@ -984,3 +984,10 @@ CREATE TABLE IF NOT EXISTS `dt_catalogues_categories_blocs` (
 SQL;
 	$update->query($q);
 }
+
+function update_46($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_blogs` ADD `titre` VARCHAR( 100 ) NOT NULL DEFAULT '' AFTER `nom` 
+SQL;
+	$update->query($q);
+}

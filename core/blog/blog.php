@@ -90,7 +90,7 @@ SQL;
 
 	public function load($id) {
 		$q = <<<SQL
-SELECT id, nom, `access` FROM dt_blogs WHERE id = $id
+SELECT id, nom, titre, `access` FROM dt_blogs WHERE id = $id
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {

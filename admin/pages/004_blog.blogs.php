@@ -72,6 +72,7 @@ if ($action == "create" or $action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start("Blog")}
 {$form->input(array('name' => "blog[nom]", 'label' => "Nom"))}
+{$form->input(array('name' => "blog[titre]", 'label' => "Titre"))}
 {$form->input(array('type' => "checkbox", 'name' => "blog[access]", 'value' => 1, 'label' => $dico->t('Acces'), 'template' => $template_checkbox))}
 {$form->fieldset_end()}
 HTML;
