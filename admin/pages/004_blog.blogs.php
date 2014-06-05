@@ -134,7 +134,7 @@ HTML;
 		$langues_list = implode(",", $blog->langues());
 		$themes_list = implode(",", $blog->themes());
 		$q = <<<SQL
-SELECT DISTINCT(b.id), b.titre, lg.code_langue, b.affichage, b.date_affichage
+SELECT DISTINCT(b.id), b.titre, lg.code_langue AS id_langues, b.affichage, b.date_affichage
 FROM dt_billets AS b
 INNER JOIN dt_langues AS lg ON lg.id = b.id_langues
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
