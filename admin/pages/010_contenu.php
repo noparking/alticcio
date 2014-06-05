@@ -19,7 +19,6 @@ if ($config->get("langue") != "en_UK") {
 	$page->javascript[] = $config->core_media("ui.datepicker-".$lang.".js");
 }
 $page->javascript[] = $config->media("contenu.js");
-$page->javascript[] = $config->core_media("filter-edit.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->css[] = $config->core_media("jquery-ui.custom.css");
 

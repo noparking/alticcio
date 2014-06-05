@@ -1,19 +1,26 @@
 <?php
 
-$config->core_include("database/tools", "outils/mysql", "outils/form", "outils/langue", "outils/filter", "outils/pager");
+$config->core_include("database/tools", "outils/mysql", "outils/form", "outils/phrase", "outils/langue", "outils/filter", "outils/pager");
 $config->core_include("blog/blogpost", "blog/blogtheme", "outils/url_redirection");
 $config->base_include("functions/tree");
 
 $sql = new Mysql($config->db());
 $blogpost = new Blogpost($sql);
+$produits = array(); 
+if($id_billets = $url2->get('id')) {
+	$blogpost->load($id_billets);
+	$produits = $blogpost->produits(); 
+}
 
 $langue = new Langue($sql);
+$id_langues = $langue->id($config->get("langue"));
 
 $theme = new BlogTheme($sql);
 
 $url_redirection = new UrlRedirection($sql);
 
 $user_data = $user->data();
+
 
 /*
  * Javascripts et CSS
@@ -95,25 +102,59 @@ if ($form->value('section')) {
 }
 $traduction = $form->value("lang");
 
+$filter_schema_produits = array(
+	'id' => array(
+		'title' => 'ID',
+		'type' => 'between',
+		'order' => 'DESC',
+		'field' => 'pr.id',
+	),
+	'ref' => array(
+		'title' => $dico->t('Reference'),
+	),
+	'nom' => array(
+		'title' => $dico->t('Nom'),
+		'type' => 'contain',
+		'field' => 'ph.phrase',
+	),
+	'classement' => array(
+		'title' => $dico->t('Classement'),
+		'type' => 'between',
+		'field' => 'bp.classement',
+		'form' => array(
+			'name' => 'produits[%id%][classement]',
+			'method' => 'input',
+			'type' => 'text',
+			'template' => '#{field}',
+		),
+	),
+);
+$pager_produits = new Pager($sql, array(10, 30, 50, 100, 200), "pager_produits");
+$filter_produits = new Filter($pager_produits, $filter_schema_produits, array_keys($produits), "filter_produits", true);
+
 /*
  * Traitement du formulaire
  */
 if ($form->is_submitted()) {
 	$data = $form->escaped_values();
 	switch ($form->action()) {
-		case "reload": break;
+		case "translate":
+		case "filter":
+		case "pager":
+		case "reload":
+			break;
 		case "add-theme":
 			$data['theme']['affichage'] = 1;
 		 	$theme->save($data);
 			break;
 		case "delete":
-			$blogpost->load($url2->get('id'));
 			$blogpost->delete();
 			$url2->redirect("current", array('action' => "", 'id' => ""));
 			break;
 		default:
 			if ($form->validate()) {
 				$data['blogpost']['id_users'] = $_SESSION['extranet']['user']['id'];
+				$filter_produits->clean_data($data, "produits");
 				$id_billets = $url_redirection->save_object($blogpost, $data, array('titre_url' => "titre"));
 				if ($id_billets === false) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
@@ -143,7 +184,12 @@ else {
 	$form->reset();
 }
 
-
+if ($form->changed()) {
+	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
+}
+else {
+	$filter_produits->select(array_keys($blogpost->produits()));
+}
 
 /*
  * Rendu HTML
@@ -153,11 +199,10 @@ if ($action == "create") {
 	$titre_page =  $dico->t("CreerBillet");
 }
 else if ($action == "edit") {
-	$blog_id = $url2->get('id');
-	$blogpost->load($blog_id);
 	$titre_page =  $dico->t("EditerBillet");
 	$form->default_values['blogpost'] = $blogpost->values;
 	$form->default_values['themes'] = $blogpost->themes;
+	$form->default_values['produits'] = $produits;
 }
 $buttons['new'] = $page->l($dico->t("Nouveau"), $url2->make("current", array('action' => "create", 'id' => "")));
 
@@ -205,14 +250,30 @@ HTML;
 	$themes_checkboxes .= "</ul>";
 	$themes_options = options_select_tree(DBTools::tree($theme->all_themes($id_blog)), $form, "themes");
 	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => $dico->t('Themes'), 'class' => "produit-section produit-section-themes".$hidden['themes'], 'id' => "produit-section-themes"))}
-{$themes_checkboxes}
-{$form->fieldset_end()}
-{$form->fieldset_start(array('legend' => $dico->t('NouveauTheme'), 'class' => "produit-section produit-section-themes".$hidden['themes'], 'id' => "produit-section-themes"))}
+{$form->fieldset_start(array('legend' => $dico->t('NouveauTheme'), 'class' => "produit-section produit-section-themes".$hidden['themes'], 'id' => "produit-section-nouveau-theme"))}
 {$form->input(array('name' => "theme[nom]", 'label' => $dico->t('Nom') ))}
 {$form->select(array('name' => "id_blog", 'label' => $dico->t('Blog'), 'options' => $blogs))}
 {$form->select(array('name' => "theme[id_parent]", 'label' => $dico->t('ThemeParent'), 'options' => $themes_options))}
 {$form->input(array('name' => "add-theme", 'type' => "submit", 'value' => $dico->t('Ajouter'), 'template' => "#{field}"))}
+{$form->fieldset_end()}
+
+{$form->fieldset_start(array('legend' => $dico->t('Themes'), 'class' => "produit-section produit-section-themes".$hidden['themes'], 'id' => "produit-section-themes"))}
+{$themes_checkboxes}
+{$form->fieldset_end()}
+HTML;
+
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
+HTML;
+	$pager = $pager_produits;
+	$filter = $filter_produits;
+	$blogpost->all_produits($id_langues, $filter);
+	$main .= $page->inc("snippets/filter-form");
+	foreach ($filter->selected() as $selected_produit) {
+		$main .= $form->hidden(array('name' => "produits[$selected_produit][classement]"));
+	}
+
+	$main .= <<<HTML
 {$form->fieldset_end()}
 HTML;
 	if ($action == "edit") {
@@ -221,6 +282,7 @@ HTML;
 	$form_end = $form->form_end();
 }
 else {
+	$page->javascript[] = $config->core_media("filter-edit.js");
 	$titre_page =  $dico->t("GestionBillets");
 	$q = <<<SQL
 SELECT DISTINCT(b.id), b.titre, u.login, lg.code_langue, b.affichage, b.date_affichage 

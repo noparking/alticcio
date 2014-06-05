@@ -144,6 +144,27 @@ SQL;
 					$this->sql->query($q);
 				}
 			}
+
+			if (isset($data['produits'])) {
+				$q = <<<SQL
+DELETE FROM dt_billets_produits WHERE id_billets = $id
+SQL;
+				$this->sql->query($q);
+
+				$values = array();
+				foreach ($data['produits'] as $id_produits => $produit) {
+					$classement = (int)$produit['classement'];
+					$values[] = "($id, {$id_produits}, {$classement})";
+				}
+				if (count($values)) {
+					$values = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_billets_produits (id_billets, id_produits, classement) VALUES $values
+SQL;
+					$this->sql->query($q);
+				}
+			}
+
 			return $id;
 		}
 	}
@@ -171,4 +192,41 @@ SQL;
 			return false;
 		}
 	}
+
+	public function produits() {
+		if (!isset($this->id)) {
+			return array();
+		}
+		$q = <<<SQL
+SELECT id_produits, classement FROM dt_billets_produits WHERE id_billets = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		$ids = array();
+		while ($row = $this->sql->fetch($res)) {
+			$ids[$row['id_produits']] = $row;
+		}
+
+		return $ids;
+	}
+
+	public function all_produits($id_langues, &$filter = null) {
+		$id_billets = isset($this->id) ? $this->id : 0;
+		$q = <<<SQL
+SELECT pr.id, pr.ref, ph.phrase AS nom, bp.classement FROM dt_produits AS pr
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND ph.id_langues = {$id_langues}
+LEFT OUTER JOIN dt_billets_produits AS bp ON bp.id_produits = pr.id AND bp.id_billets = {$id_billets}
+SQL;
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+		$res = $filter->query($q);
+
+		$liste = array();
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
 }
+

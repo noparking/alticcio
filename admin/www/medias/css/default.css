@@ -598,6 +598,13 @@ li.blogs {
 #produit-section-images-images {
 	background:none;
 }
+#produit-section-themes {
+	width: 400px;
+}
+#produit-section-nouveau-theme {
+	width: 170px;
+	float: right;
+}
 
 /* Colonne Right */
 #liste_tables {

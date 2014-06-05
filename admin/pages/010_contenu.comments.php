@@ -137,6 +137,7 @@ SQL;
 		if ($id) {
 			$q .= " AND item = $id";
 		}
+		$page->javascript[] = $config->core_media("filter-edit.js");
 		$pager = new Pager($sql, array(20, 30, 50, 100, 200));
 		$filter = new Filter($pager, array(
 			'id' => array(

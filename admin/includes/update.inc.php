@@ -990,4 +990,17 @@ function update_46($update) {
 ALTER TABLE `dt_blogs` ADD `titre` VARCHAR( 100 ) NOT NULL DEFAULT '' AFTER `nom` 
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_billets_produits` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_billets` int(11) NOT NULL DEFAULT '0',
+  `id_produits` int(11) NOT NULL DEFAULT '0',
+  `classement` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `id_billets` (`id_billets`),
+  KEY `id_produits` (`id_produits`)
+)
+SQL;
+	$update->query($q);
 }
