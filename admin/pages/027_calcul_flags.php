@@ -67,7 +67,8 @@ while ($row_bases = $sql->fetch($rs_bases)) {
 $html = "";
 if ($form1->is_submitted()) {
 	$data = $form1->escape_values();
-	$liste_diametres = array(40, 50, 60, 70, 75, 80, 90, 100, 120);
+	//$liste_diametres = array(40, 50, 60, 70, 75, 80, 90, 100, 120);
+	$liste_diametres = array(60);
 	$html = '<table id="resistance_flags" summary="">';
 	$html .= '<tr>';
 	$html .= '<th>'.$dico->t('DiametreBase').' (cm)</th>';
