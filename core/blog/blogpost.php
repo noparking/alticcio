@@ -106,6 +106,9 @@ SQL;
 				move_uploaded_file($file['tmp_name'], $data['dir_vignettes'].$file_name);
 				$data['blogpost']['vignette'] = $file_name;
 			}
+			else if ($data['vignette-delete']) {
+				$data['blogpost']['vignette'] = "";
+			}
 			
 			if (isset($data['blogpost']['id'])) {
 				$id = $data['blogpost']['id'];

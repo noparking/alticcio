@@ -230,7 +230,8 @@ if ($action == "create" or $action == "edit") {
 	if ($blogpost->values['vignette']) {
 		$src = $config->core_media("blogs/".$blogpost->values['vignette']);
 		$vignette = <<<HTML
-<img src="$src" height="100px" alt="vignette" />
+<img src="$src" height="100px" alt="vignette" id="blog-vignette" />
+{$form->input(array('type' => "hidden", 'id' => "delete-blog-vignette", 'name' => "vignette-delete", 'value' => 0))}
 HTML;
 	}
 	$main = <<<HTML

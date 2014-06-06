@@ -13,6 +13,12 @@ $(document).ready(function () {
 		var form = $(this).parents("form");
 		form.submit();
 	});
+
+	$("#blog-vignette").click(function() {
+		$(this).toggleClass("to-delete");
+		var del = $("input#delete-blog-vignette").val();
+		$("input#delete-blog-vignette").val(del == 1 ? 0 : 1);
+	});
 });
 
 function check_parents(element) {
