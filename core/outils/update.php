@@ -95,7 +95,7 @@ SQL;
 	function svn_up($svn) {
 		if ($svn) {
 			$dir = dirname(__FILE__)."/../../../";
-			$command = "svn up";
+			$command = "svn up --non-interactive";
 			if (isset($svn['username'])) {
 				$command .= " --username {$svn['username']}";
 			} 
@@ -103,7 +103,7 @@ SQL;
 				$command .= " --password {$svn['password']}";
 			} 
 			$command .= " $dir";
-			system($command);
+			return shell_exec($command);
 		}
 	}
 }

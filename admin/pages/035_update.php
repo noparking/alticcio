@@ -19,11 +19,17 @@ if ($form->is_submitted()) {
 	$data = $form->escaped_values();
 	$update->version = $data['version_actuelle'];
 	$update->execute($data['nouvelle_version']);
-	$update->svn_up($config->get('svn'));
+	$svn_infos = $update->svn_up($config->get('svn'));
 
 	$message = <<<HTML
 <p class="message">Mis à jour à la version {$update->version}</p>
 HTML;
+	if ($svn_infos) {
+		$message = <<<HTML
+<pre><p class="message">{$svn_infos}</p></pre>
+HTML;
+	}
+
 	if (count($update->errors)) {
 		foreach ($update->errors as $version => $error) {
 		$message .= <<<HTML
