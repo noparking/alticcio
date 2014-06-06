@@ -94,16 +94,21 @@ SQL;
 
 	function svn_up($svn) {
 		if ($svn) {
-			$dir = dirname(__FILE__)."/../../../";
-			$command = "2>&1 svn up --non-interactive";
-			if (isset($svn['username'])) {
-				$command .= " --username {$svn['username']}";
-			} 
-			if (isset($svn['password'])) {
-				$command .= " --password {$svn['password']}";
-			} 
-			$command .= " $dir";
-			return shell_exec($command);
+			$dir = dirname(__FILE__)."/../../../..";
+			$output = "";
+			foreach ($svn['sites'] as $site) {
+				$command = "2>&1 svn up --non-interactive";
+				if (isset($svn['username'])) {
+					$command .= " --username {$svn['username']}";
+				} 
+				if (isset($svn['password'])) {
+					$command .= " --password {$svn['password']}";
+				} 
+				$command .= " $dir/$site";
+				$output .= shell_exec($command);
+			}
+
+			return $output;
 		}
 	}
 }
