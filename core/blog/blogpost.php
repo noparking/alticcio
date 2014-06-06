@@ -98,6 +98,15 @@ SQL;
 			return self::UNDATED;
 		}
 		else {
+			if (isset($data['vignette'])) {
+				$file = $data['vignette'];
+				preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
+				$ext = $matches[1];
+				$file_name = md5_file($file['tmp_name']).$ext;
+				move_uploaded_file($file['tmp_name'], $data['dir_vignettes'].$file_name);
+				$data['blogpost']['vignette'] = $file_name;
+			}
+			
 			if (isset($data['blogpost']['id'])) {
 				$id = $data['blogpost']['id'];
 				$data['blogpost']['date_update'] = time();
@@ -131,7 +140,7 @@ SQL;
 				
 				$id = $this->sql->insert_id();
 			}
-			
+
 			if (isset($data['themes'])) {
 				$themes_blogs = array();
 				foreach ($data['themes'] as $theme => $checked) {

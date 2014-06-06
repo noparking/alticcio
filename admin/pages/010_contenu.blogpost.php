@@ -75,6 +75,7 @@ $form = new Form(array(
 	'check' => array(
 		'blogpost[texte]' => array("validate_html"),
 	),
+	'files' => array("vignette"),
 ));
 $form->fields_error_messages = array(
 	'blogpost[texte]' => array(
@@ -155,6 +156,8 @@ if ($form->is_submitted()) {
 			if ($form->validate()) {
 				$data['blogpost']['id_users'] = $_SESSION['extranet']['user']['id'];
 				$filter_produits->clean_data($data, "produits");
+				$data['vignette'] = $form->value('vignette');
+				$data['dir_vignettes'] = $config->get("medias_path")."www/medias/images/blogs/";
 				$id_billets = $url_redirection->save_object($blogpost, $data, array('titre_url' => "titre"));
 				if ($id_billets === false) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
@@ -223,10 +226,19 @@ if ($action == "create" or $action == "edit") {
 	$left = $page->inc("snippets/produits-sections");
 
 	$form_start = $form->form_start();
+	$vignette = "";
+	if ($blogpost->values['vignette']) {
+		$src = $config->core_media("blogs/".$blogpost->values['vignette']);
+		$vignette = <<<HTML
+<img src="$src" height="100px" alt="vignette" />
+HTML;
+	}
 	$main = <<<HTML
 {$message}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 {$form->fieldset_start(array('legend' => $dico->t('VotreBillet:'), 'class' => "produit-section produit-section-contenu".$hidden['contenu'], 'id' => "produit-section-contenu"))}
+{$form->input(array('type' => "file", 'name' => "vignette", 'label' => $dico->t('Vignette') ))}
+{$vignette}
 {$form->input(array('name' => "blogpost[titre]", 'id' => 'titre', 'label' => $dico->t("Titre")))}
 {$form->textarea(array('name' => "blogpost[texte]", 'id' => 'texte', 'class' => "dteditor", 'label' => $dico->t("Texte")))}
 {$form->select(array('name' => "blogpost[id_langues]", 'id' => "id_langues", 'label' => $dico->t("Langue"), 'options' => $user->bloglangues(), 'template' => $template_date))}

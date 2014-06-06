@@ -992,6 +992,11 @@ SQL;
 	$update->query($q);
 
 	$q = <<<SQL
+ALTER TABLE `dt_billets` ADD `vignette` VARCHAR( 100 ) NOT NULL DEFAULT '' AFTER `texte` 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_billets_produits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_billets` int(11) NOT NULL DEFAULT '0',
