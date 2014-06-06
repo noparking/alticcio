@@ -92,9 +92,19 @@ SQL;
 		return $versions;
 	}
 
-	function svn_up() {
-		$dir = dirname(__FILE__)."/../../../";
-		system("svn up $dir");
+	function svn_up($svn) {
+		if ($svn) {
+			$dir = dirname(__FILE__)."/../../../";
+			$command = "svn up";
+			if (isset($svn['username'])) {
+				$command .= " --username {$svn['username']}";
+			} 
+			if (isset($svn['password'])) {
+				$command .= " --password {$svn['password']}";
+			} 
+			$command .= " $dir";
+			system($command);
+		}
 	}
 }
 
