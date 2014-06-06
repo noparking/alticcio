@@ -103,7 +103,7 @@ SQL;
 				$command .= " --password {$svn['password']}";
 			} 
 			$command .= " $dir";
-			return exec($command);
+			return shell_exec($command);
 		}
 	}
 }
