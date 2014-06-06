@@ -25,7 +25,7 @@ if ($form->is_submitted()) {
 <p class="message">Mis à jour à la version {$update->version}</p>
 HTML;
 	if ($svn_infos) {
-		$message = <<<HTML
+		$message .= <<<HTML
 <pre><p class="message">{$svn_infos}</p></pre>
 HTML;
 	}
