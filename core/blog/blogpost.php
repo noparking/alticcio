@@ -240,5 +240,37 @@ SQL;
 		
 		return $liste;
 	}
+
+	public function previous() {
+		$ids_themes = implode(",", array_keys($this->themes));
+		$q = <<<SQL
+SELECT titre, titre_url FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
+WHERE btb.id_themes_blogs IN ($ids_themes)
+AND b.date_affichage < {$this->values['date_affichage']}
+AND b.affichage = 1
+ORDER BY b.date_affichage DESC
+LIMIT 1
+SQL;
+		$res = $this->sql->query($q);
+		
+		return $this->sql->fetch($res); 
+	}
+
+	public function next() {
+		$ids_themes = implode(",", array_keys($this->themes));
+		$q = <<<SQL
+SELECT titre, titre_url FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
+WHERE btb.id_themes_blogs IN ($ids_themes)
+AND b.date_affichage > {$this->values['date_affichage']}
+AND b.affichage = 1
+ORDER BY b.date_affichage ASC
+LIMIT 1
+SQL;
+		$res = $this->sql->query($q);
+		
+		return $this->sql->fetch($res); 
+	}
 }
 
