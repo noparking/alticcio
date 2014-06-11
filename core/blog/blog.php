@@ -153,7 +153,7 @@ SQL;
 	function billets($id_blogs, $nb, $offset = 0) {
 		$date_affichage = time();
 		$q = <<<SQL
-SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url
+SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url, b.vignette
 FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
 INNER JOIN dt_blogs_themes_blogs AS bltb ON bltb.id_themes_blogs = bitb.id_themes_blogs

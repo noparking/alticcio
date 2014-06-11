@@ -50,7 +50,7 @@ SQL;
 	function billets() {
 		$date_affichage = time();
 		$q = <<<SQL
-SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url
+SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url, b.vignette
 FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id AND bitb.id_themes_blogs = {$this->id}
 WHERE b.affichage = 1 AND date_affichage <= {$date_affichage}
