@@ -117,7 +117,7 @@ SQL;
 		$this->sql->query($q);
 	}
 
-	public function blogs() {
+	public function all_blogs() {
 		$q = <<<SQL
 SELECT id, nom FROM dt_blogs
 SQL;
@@ -128,5 +128,39 @@ SQL;
 		}
 
 		return $blogs;
+	}
+
+	public function blogs() {
+		$q = <<<SQL
+SELECT b.id FROM dt_blogs AS b
+INNER JOIN dt_blogs_themes_blogs AS btb ON btb.id_blogs = b.id AND btb.id_themes_blogs = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		$blogs = array();
+		while ($row = $this->sql->fetch($res)) {
+			$blogs[] = $row['id'];
+		}
+
+		return $blogs;
+	}
+	
+	function billets_of_blogs() {
+		$date_affichage = time();
+		$liste_blogs = implode(",", $this->blogs());
+		$q = <<<SQL
+SELECT DISTINCT(b.id), b.titre, b.texte, b.date_affichage, b.titre_url, b.vignette
+FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS bitb ON bitb.id_billets = b.id
+INNER JOIN dt_blogs_themes_blogs AS btb ON btb.id_themes_blogs = bitb.id_themes_blogs AND btb.id_blogs IN ($liste_blogs)
+WHERE b.affichage = 1 AND date_affichage <= {$date_affichage}
+ORDER BY date_affichage DESC
+SQL;
+		$billets = array();
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$billets[] = $row;
+		}
+		
+		return $billets;
 	}
 }

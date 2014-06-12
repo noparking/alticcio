@@ -73,7 +73,7 @@ if ($action == "edit") {
 }
 
 if ($action == "create" or $action == "edit") {
-	$blogs = $theme->blogs();
+	$blogs = $theme->all_blogs();
 	$id_blog = isset($data['id_blog']) ? $data['id_blog'] : (isset($theme->id_blogs) ? $theme->id_blogs : key($blogs));
 	$form->default_values['id_blog'] = $id_blog;
 	$themes = options_select_tree(DBTools::tree($theme->all_themes($id_blog)), $form, "themes");
