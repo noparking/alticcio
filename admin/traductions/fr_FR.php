@@ -655,10 +655,11 @@ $d['prix'] = array(
 
 $t['DelaiLivraison'] = "Délai de livraison";
 $d['delais_livraison'] = array(
-	'' => "...",
-	'< 1' => "Moins d’une semaine",
-	'2-3' => "Entre 2 et 3 semaines",
-	'3-4' => "Entre 3 et 4 semaines",
-	'4-6' => "Entre 4 et 6 semaines",
-	'> 6' => "Plus de 6 semaines",
+	'< 1' => "moins d’une semaine ",
+     '1-2' => "entre 1 et 2 semaines ",
+	'2-3' => "entre 2 et 3 semaines ",
+	'3-4' => "entre 3 et 4 semaines ",
+     '4-5' => "entre 4 et 5 semaines ",
+	'4-6' => "entre 4 et 6 semaines ",
+	'> 6' => "plus de 6 semaines ",
 );
