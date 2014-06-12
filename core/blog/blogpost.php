@@ -241,10 +241,31 @@ SQL;
 		return $liste;
 	}
 
+	public function similar() {
+		$ids_themes = implode(",", array_keys($this->themes));
+		$q = <<<SQL
+SELECT b.titre, b.titre_url, b.date_affichage, b.vignette FROM dt_billets AS b
+INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
+WHERE btb.id_themes_blogs IN ($ids_themes)
+AND b.affichage = 1
+AND b.id <> {$this->id}
+ORDER BY b.date_affichage DESC
+SQL;
+		$res = $this->sql->query($q);
+		$same = array();
+		
+		while ($row = $this->sql->fetch($res)) {
+			$same[] = $row;
+		}
+
+		return $same;
+
+	}
+
 	public function previous() {
 		$ids_themes = implode(",", array_keys($this->themes));
 		$q = <<<SQL
-SELECT titre, titre_url FROM dt_billets AS b
+SELECT b.titre, b.titre_url FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
 WHERE btb.id_themes_blogs IN ($ids_themes)
 AND b.date_affichage < {$this->values['date_affichage']}
@@ -260,7 +281,7 @@ SQL;
 	public function next() {
 		$ids_themes = implode(",", array_keys($this->themes));
 		$q = <<<SQL
-SELECT titre, titre_url FROM dt_billets AS b
+SELECT b.titre, b.titre_url FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
 WHERE btb.id_themes_blogs IN ($ids_themes)
 AND b.date_affichage > {$this->values['date_affichage']}
