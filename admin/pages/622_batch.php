@@ -59,14 +59,21 @@ if ($form->is_submitted()) {
 								$id_sku = nettoyage($id_sku);
 								$id_attributs = nettoyage($id_attributs);
 								$valeur_num = nettoyage($valeur_num);
+								// on contrôle si l'attribut est associé à la table management
+								$q0 = "SELECT id FROM dt_sku_attributs_management WHERE id_attributs = ".$id_attributs." AND id_sku = ".$id_sku." ";
+								$rs0 = $sql->query($q0);
+								if (mysql_num_rows($rs0) == 0) {
+									$qb = "INSERT INTO dt_sku_attributs_management SET id_attributs = ".$id_attributs.", id_sku = ".$id_sku.", groupe = 0, classement = 0";
+									$sql->query($qb);
+								}
 								// on contrôle si l'attribut du sku existe et dans ce cas on update
 								$q1 = "SELECT id FROM dt_sku_attributs WHERE id_attributs = ".$id_attributs." AND id_sku = ".$id_sku." ";
 								$rs1 = $sql->query($q1);
 								if (mysql_num_rows($rs1) > 0) {
-									$q = "UPDATE dt_sku_attributs SET valeur_numerique = ".$valeur_num." WHERE id_attributs = ".$id_attributs." AND id_sku = ".$id_sku." ";
+									$q = "UPDATE dt_sku_attributs SET valeur_numerique = '".prix($valeur_num)."' WHERE id_attributs = ".$id_attributs." AND id_sku = ".$id_sku." ";
 								}
 								else {
-									$q = "INSERT INTO dt_sku_attributs SET id_attributs = ".$id_attributs.", id_sku = ".$id_sku.", valeur_numerique = ".$valeur_num." ";
+									$q = "INSERT INTO dt_sku_attributs SET id_attributs = ".$id_attributs.", id_sku = ".$id_sku.", valeur_numerique = '".prix($valeur_num)."' ";
 								}
 								break;
 							case 3:
