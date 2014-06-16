@@ -174,7 +174,6 @@ HTML;
 {$form->select(array('name' => "catalogue_categorie[id_parent]", 'label' => $dico->t('CategorieParent'), 'options' => $categories_options))}
 {$form->input(array('name' => "catalogue_categorie[classement]", 'label' => $dico->t('Classement') ))}
 {$form->select(array('name' => "catalogue_categorie[statut]", 'label' => $dico->t('Statut'), 'options' => array($dico->t('Desactive'), $dico->t('Active') )))}
-{$form->select(array('name' => "catalogue_categorie[id_blocs]", 'label' => "Bloc associé", 'options' => $bloc_options))}
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
 <p>{$dico->t('ListeOfProduitsCategories')}</p>
