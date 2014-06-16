@@ -1009,3 +1009,23 @@ CREATE TABLE IF NOT EXISTS `dt_billets_produits` (
 SQL;
 	$update->query($q);
 }
+
+function update_47($update) {
+	$q = <<<SQL
+SElECT id, id_blocs FROM dt_catalogues_categories WHERE id_blocs <> 0
+SQL;
+	$res = $update->query($q);
+
+	while ($row = $update->sql->fetch($res)) {
+		$q = <<<SQL
+INSERT INTO `dt_catalogues_categories_blocs` (id_catalogues_categories, id_blocs, utilisation)
+VALUES ({$row['id']}, {$row['id_blocs']}, 'header')
+SQL;
+		$update->query($q);
+	}
+
+	$q = <<<SQL
+ALTER TABLE  dt_catalogues_categories DROP id_blocs
+SQL;
+	$update->query($q);
+}
