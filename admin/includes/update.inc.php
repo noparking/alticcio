@@ -1029,3 +1029,147 @@ ALTER TABLE  dt_catalogues_categories DROP id_blocs
 SQL;
 	$update->query($q);
 }
+
+function update_48($update) {
+	$q = <<<SQL
+ALTER TABLE dt_diaporamas ADD `id_langues` int(11) NOT NULL DEFAULT 0 AFTER `ref` 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE dt_images_diaporamas ADD `legende` VARCHAR ( 128 ) NOT NULL DEFAULT '' AFTER `phrase_legende` 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+SELECT * FROM dt_diaporamas
+SQL;
+	$res = $update->query($q);
+
+	$last_row = null;
+	$is_first_row = true;
+	while ($row = $update->sql->fetch($res)) {
+		if ($is_first_row) {
+			foreach ($row as $key => $value) {
+				if (strpos($key, "phrase_") === 0) {
+					$field = str_replace("phrase_", "", $key);
+					if ($field == "description") {
+						$type = "TEXT NOT NULL";
+					}
+					else {
+						$type = "VARCHAR( 128 ) NOT NULL DEFAULT ''";
+					}
+					$q = <<<SQL
+ALTER TABLE dt_diaporamas ADD `$field` $type AFTER `$key` 
+SQL;
+					$update->query($q);
+				}
+			}
+			$is_first_row = false;
+		}
+
+		$images = array();
+		$q = <<<SQL
+SELECT * FROM dt_images_diaporamas WHERE id_diaporamas = {$row['id']}
+SQL;
+		$res2 = $update->query($q);
+		while ($row2 = $update->sql->fetch($res2)) {
+			$images[] = $row2;
+		}
+
+		$new_fields = array();
+		foreach ($row as $key => $value) {
+			if (strpos($key, "phrase_") === 0) {
+				$q = <<<SQL
+SELECT phrase, id_langues FROM dt_phrases WHERE id = $value 
+SQL;
+				$res2 = $update->query($q);
+				while ($row2 = $update->sql->fetch($res2)) {
+					if ($row2['phrase']) {
+						$new_fields[$row2['id_langues']][str_replace("phrase_", "", $key)] = $row2['phrase'];
+					}
+				}
+			}
+		}
+		$first = true;
+		foreach ($new_fields as $id_langues => $data) {
+			$fields = array("id_langues");
+			$values = array($id_langues);
+			$sets = array("id_langues = $id_langues");
+			foreach ($row as $key => $value) {
+				$value = addslashes($value);
+				if ($key != "id" and $key != "id_langues") {
+					$fields[] = $key;
+					$values[] = "'$value'";
+				}
+			}
+			foreach ($data as $key => $value) {
+				$value = addslashes($value);
+				$fields[] = $key;
+				$values[] = "'$value'";
+				$sets[] = "$key = '$value'";
+			}
+			$list_fields = implode(",", $fields);
+			$list_values = implode(",", $values);
+			$list_sets = implode(",", $sets);
+			if ($first) {
+				$q = <<<SQL
+UPDATE dt_diaporamas SET $list_sets WHERE id = {$row['id']}
+SQL;
+				$update->query($q);
+				$first = false;
+			}
+			else {
+				$q = <<<SQL
+INSERT INTO dt_diaporamas ($list_fields) VALUES ($list_values) 
+SQL;
+				$update->query($q);
+				$id = $update->sql->insert_id();
+				foreach ($images as $image) {
+					$fields = array("id_diaporamas");
+					$values = array($id);
+					foreach ($image as $key => $value) {
+						if ($key != "id" and $key != "id_diaporamas" and $key != "legende") {
+							if ($key == "phrase_legende") {
+								$q = <<<SQL
+SELECT phrase FROM dt_phrases WHERE id = $value AND id_langues = $id_langues 
+SQL;
+								$res2 = $update->query($q);
+								$row2 = $update->sql->fetch($res2);
+								
+								$fields[] = "legende";
+								$values[] = $row2 ? "'".addslashes($row2['phrase'])."'" : "''";
+							}
+							else {
+								$value = addslashes($value);
+								$fields[] = $key;
+								$values[] = "'$value'";
+							}
+						}
+					}
+					$list_fields = implode(",", $fields);
+					$list_values = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_images_diaporamas ($list_fields) VALUES ($list_values)
+SQL;
+					$update->query($q);
+				}
+			}
+		}
+
+		$last_row = $row;
+	}
+	foreach ($last_row as $key => $value) {
+		if (strpos($key, "phrase_") === 0) {
+			$q = <<<SQL
+ALTER TABLE dt_diaporamas DROP $key
+SQL;
+			$update->query($q);
+		}
+	}
+
+	$q = <<<SQL
+ALTER TABLE dt_images_diaporamas DROP phrase_legende
+SQL;
+	$update->query($q);
+}
