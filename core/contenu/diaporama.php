@@ -7,12 +7,11 @@ class Diaporama extends AbstractObject {
 	public $type = "diaporama";
 	public $table = "dt_diaporamas";
 	public $images_table = "dt_images_diaporamas";
-	public $phrase_fields = array('phrase_titre', 'phrase_description', 'phrase_url_key');
+	public $phrase_fields = array();
 
-	public function liste($id_langues, &$filter = null) {
+	public function liste(&$filter = null) {
 		$q = <<<SQL
-SELECT d.id, d.ref, p.phrase AS titre, d.section, d.actif FROM dt_diaporamas AS d
-LEFT OUTER JOIN dt_phrases AS p ON p.id = d.phrase_titre AND p.id_langues = $id_langues
+SELECT d.id, d.id_langues, d.ref, d.titre, d.section, d.actif FROM dt_diaporamas AS d
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
@@ -25,6 +24,20 @@ SQL;
 		$liste = array();
 		while ($row = $filter->fetch($res)) {
 			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
+
+	public function langues() {
+		$q = <<<SQL
+SELECT id, code_langue FROM dt_langues
+SQL;
+		$res = $this->sql->query($q);
+
+		$liste = array();
+		while ($row = $this->sql->fetch($res)) {
+			$liste[$row['id']] = $row['code_langue'];
 		}
 		
 		return $liste;
@@ -70,11 +83,9 @@ SQL;
 
 	public function last_from_section($section, $number, $id_langues) {
 		$q = <<<SQL
-SELECT d.id, d.ref, d.vignette, d.section, ph.phrase AS titre, ph2.phrase AS url_key
+SELECT d.id, d.ref, d.vignette, d.section, d.titre, d.url_key
 FROM dt_diaporamas AS d
-LEFT OUTER JOIN dt_phrases AS ph ON d.phrase_titre = ph.id AND ph.id_langues = $id_langues
-LEFT OUTER JOIN dt_phrases AS ph2 ON d.phrase_url_key = ph2.id AND ph2.id_langues = $id_langues
-WHERE d.section = '$section' AND actif = 1 AND d.phrase_titre <> 0 AND ph.phrase <> ''
+WHERE d.section = '$section' AND d.id_langues = $id_langues AND actif = 1
 ORDER BY d.classement
 SQL;
 		if ($number) {
@@ -91,9 +102,8 @@ SQL;
 
 	public function infos($ref, $id_langues) {
 		$q = <<<SQL
-SELECT d.id, d.ref, d.vignette, d.section, ph.phrase AS titre FROM dt_diaporamas AS d
-LEFT OUTER JOIN dt_phrases AS ph ON d.phrase_titre = ph.id AND ph.id_langues = $id_langues
-WHERE ref = '$ref' AND actif = 1
+SELECT d.id, d.ref, d.vignette, d.section, d.titre FROM dt_diaporamas AS d
+WHERE ref = '$ref' AND actif = 1 AND id_langues = $id_langues
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
@@ -103,23 +113,20 @@ SQL;
 	}
 
 	public function get($id, $id_langues) {
-		$id_condition = is_numeric($id) ? "d.id = $id" : "p3.phrase = '".addslashes($id)."'";
+		$id_condition = is_numeric($id) ? "d.id = $id" : "d3.url_key = '".addslashes($id)."'";
 		$q = <<<SQL
-SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, p1.phrase as titre, p2.phrase AS description
+SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, d.titre, d.description
 FROM dt_diaporamas AS d
-LEFT OUTER JOIN dt_phrases AS p1 ON d.phrase_titre = p1.id AND p1.id_langues = $id_langues
-LEFT OUTER JOIN dt_phrases AS p2 ON d.phrase_description = p2.id AND p2.id_langues = $id_langues
-LEFT OUTER JOIN dt_phrases AS p3 ON d.phrase_url_key = p3.id AND p3.id_langues = $id_langues
-WHERE {$id_condition} AND actif = 1
+WHERE {$id_condition} AND actif = 1 AND d.id_langues = $id_langues
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
 			$id_themes_photos = $row['id_themes_photos'];
 			$q = <<<SQL
-SELECT id.id, id.ref, phr.phrase AS legende
+SELECT id.id, id.ref, id.legende
 FROM dt_images_diaporamas AS id
-LEFT OUTER JOIN dt_phrases AS phr ON id.phrase_legende = phr.id AND phr.id_langues = $id_langues
-WHERE id.id_diaporamas = {$row['id']}
+INNER JOIN dt_diaporamas AS d ON d.id = id.id_diaporamas
+WHERE id.id_diaporamas = {$row['id']} AND d.id_langues = $id_langues
 ORDER BY id.classement
 SQL;
 			$res = $this->sql->query($q);

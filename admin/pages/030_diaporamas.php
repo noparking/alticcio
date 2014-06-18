@@ -41,6 +41,12 @@ $filter = new Filter($pager, array(
 		'order' => 'DESC',
 		'field' => 'd.id',
 	),
+	'id_langues' => array(
+		'title' => $dico->t('Langue'),
+		'type' => 'select',
+		'field' => 'd.id_langues',
+		'options' => $diaporama->langues(),
+	),
 	'ref' => array(
 		'title' => $dico->t('Reference'),
 		'type' => 'contain',
@@ -48,7 +54,7 @@ $filter = new Filter($pager, array(
 	'titre' => array(
 		'title' => $dico->t('Titre'),
 		'type' => 'contain',
-		'field' => 'p.phrase',
+		'field' => 'd.titre',
 	),
 	'section' => array(
 		'title' => $dico->t('Section'),
@@ -116,7 +122,7 @@ if ($form->is_submitted()) {
 			break;
 		case "save":
 			if ($form->validate()) {
-				$id_saved = $url_redirection->save_object($diaporama, $data, array('phrase_url_key' => 'phrase_titre'));
+				$id_saved = $url_redirection->save_object($diaporama, $data, array('url_key' => 'titre'));
 				if ($id_saved === false) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
@@ -142,7 +148,6 @@ if ($action == 'edit') {
 	$form->default_values['diaporama'] = $diaporama->values;
 	$images = $diaporama->images();
 	$form->default_values['image'] = $images;
-	$form->default_values['phrases'] = $phrase->get($diaporama->phrases());
 }
 
 $form_start = $form->form_start();
@@ -189,15 +194,12 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation'], 'id' => "diaporama-section-presentation"))}
 {$form->input(array('name' => "diaporama[ref]", 'label' => $dico->t('Reference')))}
-{$form->input(array('name' => "diaporama[phrase_titre]", 'type' => "hidden"))}
 {$vignette}
 {$form->input(array('type' => "file", 'name' => "vignette_file", 'label' => $dico->t('Vignette')))}
 {$form->select(array('name' => "diaporama[actif]", 'label' => $dico->t('Actif'), 'options' => array(1 => $dico->t('Active'), 0 => $dico->t('Desactive') )))}
-{$form->input(array('name' => "phrases[phrase_titre]", 'label' => $dico->t('Titre'), 'items' => $displayed_lang))}
-{$form->input(array('name' => "diaporama[phrase_url_key]", 'type' => "hidden"))}
-{$form->input(array('name' => "phrases[phrase_url_key]", 'label' => $dico->t('UrlKey'), 'items' => $displayed_lang))}
-{$form->input(array('name' => "diaporama[phrase_description]", 'type' => "hidden"))}
-{$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor"))}
+{$form->input(array('name' => "diaporama[titre]", 'label' => $dico->t('Titre')))}
+{$form->input(array('name' => "diaporama[url_key]", 'label' => $dico->t('UrlKey')))}
+{$form->textarea(array('name' => "diaporama[description]", 'label' => $dico->t('Description'), 'class' => "dteditor"))}
 {$form->select(array('name' => "diaporama[section]", 'label' => $dico->t('Section'), 'options' => $diaporama->sections()))}
 {$form->input(array('name' => "diaporama[classement]", 'label' => $dico->t('Classement')))}
 {$form->fieldset_end()}
@@ -210,7 +212,7 @@ if ($action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('AjouterUneImage'), 'class' => "produit-section produit-section-images".$hidden['images'], 'id' => "produit-section-images-new"))}
 {$form->input(array('type' => "file", 'name' => "new_image_file", 'label' => $dico->t('SelectFichier') ))}
-{$form->input(array('name' => "new_image[phrase_legende]", 'label' => $dico->t('TexteAlternatif'), 'items' => $displayed_lang))}
+{$form->input(array('name' => "new_image[legende]", 'label' => $dico->t('TexteAlternatif')))}
 {$form->input(array('name' => "new_image[classement]", 'type' => "hidden", 'forced_value' => 0))}
 {$form->input(array('type' => "submit", 'name' => "add-image", 'value' => $dico->t('Ajouter') ))}
 <p class="message">{$dico->t('AttentionSuppressionImage')}</p>
@@ -244,8 +246,7 @@ HTML;
 	<td class="drag-handle"></td>
 	<td><img class="produit-image" src="{$config->core_media("diaporamas/".$image['ref'])}" /></td>
 	<td>
-		{$form->input(array('name' => "image[".$image['id']."][phrase_legende]", 'type' => "hidden"))}
-		{$form->input(array('name' => "phrases[image][".$image['id']."][phrase_legende]", 'items' => $displayed_lang))}
+		{$form->input(array('name' => "image[".$image['id']."][legende]"))}
 	</td>
 	<td>{$form->input(array('name' => "image[".$image['id']."][affichage]", 'type' => "checkbox", 'checked' => $image['affichage']))}</td>
 	<td>
@@ -275,7 +276,7 @@ switch($action) {
 		break;
 	default :
 		$titre_page = "Liste des diaporamas";
-		$diaporama->liste($id_langues, $filter);
+		$diaporama->liste($filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

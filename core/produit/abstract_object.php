@@ -153,7 +153,9 @@ SQL;
 		}
 		$images = $this->images();
 		foreach ($images as $image) {
-			$ids['image'][$image['id']]['phrase_legende'] = $image['phrase_legende'];
+			if (isset($image['phrase_legende'])) {
+				$ids['image'][$image['id']]['phrase_legende'] = $image['phrase_legende'];
+			}
 		}
 
 		if (isset($this->attributs_table)) {
@@ -273,8 +275,13 @@ SQL;
 
 		$id = $this->sql->insert_id();
 		$data_image = array();
-		$data_image['image'][$id]['phrase_legende'] = 0;
-		$data_image['phrases']['image'][$id]['phrase_legende'] = $data['new_image']['phrase_legende'];
+		if (isset($data['new_image']['phrase_legende'])) {
+			$data_image['image'][$id]['phrase_legende'] = 0;
+			$data_image['phrases']['image'][$id]['phrase_legende'] = $data['new_image']['phrase_legende'];
+		}
+		if (isset($data['new_image']['legende'])) {
+			$data_image['image'][$id]['legende'] = $data['new_image']['legende'];
+		}
 		$this->save_images($data_image);
 	}
 
@@ -292,10 +299,12 @@ DELETE FROM {$this->images_table} WHERE id = {$id}
 SQL;
 		$this->sql->query($q);
 
-		$q = <<<SQL
+		if (isset($data['image'][$id]['phrase_legende'])) {
+			$q = <<<SQL
 DELETE FROM dt_phrases WHERE id = {$data['image'][$id]['phrase_legende']}
 SQL;
-		$this->sql->query($q);
+			$this->sql->query($q);
+		}
 	}
 
 	public function images() {
