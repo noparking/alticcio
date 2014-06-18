@@ -113,7 +113,7 @@ SQL;
 	}
 
 	public function get($id, $id_langues) {
-		$id_condition = is_numeric($id) ? "d.id = $id" : "d3.url_key = '".addslashes($id)."'";
+		$id_condition = is_numeric($id) ? "d.id = $id" : "d.url_key = '".addslashes($id)."'";
 		$q = <<<SQL
 SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, d.titre, d.description
 FROM dt_diaporamas AS d
