@@ -1096,8 +1096,8 @@ SQL;
 			$fields = array("id_langues");
 			$values = array($id_langues);
 			if (!isset($data['description'])) {
-				$fields = array("description");
-				$values = array("");
+				$fields[] = "description";
+				$values[] = "''";
 			}
 			$sets = array("id_langues = $id_langues");
 			foreach ($row as $key => $value) {
