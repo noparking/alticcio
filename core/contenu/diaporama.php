@@ -95,6 +95,16 @@ SQL;
 		$diaporamas = array();
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
+			$images = array();
+			$q = <<<SQL
+SELECT * FROM dt_images_diaporamas WHERE id_diaporamas = {$row['id']}
+ORDER BY classement ASC
+SQL;
+			$res2 = $this->sql->query($q);
+			while ($row2 = $this->sql->fetch($res2)) {
+				$images[] = $row2;
+			}
+			$row['images'] = $images;
 			$diaporamas[] = $row;
 		}
 		return $diaporamas;
