@@ -47,7 +47,12 @@ function print_link_tree($tree, $url, $name = "tree") {
 		else {
 			$links .= "<span>-</span>";
 		}
-		$links .= "<a href='$url/{$element['id']}'>{$element['nom']}</a>";
+		$nom = $element['nom'];
+		if (isset($element['statut']) and !$element['statut']) {
+			$nom = "<strike>$nom</strike>";
+		}
+		$links .= "<a href='$url/{$element['id']}'>{$nom}</a>";
+
 		if (count($element['children'])) {
 			$links .= print_link_tree($element['children'], $url,  $name);
 		}
