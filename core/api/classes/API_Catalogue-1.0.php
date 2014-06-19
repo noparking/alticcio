@@ -53,7 +53,7 @@ SQL;
 	function tree($id_catalogue, $id_parent = 0) {
 		$q = <<<SQL
 SELECT id, id_parent, nom FROM dt_catalogues_categories
-WHERE id_catalogues = $id_catalogue AND id_parent = $id_parent
+WHERE id_catalogues = $id_catalogue AND id_parent = $id_parent AND statut = 1
 ORDER BY classement, nom ASC
 SQL;
 		$res = $this->sql->query($q);
