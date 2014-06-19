@@ -359,6 +359,43 @@ HTML;
 		$this->assertEqual($grid->afficher(), $display);
 	}
 
+	function test_variable_array() {
+		$grid = new Grid(3, array(
+			':items[item]:2-1-3',
+		));
+		$grid->items = array('toto_0', 'toto_1', 'toto_2', 'toto_3', 'toto_4', 'toto_5', 'toto_6');
+		$grid->item = "<span>[key]:[value]</span>";
+		// TODO voi pour virer le clear du début a priori inutile
+		$display = <<<HTML
+<div class="container_3">
+	<div class="clear"></div>
+	<div class="grid_2">
+		<span>0:toto_0</span>
+	</div>
+	<div class="grid_1">
+		<span>1:toto_1</span>
+	</div>
+	<div class="grid_3">
+		<span>2:toto_2</span>
+	</div>
+	<div class="grid_2">
+		<span>3:toto_3</span>
+	</div>
+	<div class="grid_1">
+		<span>4:toto_4</span>
+	</div>
+	<div class="grid_3">
+		<span>5:toto_5</span>
+	</div>
+	<div class="grid_2">
+		<span>6:toto_6</span>
+	</div>
+</div>
+
+HTML;
+		$this->assertEqual($grid->afficher(), $display);
+	}
+
 	function test_array_imbrication() {
 		$grid = new Grid(3, array(
 			array(3, ':items3[item]:1'),

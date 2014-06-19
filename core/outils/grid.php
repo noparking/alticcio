@@ -124,7 +124,17 @@ class Grid {
 							$content[] = $line;
 						}
 						if ($space) {
-							$space *= count($array);
+							$spaces = explode("-", $space);
+							if (count($spaces) > 1) {
+								$space = 0;
+								for ($i = 0; $i < count($array); $i++) {
+									$space += $spaces[$i % count($spaces)];
+								}
+							}
+							else {
+								$spaces = array($space); 
+								$space *= count($array);
+							}
 						}
 					}
 					else {
@@ -184,12 +194,10 @@ class Grid {
 				}
 				else {
 					if (is_array($content)) {
-						if ($count_content = count($content)) {
-							$piece_of_space = $space / $count_content;
-						}
 						foreach ($content as $i => $line) {
 							$alpha = "";
 							$omega = "";
+							$piece_of_space = $spaces[$i % count($spaces)];
 							$nb2 = $nb / $piece_of_space;
 							if (strpos($alphaomega, "alpha") !== false and ($i + $count) % $nb2 == 0) {
 								$alpha = " alpha";
