@@ -84,7 +84,7 @@ SQL;
 	public function categories() {
 		$categories = array();
 		$q = <<<SQL
-SELECT id, nom, id_parent FROM dt_catalogues_categories
+SELECT id, nom, id_parent, statut FROM dt_catalogues_categories
 WHERE id_catalogues = {$this->id}
 ORDER BY classement ASC
 SQL;
