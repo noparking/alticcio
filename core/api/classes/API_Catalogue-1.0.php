@@ -180,10 +180,11 @@ SQL;
 		}
 	}
 
-	function bloc($id_categorie) {
+	function bloc($id_categorie, $utilisation = "header") {
 		$id = (int)$id_categorie;
 		$q = <<<SQL
-SELECT id_blocs FROM dt_catalogues_categories WHERE id = $id
+SELECT id_blocs FROM dt_catalogues_categories_blocs
+WHERE id_catalogues_categories = $id AND utilisation = '$utilisation'
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
