@@ -125,7 +125,7 @@ SQL;
 	public function get($id, $id_langues) {
 		$id_condition = is_numeric($id) ? "d.id = $id" : "d.url_key = '".addslashes($id)."'";
 		$q = <<<SQL
-SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, d.titre, d.description
+SELECT d.id, d.ref, d.vignette, d.id_themes_photos, d.section, d.titre, d.description, d.id_langues, d.classement
 FROM dt_diaporamas AS d
 WHERE {$id_condition} AND actif = 1 AND d.id_langues = $id_langues
 SQL;
@@ -148,5 +148,35 @@ SQL;
 			return $row;
 		}
 		return false;
+	}
+
+	public function previous($infos) {
+		$q = <<<SQL
+SELECT titre, url_key FROM dt_diaporamas
+WHERE section = '{$infos['section']}'
+AND id_langues = {$infos['id_langues']}
+AND actif = 1
+AND classement < {$infos['classement']}
+ORDER BY classement DESC
+LIMIT 1
+SQL;
+		$res = $this->sql->query($q);
+		
+		return $this->sql->fetch($res); 
+	}
+
+	public function next($infos) {
+		$q = <<<SQL
+SELECT titre, url_key FROM dt_diaporamas
+WHERE section = '{$infos['section']}'
+AND id_langues = {$infos['id_langues']}
+AND actif = 1
+AND classement > {$infos['classement']}
+ORDER BY classement ASC
+LIMIT 1
+SQL;
+		$res = $this->sql->query($q);
+		
+		return $this->sql->fetch($res); 
 	}
 }
