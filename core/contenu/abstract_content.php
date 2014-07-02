@@ -30,12 +30,19 @@ SQL;
 	}
 
 	public function duplicate($data) {
-		function abstract_content_duplicate_callback (&$value, $field) {
-			if (strpos($field, "phrase_") === 0) {
-				$value = 0;
+		if (!function_exists("abstract_content_duplicate_callback")) {
+			function abstract_content_duplicate_callback (&$value, $field) {
+				if (strpos($field, "phrase_") === 0) {
+					$value = 0;
+				}
 			}
 		}
+		unset($data['id']);
 		array_walk_recursive($data, "abstract_content_duplicate_callback");
-		return $this->save($data);
+		$old_id = $this->id;
+		$new_id = $this->save($data);
+		$this->id = $old_id;
+
+		return $new_id;
 	}
 }

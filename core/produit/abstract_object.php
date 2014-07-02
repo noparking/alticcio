@@ -43,13 +43,21 @@ abstract class AbstractObject {
 	}
 
 	public function duplicate($data) {
-		function abstract_object_duplicate_callback (&$value, $field) {
-			if (strpos($field, "phrase_") === 0) {
-				$value = 0;
+		if (!function_exists("abstract_object_duplicate_callback")) {
+			function abstract_object_duplicate_callback (&$value, $field) {
+				if (strpos($field, "phrase_") === 0) {
+					$value = 0;
+				}
 			}
 		}
+		unset($data[$this->type]['id']);
 		array_walk_recursive($data, "abstract_object_duplicate_callback");
-		return $this->save($data);
+		$old_id = $this->id;
+		$this->id = null;
+		$new_id = $this->save($data);
+		$this->id = $old_id;
+
+		return $new_id;
 	}
 
 	public function save($data) {

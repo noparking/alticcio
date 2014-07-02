@@ -82,7 +82,7 @@ if ($id = $url->get('id')) {
 $form = new Form(array(
 	'id' => "form-edit-diaporama-$id",
 	'class' => "form-edit",
-	'actions' => array("save", "delete", "cancel", "add-image",	"delete-image"),
+	'actions' => array("save", "delete", "cancel", "duplicate", "add-image",	"delete-image"),
 	'files' => array("vignette_file", "new_image_file"),
 ));
 
@@ -127,12 +127,16 @@ if ($form->is_submitted()) {
 					$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 				}
 				else if ($id_saved == -1) {
-					$messages[] = '<p class="message">Il existe déjà un diaporama ayant cette référence</p>';
+					$messages[] = '<p class="message">Il existe déjà un diaporama ayant cette référence dans cette langue</p>';
 				}
 				else if ($id_saved > 0) {
 					$form->reset();
 				}
 			}
+			break;
+		case "duplicate" :
+			$id = $diaporama->duplicate($data);
+			$url->redirect("current", array('action' => "edit", 'id' => $id));
 			break;
 	}
 }
@@ -154,10 +158,7 @@ $form_start = $form->form_start();
 
 $form->template = $page->inc("snippets/produits-form-template");
 
-// variable $displayed_lang définie dans ce snippet
-$main = $page->inc("snippets/translate");
-
-$main .= $page->inc("snippets/messages");
+$main = $page->inc("snippets/messages");
 
 $hidden = array('presentation' => "");
 
@@ -197,6 +198,7 @@ HTML;
 {$vignette}
 {$form->input(array('type' => "file", 'name' => "vignette_file", 'label' => $dico->t('Vignette')))}
 {$form->select(array('name' => "diaporama[actif]", 'label' => $dico->t('Actif'), 'options' => array(1 => $dico->t('Active'), 0 => $dico->t('Desactive') )))}
+{$form->select(array('name' => "diaporama[id_langues]", 'id' => "id_langues", 'label' => $dico->t("Langue"), 'options' => $diaporama->langues()))}
 {$form->input(array('name' => "diaporama[titre]", 'label' => $dico->t('Titre')))}
 {$form->input(array('name' => "diaporama[url_key]", 'label' => $dico->t('UrlKey')))}
 {$form->textarea(array('name' => "diaporama[description]", 'label' => $dico->t('Description'), 'class' => "dteditor"))}
@@ -207,6 +209,7 @@ HTML;
 }
 
 if ($action == "edit") {
+	$buttons['duplicate'] = $form->input(array('type' => "submit", 'name' => "duplicate", 'value' => $dico->t('Dupliquer') ));
 	$buttons['delete'] = $form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete", 'value' => $dico->t('Supprimer') ));
 
 	$main .= <<<HTML

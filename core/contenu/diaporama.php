@@ -52,8 +52,8 @@ SQL;
 		);
 	}
 
-	public function is_free($name, $id = null) {
-		$q = "SELECT * FROM dt_diaporamas WHERE ref = '$name'";
+	public function is_free($name, $id_langues, $id = null) {
+		$q = "SELECT * FROM dt_diaporamas WHERE ref = '$name' AND id_langues = $id_langues";
 		if ($id !== null) {
 			$q .= " AND id != $id";
 		}
@@ -62,7 +62,7 @@ SQL;
 	}
 
 	public function save($data) {
-		if (!$this->is_free($data['diaporama']['ref'], isset($data['diaporama']['id']) ? $data['diaporama']['id'] : null)) {
+		if (!$this->is_free($data['diaporama']['ref'], $data['diaporama']['id_langues'], isset($data['diaporama']['id']) ? $data['diaporama']['id'] : null)) {
 			return -1;
 		}
 		if (isset($data['vignette_file'])) {
@@ -75,6 +75,37 @@ SQL;
 		}
 
 		return parent::save($data);
+	}
+
+	public function duplicate($data) {
+		$id = isset($data['diaporama']['id']) ? $data['diaporama']['id'] : $this->id;
+		$q = <<<SQL
+SELECT ref, legende, affichage, classement FROM dt_images_diaporamas
+WHERE id_diaporamas = $id
+SQL;
+		$res = $this->sql->query($q);
+
+		$data['diaporama']['ref'] = $data['diaporama']['ref']." - copy";
+		while(($new_id = parent::duplicate($data)) == -1) {
+			$data['diaporama']['ref'] = $data['diaporama']['ref']." - copy";
+		}
+
+		$images = array();
+		$fields = "";
+		$values = array();
+		while ($row = $this->sql->fetch($res)) {
+			$row['id_diaporamas'] = $new_id;
+			$fields = "(".implode(",", array_keys($row)).")";
+			$values[] = "('".implode("','", $row)."')";
+		}
+		$values = implode(",", $values);
+
+		$q = <<<SQL
+INSERT INTO dt_images_diaporamas $fields VALUES $values
+SQL;
+		$res = $this->sql->query($q);
+
+		return $new_id;
 	}
 
 	public function delete($data) {
