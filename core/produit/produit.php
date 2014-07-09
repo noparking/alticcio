@@ -831,7 +831,7 @@ WHERE cc.id_catalogues = {$id_catalogues}
 ORDER BY id_parent DESC
 SQL;
 		$res = $this->sql->query($q);
-		if ($row = $this->sql->fetch($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$categories[] = $row;
 			$id_categories = $row['id_parent'];
 			while ($id_categories) {
@@ -854,7 +854,7 @@ SQL;
 			$id_produits = $this->id;
 		}
 		$q = <<<SQL
-SELECT c.id FROM dt_catalogues AS c
+SELECT DISTINCT(c.id) FROM dt_catalogues AS c
 INNER JOIN dt_catalogues_categories AS cc ON cc.id_catalogues = c.id
 INNER JOIN dt_catalogues_categories_produits AS ccp ON ccp.id_catalogues_categories = cc.id
 WHERE ccp.id_produits = $id_produits
