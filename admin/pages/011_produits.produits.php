@@ -2,9 +2,10 @@
 
 $menu->current('main/products/products');
 
-$config->core_include("produit/produit", "produit/application", "produit/attribut");
+$config->core_include("produit/produit", "produit/application", "produit/attribut", "produit/catalogue");
 $config->core_include("outils/form", "outils/mysql", "outils/phrase", "outils/langue");
-$config->core_include("outils/filter", "outils/pager", "outils/url_redirection");
+$config->core_include("outils/filter", "outils/pager", "outils/url_redirection", "database/tools");
+$config->base_include("functions/tree");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
@@ -312,6 +313,7 @@ if ($action == "edit") {
 		'complementaires' => $dico->t('ProduitsComplementaires'),
 		'similaires' => $dico->t('ProduitsSimilaires'),
 		'referencement' => $dico->t('Referencement'),
+		'catalogues' => $dico->t('Catalogues'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
@@ -565,6 +567,25 @@ if ($action == "create" or $action == "edit") {
 {$form->textarea(array('name' => "phrases[phrase_entretien]", 'label' => $dico->t('ConseilsEntretien'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_mode_emploi]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_mode_emploi]", 'label' => $dico->t('ModeEmploi'), 'items' => $displayed_lang, 'class' => "dteditor"))}
+{$form->fieldset_end()}
+HTML;
+
+	function print_categorie($categorie) {
+		return $categorie['nom'];
+	}
+
+	$catalogues_html = "";
+	foreach ($produit->catalogues() as $id_catalogues) {
+		$catalogues = new Catalogue($sql);
+		$catalogues->load($id_catalogues);
+		$catalogues_html .= <<<HTML
+<h3>{$catalogues->values['nom']}</h3>
+HTML;
+		$catalogues_html .= print_callback_tree(DBTools::tree($produit->categories($id_catalogues)), "print_categorie");
+	}
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Catalogues'), 'class' => "produit-section produit-section-catalogues".$hidden['catalogues'], 'id' => "produit-section-catalogues"))}
+{$catalogues_html}
 {$form->fieldset_end()}
 HTML;
 }
