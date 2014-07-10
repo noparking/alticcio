@@ -213,6 +213,7 @@ if ($action == 'edit') {
 	$form->default_values['image'] = $images;
 	$documents = $sku->documents();
 	$form->default_values['document'] = $documents;
+	$form->default_values['references_catalogues'] = $sku->references_catalogues();
 	$form->default_values['phrases'] = $phrase->get($sku->phrases());
 	$form->default_values['prix'] = $sku->prix_catalogues();
 	$form->default_values['attributs_management'] = $sku->attributs_management();
@@ -254,6 +255,7 @@ if ($action == "edit") {
 		'attributs' => $dico->t('Attributs'),
 		'images' => $dico->t('Images'),
 		'documents' => $dico->t('Documents'),
+		'references' => $dico->t('ReferencesCatalogues'),
 		'produits' => $dico->t('Produits'),
 	);
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
@@ -481,6 +483,26 @@ HTML;
 
 	// Documents
 	$main .= $page->inc("snippets/documents");
+
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('ReferencesCatalogues'), 'class' => "produit-section produit-section-references".$hidden['references'], 'id' => "produit-section-references"))}
+<table>
+<tr><th>{$dico->t('Catalogue')}</th><th>{$dico->t('Reference')}</th>
+HTML;
+
+	foreach ($sku->all_catalogues() as $id_catalogues => $nom_catalogue) {
+		$main .= <<<HTML
+<tr>
+	<td>{$nom_catalogue}</td>
+	<td>{$form->input(array('name' => "references_catalogues[$id_catalogues]", 'template' => "#{field}"))}</td>
+</tr>
+HTML;
+	}
+
+	$main .= <<<HTML
+</table>
+{$form->fieldset_end()}
+HTML;
 
 	$produit = new Produit($sql);
 	$main .= <<<HTML

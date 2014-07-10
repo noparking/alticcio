@@ -32,6 +32,20 @@ SQL;
 		return $liste;
 	}
 
+	public function references_catalogues() {
+		$q = <<<SQL
+SELECT id_catalogues, reference FROM dt_references_catalogues WHERE id_sku = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		
+		$references_catalogues = array();
+		while ($row = $this->sql->fetch($res)) {
+			$references_catalogues[$row['id_catalogues']] = $row['reference'];
+		}
+
+		return $references_catalogues;
+	}
+
 	public function save($data = null) {
 		if ($data === null) {
 			$data = array('sku' => array('id' => $this->id));
@@ -45,6 +59,25 @@ SQL;
 		else {
 			$q = "INSERT INTO dt_prix (id_sku) VALUES ($id)";
 			$this->sql->query($q);
+		}
+
+		if (isset($data['references_catalogues'])) {
+			$q = <<<SQL
+DELETE FROM dt_references_catalogues WHERE id_sku = $id
+SQL;
+			$this->sql->query($q);
+			$values = array();
+			foreach ($data['references_catalogues'] as $id_catalogues => $ref) {
+				if ($ref) {
+					$values[] = "($id, $id_catalogues, '$ref')";
+				}
+			}
+			if ($values = implode(",", $values)) {
+				$q = <<<SQL
+INSERT INTO dt_references_catalogues (id_sku, id_catalogues, reference) VALUES $values
+SQL;
+				$this->sql->query($q);
+			}
 		}
 
 		return $id;
@@ -432,7 +465,7 @@ SQL;
 
 	public function all_catalogues($catalogues = array()) {
 		$q = <<<SQL
-SELECT id, nom FROM dt_catalogues
+SELECT id, nom FROM dt_catalogues ORDER BY nom ASC
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
