@@ -11,6 +11,14 @@ body {
 	background-repeat:repeat-x;
 	background-position:0 0;
 }
+a {
+	text-decoration:none;
+	color: #0080C6;
+}
+a:hover {
+	text-decoration:underline;
+	color: #666;
+}
 #container {
 	margin:0 auto;
 	text-align:left;

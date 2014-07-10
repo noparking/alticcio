@@ -571,7 +571,10 @@ if ($action == "create" or $action == "edit") {
 HTML;
 
 	function print_categorie($categorie) {
-		return $categorie['nom'];
+		global $page;
+		global $url2;
+
+		return $page->l($categorie['nom'], $url2->make("Produits", array('type' => "catalogues_categories", 'action' => "edit", 'id' => $categorie['id'])));
 	}
 
 	$catalogues_html = "";
@@ -579,7 +582,7 @@ HTML;
 		$catalogues = new Catalogue($sql);
 		$catalogues->load($id_catalogues);
 		$catalogues_html .= <<<HTML
-<h3>{$catalogues->values['nom']}</h3>
+<h3>{$page->l($catalogues->values['nom'], $url2->make("Produits", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogues->values['id'])))}</h3>
 HTML;
 		$catalogues_html .= print_callback_tree(DBTools::tree($produit->categories($id_catalogues)), "print_categorie");
 	}
