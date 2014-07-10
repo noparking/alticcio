@@ -169,7 +169,11 @@ SQL;
 								$this->phrase('phrase_mode_emploi', $produit_phrases, $code_langue),
 								$this->phrase('phrase_entretien', $produit_phrases, $code_langue),
 							);
-							$images = $this->images($type_sku == "variante" ? $produit : $sku, $this->max_images());
+							$images = array();
+							if ($type_sku == "variante") {
+								$images = $this->images($produit, $this->max_images());
+							}
+							$images += $this->images($sku, $this->max_images() - count($images));
 							$data_ligne = array_merge($data_ligne, $images);
 							$nom_sku = (isset($sku_phrases['phrase_commercial'][$code_langue]) and $sku_phrases['phrase_commercial'][$code_langue]) ? 'phrase_commercial' : 'phrase_ultralog';
 							$data_ligne = array_merge($data_ligne, array(

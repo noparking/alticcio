@@ -131,8 +131,8 @@ SQL;
 			}
 		}
 		$ret = array();
-		for ($i = 1; $i <= $max_images; $i++) {
-			$ret[] = isset($images[$i - 1]) ? $images[$i - 1] : "";
+		for ($i = 0; $i < $max_images; $i++) {
+			$ret[] = isset($images[$i]) ? $images[$i] : "";
 		}
 
 		return $ret;
