@@ -574,15 +574,24 @@ HTML;
 		global $page;
 		global $url2;
 
-		return $page->l($categorie['nom'], $url2->make("Produits", array('type' => "catalogues_categories", 'action' => "edit", 'id' => $categorie['id'])));
+		$nom_categorie = $categorie['nom'];
+		if ($categorie['statut'] == 0) {
+			$nom_categorie = "<strike>$nom_categorie</strike>";
+		}
+
+		return $page->l($nom_categorie, $url2->make("Produits", array('type' => "catalogues_categories", 'action' => "edit", 'id' => $categorie['id'])));
 	}
 
 	$catalogues_html = "";
 	foreach ($produit->catalogues() as $id_catalogues) {
-		$catalogues = new Catalogue($sql);
-		$catalogues->load($id_catalogues);
+		$catalogue = new Catalogue($sql);
+		$catalogue->load($id_catalogues);
+		$nom_catalogue = $catalogue->values['nom'];
+		if ($catalogue->values['statut'] == 0) {
+			$nom_catalogue = "<strike>$nom_catalogue</strike>";
+		}
 		$catalogues_html .= <<<HTML
-<h3>{$page->l($catalogues->values['nom'], $url2->make("Produits", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogues->values['id'])))}</h3>
+<h3>{$page->l($nom_catalogue, $url2->make("Produits", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->values['id'])))}</h3>
 HTML;
 		$catalogues_html .= print_callback_tree(DBTools::tree($produit->categories($id_catalogues)), "print_categorie");
 	}

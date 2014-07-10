@@ -825,7 +825,7 @@ SQL;
 	public function categories($id_catalogues) {
 		$categories = array();
 		$q = <<<SQL
-SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement FROM dt_catalogues_categories AS cc
+SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement, cc.statut FROM dt_catalogues_categories AS cc
 INNER JOIN dt_catalogues_categories_produits AS ccp ON ccp.id_catalogues_categories = cc.id AND ccp.id_produits = {$this->id}
 WHERE cc.id_catalogues = {$id_catalogues}
 ORDER BY id_parent DESC
@@ -836,7 +836,7 @@ SQL;
 			$id_categories = $row['id_parent'];
 			while ($id_categories) {
 				$q = <<<SQL
-SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement FROM dt_catalogues_categories AS cc
+SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement, cc.statut FROM dt_catalogues_categories AS cc
 WHERE cc.id = {$id_categories} 
 ORDER BY cc.classement ASC
 SQL;
