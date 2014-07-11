@@ -606,4 +606,20 @@ SQL;
 		return $phrases_substituees;
 	}
 
+	function field_types() {
+		$fields = array();
+
+		$q = <<<SQL
+SHOW COLUMNS FROM {$this->table}
+SQL;
+		$res = $this->sql->query($q);
+		$columns = array();
+		while ($row = $this->sql->fetch($res)) {
+			$columns[$row['Field']] = $row['Type'];
+		}
+
+		$fields[$this->type] = $columns;
+
+		return $fields;
+	}
 }
