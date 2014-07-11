@@ -870,4 +870,75 @@ class TestOfForm extends UnitTestCase {
 		$this->assertEqual($values['a'][4], "qsd");
 		$this->assertEqual($values[42], "qsdqsd");
 	}
+
+	function test_flat() {
+		$form = new Form(array('id' => "my-form"));
+
+		$array = array(
+			'toto' => 1,
+			'titi' => 2,
+			'foo' => 'bar',
+		);
+
+		$this->assertEqual($form->flat($array), $array);
+
+		$array = array(
+			'toto' => array(
+				'titi' => 1,
+				'tata' => 2,
+			),
+			'foo' => 'bar',
+		);
+
+		$flat_array= array(
+			'toto[titi]' => 1,
+			'toto[tata]' => 2,
+			'foo' => "bar",
+		);
+	
+		$this->assertEqual($form->flat($array), $flat_array);
+		$this->assertEqual($form->flat($flat_array), $flat_array);
+
+		$array = array(
+			'toto' => array(
+				'titi' => array(
+					'tata' => 1,
+					'tutu' => 2
+				),
+				'foo' => 'bar'),
+			'foo' => 'bar',
+		);
+
+		$flat_array= array(
+			'toto[titi][tata]' => 1,
+			'toto[titi][tutu]' => 2,
+			'toto[foo]' => 'bar',
+			'foo' => "bar",
+		);
+	
+		$this->assertEqual($form->flat($array), $flat_array);
+		$this->assertEqual($form->flat($flat_array), $flat_array);
+
+		$array = array(
+			'toto' => array(
+				'titi' => array(
+					'tata' => array(
+						'truc' => 1,
+					),
+					'tutu' => 2
+				),
+				'foo' => 'bar'),
+			'foo' => 'bar',
+		);
+
+		$flat_array= array(
+			'toto[titi][tata][truc]' => 1,
+			'toto[titi][tutu]' => 2,
+			'toto[foo]' => 'bar',
+			'foo' => "bar",
+		);
+	
+		$this->assertEqual($form->flat($array), $flat_array);
+		$this->assertEqual($form->flat($flat_array), $flat_array);
+	}
 }
