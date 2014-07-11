@@ -10,6 +10,7 @@ class Form {
 	public $error_message_confirm = 'Le champ "#{name}" n\'a pas été confirmé.';
 	public $error_message_validate = 'Le champ "#{name}" n\'est pas valide.';
 	public $error_message_captcha = 'Le captcha a mal été saisi.';
+	public $error_message_field_limit = 'Le champ "#{name}" ne doit pas excéder #{limit} caractères';
 	public $error_message_upload = array(); // voir constructeur
 	public $fields_error_messages = array();
 	public $recaptcha_public = "";
@@ -22,6 +23,8 @@ class Form {
 	private $action;
 	private $enctype;
 	private $method;
+	private $field_types;
+	private $field_limits;
 	private $required;
 	private $unregistered;
 	private $confirm;
@@ -78,6 +81,15 @@ class Form {
 		}
 		$this->trim = isset($params['trim']) ? $params['trim'] : true;
 		$this->page = isset($params['page']) ? $params['page'] : null;
+
+		$this->field_types = $this->flat(isset($params['field_types']) ? $params['field_types'] : array());
+		$this->field_limits = $this->flat(isset($params['field_limits']) ? $params['field_limits'] : array());
+		foreach ($this->field_types as $key => $value) {
+			if (preg_match("/varchar\((\d+)\)/", $value, $matches)) {
+				$this->field_limits[$key] = isset($this->field_limits[$key]) ? min($this->field_limits[$key], $matches[1]) : $matches[1];
+			}
+		}
+
 		$this->required = isset($params['required']) ? $params['required'] : array();
 		$this->unregistered = isset($params['unregistered']) ? $params['unregistered'] : array();
 		$this->confirm = isset($params['confirm']) ? $params['confirm'] : array();
@@ -418,6 +430,10 @@ class Form {
 					break;
 			}
 			$attr = "";
+
+			if (isset($this->field_limits[$name])) {
+				$params['maxlength'] = isset($params['maxlength']) ? min($params['maxlength'], $this->field_limits[$name]) : $this->field_limits[$name];
+			}
 			foreach ($params as $cle => $valeur) {
 				if (in_array($cle, array('min', 'max', 'step', 'switch', 'maxlength'))) {
 					$attr .= " $cle=\"$valeur\"";
@@ -1037,8 +1053,31 @@ HTML;
 		$result &= $this->validate_recaptcha();
 		$result &= $this->validate_on_validation();
 		$result &= $this->validate_upload();
+		$result &= $this->validate_field_limits();
 		$this->form_validation = $result;
 
+		return $result;
+	}
+
+	private function validate_field_limits() {
+		$result = true;
+		foreach ($this->field_limits as $field => $limit) {
+			if (!$this->is_posted($field)) continue;
+			if (strlen($this->value($field)) > $limit) {
+				if (isset($this->fields_error_messages[$field]['field_limit'])) {
+					$message = $this->fields_error_messages[$field]['field_limit'];
+				}
+				else {
+					$message = $this->error_message_field_limit;
+				}
+				$error = str_replace("#{name}", $field, $message);
+				$error = str_replace("#{limit}", $limit, $error);
+				$this->errors[] = $error;
+				$this->fields_errors[$field][] = $error;
+				$this->invalid[$field] = 1;
+				$result = false;
+			}
+		}
 		return $result;
 	}
 
@@ -1447,5 +1486,20 @@ HTML;
 #{errors}
 TEMPLATE;
 	}
-	
+
+	public function flat($array, $char = "") {
+		$flat_array = array();
+		foreach ($array as $key => $value) {
+			if (is_array($value)) {
+				foreach ($this->flat($value, "]") as $subkey => $subvalue) {
+					$flat_array[$key.$char.'['.$subkey] = $subvalue;
+				}
+			}
+			else {
+				$flat_array[$key.$char] = $value;
+			}
+		}
+
+		return $flat_array;
+	}
 }
