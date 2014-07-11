@@ -120,6 +120,22 @@ class Message {
 		return $id;
 	}
 	
+	function field_types() {
+		$fields = array();
+
+		$q = <<<SQL
+SHOW COLUMNS FROM dt_messages
+SQL;
+		$res = $this->sql->query($q);
+		$columns = array();
+		while ($row = $this->sql->fetch($res)) {
+			$columns[$row['Field']] = $row['Type'];
+		}
+
+		$fields = $columns;
+
+		return $fields;
+	}
 }
 
 ?>
