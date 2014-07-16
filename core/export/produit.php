@@ -279,6 +279,21 @@ CREATE TABLE IF NOT EXISTS `{$this->export_table}` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 SQL;
 		$this->sql_export->query($q);
+
+		$q = <<<SQL
+SELECT id FROM dt_produits 
+SQL;
+		$res = $this->sql->query($q);
+		$ids = array();
+		while ($row = $this->sql->fetch($res)) {
+			$ids[] = $row['id'];
+		}
+		if ($ids_list = implode(",", $ids)) {
+			$q = <<<SQL
+DELETE FROM `{$this->export_table}` WHERE id_produit NOT IN ($ids_list)
+SQL;
+			$this->sql_export->query($q);
+		}
 	}
 
 	function max_images() {
