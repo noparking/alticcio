@@ -102,6 +102,11 @@ $menus = array(
 						'url' => $url2->make("Produits", array('type' => "fiches_matieres", 'action' => "", 'id' => "")),
 						'level' => 90,
 					),
+					'exportproduits' => array(
+						'label' => $dico->t("Exports"),
+						'url' => $url2->make("Exportproduits", array('type' => "")),
+						'level' => 90,
+					),
 					'compare' => array(
 						'label' => $dico->t("Comparatif"),
 						'url' => $url->make("Comparatif"),
