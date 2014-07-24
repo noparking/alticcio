@@ -298,10 +298,13 @@ SQL;
 		return $produits;
 	}
 
-	public function prix_unitaire_pour_qte($id_sku, $qte) {
+	public function prix_unitaire_pour_qte($id_sku, $qte, $id_catalogues = null) {
+		if ($id_catalogues === null) {
+			$id_catalogues = $this->id_catalogues;
+		}
 		$q = <<<SQL
 SELECT MIN(montant_ht) AS prix FROM dt_prix_degressifs
-WHERE id_sku = $id_sku AND quantite <= $qte AND id_catalogues = {$this->id_catalogues}
+WHERE id_sku = $id_sku AND quantite <= $qte AND id_catalogues = {$id_catalogues}
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
@@ -312,14 +315,19 @@ SQL;
 		else {
 			$q = <<<SQL
 SELECT montant_ht FROM dt_prix
-WHERE id_sku = $id_sku AND id_catalogues = {$this->id_catalogues}
+WHERE id_sku = $id_sku AND id_catalogues = {$id_catalogues}
 SQL;
 			$res = $this->sql->query($q);
 			$row = $this->sql->fetch($res);
 			$prix = $row['montant_ht'];
 		}
 
-		return $prix;
+		if ($prix or $id_catalogues == 0) {
+			return $prix;
+		}
+		else {
+			return $this->prix_unitaire_pour_qte($id_sku, $qte, 0);
+		}
 	}
 
 	public function set_token() {
