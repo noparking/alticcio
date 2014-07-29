@@ -1177,3 +1177,15 @@ ALTER TABLE dt_images_diaporamas DROP phrase_legende
 SQL;
 	$update->query($q);
 }
+
+function update_49($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes` ADD `notification_email` TEXT NOT NULL AFTER `notification`
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_revisions` ADD `notification_email` TEXT NOT NULL AFTER `notification`
+SQL;
+	$update->query($q);
+}
