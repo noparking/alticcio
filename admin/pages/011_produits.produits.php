@@ -526,6 +526,37 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
+	function print_categorie($categorie) {
+		global $page;
+		global $url2;
+
+		$nom_categorie = $categorie['nom'];
+		if ($categorie['statut'] == 0) {
+			$nom_categorie = "<strike>$nom_categorie</strike>";
+		}
+
+		return $page->l($nom_categorie, $url2->make("Produits", array('type' => "catalogues_categories", 'action' => "edit", 'id' => $categorie['id'])));
+	}
+
+	$catalogues_html = "";
+	foreach ($produit->catalogues() as $id_catalogues) {
+		$catalogue = new Catalogue($sql);
+		$catalogue->load($id_catalogues);
+		$nom_catalogue = $catalogue->values['nom'];
+		if ($catalogue->values['statut'] == 0) {
+			$nom_catalogue = "<strike>$nom_catalogue</strike>";
+		}
+		$catalogues_html .= <<<HTML
+<h3>{$page->l($nom_catalogue, $url2->make("Produits", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->values['id'])))}</h3>
+HTML;
+		$catalogues_html .= print_callback_tree(DBTools::tree($produit->categories($id_catalogues)), "print_categorie");
+	}
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Catalogues'), 'class' => "produit-section produit-section-catalogues".$hidden['catalogues'], 'id' => "produit-section-catalogues"))}
+{$catalogues_html}
+{$form->fieldset_end()}
+HTML;
+
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
@@ -567,37 +598,6 @@ if ($action == "create" or $action == "edit") {
 {$form->textarea(array('name' => "phrases[phrase_entretien]", 'label' => $dico->t('ConseilsEntretien'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->input(array('name' => "produit[phrase_mode_emploi]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_mode_emploi]", 'label' => $dico->t('ModeEmploi'), 'items' => $displayed_lang, 'class' => "dteditor"))}
-{$form->fieldset_end()}
-HTML;
-
-	function print_categorie($categorie) {
-		global $page;
-		global $url2;
-
-		$nom_categorie = $categorie['nom'];
-		if ($categorie['statut'] == 0) {
-			$nom_categorie = "<strike>$nom_categorie</strike>";
-		}
-
-		return $page->l($nom_categorie, $url2->make("Produits", array('type' => "catalogues_categories", 'action' => "edit", 'id' => $categorie['id'])));
-	}
-
-	$catalogues_html = "";
-	foreach ($produit->catalogues() as $id_catalogues) {
-		$catalogue = new Catalogue($sql);
-		$catalogue->load($id_catalogues);
-		$nom_catalogue = $catalogue->values['nom'];
-		if ($catalogue->values['statut'] == 0) {
-			$nom_catalogue = "<strike>$nom_catalogue</strike>";
-		}
-		$catalogues_html .= <<<HTML
-<h3>{$page->l($nom_catalogue, $url2->make("Produits", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->values['id'])))}</h3>
-HTML;
-		$catalogues_html .= print_callback_tree(DBTools::tree($produit->categories($id_catalogues)), "print_categorie");
-	}
-	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => $dico->t('Catalogues'), 'class' => "produit-section produit-section-catalogues".$hidden['catalogues'], 'id' => "produit-section-catalogues"))}
-{$catalogues_html}
 {$form->fieldset_end()}
 HTML;
 }
