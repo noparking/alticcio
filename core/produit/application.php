@@ -61,7 +61,7 @@ SQL;
 		return $liste;
 	}
 
-	public function attributs() {
+	public function attributs($grouped = "") {
 		$application_id = isset($this->id) ? $this->id : 0;
 		$q = <<<SQL
 SELECT a.id FROM dt_attributs AS a

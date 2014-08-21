@@ -94,7 +94,7 @@ SQL;
 		return $liste;
 	}
 
-	public function attributs() {
+	public function attributs($grouped = "") {
 		$attributs = array();
 		$q = <<<SQL
 SELECT id_attributs, valeur_numerique, phrase_valeur, classement FROM dt_matieres_attributs
