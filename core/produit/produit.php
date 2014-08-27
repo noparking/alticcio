@@ -1073,7 +1073,7 @@ SQL;
 			foreach ($data['personnalisations']['textes'] as $id => $perso) {
 				$values = array();
 				foreach ($perso as $key => $value) {
-					$values[] = "$key = ".in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value;
+					$values[] = "$key = ".(in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value);
 				}
 				$values_list = implode(",", $values);
 				$q = <<<SQL
@@ -1087,7 +1087,7 @@ SQL;
 			foreach ($data['personnalisations']['images'] as $id => $perso) {
 				$values = array();
 				foreach ($perso as $key => $value) {
-					$values[] = "$key = ".in_array($key, array('css', 'fichier')) ? "'$value'" : (int)$value;
+					$values[] = "$key = ".(in_array($key, array('css', 'fichier')) ? "'$value'" : (int)$value);
 				}
 
 				if (isset($data['_FILES']['personnalisations']['name']['images'][$id]['fichier'])) {
