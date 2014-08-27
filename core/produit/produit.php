@@ -1073,7 +1073,7 @@ SQL;
 			foreach ($data['personnalisations']['textes'] as $id => $perso) {
 				$values = array();
 				foreach ($perso as $key => $value) {
-					$values[] = "$key = '$value'";
+					$values[] = "$key = ".in_array($key, array('css', 'contenu') ? "'$value'", "$value";
 				}
 				$values_list = implode(",", $values);
 				$q = <<<SQL
@@ -1087,7 +1087,7 @@ SQL;
 			foreach ($data['personnalisations']['images'] as $id => $perso) {
 				$values = array();
 				foreach ($perso as $key => $value) {
-					$values[] = "$key = '$value'";
+					$values[] = "$key = ".in_array($key, array('css', 'fichier') ? "'$value'", "$value";
 				}
 
 				if (isset($data['_FILES']['personnalisations']['name']['images'][$id]['fichier'])) {
@@ -1116,7 +1116,7 @@ SQL;
 			$values = array($this->id);
 			foreach ($data['new_personnalisation_texte'] as $key => $value) {
 				$fields[] = $key;
-				$values[] = "'$value'";
+				$values[] = in_array($key, array('css', 'contenu') ? "'$value'", "$value";
 			}
 			$fields_list = implode(",", $fields);
 			$values_list = implode(",", $values);
@@ -1133,7 +1133,7 @@ SQL;
 			$values = array($this->id);
 			foreach ($data['new_personnalisation_image'] as $key => $value) {
 				$fields[] = $key;
-				$values[] = "'$value'";
+				$values[] = in_array($key, array('css', 'formats') ? "'$value'", "$value";
 			}
 
 			if (isset($data['_FILES']['new_personnalisation_image']['name']['fichier'])) {
