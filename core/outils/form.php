@@ -1383,7 +1383,13 @@ HTML;
 			return "";
 		}
 		if (in_array($params['type'], array("checkbox", "radio"))) {
-			if ($this->get_default_value($name, $this->values())) {
+			$value = $this->value($name, $this->values(), "undefined");
+			if ($value == "undefined") {
+				if ($this->get_default_value($name, $this->default_values)) {
+					return 'checked="checked"';
+				}
+			}
+			else if ($value) {
 				return 'checked="checked"';
 			}
 		}
