@@ -1135,6 +1135,19 @@ SQL;
 				$fields[] = $key;
 				$values[] = "'$value'";
 			}
+
+			if (isset($data['_FILES']['new_personnalisation_image']['name']['fichier'])) {
+				if ($name = $data['_FILES']['new_personnalisation_image']['name']['fichier']) {
+					$tmp_name = $data['_FILES']['new_personnalisation_image']['tmp_name']['fichier'];
+					preg_match("/(\.[^\.]*)$/", $name, $matches);
+					$ext = $matches[1];
+					$file_name = md5_file($tmp_name).$ext;
+					move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
+					$fields[] = "fichier";
+					$values[] = "'$file_name'";
+				}
+			}
+
 			$fields_list = implode(",", $fields);
 			$values_list = implode(",", $values);
 			$q = <<<SQL
