@@ -403,6 +403,7 @@ $t['Personnalisation'] = "Personnalisation";
 $t['PersonnalisationApercu'] = "Aperçu de la personnalisation";
 $t['PersonnalisationImages'] = "Images de personnalisation";
 $t['PersonnalisationTextes'] = "Textes de personnalisation";
+$t['PersonnalisationBackground'] = "Image de fond (cette image servira d'image de fond et les autres éléments se positionneront relativement à elle)";
 $t['PersonnalisationLocked'] = "Élément fixe (ne pourra pas être remplacé par l'utilisateur)";
 $t['PictosVente'] = "Pictos vente";
 $t['Poids'] = "Poids";
