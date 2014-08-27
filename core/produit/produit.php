@@ -1178,7 +1178,11 @@ SQL;
 HTML;
 		$personnalisations = $this->personnalisations();
 		foreach($personnalisations['textes'] as $texte) {
-			$css = $texte['css'];
+			$css = "";
+			$css .= <<<CSS
+position: absolute;
+CSS;
+			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
 			$html .= <<<HTML
 <div class="personnalisation-produit-texte" style="{$css}">
@@ -1187,7 +1191,13 @@ HTML;
 HTML;
 		}
 		foreach($personnalisations['images'] as $image) {
-			$css = <<<CSS
+			$css = "";
+			if (!$image['background']) {
+				$css .= <<<CSS
+position: absolute;
+CSS;
+			}
+			$css .= <<<CSS
 background-image: url({$images_url}{$image['fichier']});
 background-size: contain;
 background-position: center;
