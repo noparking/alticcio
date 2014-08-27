@@ -56,15 +56,8 @@ class Form {
 	private $page = null;
 	private $rendered = array();
 	private $trim = true;
-	private $_files = array(); // usable $_files array
 	
 	public function __construct($params = array()) {
-		if (isset($_FILES)) {
-			foreach ($_FILES as $name => $element) {
-				$this->_files[$name] = $this->usable_files_array($element);
-			}
-		}
-
 		$this->error_message_upload[UPLOAD_ERR_INI_SIZE] = "Le fichier dépasse la taille autorisée (".ini_get('upload_max_filesize').")";
 		$this->error_message_upload['default'] = 'Erreur pendant le téléchargement du fichier.';
 
@@ -134,6 +127,12 @@ class Form {
 			$this->unregister_values();
 		}
 		$this->step = isset($this->values['step']) ? $this->values['step'] : 1;
+		foreach ($this->filefields as $file) {
+			if (isset($_FILES[$file]) and $_FILES[$file]['name']) {
+				$this->files[$file] = $_FILES[$file];
+				$this->values[$file] = $this->files[$file];
+			}
+		}
 		if (isset($params['recaptcha_public'])) {
 			$this->recaptcha_public = $params['recaptcha_public'];
 		}
@@ -158,48 +157,9 @@ class Form {
 		if ($this->trim) {
 			array_walk_recursive($this->values, array($this, "trim_string"));
 		}
-
-		$this->values['_FILES'] = $this->_files;
-	}
-
-	public function usable_files_array($array) {
-		$usable_files_array = array();
-		foreach ($array as $key => $value) {
-			if (is_array($value)) {
-				$usable_files_array = $this->array_merge_deep($this->add_key_deep_in_array($key, $value), $usable_files_array);
-			}
-			else {
-				$usable_files_array[$key] = $value;
-			}
+		if (isset($_FILES)) {
+			$this->values['_FILES'] = $_FILES;
 		}
-		return $usable_files_array;
-	}
-
-    public function add_key_deep_in_array($final_key, $array) {
-		$new_array = array();
-		foreach ($array as $key => $value) {
-			$new_array[$key] = is_array($value) ? $this->add_key_deep_in_array($final_key, $value) : array($final_key => $value);
-		}
-
-		return $new_array;
-	}
-
-	public function array_merge_deep($a1, $a2) {
-		foreach ($a2 as $key => $value) {
-			if (is_array($value)) {
-				foreach ($value as $subkey => $subvalue) {
-					if (!isset($a1[$key][$subkey])) {
-						$a1[$key][$subkey] = array();
-					}
-					$a1[$key][$subkey] = $this->array_merge_deep($subvalue, $a1[$key][$subkey]);
-				}
-			}
-			else {
-				$a1[$key] = $value;
-			}
-		}
-
-		return $a1;
 	}
 
 	public function trim_string(&$value) {
@@ -1075,7 +1035,7 @@ HTML;
 	}
 
 	public function is_posted($field) {
-		return $this->value($field, $_POST) !== null or $this->value($field, $this->_files);
+		return $this->value($field, $_POST) !== null or $this->value($field, $_FILES);
 	}
 
 	public function validate() {
@@ -1238,8 +1198,8 @@ HTML;
 	private function validate_upload() {
 		$result = true;
 		foreach($this->filefields as $field) {
-			if (isset($this->_files[$field]['error']) and $this->_files[$field]['error'] and $this->_files[$field]['error'] != 4) {
-				$code = $this->_files[$field]['error'];
+			if (isset($_FILES[$field]['error']) and $_FILES[$field]['error'] and $_FILES[$field]['error'] != 4) {
+				$code = $_FILES[$field]['error'];
 				if (isset($this->fields_error_messages[$field]['upload'][$code])) {
 					$message = $this->fields_error_messages[$field]['upload'][$code];
 				}
@@ -1461,7 +1421,7 @@ HTML;
 			if ($previous_value !== "" && !$this->reset && (!isset($params['type']) || !in_array($params['type'], array("checkbox", "submit")))) {
 				$value = $previous_value;
 			}
-			// Cas particulier des checkbox qui deviennent des inputs texte
+			// Cas particulier des checkbox qui devienne des inputs texte
 			if (isset($params['type']) and $params['type'] != "checkbox" and in_array($name, $this->checkboxes)) {
 				$value = (int)$previous_value;
 			}
