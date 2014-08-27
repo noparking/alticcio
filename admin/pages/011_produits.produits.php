@@ -478,6 +478,8 @@ HTML;
 {$form->textarea(array('name' => "personnalisations[images][$i][css]", 'label' => "Style CSS"))}
 {$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$i][locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
 <br />
+{$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$i][background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
+<br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
 {$form->input(array('type' => "submit", 'name' => "delete-personnalisation-image[$i]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
@@ -496,6 +498,8 @@ HTML;
 {$form->input(array('name' => "new_personnalisation_image[max_poids]", 'label' => "Poids maximal du fichier (en ko)"))}
 {$form->textarea(array('name' => "new_personnalisation_image[css]", 'label' => "Style CSS"))}
 {$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+<br />
+{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
 <br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "add-personnalisation-image", 'value' => $dico->t('Ajouter') ))}
