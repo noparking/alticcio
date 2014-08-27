@@ -38,6 +38,11 @@ if ($id = $url2->get('id')) {
 	$produit->load($id);
 	$application = new Application($sql, $phrase, $id_langues);
 	$application->load($produit->values['id_applications']);
+	$personnalisations = $produit->personnalisations();
+	$personnalisation_files = array();
+	foreach ($personnalisations['images'] as $i => $rien) {
+		$personnalisation_files[] = "personnalisation_image[$i][fichier]";
+	}
 }
 
 $page->javascript[] = $url->make("DTEditorTokens")."?id_produits=$id";
@@ -57,7 +62,13 @@ $form = new Form(array(
 	),
 	'permissions' => $user->perms(),
 	'permissions_object' => "produit",
-	'files' => array("new_image_file", "new_document_file", "new_document_vignette", "new_gabarit_file"),
+	'files' => array_merge(array(
+		"new_image_file",
+		"new_document_file",
+		"new_document_vignette",
+		"new_gabarit_file",
+		"new_personnalisation_image[fichier]",
+	), $personnalisation_files),
 ));
 
 $filter_schema_sku = array(
@@ -152,6 +163,7 @@ $messages = array();
 
 if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escaped_values();
+	$data['dir_personnalisations'] = $config->get("medias_path")."www/medias/images/personnalisations/";
 	switch ($form->action()) {
 		case "translate":
 		case "filter":
@@ -198,6 +210,20 @@ if ($form->is_submitted() and $form->validate()) {
 				$produit->add_gabarit($data, $file, $dir);
 			}
 			break;
+		case "add-personnalisation-texte":
+			$produit->add_personnalisation_texte($data);
+			$form->forget_value("new_personnalisation_texte");
+			break;
+		case "delete-personnalisation-texte":
+			$produit->delete_personnalisation_texte($data, $form->action_arg());
+			break;
+		case "add-personnalisation-image":
+			$produit->add_personnalisation_image($data);
+			$form->forget_value("new_personnalisation_image");
+			break;
+		case "delete-personnalisation-image":
+			$produit->delete_personnalisation_image($data, $form->action_arg());
+			break;
 		case "delete-gabarit" :
 			$produit->delete_gabarit();
 			break;
@@ -243,6 +269,7 @@ else {
 }
 
 if ($action == 'edit') {
+	$personnalisations = $produit->personnalisations();
 	$form->default_values['produit'] = $produit->values;
 	$images = $produit->images();
 	$form->default_values['image'] = $images;
@@ -260,8 +287,7 @@ if ($action == 'edit') {
 	$form->default_values['complementaires'] = $complementaires;
 	$similaires = $produit->similaires();
 	$form->default_values['similaires'] = $similaires;
-	$personnalisation = $produit->personnalisation();
-	$form->default_values['personnalisation'] = $personnalisation;
+	$form->default_values['personnalisations'] = $personnalisations;
 }
 if (isset($application)) {
 	$phrases_applications = $phrase->get($application->phrases());
@@ -393,12 +419,87 @@ HTML;
 
 	// Personnalisation
 	$checkbox_template = "#{field} #{label}";
+	$personnalisation_url = $config->get("medias_url")."/medias/images/personnalisations/";
 	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => $dico->t('Personnalisation'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation"))}
-{$form->input(array('type' => "checkbox", 'name' => "personnalisation[texte][has]", 'label' => "Texte à saisir", 'template' => $checkbox_template))}
-{$form->input(array('name' => "personnalisation[texte][libelle]", 'label' => "Libellé du texte à saisir"))}
-{$form->input(array('type' => "checkbox", 'name' => "personnalisation[fichier][has]", 'label' => "Fichier à télécharger", 'template' => $checkbox_template))}
-{$form->input(array('name' => "personnalisation[fichier][libelle]", 'label' => "Libellé du fichier à télécharger"))}
+{$form->fieldset_start(array('legend' => $dico->t('PersonnalisationApercu'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-apercu"))}
+{$produit->display_personnalisation($personnalisation_url)}
+{$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('PersonnalisationTextes'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-texte"))}
+HTML;
+	$number = 0;
+	foreach ($personnalisations['textes'] as $i => $texte) {
+		$number++;
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => "Texte $number"))}
+{$form->textarea(array('name' => "personnalisations[textes][$i][contenu]", 'label' => "Texte par défaut"))}
+{$form->input(array('name' => "personnalisations[textes][$i][min_caracteres]", 'label' => "Nombre minimum de caractères"))}
+{$form->input(array('name' => "personnalisations[textes][$i][max_caracteres]", 'label' => "Nombre maximum de caractères"))}
+{$form->input(array('name' => "personnalisations[textes][$i][min_lignes]", 'label' => "Nombre minimum de lignes"))}
+{$form->input(array('name' => "personnalisations[textes][$i][max_lignes]", 'label' => "Nombre maximum de lignes"))}
+{$form->textarea(array('name' => "personnalisations[textes][$i][css]", 'label' => "Style CSS"))}
+{$form->input(array('type' => "checkbox", 'name' => "personnalisations[textes][$i][locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+<br />
+<br />
+{$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
+{$form->input(array('type' => "submit", 'name' => "delete-personnalisation-texte[$i]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
+{$form->fieldset_end()}
+HTML;
+	}
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => "Nouveau texte"))}
+{$form->textarea(array('name' => "new_personnalisation_texte[contenu]", 'label' => "Texte par défaut"))}
+{$form->input(array('name' => "new_personnalisation_texte[min_caracteres]", 'label' => "Nombre minimum de caractères"))}
+{$form->input(array('name' => "new_personnalisation_texte[max_caracteres]", 'label' => "Nombre maximum de caractères"))}
+{$form->input(array('name' => "new_personnalisation_texte[min_lignes]", 'label' => "Nombre minimum de lignes"))}
+{$form->input(array('name' => "new_personnalisation_texte[max_lignes]", 'label' => "Nombre maximum de lignes"))}
+{$form->textarea(array('name' => "new_personnalisation_texte[css]", 'label' => "Style CSS"))}
+{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_texte[locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+<br />
+<br />
+{$form->input(array('type' => "submit", 'name' => "add-personnalisation-texte", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_end()}
+{$form->fieldset_end()}
+{$form->fieldset_start(array('legend' => $dico->t('PersonnalisationImages'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-image"))}
+HTML;
+	$number = 0;
+	foreach ($personnalisations['images'] as $i => $image) {
+		$number++;
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => "Image $number"))}
+<img src="{$personnalisation_url}{$image['fichier']}" style="max-height: 200px; max-width: 300px;" alt="Image $i" />
+{$form->input(array('type' => "file", 'name' => "personnalisations[images][$i][fichier]", 'label' => "Image par défaut"))}
+{$form->input(array('name' => "personnalisations[images][$i][formats]", 'label' => "Formats autorisés (liste d'extensions séparées par des espaces)"))}
+{$form->input(array('name' => "personnalisations[images][$i][min_largeur]", 'label' => "Largeur minimale de l'image (en pixels)"))}
+{$form->input(array('name' => "personnalisations[images][$i][max_largeur]", 'label' => "Largeur maximale de l'image (en pixels)"))}
+{$form->input(array('name' => "personnalisations[images][$i][min_hauteur]", 'label' => "Hauteur minimale de l'image (en pixels)"))}
+{$form->input(array('name' => "personnalisations[images][$i][max_hauteur]", 'label' => "Hauteur maximale de l'image (en pixels)"))}
+{$form->input(array('name' => "personnalisations[images][$i][min_poids]", 'label' => "Poids minimal du fichier (en ko)"))}
+{$form->input(array('name' => "personnalisations[images][$i][max_poids]", 'label' => "Poids maximal du fichier (en ko)"))}
+{$form->textarea(array('name' => "personnalisations[images][$i][css]", 'label' => "Style CSS"))}
+{$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$i][locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+<br />
+<br />
+{$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
+{$form->input(array('type' => "submit", 'name' => "delete-personnalisation-image[$i]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
+{$form->fieldset_end()}
+HTML;
+	}
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => "Nouvelle image"))}
+{$form->input(array('type' => "file", 'name' => "new_personnalisation_image[fichier]", 'label' => "Image par défaut"))}
+{$form->input(array('name' => "new_personnalisation_image[formats]", 'label' => "Formats autorisés (liste d'extensions séparées par des espaces)"))}
+{$form->input(array('name' => "new_personnalisation_image[min_largeur]", 'label' => "Largeur minimale de l'image (en pixels)"))}
+{$form->input(array('name' => "new_personnalisation_image[max_largeur]", 'label' => "Largeur maximale de l'image (en pixels)"))}
+{$form->input(array('name' => "new_personnalisation_image[min_hauteur]", 'label' => "Hauteur minimale de l'image (en pixels)"))}
+{$form->input(array('name' => "new_personnalisation_image[max_hauteur]", 'label' => "Hauteur maximale de l'image (en pixels)"))}
+{$form->input(array('name' => "new_personnalisation_image[min_poids]", 'label' => "Poids minimal du fichier (en ko)"))}
+{$form->input(array('name' => "new_personnalisation_image[max_poids]", 'label' => "Poids maximal du fichier (en ko)"))}
+{$form->textarea(array('name' => "new_personnalisation_image[css]", 'label' => "Style CSS"))}
+{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+<br />
+<br />
+{$form->input(array('type' => "submit", 'name' => "add-personnalisation-image", 'value' => $dico->t('Ajouter') ))}
+{$form->fieldset_end()}
 {$form->fieldset_end()}
 HTML;
 

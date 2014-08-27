@@ -97,21 +97,7 @@ SQL;
 
 		$this->save_attributs($data, $id);
 
-		if (isset($data['personnalisation'])) {
-				$q = <<<SQL
-DELETE FROM dt_personnalisations_produits WHERE id_produits = $id
-SQL;
-				$this->sql->query($q);
-			foreach ($data['personnalisation'] as $type => $perso) {
-				if (isset($perso['has']) and $perso['has']) {
-					$q = <<<SQL
-INSERT INTO dt_personnalisations_produits (`id_produits`, `type`, `libelle`)
-VALUES ($id, '$type', '{$perso['libelle']}')
-SQL;
-					$this->sql->query($q);
-				}
-			}
-		}
+		$this->save_personnalisations($data);
 
 		$q = <<<SQL
 SELECT id, code_langue FROM dt_langues
@@ -809,19 +795,6 @@ SQL;
 		return parent::duplicate($data);
 	}
 
-	public function personnalisation() {
-		$personnalisation = array();
-		$q = <<<SQL
-SELECT * FROM dt_personnalisations_produits WHERE id_produits = {$this->id}
-SQL;
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$personnalisation[$row['type']] = array('has' => 1, 'libelle' => $row['libelle']);
-		}
-
-		return $personnalisation;
-	}
-
 	public function categories($id_catalogues) {
 		$categories = array();
 		$q = <<<SQL
@@ -1069,5 +1042,154 @@ SQL;
 		}
 
 		return $this->substitutions_tokens($phrases, $tokens);
+	}
+
+	function personnalisations() {
+		$personnalisations = array(
+			'textes' => array(),
+			'images' => array(),
+		);
+		$q = <<<SQL
+SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$personnalisations['textes'][$row['id']] = $row;
+		}
+
+		$q = <<<SQL
+SELECT * FROM dt_produits_perso_images WHERE id_produits = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$personnalisations['images'][$row['id']] = $row;
+		}
+
+		return $personnalisations;
+	}
+
+	function save_personnalisations($data) {
+		if (isset($data['personnalisations']['textes'])) {
+			foreach ($data['personnalisations']['textes'] as $id => $perso) {
+				$values = array();
+				foreach ($perso as $key => $value) {
+					$values[] = "$key = '$value'";
+				}
+				$values_list = implode(",", $values);
+				$q = <<<SQL
+UPDATE dt_produits_perso_textes SET $values_list WHERE id = $id
+SQL;
+				$this->sql->query($q);
+			}
+		}
+
+		if (isset($data['personnalisations']['images'])) {
+			foreach ($data['personnalisations']['images'] as $id => $perso) {
+				$values = array();
+				foreach ($perso as $key => $value) {
+					$values[] = "$key = '$value'";
+				}
+
+				if (isset($data['_FILES']['personnalisations']['name']['images'][$id]['fichier'])) {
+					if ($name = $data['_FILES']['personnalisations']['name']['images'][$id]['fichier']) {
+						$tmp_name = $data['_FILES']['personnalisations']['tmp_name']['images'][$id]['fichier'];
+						preg_match("/(\.[^\.]*)$/", $name, $matches);
+						$ext = $matches[1];
+						$file_name = md5_file($tmp_name).$ext;
+						move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
+						$values[] = "fichier = '$file_name'";
+					}
+				}
+
+				$values_list = implode(",", $values);
+				$q = <<<SQL
+UPDATE dt_produits_perso_images SET $values_list WHERE id = $id
+SQL;
+				$this->sql->query($q);
+			}
+		}
+	}
+
+	function add_personnalisation_texte($data) {
+		if (isset($data['new_personnalisation_texte'])) {
+			$fields = array('id_produits');
+			$values = array($this->id);
+			foreach ($data['new_personnalisation_texte'] as $key => $value) {
+				$fields[] = $key;
+				$values[] = "'$value'";
+			}
+			$fields_list = implode(",", $fields);
+			$values_list = implode(",", $values);
+			$q = <<<SQL
+INSERT INTO dt_produits_perso_textes ($fields_list) VALUES ($values_list)
+SQL;
+			$this->sql->query($q);
+		}
+	}
+
+	function add_personnalisation_image($data) {
+		if (isset($data['new_personnalisation_image'])) {
+			$fields = array('id_produits');
+			$values = array($this->id);
+			foreach ($data['new_personnalisation_image'] as $key => $value) {
+				$fields[] = $key;
+				$values[] = "'$value'";
+			}
+			$fields_list = implode(",", $fields);
+			$values_list = implode(",", $values);
+			$q = <<<SQL
+INSERT INTO dt_produits_perso_images ($fields_list) VALUES ($values_list)
+SQL;
+			$this->sql->query($q);
+		}
+	}
+
+	function delete_personnalisation_texte($data, $id) {
+		$q = <<<SQL
+DELETE FROM dt_produits_perso_textes WHERE id = $id
+SQL;
+		$this->sql->query($q);
+	}
+
+	function delete_personnalisation_image($data, $id) {
+		$q = <<<SQL
+DELETE FROM dt_produits_perso_images WHERE id = $id
+SQL;
+		$this->sql->query($q);
+	}
+
+	function display_personnalisation($images_url) {
+		$html = <<<HTML
+<div class="personnalisation-produit" id="personnalisation-produit-{$this->id}">
+<div class="personnalisation-produit-element">
+HTML;
+		$personnalisations = $this->personnalisations();
+		foreach($personnalisations['textes'] as $texte) {
+			$css = $texte['css'];
+			$css = preg_replace("/\s+/", " ", $css);
+			$html .= <<<HTML
+<div class="personnalisation-produit-texte" style="{$css}">
+	{$texte['contenu']}
+</div>
+HTML;
+		}
+		foreach($personnalisations['images'] as $image) {
+			$css = <<<CSS
+background-image: url({$images_url}{$image['fichier']});
+background-size: contain;
+background-position: center;
+background-repeat: no-repeat;
+CSS;
+			$css .= $image['css'];
+			$css = preg_replace("/\s+/", " ", $css);
+			$html .= <<<HTML
+<div class="personnalisation-produit-image" style="{$css}"></div>
+HTML;
+		}
+		$html .= <<<HTML
+</div>
+</div>
+HTML;
+		return $html;
 	}
 }
