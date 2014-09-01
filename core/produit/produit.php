@@ -97,6 +97,24 @@ SQL;
 
 		$this->save_attributs($data, $id);
 
+# Ancienne personnalisation
+		if (isset($data['personnalisation'])) {
+				$q = <<<SQL
+DELETE FROM dt_personnalisations_produits WHERE id_produits = $id
+SQL;
+				$this->sql->query($q);
+			foreach ($data['personnalisation'] as $type => $perso) {
+				if (isset($perso['has']) and $perso['has']) {
+					$q = <<<SQL
+INSERT INTO dt_personnalisations_produits (`id_produits`, `type`, `libelle`)
+VALUES ($id, '$type', '{$perso['libelle']}')
+SQL;
+					$this->sql->query($q);
+				}
+			}
+		}
+
+# Nouvelle personnalisation
 		$this->save_personnalisations($data);
 
 		$q = <<<SQL
@@ -1044,6 +1062,21 @@ SQL;
 		return $this->substitutions_tokens($phrases, $tokens);
 	}
 
+# Ancienne personnalisation (un texte et/ou un fichier)
+	public function personnalisation() {
+		$personnalisation = array();
+		$q = <<<SQL
+SELECT * FROM dt_personnalisations_produits WHERE id_produits = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$personnalisation[$row['type']] = array('has' => 1, 'libelle' => $row['libelle']);
+		}
+
+		return $personnalisation;
+	}
+	
+# Nouvelle personnalisation (plusieurs textes et/ou plusieurs fichiers)
 	function personnalisations() {
 		$personnalisations = array(
 			'textes' => array(),
@@ -1181,21 +1214,19 @@ HTML;
 			$css = "";
 			$css .= <<<CSS
 position: absolute;
+resize: none;
+overflow: hidden;
 CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
 			$html .= <<<HTML
-<div class="personnalisation-produit-texte" style="{$css}">
-	{$texte['contenu']}
-</div>
+<textarea readonly class="personnalisation-produit-texte" style="{$css}">{$texte['contenu']}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $image) {
 			$css = "";
 			if (!$image['background']) {
-				$css .= <<<CSS
-position: absolute;
-CSS;
+				$css .= "position: absolute;";
 			}
 			$css .= <<<CSS
 background-image: url({$images_url}{$image['fichier']});

@@ -269,7 +269,6 @@ else {
 }
 
 if ($action == 'edit') {
-	$personnalisations = $produit->personnalisations();
 	$form->default_values['produit'] = $produit->values;
 	$images = $produit->images();
 	$form->default_values['image'] = $images;
@@ -287,6 +286,11 @@ if ($action == 'edit') {
 	$form->default_values['complementaires'] = $complementaires;
 	$similaires = $produit->similaires();
 	$form->default_values['similaires'] = $similaires;
+# Ancienne personnalisation
+	$personnalisation = $produit->personnalisation();
+	$form->default_values['personnalisation'] = $personnalisation;	
+# Nouvelle personnalisation
+	$personnalisations = $produit->personnalisations();
 	$form->default_values['personnalisations'] = $personnalisations;
 }
 if (isset($application)) {
@@ -332,7 +336,8 @@ if ($action == "edit") {
 		'images' => $dico->t('Images'),
 		'documents' => $dico->t('Documents'),
 		'attributs' => $dico->t('Attributs'),
-		'personnalisation' => $dico->t('Personnalisation'),
+		'old_personnalisation' => $dico->t('Personnalisation'),
+		'personnalisation' => "Nouvelle personnalisation",
 		'variantes' => $dico->t('Declinaisons'),
 		'accessoires' => $dico->t('Accessoires'),
 		//'composants' => $dico->t('Composants'),
@@ -417,8 +422,18 @@ HTML;
 	// Documents
 	$main .= $page->inc("snippets/documents");
 
-	// Personnalisation
 	$checkbox_template = "#{field} #{label}";
+	// Ancienne Personnalisation
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Personnalisation'), 'class' => "produit-section produit-section-old_personnalisation".$hidden['old_personnalisation'], 'id' => "produit-section-old_personnalisation"))}
+{$form->input(array('type' => "checkbox", 'name' => "personnalisation[texte][has]", 'label' => "Texte à saisir", 'template' => $checkbox_template))}
+{$form->input(array('name' => "personnalisation[texte][libelle]", 'label' => "Libellé du texte à saisir"))}
+{$form->input(array('type' => "checkbox", 'name' => "personnalisation[fichier][has]", 'label' => "Fichier à télécharger", 'template' => $checkbox_template))}
+{$form->input(array('name' => "personnalisation[fichier][libelle]", 'label' => "Libellé du fichier à télécharger"))}
+{$form->fieldset_end()}
+HTML;
+
+	// Nouvelle personnalisation
 	$personnalisation_url = $config->get("medias_url")."/medias/images/personnalisations/";
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('PersonnalisationApercu'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-apercu"))}
