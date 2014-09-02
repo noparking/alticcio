@@ -99,12 +99,24 @@ HTML;
 			$tmp_name = $fichier['tmp_name'];
 			preg_match("/(\.[^\.]*)$/", $name, $matches);
 			$ext = $matches[1];
-			$file_name = md5_file($tmp_name).$ext;
+			$md5 = md5_file($tmp_name);
+			$file_name = $md5.$ext;
+			$web_name = $md5.".png";
 			move_uploaded_file($tmp_name, $this->path_files.$file_name);
-			copy($this->path_files.$file_name, $this->path_www.$file_name);
+
+			if (!file_exists($this->path_www.$web_name)) {
+				$im = new Imagick($this->path_files.$file_name);
+				$im->setImageFormat('png');
+
+				$im->resizeImage(500, 500, imagick::FILTER_LANCZOS, 1, true);
+
+				$im->writeImage( $this->path_www.$web_name);
+				$im->clear();
+				$im->destroy(); 
+			}
 
 			return array(
-				'url' => $this->url.$file_name,
+				'url' => $this->url.$web_name,
 			);
 		}
 
