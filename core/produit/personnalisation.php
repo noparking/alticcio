@@ -4,6 +4,15 @@ require_once "abstract_object.php";
 
 class Personnalisation {
 
+	const UPLOAD_ERROR = 1;
+	const INVALID_FORMAT = 2;
+	const TOO_SMALL_FILE = 3;
+	const TOO_LARGE_FILE = 4;
+	const TOO_SMALL_WIDTH = 5;
+	const TOO_LARGE_WIDTH = 6;
+	const TOO_SMALL_HEIGHT = 7;
+	const TOO_LARGE_HEIGHT = 8;
+
 	function __construct($sql, $url, $path_files, $path_www) {
 		$this->sql = $sql;
 		$this->url = $url;
@@ -52,8 +61,9 @@ CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
 			$readonly = $texte['locked'] ? "readonly" : "";
+			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$html .= <<<HTML
-<textarea {$readonly} class="personnalisation-produit-texte" style="{$css}">{$texte['contenu']}</textarea>
+<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}">{$texte['contenu']}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
@@ -83,7 +93,7 @@ HTML;
 				$editable = "editable";
 			}
 			$html .= <<<HTML
-<div class="personnalisation-produit-image {$editable}" style="{$css}">{$input}</div>
+<div class="personnalisation-produit-image {$editable}" style="{$css}" id_image="{$id_image}">{$input}</div>
 HTML;
 		}
 		$html .= <<<HTML
@@ -94,8 +104,9 @@ HTML;
 		return $html;
 	}
 
-	function add_image($fichier) {
-		if ($name = $fichier['name']) {
+	function add_image($id_image, $fichier) {
+		if ($fichier['error'] == 0) {
+			$name = $fichier['name'];
 			$tmp_name = $fichier['tmp_name'];
 			preg_match("/(\.[^\.]*)$/", $name, $matches);
 			$ext = $matches[1];
@@ -103,25 +114,91 @@ HTML;
 			$file_name = $md5.$ext;
 			$web_name = $md5.".png";
 			move_uploaded_file($tmp_name, $this->path_files.$file_name);
-
-			if (!file_exists($this->path_www.$web_name)) {
-				$im = new Imagick($this->path_files.$file_name);
-				$im->setImageFormat('png');
-
-				$im->resizeImage(500, 500, imagick::FILTER_LANCZOS, 1, true);
-
-				$im->writeImage( $this->path_www.$web_name);
-				$im->clear();
-				$im->destroy(); 
+			$im = new Imagick($this->path_files.$file_name);
+			$data_image = $this->data_image($id_image);
+			if ($error = $this->check_image($im, $data_image)) {
+				return array(
+					'url' => "",
+					'error' => $error,
+					'image' => $data_image,
+				);
 			}
+			else {
+				if (!file_exists($this->path_www.$web_name)) {
+					$im->setImageFormat('png');
+
+					$im->resizeImage(500, 500, Imagick::FILTER_LANCZOS, 1, true);
+
+					$im->writeImage( $this->path_www.$web_name);
+				}
+			}
+			$im->clear();
+			$im->destroy(); 
 
 			return array(
 				'url' => $this->url.$web_name,
+				'error' => 0,
 			);
 		}
 
 		return array(
 			'url' => "",
+			'error' => self::UPLOAD_ERROR,
 		);
+	}
+
+	function data_image($id_image) {
+		$q = <<<SQL
+SELECT * FROM dt_produits_perso_images WHERE id = $id_image
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		return $row;
+	}
+
+	function check_image($im, $data_image) {
+		$format = $im->getImageFormat();
+		if ($this->is_vector($format) or $format == "TIFF") {
+			return 0;
+		}
+		else if ($format == "JPEG") {
+			$length = $im->getImageLength();
+			if ($length < (1000.0 * $data_image['min_poids'])) {
+				return self::TOO_SMALL_FILE;
+			}
+			if ($length > (1000.0 * $data_image['max_poids'])) {
+				return self::TOO_LARGE_FILE;
+			}
+			
+			$width = $im->getImageWidth();
+			if ($width < $data_image['min_largeur']) {
+				return self::TOO_SMALL_WIDTH;
+			}
+			if ($width > $data_image['max_largeur']) {
+				return self::TOO_LARGE_WIDTH;
+			}
+
+			$width = $im->getImageHeight();
+			if ($width < $data_image['min_largeur']) {
+				return self::TOO_SMALL_HEIGHT;
+			}
+			if ($width > $data_image['max_largeur']) {
+				return self::TOO_LARGE_HEIGHT;
+			}
+		}
+		else {
+			return self::INVALID_FORMAT;
+		}
+	}
+
+	function is_vector($format) {
+		switch ($format) {
+			case "PDF" :
+			case "PS" :
+			case "SVG" :
+				return true;
+		}
+		return false;
 	}
 }
