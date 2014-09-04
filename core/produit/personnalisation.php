@@ -114,26 +114,34 @@ HTML;
 			$file_name = $md5.$ext;
 			$web_name = $md5.".png";
 			move_uploaded_file($tmp_name, $this->path_files.$file_name);
-			$im = new Imagick($this->path_files.$file_name);
-			$data_image = $this->data_image($id_image);
-			if ($error = $this->check_image($im, $data_image)) {
+			try {
+				$im = new Imagick($this->path_files.$file_name);
+				$data_image = $this->data_image($id_image);
+				if ($error = $this->check_image($im, $data_image)) {
+					return array(
+						'url' => "",
+						'error' => $error,
+						'image' => $data_image,
+					);
+				}
+				else {
+					if (!file_exists($this->path_www.$web_name)) {
+						$im->setImageFormat('png');
+
+						$im->resizeImage(500, 500, Imagick::FILTER_LANCZOS, 1, true);
+
+						$im->writeImage( $this->path_www.$web_name);
+					}
+				}
+				$im->clear();
+				$im->destroy(); 
+			}
+			catch (ImagickException $e) {
 				return array(
 					'url' => "",
-					'error' => $error,
-					'image' => $data_image,
+					'error' => self::INVALID_FORMAT,
 				);
 			}
-			else {
-				if (!file_exists($this->path_www.$web_name)) {
-					$im->setImageFormat('png');
-
-					$im->resizeImage(500, 500, Imagick::FILTER_LANCZOS, 1, true);
-
-					$im->writeImage( $this->path_www.$web_name);
-				}
-			}
-			$im->clear();
-			$im->destroy(); 
 
 			return array(
 				'url' => $this->url.$web_name,
