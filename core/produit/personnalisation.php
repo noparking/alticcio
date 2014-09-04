@@ -20,7 +20,7 @@ class Personnalisation {
 		$this->path_www = $path_www;
 	}
 
-	function get_default($id_produits) {
+	function get_default($id_produits, $only_unlocked = false) {
 		$personnalisations = array(
 			'textes' => array(),
 			'images' => array(),
@@ -30,7 +30,9 @@ SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$personnalisations['textes'][$row['id']] = $row;
+			if (!$only_unlocked or !$row['locked']) {
+				$personnalisations['textes'][$row['id']] = $row;
+			}
 		}
 
 		$q = <<<SQL
@@ -38,7 +40,9 @@ SELECT * FROM dt_produits_perso_images WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$personnalisations['images'][$row['id']] = $row;
+			if (!$only_unlocked or !$row['locked']) {
+				$personnalisations['images'][$row['id']] = $row;
+			}
 		}
 
 		return $personnalisations;
@@ -62,8 +66,9 @@ CSS;
 			$css = preg_replace("/\s+/", " ", $css);
 			$readonly = $texte['locked'] ? "readonly" : "";
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
+			$name = "personnalisation[textes][$id_texte]";
 			$html .= <<<HTML
-<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}">{$texte['contenu']}</textarea>
+<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}" name="{$name}">{$texte['contenu']}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
@@ -105,6 +110,14 @@ HTML;
 	}
 
 	function add_image($id_image, $fichier) {
+		$return = array(
+			'id_image' => $id_image,
+			'url' => "",
+			'error' => 0,
+			'image' => null,
+			'fichier' => "",
+			'apercu' => "",
+		);
 		if ($fichier['error'] == 0) {
 			$name = $fichier['name'];
 			$tmp_name = $fichier['tmp_name'];
@@ -118,11 +131,10 @@ HTML;
 				$im = new Imagick($this->path_files.$file_name);
 				$data_image = $this->data_image($id_image);
 				if ($error = $this->check_image($im, $data_image)) {
-					return array(
-						'url' => "",
-						'error' => $error,
-						'image' => $data_image,
-					);
+					$return['error'] = $error;
+					$return['image'] = $data_image;
+
+					return $return;
 				}
 				else {
 					if (!file_exists($this->path_www.$web_name)) {
@@ -137,22 +149,21 @@ HTML;
 				$im->destroy(); 
 			}
 			catch (ImagickException $e) {
-				return array(
-					'url' => "",
-					'error' => self::INVALID_FORMAT,
-				);
+				$return['error'] = self::INVALID_FORMAT;
+
+				return $return;
 			}
 
-			return array(
-				'url' => $this->url.$web_name,
-				'error' => 0,
-			);
+			$return['url'] = $this->url.$web_name;
+			$return['apercu'] = $web_name;
+			$return['fichier'] = $file_name;
+
+			return $return;
 		}
 
-		return array(
-			'url' => "",
-			'error' => self::UPLOAD_ERROR,
-		);
+		$return['error'] = self::UPLOAD_ERROR;
+		
+		return $return;
 	}
 
 	function data_image($id_image) {
