@@ -87,7 +87,18 @@ SQL;
 			'fichier' => "",
 			'nom_fichier' => "",
 			'sample' => $sample,
+			'textes' => array(), // nouvelle personnalisation multi-textes
+			'images' => array(), // nouvelle personnalisation multi-images
 		);
+
+		// Nouvelle pesonnalisation multi-textes multi-images
+		if (isset($this->api->post['personnalisation'])) {
+			$personnalisation = $this->api->post['personnalisation'];
+			foreach ($personnalisation as $type => $data) {
+				$perso[$type] = $data;
+				$key .= serialize($data);
+			}
+		}
 		
 		if (isset($this->api->post['perso_texte'])) {
 			$perso['texte'] = $this->api->post['perso_texte'];
@@ -287,6 +298,9 @@ SQL;
 				'personnalisation_texte' => $perso['texte'],
 				'personnalisation_fichier' => $perso['fichier'],
 				'personnalisation_nom_fichier' => $perso['nom_fichier'],
+				'perso_textes' => $perso['textes'], // nouvelle personnalisation multi-textes
+				'perso_images' => $perso['images'], // nouvelle personnalisation multi-images
+
 				'echantillon' => $perso['sample'],
 			);
 			if (isset($perso['objet'])) {
@@ -464,6 +478,8 @@ SQL;
 				'texte' => $perso['texte'],
 				'fichier' => $perso['fichier'],
 				'nom_fichier' => $perso['nom_fichier'],
+				'textes' => $perso['textes'], // nouvelle personnalisation multi-textes
+				'images' => $perso['images'], // nouvelle personnalisation multi-images
 				'qte' => $perso['qte'],
 				'prix' => $prix,
 				'prix_unitaire' => $prix_unitaire,
