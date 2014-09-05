@@ -1077,13 +1077,16 @@ SQL;
 	}
 	
 # Nouvelle personnalisation (plusieurs textes et/ou plusieurs fichiers)
-	function personnalisations() {
+	function personnalisations($id_produits = null) {
 		$personnalisations = array(
 			'textes' => array(),
 			'images' => array(),
 		);
+		if ($id_produits === null) {
+			$id_produits = $this->id;
+		}
 		$q = <<<SQL
-SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$this->id}
+SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -1091,7 +1094,7 @@ SQL;
 		}
 
 		$q = <<<SQL
-SELECT * FROM dt_produits_perso_images WHERE id_produits = {$this->id}
+SELECT * FROM dt_produits_perso_images WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -1204,13 +1207,16 @@ SQL;
 		$this->sql->query($q);
 	}
 
-	function display_personnalisation($images_url) {
+	function display_personnalisation($images_url, $id_produits = null, $perso = array(), $nl_tag = false) {
+		if ($id_produits === null) {
+			$id_produits = $this->id;
+		}
 		$html = <<<HTML
-<div class="personnalisation-produit" id="personnalisation-produit-{$this->id}">
-<div class="personnalisation-produit-element">
+<div class="personnalisation-produit personnalisation-produit-{$id_produits}" style="text-align: center;">
+<div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
 HTML;
-		$personnalisations = $this->personnalisations();
-		foreach($personnalisations['textes'] as $texte) {
+		$personnalisations = $this->personnalisations($id_produits);
+		foreach($personnalisations['textes'] as $id_texte => $texte) {
 			$css = "";
 			$css .= <<<CSS
 position: absolute;
@@ -1219,17 +1225,28 @@ overflow: hidden;
 CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
+			$contenu = $texte['contenu'];
+			if (isset($perso['textes'][$id_texte])) {
+				$contenu = $perso['textes'][$id_texte];
+			}
+			if ($nl_tag) {
+				$contenu = str_replace("\n", $nl_tag, $contenu);
+			}
 			$html .= <<<HTML
-<textarea readonly class="personnalisation-produit-texte" style="{$css}">{$texte['contenu']}</textarea>
+<textarea readonly class="personnalisation-produit-texte" style="{$css}">{$contenu}</textarea>
 HTML;
 		}
-		foreach($personnalisations['images'] as $image) {
+		foreach($personnalisations['images'] as $id_image => $image) {
 			$css = "";
 			if (!$image['background']) {
 				$css .= "position: absolute;";
 			}
+			$apercu = $image['fichier'];
+			if (isset($perso['images'][$id_image]['apercu'])) {
+				$apercu = $perso['images'][$id_image]['apercu'];
+			}
 			$css .= <<<CSS
-background-image: url({$images_url}{$image['fichier']});
+background-image: url({$images_url}{$apercu});
 background-size: contain;
 background-position: center;
 background-repeat: no-repeat;
