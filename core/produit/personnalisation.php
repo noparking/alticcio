@@ -48,7 +48,7 @@ SQL;
 		return $personnalisations;
 	}
 
-	function edit_default($id_produits) {
+	function edit_default($id_produits, $nl_tag = false) {
 		$html = <<<HTML
 <div class="personnalisation-produit" id="personnalisation-produit-{$id_produits}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
@@ -67,8 +67,12 @@ CSS;
 			$readonly = $texte['locked'] ? "readonly" : "";
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$name = "personnalisation[textes][$id_texte]";
+			$contenu = $texte['contenu'];
+			if ($nl_tag) {
+				$contenu = str_replace("\n", $nl_tag, $texte['contenu']);
+			}
 			$html .= <<<HTML
-<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}" name="{$name}">{$texte['contenu']}</textarea>
+<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}" name="{$name}">{$contenu}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
@@ -183,26 +187,26 @@ SQL;
 		}
 		else if ($format == "JPEG") {
 			$length = $im->getImageLength();
-			if ($length < (1000.0 * $data_image['min_poids'])) {
+			if ($data_image['min_poids'] and ($length < (1000.0 * $data_image['min_poids']))) {
 				return self::TOO_SMALL_FILE;
 			}
-			if ($length > (1000.0 * $data_image['max_poids'])) {
+			if ($data_image['max_poids'] and ($length > (1000.0 * $data_image['max_poids']))) {
 				return self::TOO_LARGE_FILE;
 			}
 			
 			$width = $im->getImageWidth();
-			if ($width < $data_image['min_largeur']) {
+			if ($data_image['min_largeur'] and ($width < $data_image['min_largeur'])) {
 				return self::TOO_SMALL_WIDTH;
 			}
-			if ($width > $data_image['max_largeur']) {
+			if ($data_image['max_largeur'] and ($width > $data_image['max_largeur'])) {
 				return self::TOO_LARGE_WIDTH;
 			}
 
 			$width = $im->getImageHeight();
-			if ($width < $data_image['min_largeur']) {
+			if ($data_image['min_hauteur'] and ($width < $data_image['min_hauteur'])) {
 				return self::TOO_SMALL_HEIGHT;
 			}
-			if ($width > $data_image['max_largeur']) {
+			if ($data_image['max_hauteur'] and ($width > $data_image['max_hauteur'])) {
 				return self::TOO_LARGE_HEIGHT;
 			}
 		}
