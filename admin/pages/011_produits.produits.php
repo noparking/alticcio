@@ -337,7 +337,7 @@ if ($action == "edit") {
 		'documents' => $dico->t('Documents'),
 		'attributs' => $dico->t('Attributs'),
 		'old_personnalisation' => $dico->t('Personnalisation'),
-		'personnalisation' => "Nouvelle personnalisation",
+		'personnalisation' => "Personnalisation avancée",
 		'variantes' => $dico->t('Declinaisons'),
 		'accessoires' => $dico->t('Accessoires'),
 		//'composants' => $dico->t('Composants'),
