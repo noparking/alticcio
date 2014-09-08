@@ -337,7 +337,7 @@ if ($action == "edit") {
 		'documents' => $dico->t('Documents'),
 		'attributs' => $dico->t('Attributs'),
 		'old_personnalisation' => $dico->t('Personnalisation'),
-		'personnalisation' => "Personnalisation avancée",
+		'personnalisation' => "Nouvelle personnalisation",
 		'variantes' => $dico->t('Declinaisons'),
 		'accessoires' => $dico->t('Accessoires'),
 		//'composants' => $dico->t('Composants'),
@@ -442,6 +442,11 @@ HTML;
 {$form->fieldset_start(array('legend' => $dico->t('PersonnalisationTextes'), 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-texte"))}
 HTML;
 	$number = 0;
+	$statut_options = array(
+		0 => "Bloqué (ne peut pas être remplacé par l'utilisateur)",
+		1 => "Facultatif (peut être remplacé par l'utilisateur)",
+		2 => "Obligatoire (doit être remplacé par l'utilisateur)",
+	);
 	foreach ($personnalisations['textes'] as $i => $texte) {
 		$number++;
 		$main .= <<<HTML
@@ -452,7 +457,7 @@ HTML;
 {$form->input(array('name' => "personnalisations[textes][$i][min_lignes]", 'label' => "Nombre minimum de lignes"))}
 {$form->input(array('name' => "personnalisations[textes][$i][max_lignes]", 'label' => "Nombre maximum de lignes"))}
 {$form->textarea(array('name' => "personnalisations[textes][$i][css]", 'label' => "Style CSS"))}
-{$form->input(array('type' => "checkbox", 'name' => "personnalisations[textes][$i][locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+{$form->select(array('name' => "personnalisations[textes][$i][statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
 <br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
@@ -468,7 +473,7 @@ HTML;
 {$form->input(array('name' => "new_personnalisation_texte[min_lignes]", 'label' => "Nombre minimum de lignes"))}
 {$form->input(array('name' => "new_personnalisation_texte[max_lignes]", 'label' => "Nombre maximum de lignes"))}
 {$form->textarea(array('name' => "new_personnalisation_texte[css]", 'label' => "Style CSS"))}
-{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_texte[locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+{$form->select(array('name' => "new_personnalisation_texte[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options, 'forced_value' => 1))}
 <br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "add-personnalisation-texte", 'value' => $dico->t('Ajouter') ))}
@@ -491,7 +496,7 @@ HTML;
 {$form->input(array('name' => "personnalisations[images][$i][min_poids]", 'label' => "Poids minimal du fichier (en ko)"))}
 {$form->input(array('name' => "personnalisations[images][$i][max_poids]", 'label' => "Poids maximal du fichier (en ko)"))}
 {$form->textarea(array('name' => "personnalisations[images][$i][css]", 'label' => "Style CSS"))}
-{$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$i][locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+{$form->select(array('name' => "personnalisations[images][$i][statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
 <br />
 {$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$i][background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
 <br />
@@ -512,7 +517,7 @@ HTML;
 {$form->input(array('name' => "new_personnalisation_image[min_poids]", 'label' => "Poids minimal du fichier (en ko)"))}
 {$form->input(array('name' => "new_personnalisation_image[max_poids]", 'label' => "Poids maximal du fichier (en ko)"))}
 {$form->textarea(array('name' => "new_personnalisation_image[css]", 'label' => "Style CSS"))}
-{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[locked]", 'label' => $dico->t("PersonnalisationLocked"), 'template' => $checkbox_template))}
+{$form->select(array('name' => "new_personnalisation_image[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options, 'forced_value' => 1))}
 <br />
 {$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
 <br />

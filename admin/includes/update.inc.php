@@ -1201,7 +1201,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_textes` (
   `min_lignes` int(11) NOT NULL,
   `max_lignes` int(11) NOT NULL,
   `css` text NOT NULL,
-  `locked` int(1) NOT NULL DEFAULT 0,
+  `statut` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `id_produits` (`id_produits`)
 )
@@ -1221,7 +1221,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
   `min_poids` int(11) NOT NULL,
   `max_poids` int(11) NOT NULL,
   `css` text NOT NULL,
-  `locked` int(1) NOT NULL DEFAULT 0,
+  `statut` int(1) NOT NULL DEFAULT 0,
   `background` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `id_produits` (`id_produits`)
