@@ -20,7 +20,7 @@ class Personnalisation {
 		$this->path_www = $path_www;
 	}
 
-	function get_default($id_produits, $only_unlocked = false) {
+	function get_default($id_produits, $min_statut = 0) {
 		$personnalisations = array(
 			'textes' => array(),
 			'images' => array(),
@@ -30,7 +30,7 @@ SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			if (!$only_unlocked or !$row['locked']) {
+			if ($row['statut'] >= $min_statut) {
 				$personnalisations['textes'][$row['id']] = $row;
 			}
 		}
@@ -40,7 +40,7 @@ SELECT * FROM dt_produits_perso_images WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			if (!$only_unlocked or !$row['locked']) {
+			if ($row['statut'] >= $min_statut) {
 				$personnalisations['images'][$row['id']] = $row;
 			}
 		}
@@ -61,10 +61,24 @@ position: absolute;
 z-index: 1;
 resize: none;
 overflow: hidden;
+color: black;
+border: none;
 CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
-			$readonly = $texte['locked'] ? "readonly" : "";
+			$readonly = "";
+			$editable = "";
+			switch ($texte['statut']) {
+				case 0 :
+					$readonly = 'readonly disabled="disabled"';
+					break;
+				case 1 :
+					$editable = "editable";
+					break;
+				case 2 :
+					$editable = "editable required";
+					break;
+			}
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$name = "personnalisation[textes][$id_texte]";
 			$contenu = $texte['contenu'];
@@ -72,7 +86,7 @@ CSS;
 				$contenu = str_replace("\n", $nl_tag, $texte['contenu']);
 			}
 			$html .= <<<HTML
-<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte" style="{$css}" name="{$name}">{$contenu}</textarea>
+<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}">{$contenu}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
@@ -93,13 +107,16 @@ CSS;
 			$css = preg_replace("/\s+/", " ", $css);
 			$input = "";
 			$editable = "";
-			if (!$image['locked']) {
+			if ($image['statut']) {
 				$input = <<<HTML
 <table style="height: 100%; width: 100%;"><tr><td style="vertical-align: middle;">
 <input type="file" style="display: none;" />
 </td></tr></table>
 HTML;
 				$editable = "editable";
+				if ($image['statut'] == 2) {
+					$editable .= " required";
+				}
 			}
 			$html .= <<<HTML
 <div class="personnalisation-produit-image {$editable}" style="{$css}" id_image="{$id_image}">{$input}</div>
