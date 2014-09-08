@@ -1222,6 +1222,8 @@ HTML;
 position: absolute;
 resize: none;
 overflow: hidden;
+color: black;
+border: none;
 CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
@@ -1233,7 +1235,7 @@ CSS;
 				$contenu = str_replace("\n", $nl_tag, $contenu);
 			}
 			$html .= <<<HTML
-<textarea readonly class="personnalisation-produit-texte" style="{$css}">{$contenu}</textarea>
+<textarea readonly disabled="disabled" class="personnalisation-produit-texte" style="{$css}">{$contenu}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
