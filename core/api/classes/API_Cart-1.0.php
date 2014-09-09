@@ -298,9 +298,10 @@ SQL;
 				'personnalisation_texte' => $perso['texte'],
 				'personnalisation_fichier' => $perso['fichier'],
 				'personnalisation_nom_fichier' => $perso['nom_fichier'],
-				'perso_textes' => $perso['textes'], // nouvelle personnalisation multi-textes
-				'perso_images' => $perso['images'], // nouvelle personnalisation multi-images
-
+				'perso' => array(
+					'textes' => $perso['textes'], // nouvelle personnalisation multi-textes
+					'images' => $perso['images'], // nouvelle personnalisation multi-images
+				),
 				'echantillon' => $perso['sample'],
 			);
 			if (isset($perso['objet'])) {

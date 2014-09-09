@@ -65,7 +65,14 @@ SQL;
 		
 		if (isset($data['produits'])) {
 			$keys = array_keys($this->produits());
+
 			foreach ($data['produits'] as $id_commandes_produits => $produit) {
+
+				if (isset($produit['perso'])) {
+					$perso = $produit['perso'];
+					unset($produit['perso']);
+				}
+
 				if (in_array($id_commandes_produits, $keys)) {
 					$values = array();
 					$produit['id_commandes'] = $id;
@@ -77,6 +84,7 @@ SQL;
 					$q = <<<SQL
 UPDATE dt_commandes_produits SET $values WHERE id = {$id_commandes_produits}
 SQL;
+					$this->sql->query($q);
 				}
 				else {
 					$fields = array();
@@ -92,11 +100,43 @@ SQL;
 					$q = <<<SQL
 INSERT INTO dt_commandes_produits ({$fields}) VALUES ({$values})
 SQL;
+					$this->sql->query($q);
+					$id_commandes_produits = $this->sql->insert_id();
 				}
+
+				$q = <<<SQL
+DELETE FROM dt_commandes_perso_textes WHERE id_commandes_produits = {$id_commandes_produits}
+SQL;
 				$this->sql->query($q);
+
+				$q = <<<SQL
+DELETE FROM dt_commandes_perso_images WHERE id_commandes_produits = {$id_commandes_produits}
+SQL;
+				$this->sql->query($q);
+
+				if (isset($perso)) {
+					$values = array();
+					foreach ($perso['textes'] as $id_produits_perso_textes => $texte) {
+						$values[] = "({$id_commandes_produits}, {$id_produits_perso_textes}, '{$texte}')";
+					}
+					$values_list = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_commandes_perso_textes (id_commandes_produits, id_produits_perso_textes, texte) VALUES $values_list
+SQL;
+					$this->sql->query($q);
+					$values = array();
+					foreach ($perso['images'] as $id_produits_perso_images => $image) {
+						$values[] = "({$id_commandes_produits}, {$id_produits_perso_images}, '{$image['fichier']}', '{$image['apercu']}')";
+					}
+					$values_list = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_commandes_perso_images (id_commandes_produits, id_produits_perso_images, fichier, apercu) VALUES $values_list
+SQL;
+					$this->sql->query($q);
+				}
 			}
 		}
-		
+
 		$this->ajouter_revision($id);
 
 		return $id;
