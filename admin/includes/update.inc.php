@@ -1228,4 +1228,25 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
 )
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_commandes_perso_textes` (
+  `id_commandes_produits` int(11) NOT NULL,
+  `id_produits_perso_textes` int(11) NOT NULL,
+  `texte` text NOT NULL,
+  PRIMARY KEY (`id_commandes_produits`, `id_produits_perso_textes`),
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_commandes_perso_images` (
+  `id_commandes_produits` int(11) NOT NULL,
+  `id_produits_perso_images` int(11) NOT NULL,
+  `fichier` varchar(128) NOT NULL,
+  `apercu` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_commandes_produits`, `id_produits_perso_images`)
+)
+SQL;
+	$update->query($q);
 }
