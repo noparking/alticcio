@@ -1234,7 +1234,7 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_perso_textes` (
   `id_commandes_produits` int(11) NOT NULL,
   `id_produits_perso_textes` int(11) NOT NULL,
   `texte` text NOT NULL,
-  PRIMARY KEY (`id_commandes_produits`, `id_produits_perso_textes`),
+  PRIMARY KEY (`id_commandes_produits`, `id_produits_perso_textes`)
 )
 SQL;
 	$update->query($q);
