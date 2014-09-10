@@ -96,7 +96,7 @@ SQL;
 						$values[] = $this->sql->quote_string("dt_commandes_produits", $cle, $valeur);
 					}
 					$fields[] = "personnalisation_cle";
-					$values[] = bin2hex(openssl_random_pseudo_bytes(8));
+					$values[] = "'".bin2hex(openssl_random_pseudo_bytes(8))."'";
 					$fields = implode(",", $fields);
 					$values = implode(",", $values);
 					$q = <<<SQL

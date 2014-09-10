@@ -1249,4 +1249,14 @@ CREATE TABLE IF NOT EXISTS `dt_commandes_perso_images` (
 )
 SQL;
 	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits` ADD `personnalisation_cle` VARCHAR( 128 ) NOT NULL DEFAULT ''
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_produits_revisions` ADD `personnalisation_cle` VARCHAR( 128 ) NOT NULL DEFAULT ''
+SQL;
+	$update->query($q);
 }
