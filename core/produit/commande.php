@@ -104,17 +104,17 @@ SQL;
 					$id_commandes_produits = $this->sql->insert_id();
 				}
 
-				$q = <<<SQL
+				if (isset($perso)) {
+					$q = <<<SQL
 DELETE FROM dt_commandes_perso_textes WHERE id_commandes_produits = {$id_commandes_produits}
 SQL;
-				$this->sql->query($q);
+					$this->sql->query($q);
 
-				$q = <<<SQL
+					$q = <<<SQL
 DELETE FROM dt_commandes_perso_images WHERE id_commandes_produits = {$id_commandes_produits}
 SQL;
-				$this->sql->query($q);
+					$this->sql->query($q);
 
-				if (isset($perso)) {
 					$values = array();
 					foreach ($perso['textes'] as $id_produits_perso_textes => $texte) {
 						$values[] = "({$id_commandes_produits}, {$id_produits_perso_textes}, '{$texte}')";
@@ -279,6 +279,34 @@ SQL;
 		}
 		
 		return $produits;
+	}
+
+	public function personnalisation($id_commandes_produits) {
+		$perso = array(
+			'textes' => array(),
+			'images' => array(),
+		);
+
+		$q = <<<SQL
+SELECT * FROM dt_commandes_perso_textes WHERE id_commandes_produits = $id_commandes_produits
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$perso['textes'][$row['id_produits_perso_textes']] = $row['texte'];
+		}
+
+		$q = <<<SQL
+SELECT * FROM dt_commandes_perso_images WHERE id_commandes_produits = $id_commandes_produits
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$perso['images'][$row['id_produits_perso_images']] = array(
+				'apercu' => $row['apercu'], 
+				'fichier' => $row['fichier'],
+			);
+		}
+
+		return $perso;
 	}
 
 	public function update_paiement($statut, $paiement = null) {
