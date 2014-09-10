@@ -121,20 +121,22 @@ SQL;
 					foreach ($perso['textes'] as $id_produits_perso_textes => $texte) {
 						$values[] = "({$id_commandes_produits}, {$id_produits_perso_textes}, '{$texte}')";
 					}
-					$values_list = implode(",", $values);
-					$q = <<<SQL
+					if ($values_list = implode(",", $values)) {
+						$q = <<<SQL
 INSERT INTO dt_commandes_perso_textes (id_commandes_produits, id_produits_perso_textes, texte) VALUES $values_list
 SQL;
-					$this->sql->query($q);
+						$this->sql->query($q);
+					}
 					$values = array();
 					foreach ($perso['images'] as $id_produits_perso_images => $image) {
 						$values[] = "({$id_commandes_produits}, {$id_produits_perso_images}, '{$image['fichier']}', '{$image['apercu']}')";
 					}
-					$values_list = implode(",", $values);
-					$q = <<<SQL
+					if ($values_list = implode(",", $values)) {
+						$q = <<<SQL
 INSERT INTO dt_commandes_perso_images (id_commandes_produits, id_produits_perso_images, fichier, apercu) VALUES $values_list
 SQL;
-					$this->sql->query($q);
+						$this->sql->query($q);
+					}
 				}
 			}
 		}
