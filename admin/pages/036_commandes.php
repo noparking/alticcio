@@ -1,6 +1,6 @@
 <?php
 
-$config->core_include("produit/commande");
+$config->core_include("produit/commande", "produit/produit");
 $config->core_include("outils/form", "outils/pays", "outils/langue");
 $config->core_include("outils/filter", "outils/pager");
 
@@ -13,6 +13,8 @@ $commande = new Commande($sql);
 
 $pays = new Pays($sql);
 $liste_pays = $pays->liste($id_langues);
+
+$produit = new Produit($sql);
 
 $action = $url->get('action');
 if ($id = $url->get('id')) {

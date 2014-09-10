@@ -109,9 +109,11 @@ if ($action == "edit") {
 {$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
 HTML;
 
-	foreach ($commande->produits() as $key => $produit) {
-		$id_produits = $produit['id_produits'];
-		$id_sku = $produit['id_sku'];
+	$personnalisation_url = $config->get("medias_url")."/medias/images/personnalisations/";
+	foreach ($commande->produits() as $key => $prod) {
+		$id_produits = $prod['id_produits'];
+		$perso = $commande->personnalisation($key);
+		$id_sku = $prod['id_sku'];
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Produit')." #".$id_produits." ".$dico->t("SKU")." #".$id_sku, 'class' => "produit-section produit-section-produits".$hidden['produits']))}
 {$form->html($dico->t('Produit')." : ".$page->l($id_produits, $url2->make("produits", array('type' => "produits", 'id' => $id_produits, 'action' => "edit"))))}
@@ -126,6 +128,11 @@ HTML;
 {$form->textarea(array('name' => "produits[$key][personnalisation_texte]", 'label' => "Texte perso"))}
 {$form->input(array('name' => "produits[$key][personnalisation_fichier]", 'label' => "Fichier perso"))}
 {$form->input(array('name' => "produits[$key][personnalisation_nom_fichier]", 'label' => "Nom fichier perso"))}
+HTML;
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('PersonnalisationApercu'), 'class' => "produit-section produit-section-produits".$hidden['produits']))}
+{$produit->display_personnalisation($personnalisation_url, $id_produits, $perso)}
+{$form->fieldset_end()}
 {$form->input(array('type' => "submit", 'name' => "delete-produit[$key]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
 {$form->fieldset_end()}
 HTML;
