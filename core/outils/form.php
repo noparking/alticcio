@@ -442,8 +442,11 @@ class Form {
 					$attr .= " $cle=\"$valeur\"";
 				}
 			}
-			$fields[] = $hiddenfield.'<input type="'.$type.'" name="'.$name.'"
-				id="'.$id.'" class="'.$class.'" value="'.$value.'"'.$permitted.$checked.$disabled.$readonly.$onclick.$attr.' />'.$item_label;
+			$fields[] = <<<HTML
+$hiddenfield
+<input type="{$type}" name="{$name}" id="{$id}" class="{$class}" value="{$value}" $permitted $checked $disabled $readonly $onclick $attr />
+$item_label
+HTML;
 		}
 		$params['field'] .= implode("</li><li>", $fields);
 		if (count($items) > 1) {
