@@ -530,6 +530,14 @@ SQL;
 				}
 			}
 		}
+		$ids['personnalisations'] = array('gabarits' => array());
+		foreach ($this->personnalisations_gabarits() as $id_gabarit => $gabarit_fields) {
+			foreach ($gabarit_fields as $key => $value) {
+				if (strpos($key, "phrase_") === 0) {
+					$ids['personnalisations']['gabarits'][$id_gabarit][$key] = $value;
+				}
+			}
+		}
 		return $ids;
 	}
 
@@ -1079,6 +1087,7 @@ SQL;
 # Nouvelle personnalisation (plusieurs textes et/ou plusieurs fichiers)
 	function personnalisations($id_produits = null) {
 		$personnalisations = array(
+			'gabarits' => array(),
 			'textes' => array(),
 			'images' => array(),
 		);
@@ -1086,111 +1095,179 @@ SQL;
 			$id_produits = $this->id;
 		}
 		$q = <<<SQL
-SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$id_produits}
+SELECT * FROM dt_produits_perso_gabarits WHERE id_produits = {$id_produits}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$personnalisations['textes'][$row['id']] = $row;
-		}
+			$id_gabarit = $row['id'];
+			$personnalisations['gabarits'][$id_gabarit] = $row;
+			$personnalisations['textes'][$id_gabarit] = array();
+			$personnalisations['images'][$id_gabarit] = array();
+			$q = <<<SQL
+SELECT * FROM dt_produits_perso_textes WHERE id_produits_perso_gabarits = {$id_gabarit}
+SQL;
+			$res2 = $this->sql->query($q);
+			while ($row2 = $this->sql->fetch($res2)) {
+				$personnalisations['textes'][$id_gabarit][$row2['id']] = $row2;
+			}
 
-		$q = <<<SQL
-SELECT * FROM dt_produits_perso_images WHERE id_produits = {$id_produits}
+			$q = <<<SQL
+SELECT * FROM dt_produits_perso_images WHERE id_produits_perso_gabarits = {$id_gabarit}
 SQL;
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$personnalisations['images'][$row['id']] = $row;
+			$res2 = $this->sql->query($q);
+			while ($row2 = $this->sql->fetch($res2)) {
+				$personnalisations['images'][$id_gabarit][$row2['id']] = $row2;
+			}
 		}
 
 		return $personnalisations;
 	}
 
+	function personnalisations_gabarits($id_produits = null) {
+		if ($id_produits === null) {
+			$id_produits = $this->id;
+		}
+		$q = <<<SQL
+SELECT * FROM dt_produits_perso_gabarits WHERE id_produits = $id_produits
+SQL;
+		$gabarits = array();
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$gabarits[$row['id']] = $row;
+		}
+
+		return $gabarits;
+	}
+
 	function save_personnalisations($data) {
 		if (isset($data['personnalisations']['textes'])) {
-			foreach ($data['personnalisations']['textes'] as $id => $perso) {
-				$values = array();
-				foreach ($perso as $key => $value) {
-					$values[] = "$key = ".(in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value);
-				}
-				$values_list = implode(",", $values);
-				$q = <<<SQL
+			foreach ($data['personnalisations']['textes'] as $id_gabarit => $textes) {
+				foreach ($textes as $id => $perso) {
+					$values = array();
+					foreach ($perso as $key => $value) {
+						$values[] = "$key = ".(in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value);
+					}
+					$values_list = implode(",", $values);
+					$q = <<<SQL
 UPDATE dt_produits_perso_textes SET $values_list WHERE id = $id
 SQL;
-				$this->sql->query($q);
+					$this->sql->query($q);
+				}
 			}
 		}
 
 		if (isset($data['personnalisations']['images'])) {
-			foreach ($data['personnalisations']['images'] as $id => $perso) {
-				$values = array();
-				foreach ($perso as $key => $value) {
-					$values[] = "$key = ".(in_array($key, array('css', 'fichier')) ? "'$value'" : (int)$value);
-				}
-
-				if (isset($data['_FILES']['personnalisations']['name']['images'][$id]['fichier'])) {
-					if ($name = $data['_FILES']['personnalisations']['name']['images'][$id]['fichier']) {
-						$tmp_name = $data['_FILES']['personnalisations']['tmp_name']['images'][$id]['fichier'];
-						preg_match("/(\.[^\.]*)$/", $name, $matches);
-						$ext = $matches[1];
-						$file_name = md5_file($tmp_name).$ext;
-						move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
-						$values[] = "fichier = '$file_name'";
+			foreach ($data['personnalisations']['images'] as $id_gabarit => $images) {
+				foreach ($images as $id => $perso) {
+					$values = array();
+					foreach ($perso as $key => $value) {
+						$values[] = "$key = ".(in_array($key, array('css', 'fichier')) ? "'$value'" : (int)$value);
 					}
-				}
 
+					if (isset($data['_FILES']['personnalisations']['name']['images'][$id_gabarit][$id]['fichier'])) {
+						if ($name = $data['_FILES']['personnalisations']['name']['images'][$id_gabarit][$id]['fichier']) {
+							$tmp_name = $data['_FILES']['personnalisations']['tmp_name']['images'][$id_gabarit][$id]['fichier'];
+							preg_match("/(\.[^\.]*)$/", $name, $matches);
+							$ext = $matches[1];
+							$file_name = md5_file($tmp_name).$ext;
+							move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
+							$values[] = "fichier = '$file_name'";
+						}
+					}
+
+					$values_list = implode(",", $values);
+					$q = <<<SQL
+UPDATE dt_produits_perso_images SET $values_list WHERE id = $id
+SQL;
+					$this->sql->query($q);
+				}
+			}
+		}
+	}
+
+	function add_personnalisation_gabarit($data) {
+		if (isset($data['new_personnalisation_gabarit'])) {
+			$id_phrase = 0;
+			foreach ($data['new_personnalisation_gabarit']['phrase_nom'] as $lang => $phrase) {
+				$id_phrase = $this->phrase->save($lang, $phrase, $id_phrase);
+			}
+
+			$q = <<<SQL
+INSERT INTO dt_produits_perso_gabarits (id_produits, ref, phrase_nom)
+VALUES ({$this->id}, '{$data['new_personnalisation_gabarit']['ref']}', {$id_phrase})
+SQL;
+			$this->sql->query($q);
+
+			return $this->sql->insert_id();
+		}
+	}
+
+	function add_personnalisation_texte($data) {
+		if ($id_gabarit = $data['personnalisation_gabarit']) {
+			if (isset($data['new_personnalisation_texte'])) {
+				$fields = array('id_produits_perso_gabarits');
+				$values = array($id_gabarit);
+				foreach ($data['new_personnalisation_texte'][$id_gabarit] as $key => $value) {
+					$fields[] = $key;
+					$values[] = in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value;
+				}
+				$fields_list = implode(",", $fields);
 				$values_list = implode(",", $values);
 				$q = <<<SQL
-UPDATE dt_produits_perso_images SET $values_list WHERE id = $id
+INSERT INTO dt_produits_perso_textes ($fields_list) VALUES ($values_list)
 SQL;
 				$this->sql->query($q);
 			}
 		}
 	}
 
-	function add_personnalisation_texte($data) {
-		if (isset($data['new_personnalisation_texte'])) {
-			$fields = array('id_produits');
-			$values = array($this->id);
-			foreach ($data['new_personnalisation_texte'] as $key => $value) {
-				$fields[] = $key;
-				$values[] = in_array($key, array('css', 'contenu')) ? "'$value'" : (int)$value;
-			}
-			$fields_list = implode(",", $fields);
-			$values_list = implode(",", $values);
-			$q = <<<SQL
-INSERT INTO dt_produits_perso_textes ($fields_list) VALUES ($values_list)
+	function add_personnalisation_image($data) {
+		if ($id_gabarit = $data['personnalisation_gabarit']) {
+			if (isset($data['new_personnalisation_image'])) {
+				$fields = array('id_produits_perso_gabarits');
+				$values = array($id_gabarit);
+				foreach ($data['new_personnalisation_image'][$id_gabarit] as $key => $value) {
+					$fields[] = $key;
+					$values[] = in_array($key, array('css', 'formats')) ? "'$value'" : (int)$value;
+				}
+
+				if (isset($data['_FILES']['new_personnalisation_image']['name'][$id_gabarit]['fichier'])) {
+					if ($name = $data['_FILES']['new_personnalisation_image']['name'][$id_gabarit]['fichier']) {
+						$tmp_name = $data['_FILES']['new_personnalisation_image']['tmp_name'][$id_gabarit]['fichier'];
+						preg_match("/(\.[^\.]*)$/", $name, $matches);
+						$ext = $matches[1];
+						$file_name = md5_file($tmp_name).$ext;
+						move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
+						$fields[] = "fichier";
+						$values[] = "'$file_name'";
+					}
+				}
+
+				$fields_list = implode(",", $fields);
+				$values_list = implode(",", $values);
+				$q = <<<SQL
+INSERT INTO dt_produits_perso_images ($fields_list) VALUES ($values_list)
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 		}
 	}
 
-	function add_personnalisation_image($data) {
-		if (isset($data['new_personnalisation_image'])) {
-			$fields = array('id_produits');
-			$values = array($this->id);
-			foreach ($data['new_personnalisation_image'] as $key => $value) {
-				$fields[] = $key;
-				$values[] = in_array($key, array('css', 'formats')) ? "'$value'" : (int)$value;
-			}
-
-			if (isset($data['_FILES']['new_personnalisation_image']['name']['fichier'])) {
-				if ($name = $data['_FILES']['new_personnalisation_image']['name']['fichier']) {
-					$tmp_name = $data['_FILES']['new_personnalisation_image']['tmp_name']['fichier'];
-					preg_match("/(\.[^\.]*)$/", $name, $matches);
-					$ext = $matches[1];
-					$file_name = md5_file($tmp_name).$ext;
-					move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
-					$fields[] = "fichier";
-					$values[] = "'$file_name'";
-				}
-			}
-
-			$fields_list = implode(",", $fields);
-			$values_list = implode(",", $values);
-			$q = <<<SQL
-INSERT INTO dt_produits_perso_images ($fields_list) VALUES ($values_list)
+	function delete_personnalisation_gabarit($data, $id) {
+		$q = <<<SQL
+DELETE FROM dt_produits_perso_gabarits WHERE id = $id
 SQL;
-			$this->sql->query($q);
-		}
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_produits_perso_textes WHERE id_produits_perso_gabarits = $id
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_produits_perso_images WHERE id_produits_perso_gabarits = $id
+SQL;
+		$this->sql->query($q);
 	}
 
 	function delete_personnalisation_texte($data, $id) {
@@ -1207,62 +1284,74 @@ SQL;
 		$this->sql->query($q);
 	}
 
-	function display_personnalisation($images_url, $id_produits = null, $perso = array(), $nl_tag = false) {
-		if ($id_produits === null) {
-			$id_produits = $this->id;
-		}
-		$html = <<<HTML
+	function display_personnalisation($images_url, $id_gabarit, $perso = array(), $nl_tag = false) {
+		$html = "";
+
+		$q = <<<SQL
+SELECT id_produits FROM dt_produits_perso_gabarits WHERE id = $id_gabarit
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+		$id_produits = $row['id_produits'];
+		
+		$personnalisations = $this->personnalisations($id_produits);
+		$textes = $personnalisations['textes'];
+		$images = $personnalisations['images'];
+		if ((isset($textes[$id_gabarit]) and count($textes[$id_gabarit]))
+			or (isset($images[$id_gabarit]) and count($images[$id_gabarit]))) {
+
+			$html = <<<HTML
 <div class="personnalisation-produit personnalisation-produit-{$id_produits}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
 HTML;
-		$personnalisations = $this->personnalisations($id_produits);
-		foreach($personnalisations['textes'] as $id_texte => $texte) {
-			$css = "";
-			$css .= <<<CSS
+			foreach($personnalisations['textes'][$id_gabarit] as $id_texte => $texte) {
+				$css = "";
+				$css .= <<<CSS
 position: absolute;
 resize: none;
 overflow: hidden;
 color: black;
 border: none;
 CSS;
-			$css .= $texte['css'];
-			$css = preg_replace("/\s+/", " ", $css);
-			$contenu = $texte['contenu'];
-			if (isset($perso['textes'][$id_texte])) {
-				$contenu = $perso['textes'][$id_texte];
-			}
-			if ($nl_tag) {
-				$contenu = str_replace("\n", $nl_tag, $contenu);
-			}
-			$html .= <<<HTML
+				$css .= $texte['css'];
+				$css = preg_replace("/\s+/", " ", $css);
+				$contenu = $texte['contenu'];
+				if (isset($perso['textes'][$id_texte])) {
+					$contenu = $perso['textes'][$id_texte];
+				}
+				if ($nl_tag) {
+					$contenu = str_replace("\n", $nl_tag, $contenu);
+				}
+				$html .= <<<HTML
 <textarea readonly disabled="disabled" class="personnalisation-produit-texte" style="{$css}">{$contenu}</textarea>
 HTML;
-		}
-		foreach($personnalisations['images'] as $id_image => $image) {
-			$css = "";
-			if (!$image['background']) {
-				$css .= "position: absolute;";
 			}
-			$apercu = $image['fichier'];
-			if (isset($perso['images'][$id_image]['apercu'])) {
-				$apercu = $perso['images'][$id_image]['apercu'];
-			}
-			$css .= <<<CSS
+			foreach($personnalisations['images'][$id_gabarit] as $id_image => $image) {
+				$css = "";
+				if (!$image['background']) {
+					$css .= "position: absolute;";
+				}
+				$apercu = $image['fichier'];
+				if (isset($perso['images'][$id_image]['apercu'])) {
+					$apercu = $perso['images'][$id_image]['apercu'];
+				}
+				$css .= <<<CSS
 background-image: url({$images_url}{$apercu});
 background-size: contain;
 background-position: center;
 background-repeat: no-repeat;
 CSS;
-			$css .= $image['css'];
-			$css = preg_replace("/\s+/", " ", $css);
-			$html .= <<<HTML
+				$css .= $image['css'];
+				$css = preg_replace("/\s+/", " ", $css);
+				$html .= <<<HTML
 <div class="personnalisation-produit-image" style="{$css}"></div>
 HTML;
-		}
-		$html .= <<<HTML
+			}
+			$html .= <<<HTML
 </div>
 </div>
 HTML;
+		}
 		return $html;
 	}
 }

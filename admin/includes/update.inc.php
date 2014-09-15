@@ -1192,9 +1192,21 @@ SQL;
 
 function update_50($update) {
 	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_produits_perso_textes` (
+CREATE TABLE IF NOT EXISTS `dt_produits_perso_gabarits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_produits` int(11) NOT NULL,
+  `ref` varchar(128) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_produits` (`id_produits`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_produits_perso_textes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_produits_perso_gabarits` int(11) NOT NULL,
   `contenu` text NOT NULL,
   `min_caracteres` int(11) NOT NULL,
   `max_caracteres` int(11) NOT NULL,
@@ -1203,7 +1215,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_textes` (
   `css` text NOT NULL,
   `statut` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `id_produits` (`id_produits`)
+  KEY `id_produits` (`id_produits_perso_gabarits`)
 )
 SQL;
 	$update->query($q);
@@ -1211,7 +1223,7 @@ SQL;
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_produits` int(11) NOT NULL,
+  `id_produits_perso_gabarits` int(11) NOT NULL,
   `fichier` varchar(128) NOT NULL,
   `formats` varchar(128) NOT NULL,
   `min_largeur` int(11) NOT NULL,
@@ -1224,7 +1236,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
   `statut` int(1) NOT NULL DEFAULT 0,
   `background` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `id_produits` (`id_produits`)
+  KEY `id_produits` (`id_produits_perso_gabarits`)
 )
 SQL;
 	$update->query($q);
