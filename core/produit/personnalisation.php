@@ -20,13 +20,13 @@ class Personnalisation {
 		$this->path_www = $path_www;
 	}
 
-	function get_default($id_produits, $min_statut = 0) {
+	function get_default($id_gabarit, $min_statut = 0) {
 		$personnalisations = array(
 			'textes' => array(),
 			'images' => array(),
 		);
 		$q = <<<SQL
-SELECT * FROM dt_produits_perso_textes WHERE id_produits = {$id_produits}
+SELECT * FROM dt_produits_perso_textes WHERE id_produits_perso_gabarits = {$id_gabarit}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -36,7 +36,7 @@ SQL;
 		}
 
 		$q = <<<SQL
-SELECT * FROM dt_produits_perso_images WHERE id_produits = {$id_produits}
+SELECT * FROM dt_produits_perso_images WHERE id_produits_perso_gabarits = {$id_gabarit}
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -48,12 +48,12 @@ SQL;
 		return $personnalisations;
 	}
 
-	function edit_default($id_produits, $nl_tag = false) {
+	function edit_default($id_gabarit, $nl_tag = false) {
 		$html = <<<HTML
-<div class="personnalisation-produit" id="personnalisation-produit-{$id_produits}" style="text-align: center;">
+<div class="personnalisation-produit" id="personnalisation-produit-{$id_gabarit}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
 HTML;
-		$personnalisations = $this->get_default($id_produits);
+		$personnalisations = $this->get_default($id_gabarit);
 		foreach($personnalisations['textes'] as $id_texte => $texte) {
 			$css = "";
 			$css .= <<<CSS
