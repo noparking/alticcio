@@ -478,16 +478,14 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	foreach ($gabarits as $id_gabarit => $gabarit) {
-		$main .= <<<HTML
-{$form->fieldset_start(array('legend' => "{$dico->t('PersonnalisationApercu')} ($gabarit_options[$id_gabarit])", 'class' => "personnalisation-gabarit personnalisation-gabarit-{$id_gabarit} produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-apercu"))}
-{$produit->display_personnalisation($personnalisation_url, $id_gabarit)}
-{$form->fieldset_end()}
-HTML;
 		$textes = isset($personnalisations['textes'][$id_gabarit]) ? $personnalisations['textes'][$id_gabarit] : array();
 		$images = isset($personnalisations['images'][$id_gabarit]) ? $personnalisations['images'][$id_gabarit] : array();
 
 		$main .= <<<HTML
 <div class="personnalisation-gabarit personnalisation-gabarit-{$id_gabarit}">
+{$form->fieldset_start(array('legend' => "{$dico->t('PersonnalisationApercu')} ($gabarit_options[$id_gabarit])", 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-apercu"))}
+{$produit->display_personnalisation($personnalisation_url, $id_gabarit)}
+{$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => "{$dico->t('PersonnalisationTextes')} ($gabarit_options[$id_gabarit])", 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation'], 'id' => "produit-section-personnalisation-texte-{$id_gabarit}"))}
 HTML;
 		$number = 0;
