@@ -1215,7 +1215,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_textes` (
   `css` text NOT NULL,
   `statut` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `id_produits` (`id_produits_perso_gabarits`)
+  KEY `id_produits_perso_gabarits` (`id_produits_perso_gabarits`)
 )
 SQL;
 	$update->query($q);
@@ -1236,7 +1236,17 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
   `statut` int(1) NOT NULL DEFAULT 0,
   `background` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `id_produits` (`id_produits_perso_gabarits`)
+  KEY `id_produits_perso_gabarits` (`id_produits_perso_gabarits`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_commandes_perso_gabarits` (
+  `id_commandes_produits` int(11) NOT NULL,
+  `id_produits_perso_gabarits` int(11) NOT NULL,
+  PRIMARY KEY (`id_commandes_produits`),
+  KEY `id_produits_perso_gabarits` (`id_produits_perso_gabarits`)
 )
 SQL;
 	$update->query($q);

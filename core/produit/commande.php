@@ -108,12 +108,22 @@ SQL;
 
 				if (isset($perso)) {
 					$q = <<<SQL
+DELETE FROM dt_commandes_perso_gabarits WHERE id_commandes_produits = {$id_commandes_produits}
+SQL;
+					$this->sql->query($q);
+
+					$q = <<<SQL
 DELETE FROM dt_commandes_perso_textes WHERE id_commandes_produits = {$id_commandes_produits}
 SQL;
 					$this->sql->query($q);
 
 					$q = <<<SQL
 DELETE FROM dt_commandes_perso_images WHERE id_commandes_produits = {$id_commandes_produits}
+SQL;
+					$this->sql->query($q);
+
+					$q = <<<SQL
+INSERT INTO dt_commandes_perso_gabarits (id_commandes_produits, id_produits_perso_gabarits) VALUES ($id_commandes_produits, {$perso['id_gabarit']})
 SQL;
 					$this->sql->query($q);
 
