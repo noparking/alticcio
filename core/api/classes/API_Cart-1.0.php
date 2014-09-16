@@ -299,6 +299,7 @@ SQL;
 				'personnalisation_fichier' => $perso['fichier'],
 				'personnalisation_nom_fichier' => $perso['nom_fichier'],
 				'perso' => array(
+					'id_gabarit' => $perso['id_gabarit'], // nouvelle personnalisation (gabarit)
 					'textes' => $perso['textes'], // nouvelle personnalisation multi-textes
 					'images' => $perso['images'], // nouvelle personnalisation multi-images
 				),
