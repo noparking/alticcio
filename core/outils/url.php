@@ -29,7 +29,7 @@ abstract class Url {
 		$url = str_replace('"', '', $url);
 		$elements = explode("/", $url, count($this->elements));
 		if (is_int($element)) {
-			return $elements[$element];
+			return isset($elements[$element]) ? $elements[$element] : null;
 		} else {
 			$elements_flipped = array_flip($this->elements);
 			if (isset($elements_flipped[$element]) and isset($elements[$elements_flipped[$element]])) {
