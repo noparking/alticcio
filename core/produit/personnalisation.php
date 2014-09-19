@@ -48,7 +48,7 @@ SQL;
 		return $personnalisations;
 	}
 
-	function edit_default($id_gabarit, $nl_tag = false) {
+	function edit_default($id_gabarit, $perso, $nl_tag = false) {
 		$html = <<<HTML
 <div class="personnalisation-produit" id="personnalisation-produit-{$id_gabarit}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
@@ -66,6 +66,13 @@ border: none;
 CSS;
 			$css .= $texte['css'];
 			$css = preg_replace("/\s+/", " ", $css);
+			$contenu = $texte['contenu'];
+			if (isset($perso['textes'][$id_texte]) and $perso['textes'][$id_texte]) {
+				$contenu = $perso['textes'][$id_texte];
+			}
+			if ($nl_tag) {
+				$contenu = str_replace("\n", $nl_tag, $contenu);
+			}
 			$readonly = "";
 			$editable = "";
 			switch ($texte['statut']) {
@@ -81,15 +88,15 @@ CSS;
 			}
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$name = "personnalisation[textes][$id_texte]";
-			$contenu = $texte['contenu'];
-			if ($nl_tag) {
-				$contenu = str_replace("\n", $nl_tag, $texte['contenu']);
-			}
 			$html .= <<<HTML
-<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}">{$contenu}</textarea>
+<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}" id_texte="{$id_texte}">{$contenu}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
+			$apercu = $image['fichier'];
+			if (isset($perso['images'][$id_image]['apercu']) and $perso['images'][$id_image]['apercu']) {
+				$apercu = $perso['images'][$id_image]['apercu'];
+			}
 			$css = "";
 			if ($image['background']) {
 				$css .= "position: relative; z-index: 0;";
@@ -98,7 +105,7 @@ HTML;
 				$css .= "position: absolute; z-index: 1;";
 			}
 			$css .= <<<CSS
-background-image: url({$this->url}{$image['fichier']});
+background-image: url({$this->url}{$apercu});
 background-size: contain;
 background-position: center;
 background-repeat: no-repeat;
