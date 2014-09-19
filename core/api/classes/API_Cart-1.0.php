@@ -87,6 +87,7 @@ SQL;
 			'fichier' => "",
 			'nom_fichier' => "",
 			'sample' => $sample,
+			'id_gabarit' => 0,
 			'textes' => array(), // nouvelle personnalisation multi-textes
 			'images' => array(), // nouvelle personnalisation multi-images
 		);
