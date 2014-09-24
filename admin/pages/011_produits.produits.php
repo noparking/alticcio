@@ -165,7 +165,9 @@ $messages = array();
 $id_gabarit = null;
 if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escaped_values();
-	$id_gabarit = $data['personnalisation_gabarit'];
+	if (isset($data['personnalisation_gabarit'])) {
+      $id_gabarit = $data['personnalisation_gabarit'];
+    }
 	$data['dir_personnalisations'] = $config->get("medias_path")."www/medias/images/personnalisations/";
 	switch ($form->action()) {
 		case "translate":
@@ -458,9 +460,12 @@ HTML;
 		$gabarit_options[$id_produits_perso_gabarits] = $gabarit['ref'];
 		$gabarit_fields .= <<<HTML
 <div class="personnalisation-gabarit personnalisation-gabarit-{$id_produits_perso_gabarits}">
+<img src="{$personnalisation_url}{$gabarit['apercu']}" style="max-height: 100px; max-width: 150px;" alt="{$gabarit['ref']}" />
+{$form->input(array('type' => "file", 'name' => "personnalisations[gabarits][$id_produits_perso_gabarits][apercu]", 'label' => "Aperçu"))}
 {$form->input(array('name' => "personnalisations[gabarits][$id_produits_perso_gabarits][ref]", 'label' => "Référence"))}
 {$form->input(array('name' => "personnalisations[gabarits][$id_produits_perso_gabarits][phrase_nom]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[personnalisations][gabarits][$id_produits_perso_gabarits][phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+{$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
 {$form->input(array('type' => "submit", 'name' => "delete-personnalisation-gabarit[$id_produits_perso_gabarits]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
 </div>
 HTML;
@@ -470,6 +475,7 @@ HTML;
 {$form->fieldset_start(array('legend' => "Gabarit", 'class' => "produit-section produit-section-personnalisation".$hidden['personnalisation']))}
 {$form->select(array('id' => "select-gabarit", 'name' => "personnalisation_gabarit", 'forced_value' => $id_gabarit,'label' => "Choix du gabarit", 'options' => $gabarit_options, 'template' => "#{label} : #{field}"))}
 <div class="personnalisation-gabarit personnalisation-gabarit-0">
+{$form->input(array('type' => "file", 'name' => "new_personnalisation_gabarit[apercu]", 'label' => "Aperçu"))}
 {$form->input(array('name' => "new_personnalisation_gabarit[ref]", 'label' => "Référence"))}
 {$form->input(array('name' => "new_personnalisation_gabarit[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->input(array('type' => "submit", 'name' => "add-personnalisation-gabarit", 'value' => $dico->t('Ajouter') ))}

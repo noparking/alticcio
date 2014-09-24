@@ -1197,6 +1197,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_gabarits` (
   `id_produits` int(11) NOT NULL,
   `ref` varchar(128) NOT NULL,
   `phrase_nom` int(11) NOT NULL,
+  `apercu` varchar(128) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_produits` (`id_produits`)
 )

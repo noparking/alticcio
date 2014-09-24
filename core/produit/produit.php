@@ -1140,6 +1140,31 @@ SQL;
 	}
 
 	function save_personnalisations($data) {
+		if (isset($data['personnalisations']['gabarits'])) {
+			foreach ($data['personnalisations']['gabarits'] as $id_gabarit => $gabarit) {
+				foreach ($data['phrases']['personnalisations']['gabarits'][$id_gabarit]['phrase_nom'] as $lang => $phrase) {
+					$this->phrase->save($lang, $phrase, $gabarit['phrase_nom']);
+				}
+				$values = array();
+				$values[] = "ref = '{$gabarit['ref']}'";
+				if (isset($data['_FILES']['personnalisations']['name']['gabarits'][$id_gabarit]['apercu'])) {
+					if ($name = $data['_FILES']['personnalisations']['name']['gabarits'][$id_gabarit]['apercu']) {
+						$tmp_name = $data['_FILES']['personnalisations']['tmp_name']['gabarits'][$id_gabarit]['apercu'];
+						preg_match("/(\.[^\.]*)$/", $name, $matches);
+						$ext = $matches[1];
+						$file_name = md5_file($tmp_name).$ext;
+						move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
+						$values[] = "apercu = '$file_name'";
+					}
+				}
+				$values_list = implode(",", $values);
+				$q = <<<SQL
+UPDATE dt_produits_perso_gabarits SET $values_list WHERE id = $id_gabarit
+SQL;
+				$this->sql->query($q);
+			}
+		}
+
 		if (isset($data['personnalisations']['textes'])) {
 			foreach ($data['personnalisations']['textes'] as $id_gabarit => $textes) {
 				foreach ($textes as $id => $perso) {
@@ -1191,10 +1216,21 @@ SQL;
 			foreach ($data['new_personnalisation_gabarit']['phrase_nom'] as $lang => $phrase) {
 				$id_phrase = $this->phrase->save($lang, $phrase, $id_phrase);
 			}
-
+            
+			$apercu = "";
+			if (isset($data['_FILES']['new_personnalisation_gabarit']['name']['apercu'])) {
+				if ($name = $data['_FILES']['new_personnalisation_gabarit']['name']['apercu']) {
+					$tmp_name = $data['_FILES']['new_personnalisation_gabarit']['tmp_name']['apercu'];
+					preg_match("/(\.[^\.]*)$/", $name, $matches);
+					$ext = $matches[1];
+					$apercu = md5_file($tmp_name).$ext;
+					move_uploaded_file($tmp_name, $data['dir_personnalisations'].$apercu);
+				}
+			}
+            
 			$q = <<<SQL
-INSERT INTO dt_produits_perso_gabarits (id_produits, ref, phrase_nom)
-VALUES ({$this->id}, '{$data['new_personnalisation_gabarit']['ref']}', {$id_phrase})
+INSERT INTO dt_produits_perso_gabarits (id_produits, ref, phrase_nom, apercu)
+VALUES ({$this->id}, '{$data['new_personnalisation_gabarit']['ref']}', {$id_phrase}, '{$apercu}')
 SQL;
 			$this->sql->query($q);
 
