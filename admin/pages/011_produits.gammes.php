@@ -72,10 +72,13 @@ $form = new Form(array(
 	'files' => array("new_image_file", "new_document_file", "new_document_vignette"),
 ));
 
-$section = "presentation";
+if (!isset($section)) {
+	$section = "presentation";
+}
 if ($form->value('section')) {
 	$section = $form->value('section');
 }
+
 $traduction = $form->value("lang");
 
 $messages = array();
