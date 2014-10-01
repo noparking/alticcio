@@ -1267,6 +1267,7 @@ SQL;
 					$values[] = in_array($key, array('css', 'formats')) ? "'$value'" : (int)$value;
 				}
 
+				$fichier_ok = false;
 				if (isset($data['_FILES']['new_personnalisation_image']['name'][$id_gabarit]['fichier'])) {
 					if ($name = $data['_FILES']['new_personnalisation_image']['name'][$id_gabarit]['fichier']) {
 						$tmp_name = $data['_FILES']['new_personnalisation_image']['tmp_name'][$id_gabarit]['fichier'];
@@ -1276,7 +1277,12 @@ SQL;
 						move_uploaded_file($tmp_name, $data['dir_personnalisations'].$file_name);
 						$fields[] = "fichier";
 						$values[] = "'$file_name'";
+						$fichier_ok = true;
 					}
+				}
+				if (!$fichier_ok) {
+					$fields[] = "fichier";
+					$values[] = "''";
 				}
 
 				$fields_list = implode(",", $fields);
