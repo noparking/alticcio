@@ -548,6 +548,8 @@ HTML;
 <br />
 {$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$id_gabarit][$i][background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
 <br />
+{$form->input(array('type' => "checkbox", 'name' => "personnalisations[images][$id_gabarit][$i][contain]", 'label' => $dico->t("PersonnalisationContain"), 'template' => $checkbox_template))}
+<br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ))}
 {$form->input(array('type' => "submit", 'name' => "delete-personnalisation-image[$i]", 'class' => "delete", 'value' => $dico->t('Supprimer') ))}
@@ -568,6 +570,8 @@ HTML;
 {$form->select(array('name' => "new_personnalisation_image[$id_gabarit][statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options, 'forced_value' => 1))}
 <br />
 {$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[$id_gabarit][background]", 'label' => $dico->t("PersonnalisationBackground"), 'template' => $checkbox_template))}
+<br />
+{$form->input(array('type' => "checkbox", 'name' => "new_personnalisation_image[$id_gabarit][contain]", 'label' => $dico->t("PersonnalisationContain"), 'template' => $checkbox_template))}
 <br />
 <br />
 {$form->input(array('type' => "submit", 'name' => "add-personnalisation-image[$id_gabarit]", 'value' => $dico->t('Ajouter') ))}

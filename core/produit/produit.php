@@ -1378,9 +1378,10 @@ HTML;
 				if (isset($perso['images'][$id_image]['apercu'])) {
 					$apercu = $perso['images'][$id_image]['apercu'];
 				}
+				$bg_size = $image['contain'] ? "contain" : "cover";
 				$css .= <<<CSS
 background-image: url({$images_url}{$apercu});
-background-size: contain;
+background-size: {$bg_size};
 background-position: center;
 background-repeat: no-repeat;
 box-sizing: border-box;

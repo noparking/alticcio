@@ -404,6 +404,7 @@ $t['PersonnalisationApercu'] = "Aperçu de la personnalisation";
 $t['PersonnalisationImages'] = "Images de personnalisation";
 $t['PersonnalisationTextes'] = "Textes de personnalisation";
 $t['PersonnalisationBackground'] = "Image de fond (cette image servira d'image de fond et les autres éléments se positionneront relativement à elle)";
+$t['PersonnalisationContain'] = "Ne pas couper l'image.";
 $t['PictosVente'] = "Pictos vente";
 $t['Poids'] = "Poids";
 $t['PoidsNecessaire'] = "Poids nécessaire";

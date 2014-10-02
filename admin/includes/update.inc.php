@@ -1236,6 +1236,7 @@ CREATE TABLE IF NOT EXISTS `dt_produits_perso_images` (
   `css` text NOT NULL,
   `statut` int(1) NOT NULL DEFAULT 0,
   `background` int(1) NOT NULL DEFAULT 0,
+  `contain` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `id_produits_perso_gabarits` (`id_produits_perso_gabarits`)
 )
