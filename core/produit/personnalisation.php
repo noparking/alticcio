@@ -95,6 +95,7 @@ HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
 			$apercu = $image['fichier'];
+			$bg_size = $image['contain'] ? "contain" : "cover";
 			if (isset($perso['images'][$id_image]['apercu']) and $perso['images'][$id_image]['apercu']) {
 				$apercu = $perso['images'][$id_image]['apercu'];
 			}
@@ -107,7 +108,7 @@ HTML;
 			}
 			$css .= <<<CSS
 background-image: url({$this->url}{$apercu});
-background-size: contain;
+background-size: {$bg_size};
 background-position: center;
 background-repeat: no-repeat;
 box-sizing: border-box;
