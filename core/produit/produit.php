@@ -1334,21 +1334,20 @@ SELECT id_produits FROM dt_produits_perso_gabarits WHERE id = $id_gabarit
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
-		$id_produits = $row['id_produits'];
-		
-		$personnalisations = $this->personnalisations($id_produits);
-		$textes = $personnalisations['textes'];
-		$images = $personnalisations['images'];
-		if ((isset($textes[$id_gabarit]) and count($textes[$id_gabarit]))
-			or (isset($images[$id_gabarit]) and count($images[$id_gabarit]))) {
+		if ($id_produits = $row['id_produits']) {
+			$personnalisations = $this->personnalisations($id_produits);
+			$textes = $personnalisations['textes'];
+			$images = $personnalisations['images'];
+			if ((isset($textes[$id_gabarit]) and count($textes[$id_gabarit]))
+				or (isset($images[$id_gabarit]) and count($images[$id_gabarit]))) {
 
-			$html = <<<HTML
+				$html = <<<HTML
 <div class="personnalisation-produit personnalisation-produit-{$id_produits}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
 HTML;
-			foreach($personnalisations['textes'][$id_gabarit] as $id_texte => $texte) {
-				$css = "";
-				$css .= <<<CSS
+				foreach($personnalisations['textes'][$id_gabarit] as $id_texte => $texte) {
+					$css = "";
+					$css .= <<<CSS
 position: absolute;
 resize: none;
 overflow: hidden;
@@ -1356,46 +1355,47 @@ color: black;
 border: none;
 box-sizing: border-box;
 CSS;
-				$css .= $texte['css'];
-				$css = preg_replace("/\s+/", " ", $css);
-				$contenu = $texte['contenu'];
-				if (isset($perso['textes'][$id_texte])) {
-					$contenu = $perso['textes'][$id_texte];
-				}
-				if ($nl_tag) {
-					$contenu = str_replace("\n", $nl_tag, $contenu);
-				}
-				$html .= <<<HTML
+					$css .= $texte['css'];
+					$css = preg_replace("/\s+/", " ", $css);
+					$contenu = $texte['contenu'];
+					if (isset($perso['textes'][$id_texte])) {
+						$contenu = $perso['textes'][$id_texte];
+					}
+					if ($nl_tag) {
+						$contenu = str_replace("\n", $nl_tag, $contenu);
+					}
+					$html .= <<<HTML
 <textarea readonly disabled="disabled" class="personnalisation-produit-texte" style="{$css}">{$contenu}</textarea>
 HTML;
-			}
-			foreach($personnalisations['images'][$id_gabarit] as $id_image => $image) {
-				$css = "";
-				if (!$image['background']) {
-					$css .= "position: absolute;";
 				}
-				$apercu = $image['fichier'];
-				if (isset($perso['images'][$id_image]['apercu'])) {
-					$apercu = $perso['images'][$id_image]['apercu'];
-				}
-				$bg_size = $image['contain'] ? "contain" : "cover";
-				$css .= <<<CSS
+				foreach($personnalisations['images'][$id_gabarit] as $id_image => $image) {
+					$css = "";
+					if (!$image['background']) {
+						$css .= "position: absolute;";
+					}
+					$apercu = $image['fichier'];
+					if (isset($perso['images'][$id_image]['apercu'])) {
+						$apercu = $perso['images'][$id_image]['apercu'];
+					}
+					$bg_size = $image['contain'] ? "contain" : "cover";
+					$css .= <<<CSS
 background-image: url({$images_url}{$apercu});
 background-size: {$bg_size};
 background-position: center;
 background-repeat: no-repeat;
 box-sizing: border-box;
 CSS;
-				$css .= $image['css'];
-				$css = preg_replace("/\s+/", " ", $css);
-				$html .= <<<HTML
+					$css .= $image['css'];
+					$css = preg_replace("/\s+/", " ", $css);
+					$html .= <<<HTML
 <div class="personnalisation-produit-image" style="{$css}"></div>
 HTML;
-			}
-			$html .= <<<HTML
+				}
+				$html .= <<<HTML
 </div>
 </div>
 HTML;
+			}
 		}
 		return $html;
 	}
