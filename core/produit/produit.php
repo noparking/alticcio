@@ -1356,6 +1356,7 @@ border: none;
 box-sizing: border-box;
 CSS;
 					$css .= $texte['css'];
+					$css .= preg_replace("/edit:[^;]*;/", "", $texte['css']);
 					$css = preg_replace("/\s+/", " ", $css);
 					$contenu = $texte['contenu'];
 					if (isset($perso['textes'][$id_texte])) {
@@ -1386,6 +1387,7 @@ background-repeat: no-repeat;
 box-sizing: border-box;
 CSS;
 					$css .= $image['css'];
+					$css .= preg_replace("/edit:[^;]*;/", "", $image['css']);
 					$css = preg_replace("/\s+/", " ", $css);
 					$html .= <<<HTML
 <div class="personnalisation-produit-image" style="{$css}"></div>
