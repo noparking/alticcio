@@ -65,7 +65,7 @@ color: black;
 border: none;
 box-sizing: border-box;
 CSS;
-			$css .= $texte['css'];
+			$css .= str_replace("edit:", "", $texte['css']);
 			$css = preg_replace("/\s+/", " ", $css);
 			$contenu = $texte['contenu'];
 			if (isset($perso['textes'][$id_texte]) and $perso['textes'][$id_texte]) {
@@ -113,7 +113,7 @@ background-position: center;
 background-repeat: no-repeat;
 box-sizing: border-box;
 CSS;
-			$css .= $image['css'];
+			$css .= str_replace("edit:", "", $image['css']);
 			$css = preg_replace("/\s+/", " ", $css);
 			$input = "";
 			$editable = "";
