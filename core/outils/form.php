@@ -593,7 +593,12 @@ HTML;
 		$params['field'] = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'"'.$permitted.$multiple.'>';
 		foreach ($options as $cle => $valeur) {
     		$params['field'] .= '<option value="'.$cle.'"';
-    		if ((is_array($value) and in_array($cle, $value)) or ($value !== "" and ((string)$value == (string)$cle))) {
+    		if (is_array($value)) {
+    			if (in_array($cle, $value)) {
+					$params['field'] .= ' selected="selected"';
+				}
+			}
+			else ($value !== "" and ((string)$value == (string)$cle)) {
 				$params['field'] .= ' selected="selected"';
 			}
 			if (isset($params['enable']) and 
