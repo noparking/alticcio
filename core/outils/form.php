@@ -598,7 +598,7 @@ HTML;
 					$params['field'] .= ' selected="selected"';
 				}
 			}
-			else ($value !== "" and ((string)$value == (string)$cle)) {
+			else if ($value !== "" and ((string)$value == (string)$cle)) {
 				$params['field'] .= ' selected="selected"';
 			}
 			if (isset($params['enable']) and 
