@@ -106,12 +106,12 @@ SQL;
 		// Les images
 		$q = <<<SQL
 SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
-c.date_commande, cpt.id_produits_perso_textes, cpt.texte
+c.date_commande, cpt.id_produits_perso_images, cpt.fichier, cpt.apercu
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
 INNER JOIN dt_sku AS s ON s.id = cp.id_sku
 INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
-INNER JOIN dt_commandes_perso_fichiers AS cpt ON cpt.id_commandes_produits = cp.id
+INNER JOIN dt_commandes_perso_images AS cpt ON cpt.id_commandes_produits = cp.id
 SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
