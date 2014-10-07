@@ -1096,6 +1096,7 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT * FROM dt_produits_perso_gabarits WHERE id_produits = {$id_produits}
+ORDER BY id
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
@@ -1105,6 +1106,7 @@ SQL;
 			$personnalisations['images'][$id_gabarit] = array();
 			$q = <<<SQL
 SELECT * FROM dt_produits_perso_textes WHERE id_produits_perso_gabarits = {$id_gabarit}
+ORDER BY id
 SQL;
 			$res2 = $this->sql->query($q);
 			while ($row2 = $this->sql->fetch($res2)) {
@@ -1113,6 +1115,7 @@ SQL;
 
 			$q = <<<SQL
 SELECT * FROM dt_produits_perso_images WHERE id_produits_perso_gabarits = {$id_gabarit}
+ORDER BY id
 SQL;
 			$res2 = $this->sql->query($q);
 			while ($row2 = $this->sql->fetch($res2)) {
@@ -1129,6 +1132,7 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT * FROM dt_produits_perso_gabarits WHERE id_produits = $id_produits
+ORDER BY id
 SQL;
 		$gabarits = array();
 		$res = $this->sql->query($q);
