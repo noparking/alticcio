@@ -60,9 +60,20 @@ SQL;
 		return $row['time_last_commande'];
 	}
 
+	public function last_id() {
+		$q = <<<SQL
+SELECT MAX(id) AS last_id FROM {$this->export_table}
+SQL;
+		$res = $this->sql_export->query($q);
+		$row = $this->sql_export->fetch($res);
+
+		return (int)$row['last_id'];
+	}
+
 # TODO Gérer les révisions
 	public function cmds_perso_a_exporter($date_export) {
 		$time_last_commande = $this->time_last_commande();
+		$id = $this->last_id();
 		$cmds = array();
 
 		// Les textes
@@ -82,8 +93,9 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
+			$id++;
 			$cmds[] = array(
-				'id' => $row['id'] * 2,
+				'id' => $id,
 				'id_commande' => $row['id_commandes'],
 				'id_produit' => $row['id_produits'],
 				'id_sku' => $row['id_sku'],
@@ -122,8 +134,9 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
+			$id++;
 			$cmds[] = array(
-				'id' => $row['id'] * 2 + 1,
+				'id' => $id,
 				'id_commande' => $row['id_commandes'],
 				'id_produit' => $row['id_produits'],
 				'id_sku' => $row['id_sku'],
