@@ -144,7 +144,7 @@ SQL;
 				'ref' => $row['ref'],
 				'nom' => $row['nom'],
 				'quantite' => $row['quantite'],
-				'identifiant' => "texte_$i",
+				'identifiant' => "image_$i",
 				'id_texte' => 0, 
 				'texte' => "",
 				'id_image' => $row['id_produits_perso_images'],
