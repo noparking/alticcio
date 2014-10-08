@@ -5,7 +5,6 @@ require_once "abstract_export.php";
 class ExportCommandePersonnalisations extends AbstractExport {
 	
 	public $export_table = "commandes_produits_personnalisations";
-	public $excluded = array('id');
 
 	public function export() {
 		$date_export = time();
@@ -68,7 +67,7 @@ SQL;
 
 		// Les textes
 		$q = <<<SQL
-SELECT cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
+SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
 c.date_commande, cpt.id_produits_perso_textes, cpt.texte
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
@@ -84,6 +83,7 @@ SQL;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
 			$cmds[] = array(
+				'id' => $row['id'] * 2,
 				'id_commande' => $row['id_commandes'],
 				'id_produit' => $row['id_produits'],
 				'id_sku' => $row['id_sku'],
@@ -107,7 +107,7 @@ SQL;
 
 		// Les images
 		$q = <<<SQL
-SELECT cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
+SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
 c.date_commande, cpt.id_produits_perso_images, cpt.fichier, cpt.apercu
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
@@ -123,6 +123,7 @@ SQL;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
 			$cmds[] = array(
+				'id' => $row['id'] * 2 + 1,
 				'id_commande' => $row['id_commandes'],
 				'id_produit' => $row['id_produits'],
 				'id_sku' => $row['id_sku'],
