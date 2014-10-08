@@ -5,6 +5,7 @@ require_once "abstract_export.php";
 class ExportCommandePersonnalisations extends AbstractExport {
 	
 	public $export_table = "commandes_produits_personnalisations";
+	public $excluded = array('id');
 
 	public function export() {
 		$date_export = time();
