@@ -1190,7 +1190,7 @@ SQL;
 				foreach ($images as $id => $perso) {
 					$values = array();
 					foreach ($perso as $key => $value) {
-						$values[] = "$key = ".(in_array($key, array('css', 'fichier')) ? "'$value'" : (int)$value);
+						$values[] = "$key = ".(in_array($key, array('css', 'fichier', 'formats')) ? "'$value'" : (int)$value);
 					}
 
 					if (isset($data['_FILES']['personnalisations']['name']['images'][$id_gabarit][$id]['fichier'])) {
