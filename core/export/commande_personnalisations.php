@@ -132,7 +132,7 @@ SQL;
 				'identifiant' => "texte_$i",
 				'id_texte' => 0, 
 				'texte' => "",
-				'id_image' => $row['id_produits_perso_fichiers'],
+				'id_image' => $row['id_produits_perso_images'],
 				'image' => $row['fichier'],
 				'apercu' => $row['apercu'],
 				'time_commande' => $row['date_commande'],
