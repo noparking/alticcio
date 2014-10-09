@@ -26,7 +26,7 @@ $filter = $filter_attributs_management = new Filter($pager, array(
 		'title' => $dico->t('Groupe'),
 		'type' => 'select',
 		'options' => $groupes,
-		'field' => 'ma.groupe',
+		'field' => 'am.groupe',
 		'form' => array(
 			'name' => "attributs_management[%id%][groupe]",
 			'method' => 'select',
@@ -37,7 +37,7 @@ $filter = $filter_attributs_management = new Filter($pager, array(
 	'classement' => array(
 		'title' => $dico->t('Classement'),
 		'type' => 'between',
-		'field' => 'ma.classement',
+		'field' => 'am.classement',
 		'form' => array(
 			'name' => "attributs_management[%id%][classement]",
 			'method' => 'input',
