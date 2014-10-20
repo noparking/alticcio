@@ -6,6 +6,9 @@ class ExportCommandePersonnalisations extends AbstractExport {
 	
 	public $export_table = "commandes_produits_personnalisations";
 
+	public $nb_textes = 30;
+	public $nb_images = 15;
+
 	public function export() {
 		$date_export = time();
 		$fields = $this->fields();
@@ -34,18 +37,20 @@ class ExportCommandePersonnalisations extends AbstractExport {
 			'ref',
 			'nom',
 			'quantite',
-			'identifiant',
-			'id_texte',
-			'texte',
-			'id_image',
-			'image',
-			'apercu',
 			'time_commande',
 			'date_commande',
 			'time_export',
 			'date_export',
 			'bat',
 		);
+
+		for ($i = 1; $i <= $this->nb_textes; $i++) {
+			$fields[] = "texte_$i";
+		}
+
+		for ($i = 1; $i <= $this->nb_images; $i++) {
+			$fields[] = "image_$i";
+		}
 
 		return $fields;
 	}
@@ -76,15 +81,51 @@ SQL;
 		$id = $this->last_id();
 		$cmds = array();
 
-		// Les textes
+		// Les commandes
 		$q = <<<SQL
-SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
-c.date_commande, cpt.id_produits_perso_textes, cpt.texte
+SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite, c.date_commande
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
 INNER JOIN dt_sku AS s ON s.id = cp.id_sku
 INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
+SQL;
+		if ($time_last_commande) {
+			$q .= " AND c.date_commande > $time_last_commande";
+		}
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$cmds[$row['id']] = array(
+				'id' => $row['id'],
+				'id_commande' => $row['id_commandes'],
+				'id_produit' => $row['id_produits'],
+				'id_sku' => $row['id_sku'],
+				'code_famille_vente' => $row['code'],
+				'ref' => $row['ref'],
+				'nom' => $row['nom'],
+				'quantite' => $row['quantite'],
+				'time_commande' => $row['date_commande'],
+				'date_commande' => date("Y-m-d", $row['date_commande']),
+				'time_export' => $date_export,
+				'date_export' => date("Y-m-d", $date_export),
+				'bat' => "",
+			);
+			for ($i = 1; $i <= $this->nb_textes; $i++) {
+				$cmds[$row['id']]["texte_$i"] = "";
+			}
+
+			for ($i = 1; $i <= $this->nb_images; $i++) {
+				$cmds[$row['id']]["image_$i"] = "";
+			}
+		}
+
+		// Les textes
+		$q = <<<SQL
+SELECT cp.id, cpt.texte
+FROM dt_commandes_produits AS cp
+INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
 INNER JOIN dt_commandes_perso_textes AS cpt ON cpt.id_commandes_produits = cp.id
+INNER JOIN dt_produits_perso_textes AS ppt ON ppt.id = cpt.id_produits_perso_textes
+ORDER BY ppt.id
 SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
@@ -93,39 +134,17 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
-			$id++;
-			$cmds[] = array(
-				'id' => $id,
-				'id_commande' => $row['id_commandes'],
-				'id_produit' => $row['id_produits'],
-				'id_sku' => $row['id_sku'],
-				'code_famille_vente' => $row['code'],
-				'ref' => $row['ref'],
-				'nom' => $row['nom'],
-				'quantite' => $row['quantite'],
-				'identifiant' => "texte_$i",
-				'id_texte' => $row['id_produits_perso_textes'], 
-				'texte' => $row['texte'],
-				'id_image' => 0,
-				'image' => "",
-				'apercu' => "",
-				'time_commande' => $row['date_commande'],
-				'date_commande' => date("Y-m-d", $row['date_commande']),
-				'time_export' => $date_export,
-				'date_export' => date("Y-m-d", $date_export),
-				'bat' => "",
-			);
+			$cmds[$row['id']]["texte_$i"] = $row['texte'];
 		}
 
 		// Les images
 		$q = <<<SQL
-SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite,
-c.date_commande, cpt.id_produits_perso_images, cpt.fichier, cpt.apercu
+SELECT cp.id, cpi.fichier
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
-INNER JOIN dt_sku AS s ON s.id = cp.id_sku
-INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
-INNER JOIN dt_commandes_perso_images AS cpt ON cpt.id_commandes_produits = cp.id
+INNER JOIN dt_commandes_perso_images AS cpi ON cpi.id_commandes_produits = cp.id
+INNER JOIN dt_produits_perso_images AS ppt ON ppt.id = cpi.id_produits_perso_images
+ORDER BY ppt.id
 SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
@@ -134,28 +153,7 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
-			$id++;
-			$cmds[] = array(
-				'id' => $id,
-				'id_commande' => $row['id_commandes'],
-				'id_produit' => $row['id_produits'],
-				'id_sku' => $row['id_sku'],
-				'code_famille_vente' => $row['code'],
-				'ref' => $row['ref'],
-				'nom' => $row['nom'],
-				'quantite' => $row['quantite'],
-				'identifiant' => "image_$i",
-				'id_texte' => 0, 
-				'texte' => "",
-				'id_image' => $row['id_produits_perso_images'],
-				'image' => $row['fichier'],
-				'apercu' => $row['apercu'],
-				'time_commande' => $row['date_commande'],
-				'date_commande' => date("Y-m-d", $row['date_commande']),
-				'time_export' => $date_export,
-				'date_export' => date("Y-m-d", $date_export),
-				'bat' => "",
-			);
+			$cmds[$row['id']]["image_$i"] = $row['fichier'];
 		}
 
 		return $cmds;
