@@ -91,11 +91,12 @@ FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
 INNER JOIN dt_commandes_perso_textes AS cpt ON cpt.id_commandes_produits = cp.id
 INNER JOIN dt_produits_perso_textes AS ppt ON ppt.id = cpt.id_produits_perso_textes
-ORDER BY ppt.id
+WHERE 1
 SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
+		$q .= " ORDER BY ppt.id"
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$ids_cmds[$row['id']] = $row['id'];
@@ -108,12 +109,13 @@ SELECT cp.id, cpi.fichier
 FROM dt_commandes_produits AS cp
 INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
 INNER JOIN dt_commandes_perso_images AS cpi ON cpi.id_commandes_produits = cp.id
-INNER JOIN dt_produits_perso_images AS ppt ON ppt.id = cpi.id_produits_perso_images
-ORDER BY ppt.id
+INNER JOIN dt_produits_perso_images AS ppi ON ppi.id = cpi.id_produits_perso_images
+WHERE 1
 SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
+		$q .= " ORDER BY ppi.id"
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$ids_cmds[$row['id']] = $row['id'];
