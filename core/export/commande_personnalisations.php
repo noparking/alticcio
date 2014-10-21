@@ -97,11 +97,9 @@ SQL;
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
 		$res = $this->sql->query($q);
-		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
-			$i++;
 			$ids_cmds[$row['id']] = $row['id'];
-			$textes[$row['id']]["texte_$i"] = addslashes($row['texte']);
+			$textes[$row['id']][] = addslashes($row['texte']);
 		}
 
 		// Les images
@@ -117,11 +115,9 @@ SQL;
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
 		$res = $this->sql->query($q);
-		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
-			$i++;
 			$ids_cmds[$row['id']] = $row['id'];
-			$images[$row['id']]["image_$i"] = addslashes($row['fichier']);
+			$images[$row['id']][] = addslashes($row['fichier']);
 		}
 
 		if (count($ids_cmds)) {
@@ -155,11 +151,11 @@ SQL;
 				);
 
 				for ($i = 1; $i <= $this->nb_textes; $i++) {
-					$cmd["texte_$i"] = isset($images[$row['id']]["texte_$i"]) ? $textes[$row['id']]["texte_$i"] : "";
+					$cmd["texte_$i"] = isset($textes[$row['id']][$i - 1]) ? $textes[$row['id']][$i - 1] : "";
 				}
 
 				for ($i = 1; $i <= $this->nb_images; $i++) {
-					$cmd["image_$i"] = isset($images[$row['id']]["image_$i"]) ? $images[$row['id']]["image_$i"] : "";
+					$cmd["image_$i"] = isset($images[$row['id']][$i - 1]) ? $images[$row['id']][$i - 1] : "";
 				}
 
 				$cmds[$row['id']] = $cmd;
