@@ -96,7 +96,7 @@ SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
-		$q .= " ORDER BY ppt.id"
+		$q .= " ORDER BY ppt.id";
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$ids_cmds[$row['id']] = $row['id'];
@@ -115,7 +115,7 @@ SQL;
 		if ($time_last_commande) {
 			$q .= " AND c.date_commande > $time_last_commande";
 		}
-		$q .= " ORDER BY ppi.id"
+		$q .= " ORDER BY ppi.id";
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$ids_cmds[$row['id']] = $row['id'];
