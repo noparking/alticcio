@@ -624,6 +624,7 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT $id_field, classement FROM $table WHERE id_produits = {$this->id}
+ORDER BY classement ASC
 SQL;
 		$res = $this->sql->query($q);
 
