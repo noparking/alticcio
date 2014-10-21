@@ -142,9 +142,9 @@ SQL;
 				$cmds[$row['id']]['nom'] = $row['nom'];
 				$cmds[$row['id']]['quantite'] = $row['quantite'];
 				$cmds[$row['id']]['time_commande'] = $row['date_commande'];
-				$cmds[$row['id']]['date_commande'] = date("Y-m-d"; $row['date_commande']);
+				$cmds[$row['id']]['date_commande'] = date("Y-m-d", $row['date_commande']);
 				$cmds[$row['id']]['time_export'] = $date_export;
-				$cmds[$row['id']]['date_export'] = date("Y-m-d"; $date_export);
+				$cmds[$row['id']]['date_export'] = date("Y-m-d", $date_export);
 				$cmds[$row['id']]['bat'] = "";
 
 				for ($i = 1; $i <= $this->nb_textes; $i++) {
