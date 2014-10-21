@@ -133,27 +133,30 @@ WHERE c.id IN ({$id_commandes_liste})
 SQL;
 			$res = $this->sql->query($q);
 			while ($row = $this->sql->fetch($res)) {
-				$cmds[$row['id']] = array(
-					'id' => $row['id'],
-					'id_commande' => $row['id_commandes'],
-					'id_produit' => $row['id_produits'],
-					'id_sku' => $row['id_sku'],
-					'code_famille_vente' => $row['code'],
-					'ref' => $row['ref'],
-					'nom' => $row['nom'],
-					'quantite' => $row['quantite'],
-					'time_commande' => $row['date_commande'],
-					'date_commande' => date("Y-m-d", $row['date_commande']),
-					'time_export' => $date_export,
-					'date_export' => date("Y-m-d", $date_export),
-					'bat' => "",
-				);
+				$cmds[$row['id']]['id'] = $row['id'];
+				$cmds[$row['id']]['id_commande'] = $row['id_commandes'];
+				$cmds[$row['id']]['id_produit'] = $row['id_produits'];
+				$cmds[$row['id']]['id_sku'] = $row['id_sku'];
+				$cmds[$row['id']]['code_famille_vente'] = $row['code'];
+				$cmds[$row['id']]['ref'] = $row['ref'];
+				$cmds[$row['id']]['nom'] = $row['nom'];
+				$cmds[$row['id']]['quantite'] = $row['quantite'];
+				$cmds[$row['id']]['time_commande'] = $row['date_commande'];
+				$cmds[$row['id']]['date_commande'] = date("Y-m-d"; $row['date_commande']);
+				$cmds[$row['id']]['time_export'] = $date_export;
+				$cmds[$row['id']]['date_export'] = date("Y-m-d"; $date_export);
+				$cmds[$row['id']]['bat'] = "";
+
 				for ($i = 1; $i <= $this->nb_textes; $i++) {
-					$cmds[$row['id']]["texte_$i"] = "";
+					if (!isset($cmds[$row['id']]["texte_$i"])) {
+						$cmds[$row['id']]["texte_$i"] = "";
+					}
 				}
 
 				for ($i = 1; $i <= $this->nb_images; $i++) {
-					$cmds[$row['id']]["image_$i"] = "";
+					if (!isset($cmds[$row['id']]["image_$i"])) {
+						$cmds[$row['id']]["image_$i"] = "";
+					}
 				}
 			}
 		}
