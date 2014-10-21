@@ -81,43 +81,6 @@ SQL;
 		$id = $this->last_id();
 		$cmds = array();
 
-		// Les commandes
-		$q = <<<SQL
-SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite, c.date_commande
-FROM dt_commandes_produits AS cp
-INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
-INNER JOIN dt_sku AS s ON s.id = cp.id_sku
-INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
-SQL;
-		if ($time_last_commande) {
-			$q .= " AND c.date_commande > $time_last_commande";
-		}
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$cmds[$row['id']] = array(
-				'id' => $row['id'],
-				'id_commande' => $row['id_commandes'],
-				'id_produit' => $row['id_produits'],
-				'id_sku' => $row['id_sku'],
-				'code_famille_vente' => $row['code'],
-				'ref' => $row['ref'],
-				'nom' => $row['nom'],
-				'quantite' => $row['quantite'],
-				'time_commande' => $row['date_commande'],
-				'date_commande' => date("Y-m-d", $row['date_commande']),
-				'time_export' => $date_export,
-				'date_export' => date("Y-m-d", $date_export),
-				'bat' => "",
-			);
-			for ($i = 1; $i <= $this->nb_textes; $i++) {
-				$cmds[$row['id']]["texte_$i"] = "";
-			}
-
-			for ($i = 1; $i <= $this->nb_images; $i++) {
-				$cmds[$row['id']]["image_$i"] = "";
-			}
-		}
-
 		// Les textes
 		$q = <<<SQL
 SELECT cp.id, cpt.texte
@@ -155,6 +118,45 @@ SQL;
 			$i++;
 			$cmds[$row['id']]["image_$i"] = $row['fichier'];
 		}
+
+		if (count($cmds)) {
+			$id_commandes_liste = implode(",", array_keys($cmds));
+
+			// Les autres infos des commandes
+			$q = <<<SQL
+SELECT cp.id, cp.id_commandes, cp.id_produits, cp.id_sku, fv.code, cp.ref, cp.nom, cp.quantite, c.date_commande
+FROM dt_commandes_produits AS cp
+INNER JOIN dt_commandes AS c ON c.id = cp.id_commandes
+INNER JOIN dt_sku AS s ON s.id = cp.id_sku
+INNER JOIN dt_familles_ventes AS fv ON fv.id = s.id_familles_vente
+WHERE c.id IN ({$id_commandes_liste})
+SQL;
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
+				$all_cmds[$row['id']] = array(
+					'id' => $row['id'],
+					'id_commande' => $row['id_commandes'],
+					'id_produit' => $row['id_produits'],
+					'id_sku' => $row['id_sku'],
+					'code_famille_vente' => $row['code'],
+					'ref' => $row['ref'],
+					'nom' => $row['nom'],
+					'quantite' => $row['quantite'],
+					'time_commande' => $row['date_commande'],
+					'date_commande' => date("Y-m-d", $row['date_commande']),
+					'time_export' => $date_export,
+					'date_export' => date("Y-m-d", $date_export),
+					'bat' => "",
+				);
+				for ($i = 1; $i <= $this->nb_textes; $i++) {
+					$all_cmds[$row['id']]["texte_$i"] = "";
+				}
+
+				for ($i = 1; $i <= $this->nb_images; $i++) {
+					$all_cmds[$row['id']]["image_$i"] = "";
+				}
+			}
+
 
 		return $cmds;
 	}
