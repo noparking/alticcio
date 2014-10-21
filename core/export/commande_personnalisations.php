@@ -159,7 +159,7 @@ SQL;
 				}
 
 				for ($i = 1; $i <= $this->nb_images; $i++) {
-					$cmd["image_$i"] = isset($images[$row['id']]["image_$i"]) ? $textes[$row['id']]["image_$i"] : "";
+					$cmd["image_$i"] = isset($images[$row['id']]["image_$i"]) ? $images[$row['id']]["image_$i"] : "";
 				}
 
 				$cmds[$row['id']] = $cmd;
