@@ -133,7 +133,7 @@ WHERE c.id IN ({$id_commandes_liste})
 SQL;
 			$res = $this->sql->query($q);
 			while ($row = $this->sql->fetch($res)) {
-				$all_cmds[$row['id']] = array(
+				$cmds[$row['id']] = array(
 					'id' => $row['id'],
 					'id_commande' => $row['id_commandes'],
 					'id_produit' => $row['id_produits'],
@@ -149,14 +149,14 @@ SQL;
 					'bat' => "",
 				);
 				for ($i = 1; $i <= $this->nb_textes; $i++) {
-					$all_cmds[$row['id']]["texte_$i"] = "";
+					$cmds[$row['id']]["texte_$i"] = "";
 				}
 
 				for ($i = 1; $i <= $this->nb_images; $i++) {
-					$all_cmds[$row['id']]["image_$i"] = "";
+					$cmds[$row['id']]["image_$i"] = "";
 				}
 			}
-
+		}
 
 		return $cmds;
 	}
