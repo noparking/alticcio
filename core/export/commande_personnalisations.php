@@ -80,6 +80,9 @@ SQL;
 		$time_last_commande = $this->time_last_commande();
 		$id = $this->last_id();
 		$cmds = array();
+		$ids_cmds = array();
+		$textes = array();
+		$images = array();
 
 		// Les textes
 		$q = <<<SQL
@@ -97,7 +100,8 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
-			$cmds[$row['id']]["texte_$i"] = $row['texte'];
+			$ids_cmds[$row['id']] = $row['id'];
+			$textes[$row['id']]["texte_$i"] = addslashes($row['texte']);
 		}
 
 		// Les images
@@ -116,11 +120,12 @@ SQL;
 		$i = 0;
 		while ($row = $this->sql->fetch($res)) {
 			$i++;
-			$cmds[$row['id']]["image_$i"] = $row['fichier'];
+			$ids_cmds[$row['id']] = $row['id'];
+			$images[$row['id']]["image_$i"] = addslashes($row['fichier']);
 		}
 
-		if (count($cmds)) {
-			$id_commandes_liste = implode(",", array_keys($cmds));
+		if (count($ids_cmds)) {
+			$id_commandes_liste = implode(",", $ids_cmds);
 
 			// Les autres infos des commandes
 			$q = <<<SQL
@@ -133,31 +138,31 @@ WHERE cp.id IN ({$id_commandes_liste})
 SQL;
 			$res = $this->sql->query($q);
 			while ($row = $this->sql->fetch($res)) {
-				$cmds[$row['id']]['id'] = $row['id'];
-				$cmds[$row['id']]['id_commande'] = $row['id_commandes'];
-				$cmds[$row['id']]['id_produit'] = $row['id_produits'];
-				$cmds[$row['id']]['id_sku'] = $row['id_sku'];
-				$cmds[$row['id']]['code_famille_vente'] = $row['code'];
-				$cmds[$row['id']]['ref'] = $row['ref'];
-				$cmds[$row['id']]['nom'] = $row['nom'];
-				$cmds[$row['id']]['quantite'] = $row['quantite'];
-				$cmds[$row['id']]['time_commande'] = $row['date_commande'];
-				$cmds[$row['id']]['date_commande'] = date("Y-m-d", $row['date_commande']);
-				$cmds[$row['id']]['time_export'] = $date_export;
-				$cmds[$row['id']]['date_export'] = date("Y-m-d", $date_export);
-				$cmds[$row['id']]['bat'] = "";
+				$cmd = array(
+					'id' => $row['id'],
+					'id_commande' => $row['id_commandes'],
+					'id_produit' => $row['id_produits'],
+					'id_sku' => $row['id_sku'],
+					'code_famille_vente' => $row['code'],
+					'ref' => $row['ref'],
+					'nom' => $row['nom'],
+					'quantite' => $row['quantite'],
+					'time_commande' => $row['date_commande'],
+					'date_commande' => date("Y-m-d", $row['date_commande']),
+					'time_export' => $date_export,
+					'date_export' => date("Y-m-d", $date_export),
+					'bat' => "",
+				);
 
 				for ($i = 1; $i <= $this->nb_textes; $i++) {
-					if (!isset($cmds[$row['id']]["texte_$i"])) {
-						$cmds[$row['id']]["texte_$i"] = "";
-					}
+					$cmd["texte_$i"] = isset($images[$row['id']]["texte_$i"]) ? $textes[$row['id']]["texte_$i"] : "";
 				}
 
 				for ($i = 1; $i <= $this->nb_images; $i++) {
-					if (!isset($cmds[$row['id']]["image_$i"])) {
-						$cmds[$row['id']]["image_$i"] = "";
-					}
+					$cmd["image_$i"] = isset($images[$row['id']]["image_$i"]) ? $textes[$row['id']]["image_$i"] : "";
 				}
+
+				$cmds[$row['id']] = $cmd;
 			}
 		}
 
