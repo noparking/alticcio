@@ -473,7 +473,7 @@ SQL;
 	public function attributs_management() {
 		$attributs_management = array();
 		$q = <<<SQL
-SELECT id_attributs, `groupe`, classement FROM {$this->attributs_table}_management
+SELECT id_attributs, classement FROM {$this->attributs_table}_management
 WHERE {$this->id_field} = {$this->id}
 SQL;
 		$res = $this->sql->query($q);
@@ -488,18 +488,19 @@ SQL;
 	public function attributs($grouped = "") {
 		$attributs = array();
 		$q = <<<SQL
-SELECT ma.id_attributs, ma.groupe, ma.classement AS classement_groupe, at.type_valeur, at.valeur_numerique, at.phrase_valeur, at.valeur_libre, at.classement
+SELECT ma.id_attributs, a.id_groupes_attributs, ma.classement AS classement_groupe, at.type_valeur, at.valeur_numerique, at.phrase_valeur, at.valeur_libre, at.classement
 FROM {$this->attributs_table}_management AS ma
+INNER JOIN dt_attributs AS a ON a.id = ma.id_attributs
 LEFT OUTER JOIN {$this->attributs_table} AS at ON ma.id_attributs = at.id_attributs AND ma.{$this->id_field} = at.{$this->id_field}
 WHERE ma.{$this->id_field} = {$this->id}
-ORDER BY ma.groupe ASC, ma.classement ASC
+ORDER BY a.id_groupes_attributs ASC, ma.classement ASC
 SQL;
 		$res = $this->sql->query($q);
 		
 		while ($row = $this->sql->fetch($res)) {
 			$valeur = isset($row[$row['type_valeur']]) ? $row[$row['type_valeur']] : "";
 			if ($grouped == 'grouped') {
-				$attributs[$row['groupe']][$row['id_attributs']][$row['classement']] = $valeur;
+				$attributs[$row['id_groupes_attributs']][$row['id_attributs']][$row['classement']] = $valeur;
 			}
 			else {
 				$attributs[$row['id_attributs']][$row['classement']] = $valeur;
@@ -533,11 +534,10 @@ DELETE FROM {$this->attributs_table}_management WHERE {$this->id_field} = $id
 SQL;
 			$this->sql->query($q);
 			foreach ($data['attributs_management'] as $attribut_id => $values) {
-				$groupe = isset($values['groupe']) ? (int)$values['groupe'] : 0;
 				$classement = isset($values['classement']) ? (int)$values['classement'] : 0;
 				$q = <<<SQL
-INSERT INTO {$this->attributs_table}_management (id_attributs, {$this->id_field}, `groupe`, classement)
-VALUES ($attribut_id, $id, $groupe, $classement)
+INSERT INTO {$this->attributs_table}_management (id_attributs, {$this->id_field}, classement)
+VALUES ($attribut_id, $id, $classement)
 SQL;
 				$this->sql->query($q);
 			}

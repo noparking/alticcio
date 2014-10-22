@@ -20,9 +20,11 @@ class AttributManagement {
 		}
 		$application_id = isset($this->id) ? $this->id : 0;
 		$q = <<<SQL
-SELECT DISTINCT(a.id), p.phrase AS name, am.groupe, am.classement FROM dt_attributs AS a
+SELECT DISTINCT(a.id), p.phrase AS name, a.id_groupes_attributs, p2.phrase AS groupe, am.classement FROM dt_attributs AS a
 LEFT OUTER JOIN dt_phrases AS p ON p.id = a.phrase_nom AND p.id_langues = {$this->langue}
 LEFT OUTER JOIN {$this->object->attributs_table}_management AS am ON am.id_attributs = a.id AND am.{$this->object->id_field} = {$this->object->id}
+LEFT OUTER JOIN dt_groupes_attributs AS ga ON ga.id = a.id_groupes_attributs
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = ga.phrase_nom AND p2.id_langues = {$this->langue}
 SQL;
 		$res = $filter->query($q);
 

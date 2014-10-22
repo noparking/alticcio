@@ -240,6 +240,7 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "attribut[phrase_nom]", 'type' => "hidden"))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "attribut[ref]", 'label' => $dico->t('Référence') ))}
+{$form->select(array('name' => "attribut[id_groupes_attributs]", 'label' => $dico->t('Groupe'), 'options' => $attribut->groupes($id_langues)))}
 {$form->select(array('name' => "attribut[id_types_attributs]", 'label' => $dico->t('TypeValeurs'), 'options' => $attribut->types()))}
 {$form->select(array('name' => "attribut[id_unites_mesure]", 'label' => $dico->t('UniteMesure'), 'options' => $attribut->unites(), 'nothing' => "..."))}
 {$form->input(array('name' => "attribut[norme]", 'label' => $dico->t('Norme') ))}

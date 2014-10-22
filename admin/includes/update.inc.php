@@ -1284,3 +1284,37 @@ ALTER TABLE `dt_commandes_produits_revisions` ADD `personnalisation_cle` VARCHAR
 SQL;
 	$update->query($q);
 }
+
+function update_51($update) {
+	$q = <<<SQL
+ALTER TABLE dt_attributs ADD `id_groupes_attributs` int(11) NOT NULL DEFAULT 0 AFTER `id_types_attributs` 
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+SELECT id_attributs, groupe FROM dt_gammes_attributs_management WHERE groupe > 0
+SQL;
+	$res = $update->query($q);
+
+	while ($row = $update->sql->fetch($res)) {
+		$q = <<<SQL
+UPDATE dt_attributs SET id_groupes_attributs = {$row['groupe']} WHERE id = {$row['id_attributs']}
+SQL;
+		$update->query($q);
+	}
+
+	$q = <<<SQL
+ALTER TABLE `dt_gammes_attributs_management` DROP `groupe`
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_produits_attributs_management` DROP `groupe`
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_sku_attributs_management` DROP `groupe`
+SQL;
+	$update->query($q);
+}

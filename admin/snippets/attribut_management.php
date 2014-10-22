@@ -25,14 +25,9 @@ $filter = $filter_attributs_management = new Filter($pager, array(
 	'groupe' => array(
 		'title' => $dico->t('Groupe'),
 		'type' => 'select',
+		'field' => 'a.id_groupes_attributs',
+		'values' => array(0 => ""),
 		'options' => $groupes,
-		'field' => 'am.groupe',
-		'form' => array(
-			'name' => "attributs_management[%id%][groupe]",
-			'method' => 'select',
-			'options' => $groupes_options,
-			'template' => '#{field}',
-		),
 	),
 	'classement' => array(
 		'title' => $dico->t('Classement'),

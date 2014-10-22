@@ -50,6 +50,20 @@ SQL;
 		return $liste;
 	}
 
+	public function groupes($id_langues) {
+		$q = <<<SQL
+SELECT ga.id, p.phrase AS nom FROM dt_groupes_attributs AS ga
+LEFT OUTER JOIN dt_phrases AS p ON p.id = ga.phrase_nom AND p.id_langues = $id_langues 
+SQL;
+		$res = $this->sql->query($q);
+		$groupes = array();
+		while ($row = $this->sql->fetch($res)) {
+			$groupes[$row['id']] = $row['nom'];
+		}
+
+		return $groupes;
+	}
+
 	public function types($code_as_key = false) {
 		$q = <<<SQL
 SELECT id, code FROM dt_types_attributs
