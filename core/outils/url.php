@@ -5,6 +5,7 @@ abstract class Url {
 	private $base = "";
 	private $elements = array();
 	private $elements_with_trailing_slashes = array();
+	private $set_elements = array();
 	
 	public function set_base($base) {
 		$this->base = $base;
@@ -20,8 +21,16 @@ abstract class Url {
 			$this->elements[] = $element;
 		}
 	}
+
+	public function set($element, $value) {
+		$this->set_elements[$element] = $value;
+		return $value;
+	}
 	
 	public function get($element) {
+		if (isset($this->set_elements[$element])) {
+			return $this->set_elements[$element];
+		}
 		$base = trim($this->base, "/");
 		$url = str_replace($base, "", str_replace("?".$_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']));
 		$url = trim($url, "/");
