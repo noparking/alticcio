@@ -153,5 +153,6 @@ $filter = new Filter($pager, array(
 		'title' => $dico->t('Date'),
 		'type' => 'date_between',
 		'field' => 'c.date_commande',
+		'format' => "d/m/Y - (H:m:i)",
 	),
 ), array(), "filter_commandes");
