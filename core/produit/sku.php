@@ -180,7 +180,7 @@ SQL;
 
 				$montant_ht = (float)$data['prix'][$id_catalogues]['montant_ht'];
 				$q = <<<SQL
-UPDATE dt_prix_degressifs SET montant_ht = {$montant_ht} * (1 - (pourcentage / 100))
+UPDATE dt_prix_degressifs SET pourcentage = 100 - ((montant_ht * 100)  / {$montant_ht})
 WHERE id_sku = {$id_sku} AND id_catalogues = {$id_catalogues}
 SQL;
 				$this->sql->query($q);
