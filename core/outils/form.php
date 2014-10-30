@@ -1366,9 +1366,10 @@ HTML;
 		}
 
 		$unit = isset($params['unit']) ? "&nbsp;".$params['unit'] : "";
+		$prefix = isset($params['prefix']) ? $params['prefix'] : "";
 		$html = str_replace("#{label}", $label, $html);
 		$html = str_replace("#{class}", $params['class'], $html);
-		$html = str_replace("#{field}", $params['field'].$unit, $html);
+		$html = str_replace("#{field}", $prefix.$params['field'].$unit, $html);
 		$html = str_replace("#{description}", isset($params['description']) ? $params['description'] : "", $html);
 		$html = str_replace("#{errors}", $errors, $html);
 
