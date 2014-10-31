@@ -249,17 +249,19 @@ SQL;
 		foreach ($_SESSION['cart'][$this->key]['items'] as $item) {
 			$sku_ids[] = $item['id_sku'];
 		}
-		$liste_id_sku = implode(",", $sku_ids);
-		// S'il y a au moins 1 SKU franco = 0 ou montant_ht = 0
-		$q = <<<SQL
+		if (count($sku_ids)) {
+			$liste_id_sku = implode(",", $sku_ids);
+			// S'il y a au moins 1 SKU franco = 0 ou montant_ht = 0
+			$q = <<<SQL
 SELECT * FROM dt_prix
 WHERE id_catalogues = $this->id_catalogues
 AND (franco = 0 OR montant_ht = 0) 
 AND id_sku IN ($liste_id_sku)
 SQL;
-		$res = $this->sql->query($q);
-		if ($this->sql->fetch($res)) {
-			return false;
+			$res = $this->sql->query($q);
+			if ($this->sql->fetch($res)) {
+				return false;
+			}
 		}
 
 		return true;
