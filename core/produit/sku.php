@@ -173,7 +173,8 @@ SQL;
 			$set = array();
 			foreach ($data['prix'] as $id_catalogues => $prix_catalogue) {
 				foreach ($prix_catalogue as $field => $value) {
-					$set[] = "$field = '$value'";
+					$value = (float)$value;
+					$set[] = "$field = $value";
 				}
 				$q = "UPDATE dt_prix SET ".implode(',', $set)." WHERE id_sku = $id_sku AND id_catalogues = {$id_catalogues}";
 				$this->sql->query($q);
