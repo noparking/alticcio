@@ -2,7 +2,7 @@
 global $config, $page, $dico, $pager, $filter, $form;
 
 $page->javascript[] = $config->core_media("jquery.min.js");
-$page->javascript[] = $config->core_media("filter.js");
+$page->javascript[] = $config->media("filter.js");
 
 if (isset($form) and $form) {
 	$is_permitted = $form->is_permitted("checkbox", array("name" => ""));
