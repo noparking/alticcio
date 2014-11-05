@@ -78,6 +78,10 @@ $filter_schema_sku = array(
 		'type' => 'between',
 		'order' => 'DESC',
 		'field' => 's.id',
+		'link' => array(
+			'href' => $url2->make("Produits", array('type' => "sku", 'action' => "edit", 'id' => "{value}")),
+			'target' => "_blank",
+		),
 	),
 	'ref_ultralog' => array(
 		'title' => $dico->t('Reference'),
@@ -104,6 +108,10 @@ $filter_schema_produits = array(
 		'type' => 'between',
 		'order' => 'DESC',
 		'field' => 'pr.id',
+		'link' => array(
+			'href' => $url2->make("Produits", array('type' => "produits", 'action' => "edit", 'id' => "{value}")),
+			'target' => "_blank",
+		),
 	),
 	'ref' => array(
 		'title' => $dico->t('Reference'),
