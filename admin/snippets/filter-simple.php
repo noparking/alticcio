@@ -2,7 +2,7 @@
 global $config, $page, $dico, $pager, $filter;
 
 $page->javascript[] = $config->core_media("jquery.min.js");
-$page->javascript[] = $config->core("filter.js");
+$page->javascript[] = $config->media("filter.js");
 
 $html = <<<HTML
 <div class="filter-pager">
