@@ -371,9 +371,17 @@ HTML;
 			$format = isset($this->elements[$cle]['format']) ? $this->elements[$cle]['format'] : "d/m/Y";
 			$valeur = date($format, $valeur);
 		}
-
 		if (isset($this->elements[$cle]['template'])) {
 			$valeur = str_replace("{{$cle}}", $valeur, $this->elements[$cle]['template']);
+		}
+		if (isset($this->elements[$cle]['link']['href'])) {
+			$href = str_replace("{field}", $cle, $this->elements[$cle]['link']['href']);
+			$href = str_replace("{value}", $valeur, $href);
+			$target = "";
+			if (isset($this->elements[$cle]['link']['target'])) {
+				$target = " target=\"{$this->elements[$cle]['link']['target']}\"";
+			}
+			$valeur = "<a href=\"{$href}\" {$target}>{$valeur}</a>";
 		}
 		
 		return $valeur;
