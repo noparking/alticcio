@@ -264,9 +264,6 @@ SQL;
 
 	public function prix_degressifs_catalogue($id_catalogues) {
 		$prix_degressifs = $this->prix_degressifs($id_catalogues);
-		if (count($prix_degressifs) == 0) {
-			$prix_degressifs = $this->prix_degressifs(0);
-		}
 
 		return $prix_degressifs;
 	}
