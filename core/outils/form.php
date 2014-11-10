@@ -1356,6 +1356,12 @@ HTML;
 			$label .= ' class="'.$params['class'].' '.$this->form_class.' '.$this->required_class($params).'"';
 			$label .= '>'.$params['label'].$this->required_mark($params).'</label>';
 		}
+		$clean = "";
+		if (isset($params['clean'])) {
+			$clean = <<<HTML
+<button onclick="document.getElementById('{$params['id']}').value = '{$params['clean'][1]}'; return false;">{$params['clean'][0]}</button>
+HTML;
+		}
 
 		$errors = "";
 		if (isset($this->fields_errors[$params['name']]) and count($this->fields_errors[$params['name']])) {
@@ -1370,6 +1376,7 @@ HTML;
 		$html = str_replace("#{label}", $label, $html);
 		$html = str_replace("#{class}", $params['class'], $html);
 		$html = str_replace("#{field}", $prefix.$params['field'].$unit, $html);
+		$html = str_replace("#{clean}", $clean, $html);
 		$html = str_replace("#{description}", isset($params['description']) ? $params['description'] : "", $html);
 		$html = str_replace("#{errors}", $errors, $html);
 
