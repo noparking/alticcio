@@ -90,7 +90,7 @@ CSS;
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$name = "personnalisation[textes][$id_texte]";
 			$html .= <<<HTML
-<textarea {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}" id_texte="{$id_texte}">{$contenu}</textarea>
+<textarea autocomplete="off" {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}" id_texte="{$id_texte}">{$contenu}</textarea>
 HTML;
 		}
 		foreach($personnalisations['images'] as $id_image => $image) {
