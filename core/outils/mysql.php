@@ -73,7 +73,7 @@ class Mysql {
         return $value;
     }
 
-	function quote_string($table, $field, $value) {
+	function quote_string($table, $field, $value, $escape = false) {
 		if (!isset($this->types[$table])) {
 			$q = "SHOW COLUMNS FROM $table";
 			$res = $this->query($q);
@@ -85,7 +85,7 @@ class Mysql {
 		if (isset($this->types[$table][$field])) {
 			foreach (array('CHAR', 'VARCHAR', 'BINARY', 'VARBINARY', 'BLOB', 'TEXT', 'ENUM', 'SET') as $type) {
 				if (strpos($this->types[$table][$field], $type) === 0) {
-					return "'$value'";
+					return "'".($escape ? mysql_real_escape_string($value) : $value)."'";
 				}
 			}
 		}
@@ -105,6 +105,62 @@ class Mysql {
 			}
 		}
 	}
+
+	function update($table, $key_field, $conditions, $data) {
+		if (count($data) == 0) {
+			return;
+		}
+		$where = array();
+		foreach ($conditions as $field => $value) {
+			$where[] = "$field = ".$this->quote($value);
+		}
+		$where = implode(" AND ", $where);
+		$before = array();
+		$q = <<<SQL
+SELECT `$key_field` FROM `$table` WHERE 1 AND $where
+SQL;
+		$res = $this->query($q);
+		while ($row = $this->fetch($res)) {
+			$before[] = $row[$key_field];
+		}
+		$deleted = array_diff($before, array_keys($data));
+		if (count($deleted)) {
+			$list_deleted = implode(",", $deleted);
+			$q = <<<SQL
+DELETE FROM `$table` WHERE `$key_field` IN ($list_deleted)
+SQL;
+			$this->query($q);
+		}
+		$news = array();
+		foreach ($data as $key => $fields) {
+			if (in_array($key, $before)) {
+				$set = array();
+				foreach ($fields as $field => $value) {
+					$set[] = "`$field` = ".$this->quote_string($table, $field, $value, true);
+				}
+				$set = implode(",", $set);
+				$q = <<<SQL
+UPDATE `$table` SET $set WHERE 1 AND $where AND $key_field = $key
+SQL;
+				$this->query($q);
+			}
+			else {
+				$values = array();
+				foreach ($fields as $field => $value) {
+					$values[] = $this->quote_string($table, $field, $value, true);
+				}
+				$news[] = "({$key},".implode(",", array_merge($conditions, $values)).")";
+			}
+		}
+		if (count($news)) {
+			$values = implode(",", $news);
+			$fields = implode("`,`", array_merge(array_keys($conditions), array_keys(array_pop($data))));
+			$q = <<<SQL
+INSERT INTO `$table` (`$key_field`,`$fields`) VALUES $values
+SQL;
+			$this->query($q);
+		}
+    }
 }
 
 ?>
