@@ -82,6 +82,37 @@ $filter_gammes = new Filter($pager, array(
 	),
 ), array_keys($attribut->gammes()), "filter_attributs_gammes", true);
 
+$filter_skus = new Filter($pager, array(
+	'id' => array(
+		'title' => 'ID',
+		'type' => 'between',
+		'order' => 'DESC',
+		'field' => 's.id',
+	),
+	'phrase' => array(
+		'title' => $dico->t('Nom'),
+		'type' => 'contain',
+		'field' => 'p.phrase',
+	),
+	'ref_ultralog' => array(
+		'title' => $dico->t('Reference'),
+		'type' => 'contain',
+		'field' => 's.ref_ultralog',
+	),
+	'classement' => array(
+		'title' => $dico->t('Classement'),
+		'type' => 'between',
+		'field' => 'sam.classement',
+		'form' => array(
+			'name' => "sku[%id%][classement]",
+			'method' => 'input',
+			'type' => 'text',
+			'template' => '#{field}',
+			'class' => "input-text-numeric",
+		),
+	),
+), array_keys($attribut->skus()), "filter_attributs_gammes", true);
+
 $form = new Form(array(
 	'id' => "form-edit-attribut-$id",
 	'class' => "form-edit",
@@ -135,11 +166,13 @@ if ($form->is_submitted()) {
 }
 
 $attribut_gammes = $attribut->gammes();
+$attribut_skus = $attribut->skus();
 if ($form->changed()) {
 	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
 }
 else {
 	$filter_gammes->select(array_keys($attribut_gammes));
+	$filter_skus->select(array_keys($attribut_skus));
 }
 
 if ($action == 'edit') {
@@ -149,6 +182,7 @@ if ($action == 'edit') {
 	$form->default_values['reference'] = $attribut->reference();
 	$form->default_values['valeurs'] = $attribut->valeurs();
 	$form->default_values['gammes'] = $attribut_gammes;
+	$form->default_values['sku'] = $attribut_skus;
 }
 
 $form_start = $form->form_start();
@@ -282,13 +316,19 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	foreach ($filter->selected() as $selected_gamme) {
-		$main .= $form->hidden(array('name' => "gammes[$selected_gamme][classement]")); # TODO vérifier pas de doublons
+		$main .= $form->hidden(array('name' => "gammes[$selected_gamme][classement]"));
 	}
-	//$attribut->liste_sku($filter);
+	$filter = $filter_skus;
+	$attribut->liste_skus($filter);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('SKU'), 'class' => "produit-section produit-section-sku".$hidden['sku'], 'id' => "produit-section-sku"))}
+{$page->inc("snippets/filter-form")}
+{$form->input(array('name' => "all_sku[classement]", 'label' => "Changer le classement pour tous les SKU sélectionnés"))}
 {$form->fieldset_end()}
 HTML;
+	foreach ($filter->selected() as $selected_sku) {
+		$main .= $form->hidden(array('name' => "sku[$selected_sku][classement]"));
+	}
 }
 
 if ($action == "create" or $action == "edit") {
