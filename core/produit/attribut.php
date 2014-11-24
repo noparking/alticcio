@@ -50,6 +50,41 @@ SQL;
 		return $liste;
 	}
 
+	public function liste_gammes(&$filter = null) {
+		$q = <<<SQL
+SELECT g.id, p.phrase, g.ref, gam.classement FROM dt_gammes AS g
+LEFT OUTER JOIN dt_gammes_attributs_management AS gam ON gam.id_gammes = g.id AND gam.id_attributs = {$this->id} 
+LEFT OUTER JOIN dt_phrases AS p ON p.id = g.phrase_nom AND p.id_langues = {$this->langue}
+SQL;
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+		$res = $filter->query($q);
+
+		$liste = array();
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
+
+	public function gammes() {
+		$q = <<<SQL
+SELECT g.id, gam.classement FROM dt_gammes AS g
+INNER JOIN dt_gammes_attributs_management AS gam ON gam.id_gammes = g.id AND gam.id_attributs = {$this->id} 
+SQL;
+		$res = $this->sql->query($q);
+		$gammes = array();
+		while ($row = $this->sql->fetch($res)) {
+			$gammes[$row['id']] = array(
+				'classement' => $row['classement'],
+			);
+		}
+
+		return $gammes;
+	}
+
 	public function groupes($id_langues) {
 		$q = <<<SQL
 SELECT ga.id, p.phrase AS nom FROM dt_groupes_attributs AS ga
@@ -231,12 +266,26 @@ SQL;
 			$this->sql->query($q);
 			$q = "INSERT INTO dt_attributs_valeurs (id_attributs, type_valeur, valeur_numerique, phrase_valeur) VALUES ($id, '{$valeurs['type_valeur']}', {$valeurs['valeur_numerique']}, {$id_phrase})";
 			$this->sql->query($q);
+			$q = "UPDATE dt_gammes_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
+			$this->sql->query($q);
 			$q = "UPDATE dt_produits_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
 			$q = "UPDATE dt_sku_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
 			$q = "UPDATE dt_matieres_attributs SET valeur_numerique={$valeur_numerique}, phrase_valeur='{$phrase_valeur}' WHERE id_attributs = $id";
 			$this->sql->query($q);
+		}
+		if (isset($data['gammes'])) {
+			if(isset($data['all_gammes'])) {
+				foreach ($data['all_gammes'] as $key => $value) {
+					if ($value !== "") {
+						foreach ($data['gammes'] as $id_gammes => $gammes) {
+							$data['gammes'][$id_gammes][$key] = $value;
+						}
+					}
+				}
+			}
+			$this->sql->update("dt_gammes_attributs_management", "id_gammes", array('id_attributs' => $id), $data['gammes']);
 		}
 
 		return $id;

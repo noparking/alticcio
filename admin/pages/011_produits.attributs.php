@@ -7,7 +7,6 @@ $config->core_include("outils/phrase", "outils/langue");
 $config->core_include("outils/filter", "outils/pager");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
-$page->javascript[] = $config->core_media("filter-edit.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
 
@@ -25,6 +24,11 @@ $id_langues = $langue->id($config->get("langue"));
 $phrase = new Phrase($sql);
 
 $attribut = new Attribut($sql, $phrase, $id_langues);
+
+$action = $url2->get('action');
+if ($id = $url2->get('id')) {
+	$attribut->load($id);
+}
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter = new Filter($pager, array(
@@ -47,10 +51,36 @@ $filter = new Filter($pager, array(
 	),
 ), array(), "filter_attributs");
 
-$action = $url2->get('action');
-if ($id = $url2->get('id')) {
-	$attribut->load($id);
-}
+$filter_gammes = new Filter($pager, array(
+	'id' => array(
+		'title' => 'ID',
+		'type' => 'between',
+		'order' => 'DESC',
+		'field' => 'g.id',
+	),
+	'phrase' => array(
+		'title' => $dico->t('Nom'),
+		'type' => 'contain',
+		'field' => 'p.phrase',
+	),
+	'ref' => array(
+		'title' => $dico->t('Reference'),
+		'type' => 'contain',
+		'field' => 'g.ref',
+	),
+	'classement' => array(
+		'title' => $dico->t('Classement'),
+		'type' => 'between',
+		'field' => 'gam.classement',
+		'form' => array(
+			'name' => "gammes[%id%][classement]",
+			'method' => 'input',
+			'type' => 'text',
+			'template' => '#{field}',
+			'class' => "input-text-numeric",
+		),
+	),
+), array_keys($attribut->gammes()), "filter_attributs_gammes", true);
 
 $form = new Form(array(
 	'id' => "form-edit-attribut-$id",
@@ -70,6 +100,8 @@ if ($form->is_submitted()) {
 	$data = $form->escape_values();
 	switch ($form->action()) {
 		case "translate":
+		case "filter":
+		case "pager":
 		case "reload":
 			break;
 		case "reset":
@@ -90,6 +122,7 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
+				$filter_gammes->clean_data($data, "gammes");
 				$id = $attribut->save($data);
 				$form->reset();
 				if ($action != "edit") {
@@ -101,8 +134,12 @@ if ($form->is_submitted()) {
 	}
 }
 
+$attribut_gammes = $attribut->gammes();
 if ($form->changed()) {
 	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
+}
+else {
+	$filter_gammes->select(array_keys($attribut_gammes));
 }
 
 if ($action == 'edit') {
@@ -111,6 +148,7 @@ if ($action == 'edit') {
 	$form->default_values['options'] = $attribut->options();
 	$form->default_values['reference'] = $attribut->reference();
 	$form->default_values['valeurs'] = $attribut->valeurs();
+	$form->default_values['gammes'] = $attribut_gammes;
 }
 
 $form_start = $form->form_start();
@@ -143,7 +181,8 @@ if ($action == "edit") {
 
 	$types_attributs = $attribut->types();
 	$id_types_attributs = $attribut->attr('id_types_attributs');
-	if ($form->changed()) {
+	$form_changed = $form->changed(); 
+	if ($form_changed) {
 		$id_types_attributs = $form->value('attribut[id_types_attributs]');
 	}
 	$type_attribut = $types_attributs[$id_types_attributs];
@@ -229,9 +268,27 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 	}
-	else {
-		$left = $page->inc("snippets/produits-sections");
+	$sections['gammes'] = $dico->t('Gammes');
+	$sections['sku'] = $dico->t('SKU');
+	// variable $hidden mise à jour dans ce snippet
+	$left = $page->inc("snippets/produits-sections");
+
+	$filter = $filter_gammes;
+	$attribut->liste_gammes($filter);
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Gammes'), 'class' =>	"produit-section produit-section-gammes".$hidden['gammes'], 'id' => "produit-section-gammes"))}
+{$page->inc("snippets/filter-form")}
+{$form->input(array('name' => "all_gammes[classement]", 'label' => "Changer le classement pour toutes les gammes sélectionnées"))}
+{$form->fieldset_end()}
+HTML;
+	foreach ($filter->selected() as $selected_gamme) {
+		$main .= $form->hidden(array('name' => "gammes[$selected_gamme][classement]")); # TODO vérifier pas de doublons
 	}
+	//$attribut->liste_sku($filter);
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('SKU'), 'class' => "produit-section produit-section-sku".$hidden['sku'], 'id' => "produit-section-sku"))}
+{$form->fieldset_end()}
+HTML;
 }
 
 if ($action == "create" or $action == "edit") {
@@ -260,6 +317,7 @@ switch($action) {
 		$titre_page = $dico->t('EditerAttribut')." # ID : ".$id;
 		break;
 	default :
+		$page->javascript[] = $config->core_media("filter-edit.js");
 		$titre_page = $dico->t('ListeOfAttributs');
 		$attribut->liste($filter);
 		$main = $page->inc("snippets/filter");
