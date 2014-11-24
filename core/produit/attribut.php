@@ -51,6 +51,7 @@ SQL;
 	}
 
 	public function liste_gammes(&$filter = null) {
+		if (!$this->id) return array();
 		$q = <<<SQL
 SELECT g.id, p.phrase, g.ref, gam.classement FROM dt_gammes AS g
 LEFT OUTER JOIN dt_gammes_attributs_management AS gam ON gam.id_gammes = g.id AND gam.id_attributs = {$this->id} 
@@ -70,6 +71,7 @@ SQL;
 	}
 
 	public function gammes() {
+		if (!$this->id) return array();
 		$q = <<<SQL
 SELECT g.id, gam.classement FROM dt_gammes AS g
 INNER JOIN dt_gammes_attributs_management AS gam ON gam.id_gammes = g.id AND gam.id_attributs = {$this->id} 
@@ -86,6 +88,7 @@ SQL;
 	}
 
 	public function liste_skus(&$filter = null) {
+		if (!$this->id) return array();
 		$q = <<<SQL
 SELECT s.id, p.phrase, s.ref_ultralog, sam.classement FROM dt_sku AS s
 LEFT OUTER JOIN dt_sku_attributs_management AS sam ON sam.id_sku = s.id AND sam.id_attributs = {$this->id} 
@@ -105,6 +108,7 @@ SQL;
 	}
 
 	public function skus() {
+		if (!$this->id) return array();
 		$q = <<<SQL
 SELECT s.id, sam.classement FROM dt_sku AS s
 INNER JOIN dt_sku_attributs_management AS sam ON sam.id_sku = s.id AND sam.id_attributs = {$this->id} 
