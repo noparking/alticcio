@@ -30,7 +30,7 @@ if ($id = $url2->get('id')) {
 	$attribut->load($id);
 }
 
-$pager = new Pager($sql, array(20, 30, 50, 100, 200));
+$pager = new Pager($sql, array(20, 30, 50, 100, 200), "pager_attributs");
 $filter = new Filter($pager, array(
 	'id' => array(
 		'title' => 'ID',
@@ -51,7 +51,8 @@ $filter = new Filter($pager, array(
 	),
 ), array(), "filter_attributs");
 
-$filter_gammes = new Filter($pager, array(
+$pager_gammes = new Pager($sql, array(20, 30, 50, 100, 200), "pager_attributs_gammes");
+$filter_gammes = new Filter($pager_gammes, array(
 	'id' => array(
 		'title' => 'ID',
 		'type' => 'between',
@@ -82,7 +83,8 @@ $filter_gammes = new Filter($pager, array(
 	),
 ), array_keys($attribut->gammes()), "filter_attributs_gammes", true);
 
-$filter_skus = new Filter($pager, array(
+$pager_skus = new Pager($sql, array(20, 30, 50, 100, 200), "pager_attributs_skus");
+$filter_skus = new Filter($pager_skus, array(
 	'id' => array(
 		'title' => 'ID',
 		'type' => 'between',
@@ -111,7 +113,7 @@ $filter_skus = new Filter($pager, array(
 			'class' => "input-text-numeric",
 		),
 	),
-), array_keys($attribut->skus()), "filter_attributs_gammes", true);
+), array_keys($attribut->skus()), "filter_attributs_skus", true);
 
 $form = new Form(array(
 	'id' => "form-edit-attribut-$id",
@@ -307,6 +309,7 @@ HTML;
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
+	$pager = $pager_gammes;
 	$filter = $filter_gammes;
 	$attribut->liste_gammes($filter);
 	$main .= <<<HTML
@@ -318,6 +321,7 @@ HTML;
 	foreach ($filter->selected() as $selected_gamme) {
 		$main .= $form->hidden(array('name' => "gammes[$selected_gamme][classement]"));
 	}
+	$pager = $pager_skus;
 	$filter = $filter_skus;
 	$attribut->liste_skus($filter);
 	$main .= <<<HTML

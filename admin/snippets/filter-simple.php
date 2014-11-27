@@ -1,10 +1,10 @@
 <?php
 global $config, $page, $dico, $pager, $filter;
 
-$page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->media("filter.js");
 
 $html = <<<HTML
+<div class="filter">
 <div class="filter-pager">
 	{$page->inc("snippets/pager")} |
 	<div class="filter-buttons">
@@ -60,6 +60,7 @@ HTML;
 </tbody>
 </table>
 {$filter->hidden()}
+</div>
 HTML;
 	
 echo $html;

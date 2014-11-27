@@ -395,6 +395,7 @@ $t['Parametres'] = "Paramètres";
 $t['ParametresUtilisateur'] = "Paramètres de l'utilisateur";
 $t['Parent'] = "Parent";
 $t['ParPage'] = "par page";
+$t['PageSur'] = "sur";
 $t['PasAfficher'] = "Ne pas afficher";
 $t['Password'] = "Password";
 $t['Pavillon'] = "Pavillon";

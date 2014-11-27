@@ -573,7 +573,7 @@ HTML;
 		$sort = $this->sort();
 		return <<<HTML
 		<input type="hidden" name="{$this->name}[pselected]" value="{$selected}" />
-		<input type="hidden" name="{$this->name}[inverted]" value="{$this->inverted}" />
+		<input type="hidden" name="{$this->name}[inverted]"  class="filter-inverted" value="{$this->inverted}" />
 		<input type="hidden" name="{$this->name}[items]" value="{$item_list}" />
 		<input type="hidden" name="{$this->name}[md5]" value="{$this->md5()}" />
 		<input type="hidden" name="{$this->name}[action][action]" id="{$this->name}-action-action" value="" />

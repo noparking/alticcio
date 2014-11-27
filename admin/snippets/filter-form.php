@@ -1,7 +1,6 @@
 <?php
 global $config, $page, $dico, $pager, $filter, $form;
 
-$page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->media("filter.js");
 
 if (isset($form) and $form) {
@@ -12,6 +11,7 @@ else {
 }
 
 $html = <<<HTML
+<div class="filter">
 <div class="filter-pager">
 	{$page->inc("snippets/pager")} |
 	<div class="filter-buttons">
@@ -21,6 +21,7 @@ $html = <<<HTML
 </div>
 <div class="filter-actions">
 	{$dico->t("Selectionnes")} : {$filter->selectcount()}
+	| {$filter->actionlink("selectall", "Tout sélectionner")}
 	| {$filter->actionlink("unselectall", "Tout déselectionner")}
 </div>
 <table id="table_pager">
@@ -78,6 +79,7 @@ HTML;
 </tbody>
 </table>
 {$filter->hidden()}
+</div>
 HTML;
 	
 echo $html;

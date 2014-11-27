@@ -114,7 +114,7 @@ SELECT s.id, sam.classement FROM dt_sku AS s
 INNER JOIN dt_sku_attributs_management AS sam ON sam.id_sku = s.id AND sam.id_attributs = {$this->id} 
 SQL;
 		$res = $this->sql->query($q);
-		$gammes = array();
+		$skus = array();
 		while ($row = $this->sql->fetch($res)) {
 			$skus[$row['id']] = array(
 				'classement' => $row['classement'],

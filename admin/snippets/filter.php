@@ -1,10 +1,10 @@
 <?php
 global $config, $page, $dico, $pager, $filter;
 
-$page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->media("filter.js");
 
 $html = <<<HTML
+<div class="filter">
 <div class="filter-pager">
 	{$page->inc("snippets/pager")} |
 	<div class="filter-buttons">
@@ -17,7 +17,7 @@ HTML;
 $html .= <<<HTML
 <div class="filter-actions">
 	{$dico->t("Selectionnes")} : {$filter->selectcount()}
-	|	{$filter->actionlink("selectall", "Tout sélectionner")}
+	| {$filter->actionlink("selectall", "Tout sélectionner")}
 	| {$filter->actionlink("unselectall", "Tout déselectionner")}
 </div>
 HTML;
@@ -84,6 +84,7 @@ HTML;
 </tbody>
 </table>
 {$filter->hidden()}
+</div>
 HTML;
 	
 echo $html;

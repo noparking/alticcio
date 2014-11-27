@@ -1,8 +1,7 @@
 <?php
 global $config, $page, $dico, $pager;
 
-$page->javascript[] = $config->core_media("jquery.min.js");
-$page->javascript[] = $config->core_media("pager.js");
+$page->javascript[] = $config->media("pager.js");
 
 $page_s = $pager->pages() > 1 ? $dico->t("pages") : $dico->t("page");
 
