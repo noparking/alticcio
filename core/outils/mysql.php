@@ -107,9 +107,6 @@ class Mysql {
 	}
 
 	function update($table, $key_field, $conditions, $data) {
-		if (count($data) == 0) {
-			return;
-		}
 		$where = array();
 		foreach ($conditions as $field => $value) {
 			$where[] = "$field = ".$this->quote($value);
@@ -127,9 +124,10 @@ SQL;
 		if (count($deleted)) {
 			$list_deleted = implode(",", $deleted);
 			$q = <<<SQL
-DELETE FROM `$table` WHERE `$key_field` IN ($list_deleted)
+DELETE FROM `$table` WHERE 1 AND $where AND `$key_field` IN ($list_deleted)
 SQL;
 			$this->query($q);
+debug::dump($q);
 		}
 		$news = array();
 		foreach ($data as $key => $fields) {

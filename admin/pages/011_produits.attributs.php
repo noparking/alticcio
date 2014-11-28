@@ -153,7 +153,17 @@ if ($form->is_submitted()) {
 		case "delete-option":
 			$attribut->delete_option($data, $form->action_arg());
 			break;
-		default :
+		case 'addtogammes' :
+			$attribut->add_to_gammes();
+			$attribut_gammes = $attribut->gammes();
+			$filter_gammes->select(array_keys($attribut_gammes));
+			break;
+		case 'addtoskus' :
+			$attribut->add_to_skus();
+			$attribut_skus = $attribut->skus();
+			$filter_skus->select(array_keys($attribut_skus));
+			break;
+		default:
 			if ($action == "edit" or $action == "create") {
 				$filter_gammes->clean_data($data, "gammes");
 				$id = $attribut->save($data);

@@ -17,7 +17,6 @@ HTML;
 $html .= <<<HTML
 <div class="filter-actions">
 	{$dico->t("Selectionnes")} : {$filter->selectcount()}
-	| {$filter->actionlink("selectall", "Tout sélectionner")}
 	| {$filter->actionlink("unselectall", "Tout déselectionner")}
 </div>
 HTML;

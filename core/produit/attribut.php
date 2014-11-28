@@ -71,7 +71,7 @@ SQL;
 	}
 
 	public function gammes() {
-		if (!$this->id) return array();
+		if (!isset($this->id) or !$this->id) return array();
 		$q = <<<SQL
 SELECT g.id, gam.classement FROM dt_gammes AS g
 INNER JOIN dt_gammes_attributs_management AS gam ON gam.id_gammes = g.id AND gam.id_attributs = {$this->id} 
@@ -85,6 +85,18 @@ SQL;
 		}
 
 		return $gammes;
+	}
+
+	public function add_to_gammes() {
+		$data = array();
+		$q = <<<SQL
+SELECT id FROM dt_gammes
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$data[$row['id']] = array('classement' => 0);
+		}
+		$this->sql->update("dt_gammes_attributs_management", "id_gammes", array('id_attributs' => $this->id), $data);
 	}
 
 	public function liste_skus(&$filter = null) {
@@ -108,7 +120,7 @@ SQL;
 	}
 
 	public function skus() {
-		if (!$this->id) return array();
+		if (!isset($this->id) or !$this->id) return array();
 		$q = <<<SQL
 SELECT s.id, sam.classement FROM dt_sku AS s
 INNER JOIN dt_sku_attributs_management AS sam ON sam.id_sku = s.id AND sam.id_attributs = {$this->id} 
@@ -122,6 +134,18 @@ SQL;
 		}
 
 		return $skus;
+	}
+
+	public function add_to_skus() {
+		$data = array();
+		$q = <<<SQL
+SELECT id FROM dt_sku
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$data[$row['id']] = array('classement' => 0);
+		}
+		$this->sql->update("dt_sku_attributs_management", "id_sku", array('id_attributs' => $this->id), $data);
 	}
 
 	public function groupes($id_langues) {
