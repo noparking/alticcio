@@ -173,6 +173,7 @@ SQL;
 			'attributs_variants' => $produit->variantes_filtre(),
 			'customizable' => ($produit->values['id_types_produits'] == 2),
 			'customization' => $produit->personnalisation(),
+			'documents' => $produit->documents(array('actif' => 1, 'public' => 1)),
 		);
 
 		return $fiche;
