@@ -390,15 +390,20 @@ SQL;
 		$this->sql->query($q);
 	}
 
-	public function documents() {
+	public function documents($conditions = array()) {
 		$documents = array();
 
 		if (isset($this->documents_table) and $this->documents_table and isset($this->id) and $this->id) {
 			$id_field = $this->id_field();
+			$where = "";
+			foreach ($conditions as $key => $value) {
+				$where .= " AND d.$key = $value";
+			}
 			$q = <<<SQL
-SELECT * FROM {$this->documents_table} AS dt
+SELECT dt.*, d.*, l.code_langue FROM {$this->documents_table} AS dt
 INNER JOIN 	dt_documents AS d ON d.id = dt.id_documents
-WHERE {$id_field} = {$this->id} ORDER BY classement
+LEFT OUTER JOIN dt_langues AS l ON l.id = d.id_langues
+WHERE 1 $where AND {$id_field} = {$this->id} ORDER BY classement
 SQL;
 			$res = $this->sql->query($q);
 			
