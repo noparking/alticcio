@@ -127,7 +127,6 @@ SQL;
 DELETE FROM `$table` WHERE 1 AND $where AND `$key_field` IN ($list_deleted)
 SQL;
 			$this->query($q);
-debug::dump($q);
 		}
 		$news = array();
 		foreach ($data as $key => $fields) {
