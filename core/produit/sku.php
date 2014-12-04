@@ -263,9 +263,12 @@ SQL;
 	}
 
 	public function prix_degressifs_catalogue($id_catalogues) {
-		$prix_degressifs = $this->prix_degressifs($id_catalogues);
-
-		return $prix_degressifs;
+		if ($this->prix(null, $id_catalogues)) {
+			return $this->prix_degressifs($id_catalogues);
+		}
+		else {
+			return $this->prix_degressifs(0);
+		}
 	}
 
 	public function prix_unitaire_pour_qte($id_sku, $qte, $id_catalogues = 0) {
