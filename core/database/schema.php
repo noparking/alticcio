@@ -26,7 +26,7 @@ class Schema {
 		$tables = $this->tables();
 		foreach($tables as $key => $table) {
 			if ($table['name'] != "update") {
-				$q = "SHOW COLUMNS FROM ".$table['name']." ";
+				$q = "SHOW COLUMNS FROM `".$table['name']."`";
 				$res = $this->sql->query($q);
 				while ($row = mysql_fetch_assoc($res)) {
 					$tables[$key]['champs'][] = array($row['Field'], $row['Type']);
