@@ -155,8 +155,9 @@ if ($action == "edit") {
 {$form->fieldset_start(array('legend' => $dico->t('Parametres'), 'class' => "produit-section produit-section-parametres".$hidden['parametres'], 'id' => "produit-section-parametres"))}
 HTML;
 	foreach ($boutique->values['data'] as $data_key => $data_value) {
+			$is_json = isset($boutique->json_data[$data_key]) ? " (JSON)" : "";
 			$main .= <<<HTML
-{$form->textarea(array('name' => "boutique[data][$data_key]", 'label' => $data_key))}
+{$form->textarea(array('name' => "boutique[data][$data_key]", 'label' => $data_key.$is_json))}
 HTML;
 
 	}

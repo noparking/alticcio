@@ -7,6 +7,7 @@ class Boutique extends AbstractObject {
 	public $type = "boutique";
 	public $table = "dt_boutiques";
 	public $id_field = "id_boutiques";
+	public $json_data = array();
 
 	function liste($filter = null) {
 		if ($filter === null) {
@@ -58,6 +59,7 @@ SQL;
 	function load($id) {
 		$result = parent::load($id);
 		$this->values['data'] = array();
+		$this->json_data = array();
 		if ($result) {
 			$q = <<<SQL
 SELECT data_key, data_value FROM dt_boutiques_data WHERE id_boutiques = {$id}
@@ -65,6 +67,10 @@ SQL;
 			$res = $this->sql->query($q);
 			while ($row = $this->sql->fetch($res)) {
 				$this->values['data'][$row['data_key']] = $row['data_value'];
+				$json = json_decode($row['data_value']);
+				if (!is_null($json)) {
+					$this->json_data[$row['data_key']] = $json;
+				}
 			}
 		}
 
