@@ -809,6 +809,7 @@ SQL;
 		$q = <<<SQL
 SELECT MIN(p.montant_ht) AS prix_mini FROM dt_prix AS p
 INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = p.id_sku
+INNER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1
 WHERE sv.id_produits = {$this->id} AND id_catalogues = $id_catalogues
 SQL;
 		$res = $this->sql->query($q);
