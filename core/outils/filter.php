@@ -7,6 +7,7 @@ class Filter {
 	private $elements;
 	private $visible_elements;
 	private $name;
+	private $uri;
 	private $total;
 	private $rows = array();
 	private $items = array();
@@ -16,17 +17,18 @@ class Filter {
 	private $inputs = array();
 
 	public function __construct($sql, $elements, $selected = array(), $name = "filter", $selected_only = null) {
-//unset($_SESSION['filters'][$name]);
 		$this->sql = $sql;
 		$this->name = $name;
+		$this->uri = strpos($_SERVER['REQUEST_URI'], "?") ? strstr($_SERVER['REQUEST_URI'], "?", true) : $_SERVER['REQUEST_URI'];
+//unset($_SESSION['filters'][$this->name][$this->uri]);
 		$this->elements = array();
 		if (isset($_POST[$this->name])) {
 			$filter = $_POST[$this->name];
-			$_SESSION['filters'][$this->name] = $filter;
+			$_SESSION['filters'][$this->name][$this->uri] = $filter;
 		}
 		else {
-			if (isset($_SESSION['filters'][$this->name])) {
-				$filter = $_SESSION['filters'][$this->name];
+			if (isset($_SESSION['filters'][$this->name][$this->uri])) {
+				$filter = $_SESSION['filters'][$this->name][$this->uri];
 			}
 			else {
 				$filter = array();
@@ -114,7 +116,7 @@ class Filter {
 		// On a traité la sélection avant le reset car le reset n'affecte pas la sélection
 		if ($this->action('reset')) {
 			$filter = array();
-			$_SESSION['filters'][$this->name] = array();
+			$_SESSION['filters'][$this->name][$this->uri] = array();
 			if (method_exists($sql, "reset")) {
 				$sql->reset();
 			}
