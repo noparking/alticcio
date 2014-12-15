@@ -79,7 +79,7 @@ if ($form->is_submitted()) {
 							case 3:
 								list($ref, $designation, $fam, $sfam, $ssfam, $prix) = explode(";", $line);
 								$ref = nettoyage($ref);
-								$designation = nettoyage($designation);
+								$designation = nettoyage(strtolower($designation));
 								$fam = nettoyage($fam);
 								$sfam = nettoyage($sfam);
 								$ssfam = nettoyage($ssfam);
