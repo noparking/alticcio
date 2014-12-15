@@ -819,8 +819,25 @@ SQL;
 	}
 
 	public function duplicate($data) {
+		$old_id = $data['produit']['id'];
 		unset($data['produit']['id']);
-		return parent::duplicate($data);
+		$new_id = parent::duplicate($data);
+		$tables = array(
+			//'dt_documents_produits',
+			'dt_images_produits',
+			'dt_personnalisations_produits',
+			'dt_produits_attributs',
+			'dt_produits_attributs_management',
+			'dt_produits_complementaires',
+			//'dt_produits_perso_gabarits',
+			'dt_produits_similaires',
+			'dt_sku_accessoires',
+			'dt_sku_composants',
+			'dt_sku_variantes',
+		);
+		$this->sql->duplicate($tables, "id_produits", $old_id, $new_id);
+
+		return $new_id;
 	}
 
 	public function categories($id_catalogues) {

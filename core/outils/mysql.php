@@ -158,6 +158,45 @@ SQL;
 			$this->query($q);
 		}
     }
+
+	function duplicate($tables, $column, $old_id, $new_id) {
+		foreach ($tables as $table) {
+			// Nettoyage éventuel
+			$q = <<<SQL
+DELETE FROM `$table` WHERE `$column` = $new_id
+SQL;
+			$res = $this->query($q);
+
+			$q = <<<SQL
+SELECT * FROM `$table` WHERE `$column` = $old_id
+SQL;
+			$res = $this->query($q);
+			$fields = array();
+			$values = array();
+			$first = true;
+			while ($row = $this->fetch($res)) {
+				unset($row['id']);
+				$row[$column] = $new_id;
+				$vals = array();
+				foreach ($row as $field => $value) {
+					if ($first) {
+						$fields[] = $field;
+					}
+					$vals[] = $this->quote_string($table, $field, $value, true);
+				}
+				$first = false;
+				$values[] = "(".implode(",", $vals).")";
+			}
+			if (count($values)) {
+				$fields_list = implode(",", $fields);
+				$values_list = implode(",", $values);
+				$q = <<<SQL
+INSERT INTO `$table` ($fields_list) VALUES $values_list
+SQL;
+				$this->query($q);
+			}
+		}
+	}
 }
 
 ?>
