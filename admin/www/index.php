@@ -50,8 +50,9 @@ if (!$user->is_logged() and !in_array($page_file, $not_authentificated_pages)) {
 }
 
 $config->set('langue', $url->get('langue')."_".$url->get('pays'));
+$config->set_if_not('default_langages', array("fr_FR"));
 
-$dico = new Dico($config->get("langue"));
+$dico = new Dico($config->get("langue"), $config->get("default_langages"));
 $dico->add(dirname(__FILE__)."/../../core/traductions");
 $dico->add(dirname(__FILE__)."/../traductions");
 $dico->add(dirname(__FILE__)."/../../../admin/traductions");
