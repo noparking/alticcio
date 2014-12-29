@@ -134,6 +134,12 @@ class Config {
 	public function set($var, $value) {
 		$this->vars[$var] = $value;
 	}
+
+	public function set_if_not($var, $value) {
+		if (!isset($this->vars[$var])) {
+			$this->vars[$var] = $value;
+		}
+	}
 	
 	public function get() {
 		$vars = $this->vars;
