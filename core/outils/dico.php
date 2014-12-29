@@ -10,7 +10,7 @@ class Dico {
 	public $template_normal = '#{term}';
 	
 	private $language;
-	private $default_language;
+	private $default_languages;
 	
 	private $terms = array();
 	private $default_terms = array();
@@ -19,24 +19,29 @@ class Dico {
 	private $data = array();
 	private $default_data = array();
 	
-	public function __construct($language, $default_language = "fr_FR") {
+	public function __construct($language, $default_languages = array("fr_FR")) {
 		$this->language = $language;
-		$this->default_language = $default_language;
+		if (!is_array($default_languages)) {
+			$default_languages = array($default_languages)
+		}
+		$this->default_languages = $default_languages;
 	}
 	
 	public function add($dir) {	
-		$file = "$dir/{$this->default_language}.php";
-		if (file_exists($file)) {
-			unset($t, $d);
-			require $file;
-			if (isset($t)) {
-				$this->add_default_terms($t);
-				$this->add_reverted_terms($t);
+		foreach (array_reverse($this->default_languages) as $default_language) {
+			$file = "$dir/{$default_language}.php";
+			if (file_exists($file)) {
+				unset($t, $d);
+				require $file;
+				if (isset($t)) {
+					$this->add_default_terms($t);
+					$this->add_reverted_terms($t);
+				}
+				if (isset($d)) {
+					$this->add_default_data($d);
+				}
+				unset($t, $d);
 			}
-			if (isset($d)) {
-				$this->add_default_data($d);
-			}
-			unset($t, $d);
 		}
 		
 		$file = "$dir/{$this->language}.php";
