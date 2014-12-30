@@ -22,7 +22,7 @@ class Dico {
 	public function __construct($language, $default_languages = array("fr_FR")) {
 		$this->language = $language;
 		if (!is_array($default_languages)) {
-			$default_languages = array($default_languages)
+			$default_languages = array($default_languages);
 		}
 		$this->default_languages = $default_languages;
 	}
