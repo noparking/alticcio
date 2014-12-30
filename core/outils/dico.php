@@ -9,8 +9,8 @@ class Dico {
 	public $template_default = '#{term}';
 	public $template_normal = '#{term}';
 	
-	private $language;
-	private $default_languages;
+	public $language;
+	public $default_languages;
 	
 	private $terms = array();
 	private $default_terms = array();
