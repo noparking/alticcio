@@ -84,7 +84,7 @@ SQL;
 		return $this->max_id;
 	}
 
-	public function get($ids) {
+	public function get($ids, $default_languages = array()) {
 		if (!is_array($ids)) {
 			$ids = array($ids);
 		}
@@ -103,6 +103,22 @@ SQL;
 
 			while ($row = $this->sql->fetch($res)) {
 				$data[$row['id']][$row['code_langue']] = $row['phrase'];
+			}
+		}
+
+		$codes_langues = array_keys($this->langues);
+		foreach ($default_languages as $default_language) {
+			foreach (array_keys($data) as $id) {
+				foreach ($codes_langues as $code_langue) {
+					if (!isset($data[$id][$code_langue])) {
+						$data[$id][$code_langue] = "";
+					}
+				}
+				foreach ($data[$id] as $code_langue => $phrase) {
+					if (!$phrase and $data[$id][$default_language]) {
+						$data[$id][$code_langue] = $data[$id][$default_language];
+					}
+				}
 			}
 		}
 
