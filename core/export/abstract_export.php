@@ -64,6 +64,9 @@ SQL;
 					if (is_array($attr['phrase_valeur'])) {
 						$valeurs_unites = array();
 						foreach ($phrases['valeurs_attributs'][$attr['id_attributs']][0] as $v) {
+							if (!isset($v[$code_langue])) {
+								$v[$code_langue] = "";
+							}
 							$valeurs_unites[] = trim("{$v[$code_langue]} {$attr['unite']}");
 						}
 						$valeur = implode(", ", $valeurs_unites);

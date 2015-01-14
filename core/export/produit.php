@@ -130,7 +130,7 @@ SQL;
 		$url_redirection = new UrlRedirection($this->sql, 5);
 
 		$data_lignes = array();
-		$couples = array();
+		$deja_faits = array();
 		
 		foreach ($this->langues() as $id_langues => $code_langue) {
 			foreach ($produits as $data) { 	
@@ -147,8 +147,8 @@ SQL;
 					$classement = 0; # supprimer cette ligne pour un classement global
 					foreach ($produit->$method() as $variante) {
 						$classement += 1;
-						if (!isset($couples[$data['id']][$variante['id_sku']])) {
-							$couples[$data['id']][$variante['id_sku']] = true;
+						if (!isset($deja_faits[$id_langues][$data['id']][$variante['id_sku']])) {
+							$deja_faits[$id_langues][$data['id']][$variante['id_sku']] = true;
 							$sku->load($variante['id_sku']);
 							$sku_values = $sku->values;
 							$sku_phrases = $phrase->get($sku->phrases());
