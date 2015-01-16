@@ -886,6 +886,18 @@ SQL;
 		return $catalogues;
 	}
 
+	public function is_in_catalogue($id_catalogues) {
+		$q = <<<SQL
+SELECT id_catalogues FROM dt_catalogues_categories AS cc
+INNER JOIN dt_catalogues_categories_produits AS ccp ON ccp.id_catalogues_categories = cc.id
+WHERE ccp.id_produits = {$this->id} AND id_catalogues = $id_catalogues
+SQL;
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
+
+		return $row ? true : false;
+	}
+
 	public function image_hd($image_id) {
 		return "prod_{$this->id}_{$image_id}";
 	}
