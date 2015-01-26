@@ -3,6 +3,7 @@
 class Config {
 	
 	private $vars = array();
+	private $param = array();
 	
 	public function __construct() {
 		if (isset($GLOBALS['config']) and is_array($GLOBALS['config'])) {
@@ -11,6 +12,12 @@ class Config {
 			}
 			if (!isset($GLOBALS['config']['base_path'])) {
 				$this->set('base_path', dirname(__FILE__)."/../../../project/");
+			}
+		}
+
+		if (isset($GLOBALS['param']) and is_array($GLOBALS['param'])) {
+			foreach ($GLOBALS['param'] as $key => $value) {
+				$this->param[$key] =  $value;
 			}
 		}
 	}
@@ -153,6 +160,20 @@ class Config {
 		}
 		
 		return $vars;
+	}
+
+	public function param() {
+		$param = $this->param;
+		foreach (func_get_args() as $arg) {
+			if (is_array($param) and isset($param[$arg])) {
+				$param = $param[$arg];
+			}
+			else {
+				return null;
+			}
+		}
+		
+		return $param;
 	}
 	
 	public function db($type = "") {

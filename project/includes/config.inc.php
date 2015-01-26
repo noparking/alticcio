@@ -33,6 +33,7 @@ if (count($pos_starts) > 0) {
 	}
 }
 $default_config = array();
+$config = array();
 if (file_exists(dirname(__FILE__).'/../sites/default/config.php')) {
 	include dirname(__FILE__).'/../sites/default/config.php';
 	$default_config = $config;
@@ -44,4 +45,18 @@ if ($selected_name) {
 if (file_exists(dirname(__FILE__).'/../sites/global/config.php')) {
 	include dirname(__FILE__).'/../sites/global/config.php';
 	$default_config = $config;
+}
+
+$default_param = array();
+$param = array();
+if (file_exists($rep_sites.'default/param.php')) {
+	include $rep_sites.'default/param.php';
+	$default_param = $param;
+}
+if (file_exists($rep_sites.$selected_name.'/param.php')) {
+	include $rep_sites.$selected_name.'/param.php';
+	$param += $default_param;
+}
+if (file_exists($rep_sites.'global/param.php')) {
+	include $rep_sites.'global/param.php';
 }
