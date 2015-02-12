@@ -505,14 +505,32 @@ SQL;
 		while ($row = $this->sql->fetch($res)) {
 			$valeur = isset($row[$row['type_valeur']]) ? $row[$row['type_valeur']] : "";
 			if ($grouped == 'grouped') {
-				$attributs[$row['id_groupes_attributs']][$row['id_attributs']][$row['classement']] = $valeur;
+				$attributs[$row['id_groupes_attributs']][$row['id_attributs']][(int)$row['classement']] = $valeur;
 			}
 			else {
-				$attributs[$row['id_attributs']][$row['classement']] = $valeur;
+				$attributs[$row['id_attributs']][(int)$row['classement']] = $valeur;
 			}
 		}
 
 		return $attributs;
+	}
+
+	public function types_attributs() {
+		$types_attributs = array();
+		$q = <<<SQL
+SELECT a.id, ta.code
+FROM {$this->attributs_table}_management AS ma
+INNER JOIN dt_attributs AS a ON a.id = ma.id_attributs
+INNER JOIN dt_types_attributs AS ta ON a.id_types_attributs = ta.id
+WHERE ma.{$this->id_field} = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		
+		while ($row = $this->sql->fetch($res)) {
+			$types_attributs[$row['id']] = $row['code'];
+		}
+
+		return $types_attributs;
 	}
 
 	public function add_attribut($data) {
