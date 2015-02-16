@@ -48,13 +48,40 @@ SQL;
 		return $personnalisations;
 	}
 
-	function edit_default($id_gabarit, $perso, $nl_tag = false) {
+	function split_css($css) {
+		$css_position = array();
+		$css_render = array();
+		foreach (explode(";", $css) as $propertie) {
+			switch (trim(strstr($propertie, ":", true))) {
+				case "top":
+				case "bottom":
+				case "left":
+				case "right":
+				case "position":
+				case "z-index":
+					$css_position[] = $propertie;
+					break;
+				case "width":
+				case "height":
+					$css_position[] = $propertie;
+					$css_render[] = $propertie;
+				default:
+					$css_render[] = $propertie;
+			}
+		}
+
+		return array(implode(";", $css_position), implode(";", $css_render));
+	}
+
+	function edit_default($id_gabarit, $perso, $nl_tag = false, $replace = array()) {
 		$html = <<<HTML
 <div class="personnalisation-produit" id="personnalisation-produit-{$id_gabarit}" style="text-align: center;">
 <div class="personnalisation-produit-element" style="display: inline-block; position: relative;">
 HTML;
 		$personnalisations = $this->get_default($id_gabarit);
+		$nb_texte = 0;
 		foreach($personnalisations['textes'] as $id_texte => $texte) {
+			$nb_texte++;
 			$css = "";
 			$css .= <<<CSS
 position: absolute;
@@ -67,6 +94,9 @@ box-sizing: border-box;
 CSS;
 			$css .= str_replace("edit:", "", $texte['css']);
 			$css = preg_replace("/\s+/", " ", $css);
+			
+			list($css_span, $css_field) = $this->split_css($css);
+
 			$contenu = $texte['contenu'];
 			if (isset($perso['textes'][$id_texte]) and $perso['textes'][$id_texte]) {
 				$contenu = $perso['textes'][$id_texte];
@@ -90,9 +120,14 @@ CSS;
 			$maxlength = $texte['max_caracteres'] ? 'maxlength="'.$texte['max_caracteres'].'"' : "";
 			$name = "personnalisation[textes][$id_texte]";
 			$html .= <<<HTML
-<textarea autocomplete="off" {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css}" name="{$name}" id_texte="{$id_texte}">{$contenu}</textarea>
+<span class="zone-editable" style="{$css_span}">
+<textarea autocomplete="off" {$readonly} {$maxlength} class="personnalisation-produit-texte {$editable}" style="{$css_field}" name="{$name}" id_texte="{$id_texte}">{$contenu}</textarea>
+<label class="zone-editable-label" for="personnalisation[textes][$id_texte]">TextZone $nb_texte</label>
+<span class="icon-zone-editable texte"></span>
+</span>
 HTML;
 		}
+		$nb_image = 0;
 		foreach($personnalisations['images'] as $id_image => $image) {
 			$apercu = $image['fichier'];
 			$bg_size = $image['contain'] ? "contain" : "cover";
@@ -115,13 +150,20 @@ box-sizing: border-box;
 CSS;
 			$css .= str_replace("edit:", "", $image['css']);
 			$css = preg_replace("/\s+/", " ", $css);
+
 			$input = "";
 			$editable = "";
 			if ($image['statut']) {
+				$nb_image++;
 				$input = <<<HTML
-<table style="height: 100%; width: 100%;"><tr><td style="vertical-align: middle;">
-<input type="file" style="display: none;" />
-</td></tr></table>
+<span class="zone-editable">
+	<span class="custom-file">
+			<input type="file">
+		<span class="file-label">ChoseFile</span>
+	</span>
+	<label class="zone-editable-label" for="">Image {$nb_image}</label>
+	<span class="icon-zone-editable image"></span>
+</span>
 HTML;
 				$editable = "editable";
 				if ($image['statut'] == 2) {
@@ -136,6 +178,9 @@ HTML;
 </div>
 </div>
 HTML;
+		foreach ($replace as $before => $after) {
+			$html = str_replace($before, $after, $html);
+		}
 
 		return $html;
 	}
