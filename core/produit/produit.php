@@ -945,7 +945,7 @@ SQL;
 		$q = <<<SQL
 SELECT  sa.id_sku, sa.id_attributs, sa.valeur_numerique, ph.phrase, ar.field_label, ar.table_name, ar.field_value
 FROM dt_sku_attributs AS sa
-LEFT OUTER JOIN dt_phrases AS ph ON ph.id = sa.phrase_valeur
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = sa.phrase_valeur AND ph.id_langues = {$id_langues}
 LEFT OUTER JOIN dt_attributs_references AS ar ON ar.id_attributs = sa.id_attributs
 INNER JOIN dt_sku_variantes AS sv ON sv.id_sku = sa.id_sku AND sv.id_produits = {$id}
 SQL;
