@@ -22,6 +22,11 @@ $filter = $filter_attributs_management = new Filter($pager, array(
 		'type' => 'contain',
 		'field' => 'p.phrase',
 	),
+	'norme' => array(
+		'title' => $dico->t('Norme'),
+		'type' => 'contain',
+		'field' => 'a.norme',
+	),
 	'groupe' => array(
 		'title' => $dico->t('Groupe'),
 		'type' => 'select',
