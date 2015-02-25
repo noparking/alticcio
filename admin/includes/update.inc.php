@@ -1318,3 +1318,91 @@ ALTER TABLE `dt_sku_attributs_management` DROP `groupe`
 SQL;
 	$update->query($q);
 }
+
+function update_51($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `titre` varchar(250) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  `phrase_description` int(11) NOT NULL,
+  `fichier` varchar(150) NOT NULL,
+  `id_types_assets` int(11) NOT NULL,
+  `actif` tinyint(1) NOT NULL,
+  `public` tinyint(1) NOT NULL,
+  `copyright` varchar(150) NOT NULL,
+  `date_creation` int(11) NOT NULL,
+  `date_modification` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_types_assets` (`id_types_assets`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_langues` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_assets` int(11) NOT NULL,
+  `id_langues` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_assets` (`id_assets`),
+  KEY `id_langues` (`id_langues`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_types_assets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(128) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_tags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(128) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_tags_assets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_assets` int(11) NOT NULL,
+  `id_assets_tags` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_assets` (`id_assets`),
+  KEY `id_assets_tags` (`id_assets_tags`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_links` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_assets` int(11) NOT NULL,
+  `link_type` varchar(64) NOT NULL,
+  `link_id` int(11) NOT NULL,
+  `classement` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `link` (`link_type`,`link_id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(64) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+}

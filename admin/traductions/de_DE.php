@@ -589,7 +589,8 @@ $d['pages'] = array(
 	"gammes" => "gammes",
 	"factures" => "factures",
 	"aide" => "aide",
-     "degressifs" => "degressifs",
+	"degressifs" => "degressifs",
+	"assets" => "assets",
 );
 
 $d['hd_extensions'] = array(

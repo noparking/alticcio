@@ -161,6 +161,12 @@ $menus = array(
 						'url' => $url0->make("Diaporamas", array('id' => "")),
 						'level' => 60,
 					),
+					'assets' => array(
+						'label' => "Assets",
+						'url' => $url0->make("Assets", array('id' => "")),
+						'level' => 60,
+						'actif' => $config->param('assets') === true,
+					),
 				),
 			),
 			
