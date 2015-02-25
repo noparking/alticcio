@@ -1319,7 +1319,7 @@ SQL;
 	$update->query($q);
 }
 
-function update_51($update) {
+function update_52($update) {
 	$q = <<<SQL
 CREATE TABLE IF NOT EXISTS `dt_assets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
