@@ -263,13 +263,14 @@ SQL;
 	}
 
 	public function previous() {
+		$date_affichage = time();
 		$ids_themes = implode(",", array_keys($this->themes));
 		$q = <<<SQL
 SELECT b.titre, b.titre_url FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
 WHERE btb.id_themes_blogs IN ($ids_themes)
 AND b.date_affichage < {$this->values['date_affichage']}
-AND b.affichage = 1
+AND b.affichage = 1 AND b.date_affichage <= {$date_affichage}
 ORDER BY b.date_affichage DESC
 LIMIT 1
 SQL;
@@ -279,13 +280,14 @@ SQL;
 	}
 
 	public function next() {
+		$date_affichage = time();
 		$ids_themes = implode(",", array_keys($this->themes));
 		$q = <<<SQL
 SELECT b.titre, b.titre_url FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
 WHERE btb.id_themes_blogs IN ($ids_themes)
 AND b.date_affichage > {$this->values['date_affichage']}
-AND b.affichage = 1
+AND b.affichage = 1 AND b.date_affichage <= {$date_affichage}
 ORDER BY b.date_affichage ASC
 LIMIT 1
 SQL;
