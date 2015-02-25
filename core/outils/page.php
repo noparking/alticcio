@@ -169,7 +169,7 @@ class Page {
 		return rtrim($jsvars);
 	}
 	
-	public function inc($inc) {
+	public function inc($inc, $vars = array()) {
 		ob_start();
 		if (file_exists($this->base_path.$inc)) {
 			include $this->base_path.$inc;
