@@ -60,10 +60,12 @@ SQL;
 				}
 			}
 			$values = implode(",", $values);
-			$q = <<<SQL
+			if ($values) {
+				$q = <<<SQL
 INSERT INTO dt_assets_links (id_assets, link_type, link_id, classement) VALUES $values 
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 		}
 		else {
 			$data['asset']['date_creation'] = $time;
