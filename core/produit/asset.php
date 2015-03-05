@@ -66,6 +66,11 @@ INSERT INTO dt_assets_links (id_assets, link_type, link_id, classement) VALUES $
 SQL;
 				$this->sql->query($q);
 			}
+
+			$q = <<<SQL
+DELETE FROM dt_assets_tags_assets WHERE id_assets = {$data['asset']['id']} 
+SQL;
+			$this->sql->query($q);
 		}
 		else {
 			$data['asset']['date_creation'] = $time;
@@ -85,6 +90,18 @@ SQL;
 			$file_name = $file['name'];
 			copy($file, $dir.$file_name);
 			$data['asset']['fichier'] = $file['name'];
+		}
+
+		if (isset($data['tags'])) {
+			$values = array();
+			foreach ($data['tags'] as $id_assets_tags) {
+				$values[] = "({$data['asset']['id']}, {$id_assets_tags})";
+			}
+			$list_values = implode(",", $values); 
+			$q = <<<SQL
+INSERT INTO dt_assets_tags_assets (id_assets, id_assets_tags) VALUES $list_values
+SQL;
+			$this->sql->query($q);
 		}
 
 		return parent::save($data);
@@ -144,5 +161,34 @@ SQL;
 		}
 		
 		return $links;
+	}
+
+
+	public function all_tags() {
+		$q = <<<SQL
+SELECT id, code FROM dt_assets_tags
+SQL;
+		$res = $this->sql->query($q);
+
+		$tags = array();
+		while ($row = $this->sql->fetch($res)) {
+			$tags[$row['id']] = $row['code'];
+		}
+
+		return $tags;
+	}
+
+	public function tags() {
+		$q = <<<SQL
+SELECT id_assets_tags FROM dt_assets_tags_assets WHERE id_assets = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+
+		$tags = array();
+		while ($row = $this->sql->fetch($res)) {
+			$tags[] = $row['id_assets_tags'];
+		}
+
+		return $tags;
 	}
 }
