@@ -71,6 +71,11 @@ SQL;
 DELETE FROM dt_assets_tags_assets WHERE id_assets = {$data['asset']['id']} 
 SQL;
 			$this->sql->query($q);
+
+			$q = <<<SQL
+DELETE FROM dt_assets_langues WHERE id_assets = {$data['asset']['id']} 
+SQL;
+			$this->sql->query($q);
 		}
 		else {
 			$data['asset']['date_creation'] = $time;
@@ -92,10 +97,12 @@ SQL;
 			$data['asset']['fichier'] = $file['name'];
 		}
 
+		$id_assets = parent::save($data);
+
 		if (isset($data['tags'])) {
 			$values = array();
 			foreach ($data['tags'] as $id_assets_tags) {
-				$values[] = "({$data['asset']['id']}, {$id_assets_tags})";
+				$values[] = "($id_assets, $id_assets_tags)";
 			}
 			$list_values = implode(",", $values); 
 			$q = <<<SQL
@@ -104,7 +111,19 @@ SQL;
 			$this->sql->query($q);
 		}
 
-		return parent::save($data);
+		if (isset($data['langues'])) {
+			$values = array();
+			foreach ($data['langues'] as $id_langues) {
+				$values[] = "($id_assets, $id_langues)";
+			}
+			$list_values = implode(",", $values); 
+			$q = <<<SQL
+INSERT INTO dt_assets_langues (id_assets, id_langues) VALUES $list_values
+SQL;
+			$this->sql->query($q);
+		}
+
+		return $id_assets;
 	}
 
 	public function all_links_by_type($link_type, $filter = null) {
@@ -190,5 +209,33 @@ SQL;
 		}
 
 		return $tags;
+	}
+	
+	public function all_langues() {
+		$q = <<<SQL
+SELECT id, code_langue FROM dt_langues
+SQL;
+		$res = $this->sql->query($q);
+
+		$langues = array();
+		while ($row = $this->sql->fetch($res)) {
+			$langues[$row['id']] = $row['code_langue'];
+		}
+
+		return $langues;
+	}
+
+	public function langues() {
+		$q = <<<SQL
+SELECT id_langues FROM dt_assets_langues WHERE id_assets = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+
+		$langues = array();
+		while ($row = $this->sql->fetch($res)) {
+			$langues[] = $row['id_langues'];
+		}
+
+		return $langues;
 	}
 }

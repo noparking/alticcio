@@ -143,6 +143,7 @@ if ($action == 'edit') {
 	$form->default_values['phrases'] = $phrase->get($asset->phrases());
 	$form->default_values['asset_links'] = $asset->links();
 	$form->default_values['tags'] = $asset->tags();
+	$form->default_values['langues'] = $asset->langues();
 	/*
 	$form->default_values['asset_gamme'] = $asset_links['gamme'];
 	$form->default_values['asset_produit'] = $asset_links['produit'];
@@ -220,6 +221,7 @@ if ($action == "create" or $action == "edit") {
 {$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor"))}
 {$form->select(array('name' => "asset[id_types_assets]", 'label' => $dico->t('TypeAsset'), 'options' => $codes_types))}
 {$form->select(array('name' => "tags[]", 'options' => $asset->all_tags(), 'label' => $dico->t('Tags'), 'multiple' => true))}
+{$form->select(array('name' => "langues[]", 'options' => $asset->all_langues(), 'label' => $dico->t('Langues'), 'multiple' => true))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[actif]", 'label' => $dico->t('Actif')))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[public]", 'label' => $dico->t('Public')))}
 {$form->input(array('name' => "asset[copyright]", 'label' => $dico->t('Copyright')))}
