@@ -133,6 +133,9 @@ if ($form->is_submitted() and $form->validate()) {
 				if ($action == "edit") {
 					$page->inc("snippets/attribut_management");
 					$filter_attributs_management->clean_data($data, 'attributs_management');
+
+					$page->inc("snippets/assets");
+					$filter_assets->clean_data($data, 'assets');
 				}
 				if ($id = $url_redirection->save_object($gamme, $data, array('phrase_url_key' => 'phrase_nom'))) {
 					$gamme_saved = true; // used for hook
@@ -155,6 +158,7 @@ if ($form->changed()) {
 }
 else if ($action == 'edit') {
 	$attribut_management_selected = array_keys($gamme->attributs());
+	$assets_selected = array_keys($gamme->assets());
 }
 
 if ($action == 'edit') {
@@ -166,6 +170,7 @@ if ($action == 'edit') {
 	$form->default_values['phrases'] = $phrase->get($gamme->phrases());
 	$form->default_values['attributs_management'] = $gamme->attributs_management();
 	$form->default_values['attributs'] = $gamme->attributs();
+	$form->default_values['assets'] = $gamme->assets();
 }
 else {
 	$page->javascript[] = $config->core_media("filter-edit.js");
@@ -205,6 +210,9 @@ if ($action == "edit") {
 		'documents' => $dico->t('Documents'),
 		'produits' => $dico->t('Produits'),
 	);
+	if ($config->param('assets')) {
+		$sections['assets'] = $dico->t('Assets');
+	}
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 }
@@ -224,6 +232,16 @@ if ($action == "create" or $action == "edit") {
 HTML;
 }
 if ($action == "edit") {
+	if ($config->param('assets')) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Assets'), 'class' => "produit-section produit-section-assets".$hidden['assets'], 'id' => "produit-section-assets"))}
+{$page->inc("snippets/assets")}
+{$form->fieldset_end()}
+HTML;
+		foreach (array_intersect($filter_assets->selected(), array_keys($gamme->all_assets())) as $selected_asset) {
+			$main .= $form->hidden(array('name' => "assets[$selected_asset][classement]", 'if_not_yet_rendered' => true));
+		}
+	}
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('AttributsManagement'), 'class' => "produit-section produit-section-attributs_management".$hidden['attributs_management'], 'id' => "produit-section-new-attribut"))}
 {$page->inc("snippets/attribut_management")}

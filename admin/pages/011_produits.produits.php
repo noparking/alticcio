@@ -255,6 +255,8 @@ if ($form->is_submitted() and $form->validate()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
+				$page->inc("snippets/assets");
+				$filter_assets->clean_data($data, 'assets');
 				foreach (array('composants', 'accessoires', 'variantes', 'complementaires', 'similaires') as $key) {
 					$filter_name = "filter_$key";
 					$$filter_name->clean_data($data, $key);
@@ -288,6 +290,7 @@ else {
 	$filter_variantes->select(array_keys($produit->variantes()));
 	$filter_complementaires->select(array_keys($produit->complementaires()));
 	$filter_similaires->select(array_keys($produit->similaires()));
+	$assets_selected = array_keys($produit->assets());
 }
 
 if ($action == 'edit') {
@@ -314,6 +317,7 @@ if ($action == 'edit') {
 # Nouvelle personnalisation
 	$personnalisations = $produit->personnalisations();
 	$form->default_values['personnalisations'] = $personnalisations;
+	$form->default_values['assets'] = $produit->assets();
 }
 if (isset($application)) {
 	$phrases_applications = $phrase->get($application->phrases());
@@ -368,8 +372,22 @@ if ($action == "edit") {
 		'referencement' => $dico->t('Referencement'),
 		'catalogues' => $dico->t('Catalogues'),
 	);
+	if ($config->param('assets')) {
+		$sections['assets'] = $dico->t('Assets');
+	}
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
+
+	if ($config->param('assets')) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Assets'), 'class' => "produit-section produit-section-assets".$hidden['assets'], 'id' => "produit-section-assets"))}
+{$page->inc("snippets/assets")}
+{$form->fieldset_end()}
+HTML;
+		foreach (array_intersect($filter_assets->selected(), array_keys($produit->all_assets())) as $selected_asset) {
+			$main .= $form->hidden(array('name' => "assets[$selected_asset][classement]", 'if_not_yet_rendered' => true));
+		}
+	}
 
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "produit[id]"))}

@@ -119,6 +119,24 @@ VALUES ('{$this->table}', {$id}, '{$site}', {$entity_id}, '{$entity_table}')
 SQL;
 			$this->sql->query($q);
 		}
+		if (isset($data['assets'])) {
+			$q = <<<SQL
+DELETE FROM dt_assets_links WHERE link_type = '{$this->type}' AND link_id = {$this->id}
+SQL;
+			$this->sql->query($q);
+			$values=  array();
+			foreach ($data['assets'] as $id_assets => $infos) {
+				$classement = (int)$infos['classement'];
+				$values[] = "($id_assets, '{$this->type}', {$this->id}, {$classement})";
+			}
+			$list_values = implode(",", $values);
+			if ($list_values) {
+				$q = <<<SQL
+INSERT INTO dt_assets_links (id_assets, link_type, link_id, classement) VALUES $list_values
+SQL;
+				$this->sql->query($q);
+			}
+		}
 
 		$this->id = $id;
 
@@ -135,7 +153,14 @@ SQL;
 			$this->delete_document($data, $document['id']);
 		}
 
-		$q = "DELETE FROM {$this->table} WHERE id = {$this->id}";
+		$q = <<<SQL
+DELETE FROM dt_assets_links WHERE link_type = '{$this->type}' AND link_id = {$this->id}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM {$this->table} WHERE id = {$this->id}
+SQL;
 		$this->sql->query($q);
 		
 		foreach ($this->phrase_fields as $field) {
@@ -644,5 +669,50 @@ SQL;
 		$fields[$this->type] = $columns;
 
 		return $fields;
+	}
+
+	function assets() {
+		$q = <<<SQL
+SELECT a.id, al.classement FROM dt_assets_links AS al
+INNER JOIN dt_assets AS a ON a.id = al.id_assets
+WHERE al.link_type = '{$this->type}' AND al.link_id = {$this->id} 
+SQL;
+		$res = $this->sql->query($q);
+		$assets = array();
+		while ($row = $this->sql->fetch($res)) {
+			$assets[$row['id']] = $row;
+		}
+
+		return $assets;
+	}
+
+	function all_assets($filter = null) {
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+		$q = <<<SQL
+SELECT a.id, a.titre, a.id_types_assets, al.classement FROM dt_assets AS a
+LEFT OUTER JOIN dt_assets_links AS al ON id_assets = a.id AND link_type = '{$this->type}' AND link_id = {$this->id}
+SQL;
+		$res = $filter->query($q);
+		$assets = array();
+		while ($row = $filter->fetch($res)) {
+			$assets[$row['id']] = $row;
+		}
+
+		return $assets;
+	}
+
+	function types_assets() {
+		$types_assets = array();
+		$q = <<<SQL
+SELECT id, code FROM dt_types_assets 
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$types_assets[$row['id']] = $row['code'];
+		}
+
+		return $types_assets;
 	}
 }

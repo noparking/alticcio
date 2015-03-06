@@ -186,6 +186,9 @@ if ($form->is_submitted() and $form->validate()) {
 				if ($action == "edit") {
 					$page->inc("snippets/attribut_management");
 					$filter_attributs_management->clean_data($data, 'attributs_management');
+
+					$page->inc("snippets/assets");
+					$filter_assets->clean_data($data, 'assets');
 				}
 				$id = $sku->save($data);
 				$form->reset();
@@ -205,6 +208,7 @@ if ($form->changed()) {
 }
 else if ($action == 'edit') {
 	$attribut_management_selected = array_keys($sku->attributs());
+	$assets_selected = array_keys($sku->assets());
 }
 
 if ($action == 'edit') {
@@ -218,6 +222,7 @@ if ($action == 'edit') {
 	$form->default_values['prix'] = $sku->prix_catalogues();
 	$form->default_values['attributs_management'] = $sku->attributs_management();
 	$form->default_values['attributs'] = $sku->attributs();
+	$form->default_values['assets'] = $sku->assets();
 }
 
 $form_start = $form->form_start();
@@ -258,6 +263,9 @@ if ($action == "edit") {
 		'references' => $dico->t('ReferencesCatalogues'),
 		'produits' => $dico->t('Produits'),
 	);
+	if ($config->param('assets')) {
+		$sections['assets'] = $dico->t('Assets');
+	}
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
 		$sections['prix-'.$id_catalogues] = $dico->t('Prix')." $nom_catalogue";
 	}
@@ -267,6 +275,17 @@ if ($action == "edit") {
 {$form->select(array('name' => "id_catalogues", 'options' => $sku->all_catalogues(array(0 => "Changer de prix pour...")), 'forced_value' => 0, 'template' => "#{field}"))}
 {$form->input(array('type' => "submit", 'name' => "duplicate-prix", 'value' => $dico->t('Valider')))}
 HTML;
+
+	if ($config->param('assets')) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Assets'), 'class' => "produit-section produit-section-assets".$hidden['assets'], 'id' => "produit-section-assets"))}
+{$page->inc("snippets/assets")}
+{$form->fieldset_end()}
+HTML;
+		foreach (array_intersect($filter_assets->selected(), array_keys($sku->all_assets())) as $selected_asset) {
+			$main .= $form->hidden(array('name' => "assets[$selected_asset][classement]", 'if_not_yet_rendered' => true));
+		}
+	}
 	
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "sku[id]"))}
