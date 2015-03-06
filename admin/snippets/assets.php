@@ -1,6 +1,6 @@
 <?php
 global $sql, $page, $dico, $form, $config, $phrase, $id_langues, $pager, $filter,
-	   $url, $pager_assets, $filter_assets, $object, $assets;
+	   $url, $pager_assets, $filter_assets, $object, $assets, $assets_selected;
 
 $pager = $pager_assets = new Pager($sql, array(10, 30, 50, 100, 200), "pager_{$object->type}_assets");
 $filter = $filter_assets = new Filter($pager, array(
