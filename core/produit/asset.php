@@ -126,6 +126,25 @@ SQL;
 		return $id_assets;
 	}
 
+	public function delete($data) {
+		$q = <<<SQL
+DELETE FROM dt_assets_langues WHERE id_assets = {$this->id}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_assets_tags_assets WHERE id_assets = {$this->id}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_assets_links WHERE id_assets = {$this->id}
+SQL;
+		$this->sql->query($q);
+
+		return parent::delete($data);
+	}
+
 	public function all_links_by_type($link_type, $filter = null) {
 		$liste = array();
 
