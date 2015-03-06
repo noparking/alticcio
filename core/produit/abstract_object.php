@@ -672,6 +672,9 @@ SQL;
 	}
 
 	function assets() {
+		if (!isset($this->id)) {
+			return array();
+		}
 		$q = <<<SQL
 SELECT a.id, al.classement FROM dt_assets_links AS al
 INNER JOIN dt_assets AS a ON a.id = al.id_assets
