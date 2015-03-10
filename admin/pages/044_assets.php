@@ -191,7 +191,7 @@ if ($action == "edit") {
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
-	$src = $config->get("asset_url").$asset->id;
+	$src = $config->get("asset_url").$asset->id."?dl=1";
 	if ($codes_types[$asset->values['id_types_assets']] == "image" and $asset->values['actif'] and $asset->values['public']) {
 		$apercu = <<<HTML
 <a href="{$src}">

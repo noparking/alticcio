@@ -87,14 +87,20 @@ SQL;
 		$codes_types = $this->codes_types();
 		$dir = $path.$codes_types[$data['asset']['id_types_assets']]."/";
 		if (is_array($file)) {
-			$file_name = $file['name'];
+			preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
+			$ext = $matches[1];
+			$file_name = md5_file($file['tmp_name']).$ext;
 			move_uploaded_file($file['tmp_name'], $dir.$file_name);
 			$data['asset']['fichier'] = $file['name'];
+			$data['asset']['fichier_md5'] = $file_name;
 		}
 		else if (file_exists($file)) {
-			$file_name = $file['name'];
+			preg_match("/(\.[^\.]*)$/", $file, $matches);
+			$ext = $matches[1];
+			$file_name = md5_file($file).$ext;
 			copy($file, $dir.$file_name);
 			$data['asset']['fichier'] = $file['name'];
+			$data['asset']['fichier_md5'] = $file_name;
 		}
 
 		$id_assets = parent::save($data);
