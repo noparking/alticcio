@@ -493,6 +493,7 @@ SQL;
 				'colisage' => $colisages[$id_sku],
 				'franco' => $francos[$id_sku],
 				'ecotaxe' => $ecotaxes_montant,
+				'sample' => $perso['sample'],
 			);
 		}
 
