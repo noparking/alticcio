@@ -19,7 +19,7 @@ class API_Admin {
 	public function add_key($params = array()) {
 		$fields = array();
 		$values = array(); 
-		foreach (array('name', 'table_name', 'table_id_name', 'id_table', 'language', 'key', 'domain') as $field) {
+		foreach (array('name', 'table_name', 'table_id_name', 'id_table', 'language', 'key', 'domain', 'emails') as $field) {
 			if (isset($params[$field])) {
 				$fields[] = "`$field`";
 				$values[] = "'{$params[$field]}'";
