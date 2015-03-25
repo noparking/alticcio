@@ -107,6 +107,25 @@ if ($form->is_submitted() and $form->validate()) {
 			$form->reset();
 			$url->redirect("current", array('action' => "", 'id' => ""));
 			break;
+		case "import":
+			$fichier = $form->action_arg();
+			if ($id_assets = $data['import-asset'][$fichier]) {
+				$savedata['asset']['id'] = $id_assets;
+			}
+			else {
+				$savedata['asset']['id_types_assets'] = 1;
+				$savedata['asset']['public'] = true;
+				$savedata['asset']['actif'] = true;
+			}
+			$savedata['file'] = $config->get('asset_import')."/".$fichier;
+			$savedata['path'] =  $config->get("asset_path");
+			$asset->save($savedata);
+			unlink($savedata['file']);
+			$url->redirect("current", array('action' => "edit", 'id' => $asset->id));
+			break;
+		case "discard":
+			unlink($config->get('asset_import')."/".$form->action_arg());
+			break;
 		default :
 			if ($action == "edit" or $action == "create") {
 				if ($action == "edit") {
@@ -169,11 +188,13 @@ $main .= $page->inc("snippets/messages");
 
 $hidden = array('presentation' => "");
 
-if ($action == "create" or $action == "edit") {
+if ($action) {
 	$buttons['back'] = $page->l($dico->t('Retour'), $url->make("current", array('action' => "", 'id' => "")));
 }
-
-$buttons['new'] = $page->l($dico->t('NouvelAsset'), $url->make("current", array('action' => "create", 'id' => "")));
+else {
+	$buttons['new'] = $page->l($dico->t('NouvelAsset'), $url->make("current", array('action' => "create", 'id' => "")));
+	$buttons['import'] = $page->l($dico->t('ImporterAssets'), $url->make("current", array('action' => "import", 'id' => "")));
+}
 
 if ($action == "create" or $action == "edit") {
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
@@ -260,6 +281,51 @@ switch($action) {
 		break;
 	case "edit" :
 		$titre_page = $dico->t('EditerAsset')." # ID : ".$id;
+		break;
+	case "import" :
+		$titre_page = $dico->t('ImporterAssets');
+		$main = <<<HTML
+<table>
+<tr>
+	<th>{$dico->t('NouvelAsset')}</th>
+	<th>{$dico->t('AssetExistant')}</th>
+	<th>{$dico->t('Actions')}</th>
+</tr>
+HTML;
+		$something_to_import = false;
+		$options = array(0 => "");
+		$options_values = array();
+		foreach ($asset->liste($id_langues) as $row) {
+			$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
+			$options_values[$row['fichier']] = $row['id'];
+		}
+		foreach (scandir($config->get('asset_import')) as $fichier) {
+			if (strpos($fichier, ".") !== 0) {
+				$value = 0;
+				if (isset($options_values[$fichier])) {
+					$value = $options_values[$fichier];
+				}
+				$something_to_import = true;
+				$main .= <<<HTML
+<tr>
+	<td>$fichier</td>
+	<td>{$form->select(array('name' => "import-asset[$fichier]", 'options' => $options, 'forced_value' => $value, 'class' => "assets-options", 'template' => "#{field}"))}</td>
+	<td>
+		{$form->input(array('type' => "submit", 'name' => "import[$fichier]", 'value' => "Importer"))}
+		{$form->input(array('type' => "submit", 'name' => "discard[$fichier]", 'value' => "Ignorer"))}
+	</td>
+</tr>
+HTML;
+			}
+		}
+		$main .= <<<HTML
+</table>		
+HTML;
+		if (!$something_to_import) {
+			$main = <<<HTML
+<p>{$dico->t(RienAIimporter)}</p>
+HTML;
+		}
 		break;
 	default :
 		$titre_page = $dico->t('ListeOfAssets');

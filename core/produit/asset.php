@@ -66,16 +66,6 @@ INSERT INTO dt_assets_links (id_assets, link_type, link_id, classement) VALUES $
 SQL;
 				$this->sql->query($q);
 			}
-
-			$q = <<<SQL
-DELETE FROM dt_assets_tags_assets WHERE id_assets = {$data['asset']['id']} 
-SQL;
-			$this->sql->query($q);
-
-			$q = <<<SQL
-DELETE FROM dt_assets_langues WHERE id_assets = {$data['asset']['id']} 
-SQL;
-			$this->sql->query($q);
 		}
 		else {
 			$data['asset']['date_creation'] = $time;
@@ -99,13 +89,18 @@ SQL;
 			$ext = $matches[1];
 			$file_name = md5_file($file).$ext;
 			copy($file, $dir.$file_name);
-			$data['asset']['fichier'] = $file['name'];
+			$data['asset']['fichier'] = basename($file);
 			$data['asset']['fichier_md5'] = $file_name;
 		}
 
 		$id_assets = parent::save($data);
 
 		if (isset($data['tags'])) {
+			$q = <<<SQL
+DELETE FROM dt_assets_tags_assets WHERE id_assets = {$data['asset']['id']} 
+SQL;
+			$this->sql->query($q);
+
 			$values = array();
 			foreach ($data['tags'] as $id_assets_tags) {
 				$values[] = "($id_assets, $id_assets_tags)";
@@ -118,6 +113,11 @@ SQL;
 		}
 
 		if (isset($data['langues'])) {
+			$q = <<<SQL
+DELETE FROM dt_assets_langues WHERE id_assets = {$data['asset']['id']} 
+SQL;
+			$this->sql->query($q);
+
 			$values = array();
 			foreach ($data['langues'] as $id_langues) {
 				$values[] = "($id_assets, $id_langues)";

@@ -860,3 +860,7 @@ div.filter-actions a {
 img.asset {
 	width: 200px;
 }
+
+.assets-options {
+	max-width: 300px;
+}
