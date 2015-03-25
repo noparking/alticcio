@@ -323,7 +323,7 @@ HTML;
 HTML;
 		if (!$something_to_import) {
 			$main = <<<HTML
-<p>{$dico->t(RienAIimporter)}</p>
+<p>{$dico->t(RienAImporter)}</p>
 HTML;
 		}
 		break;
