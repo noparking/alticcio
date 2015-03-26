@@ -46,16 +46,11 @@ $filter_assets = new Filter($pager_assets, array(
 		'type' => 'contain',
 		'field' => 'a.titre',
 	),
-	'fichier' => array(
-		'title' => $dico->t('Fichier'),
-		'type' => 'contain',
-		'field' => 'a.fichier',
-	),
-	'id_types_assets' => array(
-		'title' => $dico->t('Type'),
+	'tags' => array(
+		'title' => $dico->t('Tags'),
 		'type' => 'select',
-		'field' => 'a.id_types_assets',
-		'options' => $asset->codes_types(),
+		'field' => 'at.id',
+		'options' => $asset->all_tags(),
 	),
 ), array(), "filter_assets");
 

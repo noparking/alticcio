@@ -14,7 +14,13 @@ class Asset extends AbstractObject {
 
 	public function liste($id_langues, &$filter = null) {
 		$q = <<<SQL
-SELECT a.id, a.titre, a.fichier, a.id_types_assets, a.actif, a.public FROM dt_assets AS a
+SELECT a.id, a.titre, a.fichier, a.actif, a.public,
+GROUP_CONCAT(at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
+FROM dt_assets AS a
+LEFT OUTER JOIN dt_assets_tags_assets AS ata ON ata.id_assets = a.id
+LEFT OUTER JOIN dt_assets_tags AS at ON at.id = ata.id_assets_tags
+WHERE 1
+GROUP BY a.id
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
