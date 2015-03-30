@@ -242,12 +242,13 @@ SQL;
 	}
 
 	public function similar() {
+		$date_affichage = time();
 		$ids_themes = implode(",", array_keys($this->themes));
 		$q = <<<SQL
 SELECT b.titre, b.titre_url, b.date_affichage, b.vignette FROM dt_billets AS b
 INNER JOIN dt_billets_themes_blogs AS btb ON btb.id_billets = b.id
 WHERE btb.id_themes_blogs IN ($ids_themes)
-AND b.affichage = 1
+AND b.affichage = 1 AND b.date_affichage <= {$date_affichage}
 AND b.id <> {$this->id}
 ORDER BY b.date_affichage DESC
 SQL;
