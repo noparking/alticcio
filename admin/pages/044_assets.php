@@ -108,7 +108,6 @@ if ($form->is_submitted() and $form->validate()) {
 				$savedata['asset']['id'] = $id_assets;
 			}
 			else {
-				$savedata['asset']['id_types_assets'] = 1;
 				$savedata['asset']['public'] = true;
 				$savedata['asset']['actif'] = true;
 			}
@@ -196,7 +195,6 @@ if ($action == "create" or $action == "edit") {
 }
 
 $apercu = "";
-$codes_types = $asset->codes_types();
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
@@ -208,7 +206,7 @@ if ($action == "edit") {
 	$left = $page->inc("snippets/produits-sections");
 
 	$src = $config->get("asset_url").$asset->id."?dl=1";
-	if ($codes_types[$asset->values['id_types_assets']] == "image" and $asset->values['actif'] and $asset->values['public']) {
+	if ($asset->is_image() and $asset->values['actif'] and $asset->values['public']) {
 		$apercu = <<<HTML
 <a href="{$src}">
 <img alt="{$asset->values['titre']}" title="{$dico->t("Telecharger")}" class="asset" src="{$src}" />
@@ -235,7 +233,6 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "asset[phrase_description]", 'type' => "hidden"))}
 {$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang, 'class' => "dteditor"))}
-{$form->select(array('name' => "asset[id_types_assets]", 'label' => $dico->t('TypeAsset'), 'options' => $codes_types))}
 {$form->select(array('name' => "tags[]", 'options' => $asset->all_tags(), 'label' => $dico->t('Tags'), 'multiple' => true))}
 {$form->select(array('name' => "langues[]", 'options' => $asset->all_langues(), 'label' => $dico->t('Langues'), 'multiple' => true))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[actif]", 'label' => $dico->t('Actif')))}

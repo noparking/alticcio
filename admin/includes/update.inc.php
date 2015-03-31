@@ -1327,14 +1327,12 @@ CREATE TABLE IF NOT EXISTS `dt_assets` (
   `phrase_nom` int(11) NOT NULL,
   `phrase_description` int(11) NOT NULL,
   `fichier` varchar(150) NOT NULL,
-  `id_types_assets` int(11) NOT NULL,
   `actif` tinyint(1) NOT NULL,
   `public` tinyint(1) NOT NULL,
   `copyright` varchar(150) NOT NULL,
   `date_creation` int(11) NOT NULL,
   `date_modification` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_types_assets` (`id_types_assets`)
+  PRIMARY KEY (`id`)
 )
 SQL;
 	$update->query($q);
@@ -1347,16 +1345,6 @@ CREATE TABLE IF NOT EXISTS `dt_assets_langues` (
   PRIMARY KEY (`id`),
   KEY `id_assets` (`id_assets`),
   KEY `id_langues` (`id_langues`)
-)
-SQL;
-	$update->query($q);
-
-	$q = <<<SQL
-CREATE TABLE IF NOT EXISTS `dt_types_assets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(128) NOT NULL,
-  `phrase_nom` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
 )
 SQL;
 	$update->query($q);

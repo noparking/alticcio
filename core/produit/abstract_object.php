@@ -694,7 +694,7 @@ SQL;
 			$filter = $this->sql;
 		}
 		$q = <<<SQL
-SELECT a.id, a.titre, a.id_types_assets, al.classement FROM dt_assets AS a
+SELECT a.id, a.titre, al.classement FROM dt_assets AS a
 LEFT OUTER JOIN dt_assets_links AS al ON id_assets = a.id AND link_type = '{$this->type}' AND link_id = {$this->id}
 SQL;
 		$res = $filter->query($q);
@@ -704,18 +704,5 @@ SQL;
 		}
 
 		return $assets;
-	}
-
-	function types_assets() {
-		$types_assets = array();
-		$q = <<<SQL
-SELECT id, code FROM dt_types_assets 
-SQL;
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$types_assets[$row['id']] = $row['code'];
-		}
-
-		return $types_assets;
 	}
 }

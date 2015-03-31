@@ -19,12 +19,6 @@ $filter = $filter_assets = new Filter($pager, array(
 		'type' => 'contain',
 		'field' => "a.titre",
 	),
-	'id_types_assets' => array(
-		'title' => $dico->t('Type'),
-		'type' => 'select',
-		'field' => 'a.id_types_assets',
-		'options' => $object->types_assets(),
-	),
 	'classement' => array(
 		'title' => $dico->t('Classement'),
 		'type' => 'between',

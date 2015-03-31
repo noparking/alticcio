@@ -35,19 +35,6 @@ SQL;
 		return $liste;
 	}
 
-	public function codes_types() {
-		$q = <<<SQL
-SELECT id, code FROM dt_types_assets
-SQL;
-		$codes_types = array();
-		$res = $this->sql->query($q);
-		while ($row = $this->sql->fetch($res)) {
-			$codes_types[$row['id']] = $row['code'];
-		}
-		
-		return $codes_types;
-	}
-
 	public function save($data) {
 		$time = time();
 		if (isset($data['asset']['id'])) {
@@ -80,13 +67,11 @@ SQL;
 
 		$file = $data['file'];
 		$path = $data['path'];
-		$codes_types = $this->codes_types();
-		$dir = $path.$codes_types[$data['asset']['id_types_assets']]."/";
 		if (is_array($file)) {
 			preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
 			$ext = $matches[1];
 			$file_name = md5_file($file['tmp_name']).$ext;
-			move_uploaded_file($file['tmp_name'], $dir.$file_name);
+			move_uploaded_file($file['tmp_name'], $path.$file_name);
 			$data['asset']['fichier'] = $file['name'];
 			$data['asset']['fichier_md5'] = $file_name;
 		}
@@ -94,7 +79,7 @@ SQL;
 			preg_match("/(\.[^\.]*)$/", $file, $matches);
 			$ext = $matches[1];
 			$file_name = md5_file($file).$ext;
-			copy($file, $dir.$file_name);
+			copy($file, $path.$file_name);
 			$data['asset']['fichier'] = basename($file);
 			$data['asset']['fichier_md5'] = $file_name;
 		}
@@ -268,5 +253,20 @@ SQL;
 		}
 
 		return $langues;
+	}
+
+	public function is_image() {
+		if (isset($this->values['fichier'])) {
+			$ext = pathinfo($this->values['fichier'], PATHINFO_EXTENSION);
+			switch (strtolower($ext)) {
+				case "jpg" :
+				case "jpeg" :
+				case "gif" :
+				case "png" :
+					return true;
+			}
+		}
+
+		return false;
 	}
 }
