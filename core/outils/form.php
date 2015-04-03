@@ -575,7 +575,9 @@ HTML;
 		if (isset($params['multiple']) and $params['multiple']) {
 			$hiddenfield = '<input type="hidden" name="multiple_values[]" value="'.substr($name, 0, -2).'" />'; // onretire les [] à la fin du nom
 			$multiple = " multiple";
-			$class .= " multiselect";
+			if ($params['multiple'] !== "normal") {
+				$class .= " multiselect";
+			}
 			if (is_array($value)) {
 				$selected_options = array();
 				ksort($value);
