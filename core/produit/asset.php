@@ -87,10 +87,12 @@ SQL;
 		$id_assets = parent::save($data);
 
 		if (isset($data['tags'])) {
-			$q = <<<SQL
+			if (isset($data['asset']['id'])) {
+				$q = <<<SQL
 DELETE FROM dt_assets_tags_assets WHERE id_assets = {$data['asset']['id']} 
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 
 			$values = array();
 			foreach ($data['tags'] as $id_assets_tags) {
@@ -104,10 +106,12 @@ SQL;
 		}
 
 		if (isset($data['langues'])) {
-			$q = <<<SQL
+			if (isset($data['asset']['id'])) {
+				$q = <<<SQL
 DELETE FROM dt_assets_langues WHERE id_assets = {$data['asset']['id']} 
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 
 			$values = array();
 			foreach ($data['langues'] as $id_langues) {

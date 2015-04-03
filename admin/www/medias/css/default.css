@@ -864,3 +864,6 @@ img.asset {
 .assets-options {
 	max-width: 300px;
 }
+
+.assets-import-infos-switch { cursor: pointer; }
+.assets-import-infos-switch.activated { color: red !important; }
