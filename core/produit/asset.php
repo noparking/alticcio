@@ -44,11 +44,19 @@ SQL;
 			$this->sql->query($q);
 
 			$values = array();
-			foreach (array('gamme', 'produit', 'sku') as $link_type) {
-				if (isset($data['asset_links'][$link_type])) {
-					foreach ($data['asset_links'][$link_type] as $link_id => $infos) {
-						$classement = (int)$infos['classement'];
+			if (isset($data['asset_links'])) {
+				foreach ($data['asset_links'] as $link_type => $link) {
+					foreach ($link as $key => $value) {
+						if (isset($value['classement'])) {
+							$classement = (int)$value['classement'];
+							$link_id = $key;
+						}
+						else {
+							$classement = $key;
+							$link_id = $value;
+						}
 						$values[] = "({$data['asset']['id']}, '{$link_type}', $link_id, {$classement})";
+
 					}
 				}
 			}

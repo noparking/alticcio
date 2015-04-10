@@ -233,13 +233,17 @@ if ($action == "create" or $action == "edit") {
 }
 
 $apercu = "";
+$attributs_for_assets = $config->get("attributs_for_assets");
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'gammes' => $dico->t('Gammes'),
 		'produits' => $dico->t('Produits'),
 		'sku' => $dico->t('SKU'),
-	);
+		);
+	if ($attributs_for_assets) {
+		$sections['attributs'] = $dico->t('Attributs');
+	}
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
@@ -309,6 +313,35 @@ HTML;
 		foreach ($$filter_name->selected() as $selected_attribut) {
 			$main .= $form->hidden(array('name' => "asset_{$link_type}[$selected_attribut][classement]", 'if_not_yet_rendered' => true));
 			$main .= $form->hidden(array('name' => "asset_{$link_type}[$selected_attribut][groupe]", 'if_not_yet_rendered' => true));
+		}
+	}
+
+	if ($attributs_for_assets) {
+		$possible_refs = implode("','", $attributs_for_assets);
+		$q = <<<SQL
+SELECT a.ref, oa.id_attributs, oa.id, p1.phrase AS phrase_option, p2.phrase AS phrase_nom FROM dt_options_attributs AS oa
+INNER JOIN dt_attributs AS a ON a.id = oa.id_attributs
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = oa.phrase_option AND p1.id_langues = $id_langues
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = a.phrase_nom AND p2.id_langues = $id_langues
+WHERE a.ref IN ('$possible_refs')
+SQL;
+		$res = $sql->query($q);
+		$attributs = array();
+		$attributs_options = array();
+		while ($row = $sql->fetch($res)) {
+			$attributs[$row['id_attributs']] = array('ref' => $row['ref'], 'nom' => $row['phrase_nom']);
+			$attributs_options[$row['id_attributs']][$row['id']] = $row['phrase_option'];
+		}
+
+		$links = $asset->links();
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
+HTML;
+		foreach ($attributs as $id_attributs => $attribut) {
+			$values = isset($links[$attribut['ref']]) ? array_keys($links[$attribut['ref']]) : array();
+			$main .= <<<HTML
+{$form->select(array('name' => "asset_links[{$attribut['ref']}][]", 'options' => $attributs_options[$id_attributs], 'label' => "{$attribut['nom']}", 'forced_value' => $values, 'multiple' => true))}
+HTML;
 		}
 	}
 }
