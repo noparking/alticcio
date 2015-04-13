@@ -55,13 +55,12 @@ $filter_assets = new Filter($pager_assets, array(
 	),
 ), array(), "filter_assets");
 
-if ($id = $url->get('id')) {
-	$asset->load($id);
-}
-
 $action = $url->get('action');
 if ($id = $url->get('id')) {
-	$asset->load($id);
+	$loaded = $asset->load($id);
+	if (!$loaded) {
+		$url->redirect("current", array('action' => "", 'id' => ""));
+	}
 }
 
 $form = new Form(array(
