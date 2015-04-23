@@ -3,7 +3,7 @@
 $menu->current('main/content/assets');
 
 $config->core_include("produit/asset", "outils/langue", "outils/phrase", "outils/form");
-$config->core_include("outils/filter", "outils/pager");
+$config->core_include("outils/filter", "outils/pager", "assets/assets_import");
 
 $page->css[] = $config->media("jquery-ui.min.css");
 $page->css[] = $config->media("ui.multiselect.css");
@@ -33,6 +33,10 @@ $id_langues = $langue->id($config->get("langue"));
 $phrase = new Phrase($sql);
 
 $asset = new Asset($sql, $phrase, $id_langues);
+
+$sources = $config->get('asset_import');
+$assets_import = new AssetsImport($sql, array('sources' => $sources));
+$assets_import->import();
 
 $pager_assets = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter_assets = new Filter($pager_assets, array(
@@ -103,58 +107,74 @@ if ($form->is_submitted() and $form->validate()) {
 			$url->redirect("current", array('action' => "", 'id' => ""));
 			break;
 		case "import":
-			$fichier = $form->action_arg();
-			$savedata['asset'] = $data['assets'][$fichier];
-			if ($id_assets = $data['existing-asset'][$fichier]) {
+			$id_import = $form->action_arg();
+			$asset_to_import = $assets_import->load(array('id' => $id_import));
+			$savedata['asset'] = $data['assets'][$id_import];
+			if ($id_assets = $data['existing-asset'][$id_import]) {
 				$savedata['asset']['id'] = $id_assets;
 			}
 			else {
 				$savedata['asset']['id'] = $asset->save($savedata);
 			}
-			foreach ($data['gammes'][$fichier] as $id_gammes) {
-				$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
+			if (isset($data['gammes'][$id_import])) {
+				foreach ($data['gammes'][$id_import] as $id_gammes) {
+					$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
+				}
 			}
-			foreach ($data['produits'][$fichier] as $id_produits) {
-				$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+			if (isset($data['produits'][$id_import])) {
+				foreach ($data['produits'][$id_import] as $id_produits) {
+					$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+				}
 			}
-			$savedata['tags'] = $data['tags'][$fichier];
-			$savedata['langues'] = $data['langues'][$fichier];
-			$savedata['file'] = $config->get('asset_import')."/".$fichier;
+			if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
+			if (isset($data['langues'][$id_import])) $savedata['langues'] = $data['langues'][$id_import];
+			$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
 			$savedata['path'] =  $config->get("asset_path");
 			$asset->save($savedata);
+			$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
 			unlink($savedata['file']);
 			$url->redirect("current", array('action' => "edit", 'id' => $asset->id));
 			break;
 		case "discard":
-			unlink($config->get('asset_import')."/".$form->action_arg());
+			$id_import = $form->action_arg();
+			$asset_to_import = $assets_import->load(array('id' => $id_import));
+			unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+			$assets_import->save(array('id' => $id_import, 'action' => ""));
 			break;
 		case "import-selected":
-			foreach ($data['assets-import-select'] as $fichier => $rien) {
-				$savedata['asset'] = $data['assets'][$fichier];
-				if ($id_assets = $data['existing-asset'][$fichier]) {
+			foreach ($data['assets-import-select'] as $id_import => $rien) {
+				$asset_to_import = $assets_import->load(array('id' => $id_import));
+				$savedata['asset'] = $data['assets'][$id_import];
+				if ($id_assets = $data['existing-asset'][$id_import]) {
 					$savedata['asset']['id'] = $id_assets;
 				}
 				else {
 					$savedata['asset']['id'] = $asset->save($savedata);
 				}
-				foreach ($data['gammes'][$fichier] as $id_gammes) {
-					$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
+				if (isset($data['gammes'][$id_import])) {
+					foreach ($data['gammes'][$id_import] as $id_gammes) {
+						$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
+					}
 				}
-				foreach ($data['produits'][$fichier] as $id_produits) {
-					$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+				if (isset($data['produits'][$id_import])) {
+					foreach ($data['produits'][$id_import] as $id_produits) {
+						$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+					}
 				}
-				$savedata['tags'] = $data['tags'][$fichier];
-				$savedata['langues'] = $data['langues'][$fichier];
-				$savedata['file'] = $config->get('asset_import')."/".$fichier;
+				if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
+				if (isset($data['langues'][$id_import])) $savedata['langues'] = $data['langues'][$id_import];
+				$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
 				$savedata['path'] =  $config->get("asset_path");
 				$asset->save($savedata);
 				unlink($savedata['file']);
+				$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
 			}
 			break;
 		case "discard-selected":
-			foreach ($data['assets-import-select'] as $fichier => $delete) {
+			foreach ($data['assets-import-select'] as $id_import => $delete) {
 				if ($delete) {
 					unlink($config->get('asset_import')."/".$fichier);
+					$assets_import->save(array('id' => $id_import, 'action' => ""));
 				}
 			}
 			break;
@@ -374,6 +394,7 @@ Pour la selection :
 <table>
 <tr>
 	<th><input type="checkbox" name="assets-import-select-all" class="assets-import-select-all" /></th>
+	<th>{$dico->t('Source')}</th>
 	<th>{$dico->t('NouvelAsset')}</th>
 	<th>{$dico->t('AssetExistant')}</th>
 	<th>{$dico->t('Infos')}</th>
@@ -387,33 +408,28 @@ HTML;
 			$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
 			$options_values[$row['fichier']] = $row['id'];
 		}
-		foreach (scandir($config->get('asset_import')) as $fichier) {
-			if (strpos($fichier, ".") !== 0) {
-				$value = 0;
-				foreach ($options_values as $key => $val) {
-					if (preg_replace("/\-.*/", "", $fichier) == preg_replace("/\-.*/", "", $key)) {
-						$value = $val;
-						break;
-					}
-				}
+		foreach ($assets_import->liste() as $id_import => $asset_to_import) {
+			$dir = $sources[$asset_to_import['source']];
+			if (file_exists($dir.$asset_to_import['fichier'])) {
 				$something_to_import = true;
 				$main .= <<<HTML
 <tr>
-	<td><input type="checkbox" name="assets-import-select[{$fichier}]" class="assets-import-select" /></td>
-	<td>$fichier</td>
-	<td>{$form->select(array('name' => "existing-asset[$fichier]", 'options' => $options, 'forced_value' => $value, 'class' => "assets-options", 'template' => "#{field}"))}</td>
+	<td><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></td>
+	<td>{$asset_to_import['source']}</td>
+	<td>{$asset_to_import['fichier']}</td>
+	<td>{$form->select(array('name' => "existing-asset[{$asset_to_import['id']}]", 'options' => $options, 'forced_value' => $asset_to_import['id_assets'], 'class' => "assets-options", 'template' => "#{field}"))}</td>
 	<td class="assets-import-infos">
 		<div class="assets-import-infos-form" style="display: none;">
 			<a class="assets-import-infos-switch" href="#">Masquer</a>
 			<table>
-				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$fichier][titre]", 'value' => $fichier, 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('name' => "gammes[$fichier][]", 'class' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('name' => "produits[$fichier][]", 'class' => "asset-import-produits", 'options' => $all_produits, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$fichier][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$fichier][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$fichier][actif]", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$fichier][public]", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$fichier][copyright]", 'class' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'value' => isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'], 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('name' => "gammes[$id_import][]", 'class' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('name' => "produits[$id_import][]", 'class' => "asset-import-produits", 'options' => $all_produits, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$id_import][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'checked' => true, 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'checked' => true, 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td></tr>
 			</table>
 		</div>
 		<div class="assets-import-infos-noform">
@@ -421,8 +437,8 @@ HTML;
 		</div>
 	</td>
 	<td>
-		{$form->input(array('type' => "submit", 'name' => "import[$fichier]", 'value' => "Importer"))}
-		{$form->input(array('type' => "submit", 'name' => "discard[$fichier]", 'value' => "Ignorer"))}
+		{$form->input(array('type' => "submit", 'name' => "import[$id_import]", 'value' => "Importer"))}
+		{$form->input(array('type' => "submit", 'name' => "discard[$id_import]", 'value' => "Ignorer"))}
 	</td>
 </tr>
 HTML;

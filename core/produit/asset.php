@@ -73,23 +73,25 @@ SQL;
 		}
 		$data['asset']['date_modification'] = $time;
 
-		$file = $data['file'];
-		$path = $data['path'];
-		if (is_array($file)) {
-			preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
-			$ext = $matches[1];
-			$file_name = md5_file($file['tmp_name']).$ext;
-			move_uploaded_file($file['tmp_name'], $path.$file_name);
-			$data['asset']['fichier'] = $file['name'];
-			$data['asset']['fichier_md5'] = $file_name;
-		}
-		else if (file_exists($file)) {
-			preg_match("/(\.[^\.]*)$/", $file, $matches);
-			$ext = $matches[1];
-			$file_name = md5_file($file).$ext;
-			copy($file, $path.$file_name);
-			$data['asset']['fichier'] = basename($file);
-			$data['asset']['fichier_md5'] = $file_name;
+		if (isset($data['file']) and isset($data['path'])) {
+			$file = $data['file'];
+			$path = $data['path'];
+			if (is_array($file)) {
+				preg_match("/(\.[^\.]*)$/", $file['name'], $matches);
+				$ext = $matches[1];
+				$file_name = md5_file($file['tmp_name']).$ext;
+				move_uploaded_file($file['tmp_name'], $path.$file_name);
+				$data['asset']['fichier'] = $file['name'];
+				$data['asset']['fichier_md5'] = $file_name;
+			}
+			else if (file_exists($file)) {
+				preg_match("/(\.[^\.]*)$/", $file, $matches);
+				$ext = $matches[1];
+				$file_name = md5_file($file).$ext;
+				copy($file, $path.$file_name);
+				$data['asset']['fichier'] = basename($file);
+				$data['asset']['fichier_md5'] = $file_name;
+			}
 		}
 
 		$id_assets = parent::save($data);
