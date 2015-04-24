@@ -36,7 +36,6 @@ $asset = new Asset($sql, $phrase, $id_langues);
 
 $sources = $config->get('asset_import');
 $assets_import = new AssetsImport($sql, array('sources' => $sources));
-$assets_import->import();
 
 $pager_assets = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter_assets = new Filter($pager_assets, array(
@@ -65,6 +64,10 @@ if ($id = $url->get('id')) {
 	if (!$loaded) {
 		$url->redirect("current", array('action' => "", 'id' => ""));
 	}
+}
+
+if ($action == "import") {
+	$assets_import->import();
 }
 
 $form = new Form(array(
