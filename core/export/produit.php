@@ -7,6 +7,7 @@ class ExportProduit extends AbstractExport {
 	public $export_table = "fiches_produits";
 
 	private $applications = array();
+	private $attributs = array();
 
 	public function __construct($sql, $sql_export) {
 		parent::__construct($sql, $sql_export);
@@ -19,6 +20,15 @@ SQL;
 		$this->applications = array();
 		while ($row = $this->sql->fetch($res)) {
 			$this->applications[$row['id']][$row['id_langues']] = $row['phrase'];
+		}
+
+		$q = <<<SQL
+SELECT id, ref FROM dt_attributs
+SQL;
+		$res = $this->sql->query($q);
+		$this->attributs = array();
+		while ($row = $this->sql->fetch($res)) {
+			$this->attributs[$row['ref']] = $row['id'];
 		}
 	}
 
@@ -84,6 +94,7 @@ SQL;
 			'id_produit',
 			'offre',
 			'recyclage',
+			'garantie',
 			'produit',
 			'attributs_produits',
 			'avantages_produit',
@@ -161,6 +172,7 @@ SQL;
 								$produit_values['id'],
 								$produit_values['offre'],
 								$this->recyclage($produit_values['id_recyclage']),
+								$this->phrase(array('valeurs_attributs', $this->attributs['garantie'], 0), $produit_phrases, $code_langue),
 								$this->phrase('phrase_nom', $produit_phrases, $code_langue),
 								$this->attributs($produit_attributs_data, $produit_phrases, $code_langue, "top"),
 								$this->phrase('phrase_avantages_produit', $produit_phrases, $code_langue),

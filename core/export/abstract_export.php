@@ -141,7 +141,19 @@ SQL;
 		return $ret;
 	}
 
-	function phrase($field, $phrases, $code_langue) {
-		return isset($phrases[$field][$code_langue]) ? strip_tags($phrases[$field][$code_langue]) : "";
+	function phrase($fields, $phrases, $code_langue) {
+		if (!is_array($fields)) {
+			$fields = array($fields);
+		}
+		$node = $phrases;
+		foreach ($fields as $field) {
+			if (isset($node[$field])) {
+				$node = $node[$field];
+			}
+			else {
+				return "";
+			}
+		}
+		return isset($node[$code_langue]) ? strip_tags($node[$code_langue]) : "";
 	}
 }
