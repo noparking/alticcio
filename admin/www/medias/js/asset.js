@@ -46,8 +46,14 @@ $(document).ready(function () {
 		$(".assets-import-edit-selected-form").find(".copy-all").each(function () {
 			var my_class = $(this).attr("name");
 			var my_val = $(this).val();
+			var my_checked = $(this).prop('checked');
 			$(".assets-import-select:checked").parents("tr").each(function () {
-				$(this).find("." + my_class).val(my_val);
+				var object = $(this).find("." + my_class);
+				if (object.attr('type') == 'checkbox') {
+					object.prop('checked', my_checked);
+				} else {
+					object.val(my_val);
+				}
 				$(this).find(".multiselect." + my_class).multiselect("destroy").multiselect();
 			});
 		});
