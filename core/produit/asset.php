@@ -283,4 +283,25 @@ SQL;
 
 		return false;
 	}
+	
+	// retourne les attributs/valeurs pour les assets
+	public function attributs_for_asset($attributs_for_assets, $id_langues) {
+		$possible_refs = implode("','", $attributs_for_assets);
+		$q = <<<SQL
+SELECT a.ref, oa.id_attributs, oa.id, p1.phrase AS phrase_option, p2.phrase AS phrase_nom FROM dt_options_attributs AS oa
+INNER JOIN dt_attributs AS a ON a.id = oa.id_attributs
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = oa.phrase_option AND p1.id_langues = $id_langues
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = a.phrase_nom AND p2.id_langues = $id_langues
+WHERE a.ref IN ('$possible_refs')
+SQL;
+		$res = $this->sql->query($q);
+		$attributs = array();
+		while ($row = $this->sql->fetch($res)) {
+			if (!isset($attributs[$row['id_attributs']])) {
+				$attributs[$row['id_attributs']] = array('ref' => $row['ref'], 'nom' => $row['phrase_nom']);
+			}
+			$attributs[$row['id_attributs']]['options'][$row['id']] = $row['phrase_option'];
+		}
+		return $attributs;
+	}
 }
