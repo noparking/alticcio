@@ -255,8 +255,10 @@ if ($form->is_submitted() and $form->validate()) {
 			break;
 		default :
 			if ($action == "edit" or $action == "create") {
-				$page->inc("snippets/assets");
-				$filter_assets->clean_data($data, 'assets');
+				if ($action == 'edit') {
+					$page->inc("snippets/assets");
+					$filter_assets->clean_data($data, 'assets');
+				}
 				foreach (array('composants', 'accessoires', 'variantes', 'complementaires', 'similaires') as $key) {
 					$filter_name = "filter_$key";
 					$$filter_name->clean_data($data, $key);
@@ -378,7 +380,7 @@ if ($action == "edit") {
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
-	if ($config->param('assets')) {
+	if ($config->param('assets')) {		
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Assets'), 'class' => "produit-section produit-section-assets".$hidden['assets'], 'id' => "produit-section-assets"))}
 {$page->inc("snippets/assets")}
