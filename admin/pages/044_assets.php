@@ -129,6 +129,13 @@ if ($form->is_submitted() and $form->validate()) {
 					$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
 				}
 			}
+			if (isset($data['attributs'][$id_import])) {
+				foreach ($data['attributs'][$id_import] as $id_attributs => $options) {
+					foreach ($options as $option) {
+						$savedata['asset_links']['attribut-'.$id_attributs][$option]['classement'] = 0;
+					}
+				}
+			}
 			if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
 			if (isset($data['langues'][$id_import])) $savedata['langues'] = $data['langues'][$id_import];
 			$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
@@ -162,6 +169,13 @@ if ($form->is_submitted() and $form->validate()) {
 				if (isset($data['produits'][$id_import])) {
 					foreach ($data['produits'][$id_import] as $id_produits) {
 						$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+					}
+				}
+				if (isset($data['attributs'][$id_import])) {
+					foreach ($data['attributs'][$id_import] as $id_attributs => $options) {
+						foreach ($options as $option) {
+							$savedata['asset_links']['attribut-'.$id_attributs][$option]['classement'] = 0;
+						}
 					}
 				}
 				if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
@@ -262,7 +276,7 @@ if ($action == "edit") {
 		'gammes' => $dico->t('Gammes'),
 		'produits' => $dico->t('Produits'),
 		'sku' => $dico->t('SKU'),
-		);
+	);
 	if ($attributs_for_assets) {
 		$sections['attributs'] = $dico->t('Attributs');
 	}
@@ -291,8 +305,10 @@ $all_tags = $asset->all_tags();
 $all_langues = $asset->all_langues();
 foreach (array("gamme", "produit", "sku") as $link_type) {
 	$var = "all_{$link_type}s";
-	foreach ($asset->all_links_by_type($link_type) as $key => $value) {
-		${$var}[$key] = "{$value['nom']} ({$value['ref']})";
+	if (!isset($$var)) {
+		foreach ($asset->all_links_by_type($link_type) as $key => $value) {
+			${$var}[$key] = "{$value['nom']} ({$value['ref']})";
+		}
 	}
 }
 if ($action == "create" or $action == "edit") {
@@ -344,9 +360,9 @@ HTML;
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
 		foreach ($asset->attributs_for_asset($attributs_for_assets, $id_langues) as $id_attributs => $attribut) {
-			$values = isset($links[$attribut['ref']]) ? array_keys($links[$attribut['ref']]) : array();
+			$values = isset($links['attribut-'.$id_attributs]) ? array_keys($links['attribut-'.$id_attributs]) : array();
 			$main .= <<<HTML
-{$form->select(array('name' => "asset_links[{$attribut['ref']}][]", 'options' => $attribut['options'], 'label' => "{$attribut['nom']}", 'forced_value' => $values, 'multiple' => true))}
+{$form->select(array('name' => "asset_links[attribut-{$id_attributs}][]", 'options' => $attribut['options'], 'label' => "{$attribut['nom']}", 'forced_value' => $values, 'multiple' => true))}
 HTML;
 		}
 	}
@@ -371,6 +387,13 @@ Pour la selection :
 	<table>
 		<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
 		<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-produits", 'options' => $all_produits, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+HTML;
+		foreach ($asset->attributs_for_asset($attributs_for_assets, $id_langues) as $id_attributs => $attribut) {
+			$main .= <<<HTML
+		<tr><td>{$attribut['nom']}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+HTML;
+		}
+		$main .= <<<HTML
 		<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-tags", 'options' => $all_tags, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
 		<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-langues", 'options' => $all_langues, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
 		<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td></tr>
@@ -414,6 +437,13 @@ HTML;
 				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'value' => isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'], 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('name' => "gammes[$id_import][]", 'class' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('name' => "produits[$id_import][]", 'class' => "asset-import-produits", 'options' => $all_produits, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+HTML;
+			foreach ($asset->attributs_for_asset($attributs_for_assets, $id_langues) as $id_attributs => $attribut) {
+				$main .= <<<HTML
+				<tr><td>{$attribut['nom']}</td><td>{$form->select(array('name' => "attributs[$id_import][$id_attributs][]", 'class' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+HTML;
+			}
+			$main .= <<<HTML
 				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$id_import][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td></tr>
@@ -452,3 +482,4 @@ HTML;
 }
 
 $form_end = $form->form_end();
+
