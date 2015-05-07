@@ -12,7 +12,7 @@ class Asset extends AbstractObject {
 		'phrase_description',
 	);
 
-	public function liste($id_langues, &$filter = null) {
+	public function liste(&$filter = null) {
 		$q = <<<SQL
 SELECT a.id, a.titre, a.fichier, a.actif, a.public,
 GROUP_CONCAT(at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
@@ -156,36 +156,19 @@ SQL;
 		return parent::delete($data);
 	}
 
-	public function all_links_by_type($link_type, $filter = null) {
+	public function all_links_gamme($filter = null) {
 		$liste = array();
 
 		if ($filter === null) {
 			$filter = $this->sql;
 		}
 
-		$field_ref = "ref";
-		$field_nom = "phrase_nom";
-		switch ($link_type) {
-			case 'gamme' :
-				$table_join = "dt_gammes";
-				break;
-			case 'produit' :
-				$table_join = "dt_produits";
-				break;
-			case 'sku' :
-				$table_join = "dt_sku";
-				$field_ref = "ref_ultralog";
-				$field_nom = "phrase_ultralog";
-				break;
-			default:
-				return $liste;
-		}
 		$asset_id = isset($this->id) ? $this->id : 0;
 		$q = <<<SQL
-SELECT t.id, t.{$field_ref} as ref, p.phrase as nom, al.link_id, al.classement
-FROM $table_join AS t
-LEFT OUTER JOIN dt_assets_links AS al ON t.id = al.link_id AND id_assets = $asset_id AND link_type = '$link_type'
-LEFT OUTER JOIN dt_phrases AS p ON p.id = t.{$field_nom} AND p.id_langues = {$this->langue}
+SELECT g.id, g.ref as ref, p.phrase as nom, al.link_id, al.classement
+FROM dt_gammes AS g
+LEFT OUTER JOIN dt_assets_links AS al ON g.id = al.link_id AND id_assets = $asset_id AND link_type = 'gamme'
+LEFT OUTER JOIN dt_phrases AS p ON p.id = g.phrase_nom AND p.id_langues = {$this->langue}
 SQL;
 		$res = $filter->query($q);
 
@@ -194,6 +177,76 @@ SQL;
 		}
 		
 		return $liste;
+	}
+	
+	public function all_links_produit($filter = null) {
+		$liste = array();
+
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+
+		$asset_id = isset($this->id) ? $this->id : 0;
+		$q = <<<SQL
+SELECT p.id, p.ref as ref, p1.phrase as nom, p2.phrase as nom_gamme, al.link_id, al.classement
+FROM dt_produits AS p
+INNER JOIN dt_gammes AS g ON g.id = p.id_gammes
+LEFT OUTER JOIN dt_assets_links AS al ON p.id = al.link_id AND id_assets = $asset_id AND link_type = 'produit'
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = p.phrase_nom AND p1.id_langues = {$this->langue}
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = g.phrase_nom AND p2.id_langues = {$this->langue}
+SQL;
+		$res = $filter->query($q);
+
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
+	
+	public function all_links_sku($filter = null) {
+		$liste = array();
+
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+
+		$asset_id = isset($this->id) ? $this->id : 0;
+		$q = <<<SQL
+SELECT s.id, s.ref_ultralog as ref, p.phrase as nom, al.link_id, al.classement
+FROM dt_sku AS s
+LEFT OUTER JOIN dt_assets_links AS al ON s.id = al.link_id AND id_assets = $asset_id AND link_type = 'sku'
+LEFT OUTER JOIN dt_phrases AS p ON p.id = s.phrase_ultralog AND p.id_langues = {$this->langue}
+SQL;
+		$res = $filter->query($q);
+
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
+	}
+	
+	public function all_links_attributs($limited_refs = null) {
+		$q = <<<SQL
+SELECT a.ref, oa.id_attributs, oa.id, p1.phrase AS phrase_option, p2.phrase AS phrase_nom FROM dt_options_attributs AS oa
+INNER JOIN dt_attributs AS a ON a.id = oa.id_attributs
+LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = oa.phrase_option AND p1.id_langues = {$this->langue}
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = a.phrase_nom AND p2.id_langues = {$this->langue}
+SQL;
+		if ($limited_refs) {
+			$limited_refs_liste = implode("','", $limited_refs);
+			$q .= " WHERE a.ref IN ('$limited_refs_liste')";
+		}
+		$res = $this->sql->query($q);
+		$attributs = array();
+		while ($row = $this->sql->fetch($res)) {
+			if (!isset($attributs[$row['id_attributs']])) {
+				$attributs[$row['id_attributs']] = array('ref' => $row['ref'], 'nom' => $row['phrase_nom']);
+			}
+			$attributs[$row['id_attributs']]['options'][$row['id']] = $row['phrase_option'];
+		}
+		return $attributs;
 	}
 
 	public function links() {
@@ -282,26 +335,5 @@ SQL;
 		}
 
 		return false;
-	}
-	
-	// retourne les attributs/valeurs pour les assets
-	public function attributs_for_asset($attributs_for_assets, $id_langues) {
-		$possible_refs = implode("','", $attributs_for_assets);
-		$q = <<<SQL
-SELECT a.ref, oa.id_attributs, oa.id, p1.phrase AS phrase_option, p2.phrase AS phrase_nom FROM dt_options_attributs AS oa
-INNER JOIN dt_attributs AS a ON a.id = oa.id_attributs
-LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = oa.phrase_option AND p1.id_langues = $id_langues
-LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = a.phrase_nom AND p2.id_langues = $id_langues
-WHERE a.ref IN ('$possible_refs')
-SQL;
-		$res = $this->sql->query($q);
-		$attributs = array();
-		while ($row = $this->sql->fetch($res)) {
-			if (!isset($attributs[$row['id_attributs']])) {
-				$attributs[$row['id_attributs']] = array('ref' => $row['ref'], 'nom' => $row['phrase_nom']);
-			}
-			$attributs[$row['id_attributs']]['options'][$row['id']] = $row['phrase_option'];
-		}
-		return $attributs;
 	}
 }

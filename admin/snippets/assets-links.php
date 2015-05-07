@@ -53,6 +53,7 @@ $filter = $$filter_name = new Filter($pager, array(
 if (isset($asset_links[$link_type])) {
 	$filter->select(array_keys($asset_links[$link_type]));
 }
-$asset->all_links_by_type($link_type, $filter);
+$method = "all_links_{$link_type}";
+$asset->$method($filter);
 echo $page->inc("snippets/filter-form");
 
