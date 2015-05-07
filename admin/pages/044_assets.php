@@ -37,8 +37,11 @@ $asset = new Asset($sql, $phrase, $id_langues);
 $sources = $config->get('asset_import');
 $assets_import = new AssetsImport($sql, array('sources' => $sources));
 
+$assets_attributs = $config->param("assets_attributs");
+$assets_links = $config->param("assets_links");
+
 $pager_assets = new Pager($sql, array(20, 30, 50, 100, 200));
-$filter_assets = new Filter($pager_assets, array(
+$filter_assets_schema = array(
 	'id' => array(
 		'title' => 'ID',
 		'type' => 'between',
@@ -50,13 +53,43 @@ $filter_assets = new Filter($pager_assets, array(
 		'type' => 'contain',
 		'field' => 'a.titre',
 	),
+);
+if (in_array('gamme', $assets_links)) {
+	$filter_assets_schema += array(
+		'links_gamme' => array(
+			'title' => $dico->t('Gammes'), 
+			'type' => 'contain',
+			'field' => 't_gamme.ref',
+		),
+	);
+}
+if (in_array('produit', $assets_links)) {
+	$filter_assets_schema += array(
+		'links_produit' => array(
+			'title' => $dico->t('Produits'), 
+			'type' => 'contain',
+			'field' => 't_produit.ref',
+		),
+	);
+}
+if (in_array('sku', $assets_links)) {
+	$filter_assets_schema += array(
+		'links_sku' => array(
+			'title' => $dico->t('SKU'), 
+			'type' => 'contain',
+			'field' => 't_sku.ref_ultralog',
+		),
+	);
+}
+$filter_assets_schema += array(
 	'tags' => array(
 		'title' => $dico->t('Tags'),
 		'type' => 'select',
 		'field' => 'at.id',
 		'options' => $asset->all_tags(),
 	),
-), array(), "filter_assets");
+);
+$filter_assets = new Filter($pager_assets, $filter_assets_schema, array(), "filter_assets");
 
 $action = $url->get('action');
 if ($id = $url->get('id')) {
@@ -129,6 +162,11 @@ if ($form->is_submitted() and $form->validate()) {
 					$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
 				}
 			}
+			if (isset($data['skus'][$id_import])) {
+				foreach ($data['skus'][$id_import] as $id_sku) {
+					$savedata['asset_links']['sku'][$id_sku]['classement'] = 0;
+				}
+			}
 			if (isset($data['attributs'][$id_import])) {
 				foreach ($data['attributs'][$id_import] as $id_attributs => $options) {
 					foreach ($options as $option) {
@@ -169,6 +207,11 @@ if ($form->is_submitted() and $form->validate()) {
 				if (isset($data['produits'][$id_import])) {
 					foreach ($data['produits'][$id_import] as $id_produits) {
 						$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+					}
+				}
+				if (isset($data['skus'][$id_import])) {
+					foreach ($data['skus'][$id_import] as $id_sku) {
+						$savedata['asset_links']['sku'][$id_sku]['classement'] = 0;
 					}
 				}
 				if (isset($data['attributs'][$id_import])) {
@@ -269,15 +312,20 @@ if ($action == "create" or $action == "edit") {
 }
 
 $apercu = "";
-$attributs_for_assets = $config->get("attributs_for_assets");
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
-		'gammes' => $dico->t('Gammes'),
-		'produits' => $dico->t('Produits'),
-		'sku' => $dico->t('SKU'),
 	);
-	if ($attributs_for_assets) {
+	if (in_array('gamme', $assets_links)) {
+		$sections['gammes'] = $dico->t('Gammes');
+	}
+	if (in_array('produit', $assets_links)) {
+		$sections['produits'] = $dico->t('Produits');
+	}
+	if (in_array('sku', $assets_links)) {
+		$sections['sku'] = $dico->t('SKU');
+	}
+	if ($assets_attributs) {
 		$sections['attributs'] = $dico->t('Attributs');
 	}
 	// variable $hidden mise à jour dans ce snippet
@@ -335,17 +383,28 @@ if ($action == "create" or $action == "edit") {
 HTML;
 }
 if ($action == "edit") {
-	$main .= <<<HTML
+	if (in_array('gamme', $assets_links)) {
+		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Gammes'), 'class' => "produit-section produit-section-gammes".$hidden['gammes'], 'id' => "produit-section-gammes"))}
 {$page->inc("snippets/assets-links", array('link_type' => "gamme"))}
 {$form->fieldset_end()}
+HTML;
+	}
+	if (in_array('produit', $assets_links)) {
+		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
 {$page->inc("snippets/assets-links", array('link_type' => "produit"))}
 {$form->fieldset_end()}
+HTML;
+	}
+	if (in_array('sku', $assets_links)) {
+		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('SKU'), 'class' => "produit-section produit-section-sku".$hidden['sku'], 'id' => "produit-section-sku"))}
 {$page->inc("snippets/assets-links", array('link_type' => "sku"))}
 {$form->fieldset_end()}
-
+HTML;
+	}
+	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "asset[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;
@@ -359,12 +418,12 @@ HTML;
 		}
 	}
 
-	if ($attributs_for_assets) {		
+	if ($assets_attributs) {		
 		$links = $asset->links();
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Attributs'), 'class' => "produit-section produit-section-attributs".$hidden['attributs'], 'id' => "produit-section-attributs"))}
 HTML;
-		foreach ($asset->all_links_attributs($attributs_for_assets) as $id_attributs => $attribut) {
+		foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
 			$values = isset($links['attribut-'.$id_attributs]) ? array_keys($links['attribut-'.$id_attributs]) : array();
 			$main .= <<<HTML
 {$form->select(array('name' => "asset_links[attribut-{$id_attributs}][]", 'options' => $attribut['options'], 'label' => "{$attribut['nom']}", 'forced_value' => $values, 'multiple' => true))}
@@ -390,13 +449,28 @@ Pour la selection :
 {$form->input(array('type' => "submit", 'name' => "edit-selected", 'class' => "assets-import-edit-selected", 'value' => "Editer les informations"))}
 <div class="assets-import-edit-selected-form" style="display: none;">
 	<table>
+HTML;
+		if (in_array("gamme", $assets_links)) {
+			$main .= <<<HTML
 		<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+HTML;
+		}
+		if (in_array("produit", $assets_links)) {
+			$main .= <<<HTML
 		<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-produits", 'options' => $all_produits, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
 HTML;
-		foreach ($asset->all_links_attributs($attributs_for_assets) as $id_attributs => $attribut) {
+		}
+		if (in_array("sku", $assets_links)) {
 			$main .= <<<HTML
+		<tr><td>{$dico->t('SKU')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-skus", 'options' => $all_skus, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+HTML;
+		}
+		if ($assets_attributs) {
+			foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+				$main .= <<<HTML
 		<tr><td>{$attribut['nom']}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => true, 'template' => "#{field}"))}</td></tr>
 HTML;
+			}
 		}
 		$main .= <<<HTML
 		<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-tags", 'options' => $all_tags, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
@@ -440,15 +514,30 @@ HTML;
 			<a class="assets-import-infos-switch" href="#">Masquer</a>
 			<table>
 				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'value' => isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'], 'template' => "#{field}"))}</td></tr>
+HTML;
+				if (in_array("gamme", $assets_links)) {
+					$main .= <<<HTML
 				<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('name' => "gammes[$id_import][]", 'class' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+HTML;
+				}
+				if (in_array("produit", $assets_links)) {
+					$main .= <<<HTML
 				<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('name' => "produits[$id_import][]", 'class' => "asset-import-produits", 'options' => $all_produits, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 HTML;
-			foreach ($asset->all_links_attributs($attributs_for_assets) as $id_attributs => $attribut) {
-				$main .= <<<HTML
-				<tr><td>{$attribut['nom']}</td><td>{$form->select(array('name' => "attributs[$id_import][$id_attributs][]", 'class' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+				}
+				if (in_array("sku", $assets_links)) {
+					$main .= <<<HTML
+				<tr><td>{$dico->t('SKU')}</td><td>{$form->select(array('name' => "skus[$id_import][]", 'class' => "asset-import-skus", 'options' => $all_skus, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 HTML;
-			}
-			$main .= <<<HTML
+				}
+				if ($assets_attributs) {
+					foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+						$main .= <<<HTML
+					<tr><td>{$attribut['nom']}</td><td>{$form->select(array('name' => "attributs[$id_import][$id_attributs][]", 'class' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
+HTML;
+					}
+				}
+				$main .= <<<HTML
 				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$id_import][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td></tr>
@@ -481,7 +570,7 @@ HTML;
 		$titre_page = $dico->t('ListeOfAssets');
 		$filter = $filter_assets;
 		$pager = $pager_assets;
-		$asset->liste($filter);
+		$asset->liste($assets_links, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

@@ -12,13 +12,41 @@ class Asset extends AbstractObject {
 		'phrase_description',
 	);
 
-	public function liste(&$filter = null) {
+	public function liste($link_types = array(), &$filter = null) {
+		$select = "";
+		$join = "";
+		foreach ($link_types as $link_type) {
+			switch ($link_type) {
+				case 'gamme':
+					$table = "dt_gammes";
+					$field = "ref";
+					break;
+				case 'produit':
+					$table = "dt_produits";
+					$field = "ref";
+					break;
+				case 'sku':
+					$table = "dt_sku";
+					$field = "ref_ultralog";
+					break;
+			}
+			$select .= <<<SQL
+, GROUP_CONCAT(t_{$link_type}.{$field} ORDER BY t_{$link_type}.{$field} ASC SEPARATOR ', ') AS links_{$link_type}
+SQL;
+			$join .= <<<SQL
+LEFT OUTER JOIN dt_assets_links AS al_{$link_type} ON al_{$link_type}.id_assets = a.id AND al_{$link_type}.link_type = '$link_type'
+LEFT OUTER JOIN {$table} AS t_{$link_type} ON t_{$link_type}.id = al_{$link_type}.link_id
+
+SQL;
+		}
 		$q = <<<SQL
 SELECT a.id, a.titre, a.fichier, a.actif, a.public,
 GROUP_CONCAT(at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
+{$select}
 FROM dt_assets AS a
 LEFT OUTER JOIN dt_assets_tags_assets AS ata ON ata.id_assets = a.id
 LEFT OUTER JOIN dt_assets_tags AS at ON at.id = ata.id_assets_tags
+{$join}
 WHERE 1
 GROUP BY a.id
 SQL;
