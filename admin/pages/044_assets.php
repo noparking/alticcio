@@ -88,6 +88,18 @@ $filter_assets_schema += array(
 		'field' => 'at.id',
 		'options' => $asset->all_tags(),
 	),
+	'actif' => array(
+		'title' => $dico->t('Actif'),
+		'type' => 'select',
+		'options' => array(1 => $dico->t("Oui"), 0 => $dico->t("Non")),
+		'field' => 'a.actif',
+	),
+	'public' => array(
+		'title' => $dico->t('Public'),
+		'type' => 'select',
+		'options' => array(1 => $dico->t("Oui"), 0 => $dico->t("Non")),
+		'field' => 'a.public',
+	),
 );
 $filter_assets = new Filter($pager_assets, $filter_assets_schema, array(), "filter_assets");
 
