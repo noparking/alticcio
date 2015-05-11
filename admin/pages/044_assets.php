@@ -154,6 +154,13 @@ if ($form->is_submitted() and $form->validate()) {
 			$form->reset();
 			$url->redirect("current", array('action' => "", 'id' => ""));
 			break;
+		case "delete-selected":
+			foreach ($filter_assets->selected() as $id_assets) {
+				if ($asset->load($id_assets)) {
+					$asset->delete($data);
+				}
+			}
+			break;
 		case "import":
 			$id_import = $form->action_arg();
 			$asset_to_import = $assets_import->load(array('id' => $id_import));
@@ -317,6 +324,7 @@ if ($action) {
 else {
 	$buttons['new'] = $page->l($dico->t('NouvelAsset'), $url->make("current", array('action' => "create", 'id' => "")));
 	$buttons['import'] = $page->l($dico->t('ImporterAssets'), $url->make("current", array('action' => "import", 'id' => "")));
+	$buttons['delete-selected'] = $form->input(array('type' => "submit", 'value' => $dico->t('Supprimer'), 'name' => "delete-selected", 'class' => "delete"));
 }
 
 if ($action == "create" or $action == "edit") {
