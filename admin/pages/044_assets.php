@@ -268,6 +268,8 @@ if ($form->is_submitted() and $form->validate()) {
 				}
 				$data['file'] = $form->value('asset_file');
 				$data['path'] =  $config->get("asset_path");
+				if (!isset($data['tags'])) $data['tags'] = array();
+				if (!isset($data['langues'])) $data['langues'] = array();
 				if ($id = $asset->save($data)) {
 					$asset_saved = true; // used for hook
 					$form->reset();

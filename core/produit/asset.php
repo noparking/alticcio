@@ -136,11 +136,12 @@ SQL;
 			foreach ($data['tags'] as $id_assets_tags) {
 				$values[] = "($id_assets, $id_assets_tags)";
 			}
-			$list_values = implode(",", $values); 
-			$q = <<<SQL
+			if ($list_values = implode(",", $values)) {
+				$q = <<<SQL
 INSERT INTO dt_assets_tags_assets (id_assets, id_assets_tags) VALUES $list_values
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 		}
 
 		if (isset($data['langues'])) {
@@ -155,11 +156,12 @@ SQL;
 			foreach ($data['langues'] as $id_langues) {
 				$values[] = "($id_assets, $id_langues)";
 			}
-			$list_values = implode(",", $values); 
-			$q = <<<SQL
+			if ($list_values = implode(",", $values)) { 
+				$q = <<<SQL
 INSERT INTO dt_assets_langues (id_assets, id_langues) VALUES $list_values
 SQL;
-			$this->sql->query($q);
+				$this->sql->query($q);
+			}
 		}
 
 		return $id_assets;
