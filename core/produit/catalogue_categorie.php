@@ -192,6 +192,7 @@ SQL;
 		$q = <<<SQL
 SELECT b.id, b.nom FROM dt_blocs as b
 INNER JOIN dt_catalogues AS c ON c.id = {$this->values['id_catalogues']} AND c.id_langues = b.id_langues
+ORDER BY b.nom ASC
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
