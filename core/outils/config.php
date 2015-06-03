@@ -88,6 +88,7 @@ class Config {
 		switch ($type) {
 			case 'css':
 			case 'js':
+			case 'swf':
 				return $this->media_file("core", $type, $file);
 			case 'pdf':
 				return $this->media_file("core", "docs", $file);
