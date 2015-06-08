@@ -111,9 +111,11 @@ if ($form->is_submitted()) {
 			if ($action == "edit") {
 				if ($form->validate()) {
 					$selected_produits = $filter->selected();
-					foreach ($data['produits'] as $id_produits => $p) {
-						if (!in_array($id_produits, $selected_produits)) {
-							unset($data['produits'][$id_produits]);
+					if (isset($data['produits'])) {
+						foreach ($data['produits'] as $id_produits => $p) {
+							if (!in_array($id_produits, $selected_produits)) {
+								unset($data['produits'][$id_produits]);
+							}
 						}
 					}
 					$id_saved = $url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
@@ -160,7 +162,7 @@ if ($action == "edit") {
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
-	$categories_options = options_select_tree(DBTools::tree($catalogue->categories()), $form, "categories");
+	$categories_options = options_select_tree(DBTools::tree($catalogue->categories(), $id), $form, "categories");
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "catalogue_categorie[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "catalogue_categorie[id_catalogues]"))}
