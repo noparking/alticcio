@@ -861,7 +861,7 @@ SQL;
 				$res = $this->sql->query($q);
 				$row = $this->sql->fetch($res);
 				$categories[] = $row;
-				$id_categories = $row['id_parent'];
+				$id_categories = ($row['id_parent'] != $id_categories) ? $row['id_parent'] : 0
 			}
 		}
 		return $categories;
