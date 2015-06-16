@@ -86,7 +86,7 @@ SQL;
 		$this->sql_export->query($q);
 
 		$q = <<<SQL
-SELECT id_produit, id_sku, num_pages FROM catalogue
+SELECT id_produit, id_sku, num_pages FROM catalogue WHERE id_catalogue = '$id_catalogues'
 SQL;
 		$res = $this->sql_export->query($q);
 		$this->num_pages = array();
