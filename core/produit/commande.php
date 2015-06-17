@@ -50,7 +50,7 @@ SQL;
 			}
 			$data['commande']['montant'] = $montant;
 			if (!isset($data['commande']['frais_de_port'])) {
-				$id_boutiques = isset($data['commande']['id_boutiques']) ? $data['commande']['id_boutiques'] : 0;
+				$id_boutiques = isset($data['commande']['id_boutiques']) ? $data['commande']['id_boutiques'] : (isset($this->values['id_boutiques']) ? $this->values['id_boutiques'] : 0);
 				$data['commande']['frais_de_port'] = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays'], $id_boutiques);
 			}
 			$ecotaxe = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
