@@ -47,6 +47,7 @@ $filter_assets_schema = array(
 		'type' => 'between',
 		'order' => 'DESC',
 		'field' => 'a.id',
+		'template' => "{id} <img alt=\"\" src=\"{$config->get("asset_url")}{id}?thumb=1\" />",
 	),
 	'titre' => array(
 		'title' => $dico->t('Titre'),
