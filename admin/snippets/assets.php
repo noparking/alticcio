@@ -13,6 +13,7 @@ $filter = $filter_assets = new Filter($pager, array(
 			'href' => $url->make("assets", array('action' => "edit", 'id' => "{value}")),
 			'target' => "_blank",
 		),
+		'template' => "{id} <img alt=\"\" src=\"{$config->get("asset_url")}{id}?thumb=1\" />",
 	),
 	'titre' => array(
 		'title' => $dico->t('Titre'),

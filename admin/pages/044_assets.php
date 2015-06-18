@@ -354,21 +354,13 @@ if ($action == "edit") {
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
-	$src = $config->get("asset_url").$asset->id."?dl=1";
-	if ($asset->is_image() and $asset->values['actif'] and $asset->values['public']) {
+	$href = $config->get("asset_url").$asset->id."?dl=1";
+	$src = $config->get("asset_url").$asset->id."?thumb=1";
+	if ($asset->values['actif']) {
 		$apercu = <<<HTML
-<a href="{$src}">
+<a href="{$href}">
 <img alt="{$asset->values['titre']}" title="{$dico->t("Telecharger")}" class="asset" src="{$src}" />
 </a>
-HTML;
-	}
-	else if($asset->values['actif']) {
-		$apercu = <<<HTML
-<ul class="buttons_actions"><li>
-<a href="{$src}">
-{$dico->t("Telecharger")}
-</a>
-</li></ul>
 HTML;
 	}
 }

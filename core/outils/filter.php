@@ -350,19 +350,19 @@ HTML;
 				}
 			}
 			$return = $form->$method($params);
+			if (isset($this->elements[$cle]['template'])) {
+				$return = str_replace("{{$cle}}", $return, $this->elements[$cle]['template']);
+			}
 		}
 		else {
 			$return = $this->value($cle, $valeur);
-		}
-
-		if (isset($this->elements[$cle]['template'])) {
-			$return = str_replace("{{$cle}}", $return, $this->elements[$cle]['template']);
 		}
 
 		return $return;
 	}
 
 	public function value($cle, $valeur) {
+		$value = $valeur;
 		if (isset($this->elements[$cle]['values'][$valeur])) {
 			$valeur = $this->elements[$cle]['values'][$valeur];
 		}
@@ -378,7 +378,7 @@ HTML;
 		}
 		if (isset($this->elements[$cle]['link']['href'])) {
 			$href = str_replace("{field}", $cle, $this->elements[$cle]['link']['href']);
-			$href = str_replace("{value}", $valeur, $href);
+			$href = str_replace("{value}", $value, $href);
 			$target = "";
 			if (isset($this->elements[$cle]['link']['target'])) {
 				$target = " target=\"{$this->elements[$cle]['link']['target']}\"";
