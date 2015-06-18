@@ -694,8 +694,14 @@ SQL;
 			$filter = $this->sql;
 		}
 		$q = <<<SQL
-SELECT a.id, a.titre, al.classement FROM dt_assets AS a
+SELECT a.id, a.titre, al.classement,
+GROUP_CONCAT(at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
+FROM dt_assets AS a
 LEFT OUTER JOIN dt_assets_links AS al ON id_assets = a.id AND link_type = '{$this->type}' AND link_id = {$this->id}
+LEFT OUTER JOIN dt_assets_tags_assets AS ata ON ata.id_assets = a.id
+LEFT OUTER JOIN dt_assets_tags AS at ON at.id = ata.id_assets_tags
+WHERE 1
+GROUP BY a.id
 SQL;
 		$res = $filter->query($q);
 		$assets = array();
@@ -704,5 +710,19 @@ SQL;
 		}
 
 		return $assets;
+	}
+
+	public function all_assets_tags() {
+		$q = <<<SQL
+SELECT id, code FROM dt_assets_tags
+SQL;
+		$res = $this->sql->query($q);
+
+		$tags = array();
+		while ($row = $this->sql->fetch($res)) {
+			$tags[$row['id']] = $row['code'];
+		}
+
+		return $tags;
 	}
 }
