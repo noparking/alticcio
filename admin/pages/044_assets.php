@@ -515,6 +515,29 @@ HTML;
 			$options_values[$row['fichier']] = $row['id'];
 		}
 		foreach ($assets_import->liste() as $id_import => $asset_to_import) {
+			if ($asset_to_import['id_assets']) {
+				$asset->load($asset_to_import['id_assets']);
+				$form->default_values['assets'][$id_import] = $asset->values;
+				foreach ($asset->links() as $link_type => $links) {
+					if (strpos($link_type, "attribut") === 0) {
+						$id_attributs = str_replace("attribut-", "", $link_type);
+						$form->default_values['attributs'][$id_import][$id_attributs] = array_keys($links);
+					}
+					else {
+						$form->default_values[$link_type."s"][$id_import] = array_keys($links);
+					}
+				}
+				$form->default_values['tags'][$id_import] = $asset->tags();
+				$form->default_values['langues'][$id_import] = $asset->langues();
+			}
+			else {
+				$form->default_values['assets'][$id_import] = array(
+					'titre' => 	isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'],
+					'copyright' => "Dickson-Constant",
+					'actif' => true,
+					'public' => true,
+				);
+			}
 			$dir = $sources[$asset_to_import['source']];
 			if (file_exists($dir.$asset_to_import['fichier'])) {
 				$something_to_import = true;
@@ -528,7 +551,7 @@ HTML;
 		<div class="assets-import-infos-form" style="display: none;">
 			<a class="assets-import-infos-switch" href="#">Masquer</a>
 			<table>
-				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'value' => isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'], 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'template' => "#{field}"))}</td></tr>
 HTML;
 				if (in_array("gamme", $assets_links)) {
 					$main .= <<<HTML
@@ -555,9 +578,9 @@ HTML;
 				$main .= <<<HTML
 				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$id_import][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'template' => "#{field}"))}</td></tr>
 			</table>
 		</div>
 		<div class="assets-import-infos-noform">
