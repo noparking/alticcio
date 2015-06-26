@@ -253,7 +253,8 @@ if ($form->is_submitted() and $form->validate()) {
 		case "discard-selected":
 			foreach ($data['assets-import-select'] as $id_import => $delete) {
 				if ($delete) {
-					unlink($config->get('asset_import')."/".$fichier);
+					$asset_to_import = $assets_import->load(array('id' => $id_import));
+					unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
 					$assets_import->save(array('id' => $id_import, 'action' => ""));
 				}
 			}
