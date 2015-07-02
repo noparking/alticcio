@@ -13,11 +13,6 @@ $page->javascript[] = $config->media("produit.js");
 $page->javascript[] = $config->media("asset.js");
 $page->javascript[] = $config->media("jquery-ui.min.js");
 $page->javascript[] = $config->media("ui.multiselect.js");
-$page->post_javascript["multiselect"] = <<<JAVASCRIPT
-$(document).ready(function() {
-	$(".multiselect").multiselect();
-});
-JAVASCRIPT;
 
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
@@ -468,34 +463,61 @@ Pour la selection :
 HTML;
 		if (in_array("gamme", $assets_links)) {
 			$main .= <<<HTML
-		<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-gammes", 'name' => "copy-asset-import-gammes", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Gammes')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
 HTML;
 		}
 		if (in_array("produit", $assets_links)) {
 			$main .= <<<HTML
-		<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-produits", 'options' => $all_produits, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-produits", 'name' => "copy-asset-import-produits", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Produits')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-produits", 'options' => $all_produits, 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
 HTML;
 		}
 		if (in_array("sku", $assets_links)) {
 			$main .= <<<HTML
-		<tr><td>{$dico->t('SKU')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-skus", 'options' => $all_skus, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-skus", 'name' => "copy-asset-import-skus", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('SKU')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-skus", 'options' => $all_skus, 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
 HTML;
 		}
 		if ($assets_attributs) {
 			foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
 				$main .= <<<HTML
-		<tr><td>{$attribut['nom']}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => true, 'template' => "#{field}"))}</td></tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-attribut-{$id_attributs}", 'name' => "copy-asset-import-attribut-{$id_attributs}", 'template' => "#{field}"))}</td>
+			<td>{$attribut['nom']}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
 HTML;
 			}
 		}
 		$main .= <<<HTML
-		<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-tags", 'options' => $all_tags, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
-		<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-langues", 'options' => $all_langues, 'multiple' => true, 'template' => "#{field}"))}</td></tr>
-		<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-		<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-public", 'checked' => true, 'template' => "#{field}"))}</td></tr>
-		<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('class' => "copy-all", 'name' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td></tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-tags", 'name' => "copy-asset-import-tags", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Tags')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-tags", 'options' => $all_tags, 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-langues", 'name' => "copy-asset-import-langues", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Langues')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-langues", 'options' => $all_langues, 'multiple' => true, 'template' => "#{field}"))}</td>
+		</tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-actif", 'name' => "copy-asset-import-actif", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Actif')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-actif", 'checked' => true, 'template' => "#{field}"))}</td>
+		</tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-public", 'name' => "copy-asset-import-public", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Public')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-public", 'checked' => true, 'template' => "#{field}"))}</td>
+		</tr>
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-copyright", 'name' => "copy-asset-import-copyright", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Copyright')}</td><td>{$form->input(array('class' => "copy-all", 'name' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td>
+		</tr>
 	</table>
-	{$form->input(array('type' => "submit", 'name' => "copy-all", 'class' => "assets-import-copy-all", 'value' => "Valider"))}
+	{$form->input(array('type' => "submit", 'name' => "copy-all", 'class' => "assets-import-copy-all", 'value' => "Appliquer à la selection"))}
 </div>
 </div>
 <table>
