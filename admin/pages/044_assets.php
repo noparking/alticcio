@@ -133,9 +133,10 @@ $traduction = $form->value("lang");
 
 $messages = array();
 
+$form_action = null;
 if ($form->is_submitted() and $form->validate()) {
 	$data = $form->escape_values();
-	switch ($form->action()) {
+	switch ($form_action = $form->action()) {
 		case "translate":
 		case "filter":
 		case "pager":
