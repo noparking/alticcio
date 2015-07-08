@@ -830,16 +830,16 @@ div.filter-actions a {
 }
 
 /* elements de formulaire */
-.input-text-numeric {
+form .input-text-numeric {
 	width: 50px;
 }
 
-.multiselect {
+form .multiselect {
 	width: 460px;
 	height: 120px;
 }
 
-.little-select {
+form .little-select {
 	width: 130px;
 }
 

@@ -1394,3 +1394,10 @@ CREATE TABLE IF NOT EXISTS `dt_assets_users` (
 SQL;
 	$update->query($q);
 }
+
+function update_53($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_prix` CHANGE `frais_port` `frais_port` FLOAT NOT NULL DEFAULT '0';
+SQL;
+	$update->query($q);
+}

@@ -326,11 +326,17 @@ HTML;
 {$form->fieldset_end()}
 HTML;
 
+	$options_frais_port = array(
+		0 => $dico->t('PrixNonFranco'),
+		1 => $dico->t('PrixFranco'),
+		2 => $dico->t('FraisPortFixe'),
+	);
+	$template_frais_de_port = str_replace("#{field}", "#{field}".$form->input(array('name' => "prix[$id_catalogues][frais_port]", 'class' => "input-text-numeric", 'template' => "#{field}")), $page->inc("snippets/produits-form-template"));
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Prix')." $nom_catalogue", 'class' => "produit-section produit-section-prix-$id_catalogues".$hidden['prix-'.$id_catalogues], 'id' => "produit-section-prix-$id_catalogues"))}
 {$form->input(array('name' => "prix[$id_catalogues][montant_ht]", 'label' => $dico->t('PrixHT') ))} 
-{$form->input(array('name' => "prix[$id_catalogues][franco]", 'label' => $dico->t('PrixFranco'), 'type' => "checkbox"))}
+{$form->select(array('name' => "prix[$id_catalogues][franco]", 'label' => $dico->t('FraisPort'), 'options' => $options_frais_port, 'class' => "frais-port", 'template' => $template_frais_de_port))}
 HTML;
 		if ($id_catalogues == 0) {
 			$main .= <<<HTML

@@ -101,4 +101,18 @@ $(document).ready(function () {
 			}
 		});
 	});
+	if ($("select.frais-port").val() > 1) {
+		$("select.frais-port").next("input").show();
+	}
+	else {
+		$("select.frais-port").next("input").hide();
+	}
+	$("select.frais-port").change(function () {
+		if ($(this).val() > 1) {
+			$(this).next("input").show();
+		}
+		else {
+			$(this).next("input").hide();
+		}
+	});
 });
