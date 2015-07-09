@@ -7,10 +7,13 @@ class API_Cart {
 	private $id_langues;
 	private $id_catalogues = 0;
 
-	public function __construct($api) {
+	public function __construct($api, $id_langues = null) {
 		$this->api = $api;
 		$this->key = $api->key();
 		$this->sql = $api->sql;
+		if ($id_langues !== null) {
+			$this->id_langues = $id_langues;
+		}
 
 		if (!isset($_SESSION['cart'][$this->key]) or !is_array($_SESSION['cart'][$this->key])) {
 			$_SESSION['cart'][$this->key] = array();
@@ -279,15 +282,22 @@ SQL;
 		}
 		$sku_ids = implode(",", $sku_ids);
 		$q = <<<SQL
-SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog FROM dt_sku AS s
+SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog,
+px.id as px_id, px.montant_ht, px2.montant_ht AS montant_ht_default, px.franco, px2.franco AS franco_default,
+px.frais_port, px2.frais_port AS frais_port_default
+FROM dt_sku AS s
 LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = $id_langues
 LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = $id_langues
+LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = {$this->id_catalogues}
+LEFT OUTER JOIN dt_prix AS px2 ON px2.id_sku = s.id AND px2.id_catalogues = 0
 WHERE s.id IN ($sku_ids)
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			$data[$row['id']]['nom'] = addslashes($row['phrase_commercial'] ? $row['phrase_commercial'] : $row['phrase_ultralog']);
 			$data[$row['id']]['ref'] = $row['ref_ultralog'];
+			$data[$row['id']]['franco'] = isset($row['franco']) ? $row['franco'] : $row['franco_default'];
+			$data[$row['id']]['frais_port'] = isset($row['frais_port']) ? $row['frais_port'] : $row['frais_port_default'];
 		}
 		foreach ($_SESSION['cart'][$this->key]['personnalisations'] as $perso) {
 			$id_sku = $perso["id_sku"];
@@ -298,6 +308,8 @@ SQL;
 				'nom' =>  $data[$id_sku]['nom'],
 				'prix_unitaire' =>  $this->prix_unitaire_pour_qte($id_sku, $perso['qte']),
 				'quantite' => $perso['qte'],
+				'franco' => $data[$id_sku]['franco'],
+				'frais_port' =>  $data[$id_sku]['frais_port'],
 				'personnalisation_texte' => $perso['texte'],
 				'personnalisation_fichier' => $perso['fichier'],
 				'personnalisation_nom_fichier' => $perso['nom_fichier'],
@@ -380,6 +392,7 @@ SQL;
 		$sku_ids = array();
 		$produits_ids = array();
 		$francos = array();
+		$frais_port = array();
 		$ecotaxes = array();
 		$personnalisations = $this->personnalisations();
 		foreach ($personnalisations as $perso) {
@@ -398,7 +411,9 @@ SQL;
 		}
 		$produits_ids = implode(",", $produits_ids);
 		$q = <<<SQL
-SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog, px.id as px_id, px.montant_ht, px2.montant_ht AS montant_ht_default, px.franco, s.min_commande, s.colisage FROM dt_sku AS s
+SELECT p1.phrase AS phrase_commercial, p2.phrase AS phrase_ultralog, s.id, s.ref_ultralog,
+	   px.id as px_id, px.montant_ht, px2.montant_ht AS montant_ht_default, px.franco, px2.franco AS franco_default, px.frais_port, px2.frais_port AS frais_port_default,
+	   s.min_commande, s.colisage FROM dt_sku AS s
 LEFT OUTER JOIN dt_phrases AS p1 ON p1.id = s.phrase_commercial AND p1.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = s.phrase_ultralog AND p2.id_langues = {$this->id_langues()}
 LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = {$this->id_catalogues}
@@ -413,7 +428,8 @@ SQL;
 			$prix_degressifs[$row['id']][1] = $prix_catalogue[$row['id']] ? $row['montant_ht'] : $row['montant_ht_default'];
 			$qtes_min[$row['id']] = $row['min_commande'];
 			$colisages[$row['id']] = $row['colisage'];
-			$francos[$row['id']] = $row['franco'];
+			$francos[$row['id']] = $prix_catalogue[$row['id']] ? $row['franco'] : $row['franco_default'];
+			$frais_port[$row['id']] = $prix_catalogue[$row['id']] ? $row['frais_port'] : $row['frais_port_default'];
 		}
 
 		$q = <<<SQL
@@ -492,6 +508,7 @@ SQL;
 				'qte_min' => $qtes_min[$id_sku],
 				'colisage' => $colisages[$id_sku],
 				'franco' => $francos[$id_sku],
+				'frais_port' => $frais_port[$id_sku],
 				'ecotaxe' => $ecotaxes_montant,
 				'sample' => $perso['sample'],
 			);

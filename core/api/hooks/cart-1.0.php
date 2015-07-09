@@ -79,6 +79,25 @@ function get_cart_content() {
 	return $ret;
 }
 
+function get_cart_shipping($api, $id_langues, $id_pays_livraison, $id_boutiques) {
+	$cart = new API_Cart($api, $id_langues);
+	$content = $cart->content($id_pays_livraison);
+	$frais_port = 0;
+	$total_pour_livraison = 0;
+	foreach ($content['products'] as $product) {
+		if ($product['franco'] == 2) {
+			$frais_port += $product['frais_port'];
+		}
+		else {
+			$total_pour_livraison += $product['prix'];
+		}
+	}
+	$livraison = new API_Livraison($api);
+	$frais_port += $livraison->forfait($id_langues, $total_pour_livraison, $id_pays_livraison, $id_boutiques);
+
+	return $frais_port;
+}
+
 function get_cart_livraison() {
 	$args = func_get_args();
 	$api = array_shift($args);

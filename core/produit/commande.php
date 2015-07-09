@@ -43,15 +43,26 @@ SQL;
 		}
 		if (isset($data['produits'])) {
 			$montant = 0;
+			$montant_pour_livraison = 0;
+			$frais_port = 0;
 			$id_sku_quantite = array();
 			foreach ($data['produits'] as $produit) {
-				$montant += $produit['prix_unitaire'] * $produit['quantite'];
+				$montant_produit = $produit['prix_unitaire'] * $produit['quantite'];
+				$montant += $montant_produit;
+				switch ($produit['franco']) {
+					case 1 :
+						$montant_pour_livraison += $montant_produit;
+						break;
+					case 2 :
+						$frais_port += $produit['frais_port'];
+						break;
+				}
 				$id_sku_quantite[$produit['id_sku']] = $produit['quantite'];
 			}
 			$data['commande']['montant'] = $montant;
 			if (!isset($data['commande']['frais_de_port'])) {
 				$id_boutiques = isset($data['commande']['id_boutiques']) ? $data['commande']['id_boutiques'] : (isset($this->values['id_boutiques']) ? $this->values['id_boutiques'] : 0);
-				$data['commande']['frais_de_port'] = $this->frais_de_port($montant, $this->langue, $data['commande']['livraison_pays'], $id_boutiques);
+				$data['commande']['frais_de_port'] = $frais_port + $this->frais_de_port($montant_pour_livraison, $this->langue, $data['commande']['livraison_pays'], $id_boutiques);
 			}
 			$ecotaxe = $this->ecotaxe($id_sku_quantite, $data['commande']['livraison_pays']);
 			$data['commande']['ecotaxe'] = $ecotaxe;
