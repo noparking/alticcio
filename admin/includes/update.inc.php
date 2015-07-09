@@ -1397,7 +1397,7 @@ SQL;
 
 function update_53($update) {
 	$q = <<<SQL
-ALTER TABLE `dt_prix` CHANGE `frais_port` `frais_port` FLOAT NOT NULL DEFAULT '0';
+ALTER TABLE `dt_prix` ADD `frais_port` `frais_port` FLOAT NOT NULL DEFAULT '0';
 SQL;
 	$update->query($q);
 
