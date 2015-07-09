@@ -327,12 +327,12 @@ HTML;
 HTML;
 
 	$options_frais_port = array(
-		0 => $dico->t('PrixNonFranco'),
+		0 => $dico->t('FraisPortDevis'),
 		1 => $dico->t('PrixFranco'),
 		2 => $dico->t('FraisPortFixe'),
 	);
-	$template_frais_de_port = str_replace("#{field}", "#{field}".$form->input(array('name' => "prix[$id_catalogues][frais_port]", 'class' => "input-text-numeric", 'template' => "#{field}")), $page->inc("snippets/produits-form-template"));
 	foreach ($sku->catalogues(array(0 => "standard")) as $id_catalogues => $nom_catalogue) {
+		$template_frais_de_port = str_replace("#{field}", "#{field}".$form->input(array('name' => "prix[$id_catalogues][frais_port]", 'class' => "input-text-numeric", 'template' => "#{field}")), $form->template);
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Prix')." $nom_catalogue", 'class' => "produit-section produit-section-prix-$id_catalogues".$hidden['prix-'.$id_catalogues], 'id' => "produit-section-prix-$id_catalogues"))}
 {$form->input(array('name' => "prix[$id_catalogues][montant_ht]", 'label' => $dico->t('PrixHT') ))} 
