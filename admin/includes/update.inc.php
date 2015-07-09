@@ -1397,17 +1397,17 @@ SQL;
 
 function update_53($update) {
 	$q = <<<SQL
-ALTER TABLE `dt_prix` ADD `frais_port` `frais_port` FLOAT NOT NULL DEFAULT '0';
+ALTER TABLE `dt_commandes_produits` ADD `franco` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `echantillon`, ADD `frais_port` FLOAT NOT NULL DEFAULT '0' AFTER `franco`
 SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-ALTER TABLE `dt_commandes_produits` ADD `franco` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `echantillon`, ADD `frais_port` FLOAT NOT NULL DEFAULT '0' AFTER `franco` ;
+ALTER TABLE `dt_commandes_produits` ADD `franco` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `echantillon`, ADD `frais_port` FLOAT NOT NULL DEFAULT '0' AFTER `franco`
 SQL;
 	$update->query($q);
 
 	$q = <<<SQL
-ALTER TABLE `dt_commandes_produits_revisions` ADD `franco` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `echantillon`, ADD `frais_port` FLOAT NOT NULL DEFAULT '0' AFTER `franco` ;
+ALTER TABLE `dt_commandes_produits_revisions` ADD `franco` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `echantillon`, ADD `frais_port` FLOAT NOT NULL DEFAULT '0' AFTER `franco`
 SQL;
 	$update->query($q);
 }
