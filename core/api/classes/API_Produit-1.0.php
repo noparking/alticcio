@@ -241,7 +241,6 @@ SQL;
 		}
 
 		$prix = $sku->prix(null, $id_catalogue);
-		$franco = $prix['franco'];
 
 		$price = array(
 			'id_sku' => $id_sku,
@@ -250,7 +249,8 @@ SQL;
 			'qte' => $qte,
 			'qte_min' => $sku->values['min_commande'],
 			'colisage' => $sku->values['colisage'],
-			'franco' => $franco,
+			'franco' => $prix['franco'],
+			'frais_port' => $prix['frais_port'],
 			'ecotaxes' => $ecotaxes,
 		);
 
