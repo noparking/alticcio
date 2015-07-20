@@ -54,6 +54,7 @@ if ($action == "create" or $action == "edit") {
 {$form->fieldset_start(array('legend' => $dico->t('Commande'), 'class' => "produit-section produit-section-commande".$hidden['commande'], 'id' => "produit-section-commande"))}
 {$form->input(array('name' => "commande[shop]", 'label' => "Shop"))}
 {$form->input(array('name' => "commande[id_api_keys]", 'label' => "id_api_keys"))}
+{$form->input(array('name' => "commande[api_tracked]", 'label' => "api_tracked"))}
 {$form->select(array('name' => "commande[etat]", 'label' => "Etat", 'options' => $etats))}
 {$form->text(array('name' => "commande[montant]", 'label' => "Montant"))}
 {$form->text(array('name' => "commande[frais_de_port]", 'label' => "Frais de port"))}

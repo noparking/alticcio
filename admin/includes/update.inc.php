@@ -1411,3 +1411,15 @@ ALTER TABLE `dt_commandes_produits_revisions` ADD `franco` TINYINT( 1 ) NOT NULL
 SQL;
 	$update->query($q);
 }
+
+function update_54($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_commandes` ADD `api_tracked` VARCHAR( 64 ) NOT NULL DEFAULT '' AFTER `id_api_keys` ;
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_commandes_revisions` ADD `api_tracked` VARCHAR( 64 ) NOT NULL DEFAULT '' AFTER `id_api_keys` ;
+SQL;
+	$update->query($q);
+}
