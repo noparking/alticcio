@@ -73,6 +73,7 @@ $t['CalculApartirBase'] = "Calcul à partir d'une base d'Event Flags";
 $t['CalculApartirVent'] = "Calcul à partir d'une force de vent";
 $t['CalculPoidsEvent'] = "Calculer le poids de la base de votre Event Flags";
 $t['CalculResistanceVent'] = "Calculer la résistance au vent d'un mât";
+$t['CanauxDiffusion'] = "Canaux de diffusion";
 $t['Caracteristiques'] = "Caractéristiques";
 $t['Catalogue'] = "Catalogue";
 $t['CategorieParent'] = "Catégorie parent";

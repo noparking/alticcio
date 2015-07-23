@@ -42,6 +42,7 @@ $t['BilletdeBlog'] = "Blog post";
 $t['BilletsduBlog'] = "Blog posts";
 $t['Blog'] = "Blog";
 $t['Categories'] = "Categories";
+$t['CanauxDiffusion'] = "Canaux de diffusion";
 $t['Caracteristiques'] = "Caracteristics";
 $t['CategorieParent'] = "Parent category";
 $t['CeMois:'] = "Analytics for the current month.";

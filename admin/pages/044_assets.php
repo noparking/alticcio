@@ -297,6 +297,7 @@ if ($action == 'edit') {
 	$form->default_values['phrases'] = $phrase->get($asset->phrases());
 	$form->default_values['asset_links'] = $asset->links();
 	$form->default_values['tags'] = $asset->tags();
+	$form->default_values['targets'] = $asset->selected_targets();
 	$form->default_values['langues'] = $asset->langues();
 }
 else {
@@ -362,6 +363,7 @@ HTML;
 	}
 }
 $all_tags = $asset->all_tags();
+$all_targets = $asset->all_targets();
 $all_langues = $asset->all_langues();
 
 foreach ($asset->all_links_gamme() as $key => $value) {
@@ -390,6 +392,7 @@ if ($action == "create" or $action == "edit") {
 {$form->select(array('name' => "langues[]", 'options' => $all_langues, 'label' => $dico->t('Langues'), 'multiple' => true))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[actif]", 'label' => $dico->t('Actif')))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[public]", 'label' => $dico->t('Public')))}
+{$form->input(array('type' => "checkbox", 'name' => "targets", 'items' => $all_targets, 'item_as_value' => true, 'label' => $dico->t('CanauxDiffusion')))}
 {$form->input(array('name' => "asset[copyright]", 'label' => $dico->t('Copyright')))}
 {$form->textarea(array('name' => "asset[infos]", 'label' => $dico->t('Infos')))}
 {$form->fieldset_end()}

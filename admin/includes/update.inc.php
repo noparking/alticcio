@@ -1430,3 +1430,27 @@ ALTER TABLE `dt_assets` ADD `infos` TEXT NOT NULL;
 SQL;
 	$update->query($q);
 }
+
+function update_56($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_targets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(128) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_assets_targets_assets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_assets` int(11) NOT NULL,
+  `id_assets_targets` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_assets` (`id_assets`),
+  KEY `id_assets_targets` (`id_assets_targets`)
+)
+SQL;
+	$update->query($q);
+}

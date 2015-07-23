@@ -138,11 +138,35 @@ SQL;
 
 			$values = array();
 			foreach ($data['tags'] as $id_assets_tags) {
-				$values[] = "($id_assets, $id_assets_tags)";
+				if ($id_assets_tags) {
+					$values[] = "($id_assets, $id_assets_tags)";
+				}
 			}
 			if ($list_values = implode(",", $values)) {
 				$q = <<<SQL
 INSERT INTO dt_assets_tags_assets (id_assets, id_assets_tags) VALUES $list_values
+SQL;
+				$this->sql->query($q);
+			}
+		}
+
+		if (isset($data['targets'])) {
+			if (isset($data['asset']['id'])) {
+				$q = <<<SQL
+DELETE FROM dt_assets_targets_assets WHERE id_assets = {$data['asset']['id']} 
+SQL;
+				$this->sql->query($q);
+			}
+
+			$values = array();
+			foreach ($data['targets'] as $id_assets_targets) {
+				if ($id_assets_targets) {
+					$values[] = "($id_assets, $id_assets_targets)";
+				}
+			}
+			if ($list_values = implode(",", $values)) {
+				$q = <<<SQL
+INSERT INTO dt_assets_targets_assets (id_assets, id_assets_targets) VALUES $list_values
 SQL;
 				$this->sql->query($q);
 			}
@@ -179,6 +203,11 @@ SQL;
 
 		$q = <<<SQL
 DELETE FROM dt_assets_tags_assets WHERE id_assets = {$this->id}
+SQL;
+		$this->sql->query($q);
+
+		$q = <<<SQL
+DELETE FROM dt_assets_targets_assets WHERE id_assets = {$this->id}
 SQL;
 		$this->sql->query($q);
 
@@ -326,6 +355,49 @@ SQL;
 		}
 
 		return $tags;
+	}
+
+	public function all_targets() {
+		$q = <<<SQL
+SELECT id, code FROM dt_assets_targets
+SQL;
+		$res = $this->sql->query($q);
+
+		$targets = array();
+		while ($row = $this->sql->fetch($res)) {
+			$targets[$row['id']] = $row['code'];
+		}
+
+		return $targets;
+	}
+
+	public function selected_targets() {
+		$q = <<<SQL
+SELECT at.id, ata.id_assets FROM dt_assets_targets AS at
+LEFT OUTER JOIN dt_assets_targets_assets AS ata ON ata.id_assets_targets = at.id AND ata.id_assets = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+
+		$targets = array();
+		while ($row = $this->sql->fetch($res)) {
+			$targets[$row['id']] = $row['id_assets'] ? true : false;
+		}
+
+		return $targets;
+	}
+
+	public function targets() {
+		$q = <<<SQL
+SELECT id_assets_targets FROM dt_assets_targets_assets WHERE id_assets = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+
+		$targets = array();
+		while ($row = $this->sql->fetch($res)) {
+			$targets[] = $row['id_assets_targets'];
+		}
+
+		return $targets;
 	}
 	
 	public function all_langues() {
