@@ -386,7 +386,12 @@ class Form {
 				$class .= " ".$params['class'];
 			}
 			$params['class'] = $class;
-			$value = $type == 'file' ? "" : htmlspecialchars($this->get_value($params, $name));
+			if (isset($params['item_as_value']) and $params['item_as_value']) {
+				$value = $item;
+			}
+			else {
+				$value = $type == 'file' ? "" : htmlspecialchars($this->get_value($params, $name));
+			}
 			$checked = $this->get_checked($params, $name); 
 			$disabled = (isset($params['disabled']) and $params['disabled']) ? ' disabled="disabled"': "";
 			$readonly = (isset($params['readonly']) and $params['readonly']) ? ' readonly="readonly"': "";
