@@ -391,6 +391,7 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('type' => "checkbox", 'name' => "asset[actif]", 'label' => $dico->t('Actif')))}
 {$form->input(array('type' => "checkbox", 'name' => "asset[public]", 'label' => $dico->t('Public')))}
 {$form->input(array('name' => "asset[copyright]", 'label' => $dico->t('Copyright')))}
+{$form->textarea(array('name' => "asset[infos]", 'label' => $dico->t('Infos')))}
 {$form->fieldset_end()}
 HTML;
 }
@@ -555,12 +556,17 @@ HTML;
 				$form->default_values['langues'][$id_import] = $asset->langues();
 			}
 			else {
-				$form->default_values['assets'][$id_import] = array(
-					'titre' => 	isset($asset_to_import['asset_data']['fichier']) ? $asset_to_import['asset_data']['fichier'] : $asset_to_import['fichier'],
+				$default_values = array(
+					'titre' => $asset_to_import['fichier'],
 					'copyright' => "Dickson-Constant",
 					'actif' => true,
 					'public' => true,
+					'infos' => "",
 				);
+				foreach (array('titre', 'copyright', 'actif', 'public', 'infos') as $element) {
+					$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
+					$form->default_values['assets'][$id_import][$element] = $value;
+				}
 			}
 			$dir = $sources[$asset_to_import['source']];
 			if (file_exists($dir.$asset_to_import['fichier'])) {
@@ -605,6 +611,7 @@ HTML;
 				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$dico->t('Infos')}</td><td>{$form->textarea(array('name' => "assets[$id_import][infos]", 'class' => "asset-import-infos", 'template' => "#{field}"))}</td></tr>
 			</table>
 		</div>
 		<div class="assets-import-infos-noform">

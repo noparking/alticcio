@@ -1423,3 +1423,10 @@ ALTER TABLE `dt_commandes_revisions` ADD `api_tracked` VARCHAR( 64 ) NOT NULL DE
 SQL;
 	$update->query($q);
 }
+
+function update_55($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_assets` ADD `infos` TEXT NOT NULL;
+SQL;
+	$update->query($q);
+}

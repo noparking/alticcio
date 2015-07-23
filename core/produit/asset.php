@@ -101,6 +101,10 @@ SQL;
 		}
 		$data['asset']['date_modification'] = $time;
 
+		if (!isset($data['asset']['infos'])) {
+			$data['asset']['infos'] = "";
+		}
+
 		if (isset($data['file']) and isset($data['path'])) {
 			$file = $data['file'];
 			$path = $data['path'];
