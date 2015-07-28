@@ -587,7 +587,7 @@ HTML;
 					$form->default_values['assets'][$id_import][$element] = $value;
 				}
 				foreach ($targets as $id_target => $target) {
-					$form->default_values['targets'][$id_import][$id_target] = true;
+					$form->default_values['targets'][$id_import][$id_target] = isset($asset_to_import['asset_data']['targets'][$id_target]) ? $asset_to_import['asset_data']['targets'][$id_target] : true;
 				}
 			}
 			$dir = $sources[$asset_to_import['source']];
