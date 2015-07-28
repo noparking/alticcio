@@ -206,52 +206,56 @@ if ($form->is_submitted() and $form->validate()) {
 			$assets_import->save(array('id' => $id_import, 'action' => ""));
 			break;
 		case "import-selected":
-			foreach ($data['assets-import-select'] as $id_import => $rien) {
-				$asset_to_import = $assets_import->load(array('id' => $id_import));
-				$savedata['asset'] = $data['assets'][$id_import];
-				if ($id_assets = $data['existing-asset'][$id_import]) {
-					$savedata['asset']['id'] = $id_assets;
-				}
-				else {
-					$savedata['asset']['id'] = $asset->save($savedata);
-				}
-				if (isset($data['gammes'][$id_import])) {
-					foreach ($data['gammes'][$id_import] as $id_gammes) {
-						$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
+			if (isset($data['assets-import-select'])) {
+				foreach ($data['assets-import-select'] as $id_import => $rien) {
+					$asset_to_import = $assets_import->load(array('id' => $id_import));
+					$savedata['asset'] = $data['assets'][$id_import];
+					if ($id_assets = $data['existing-asset'][$id_import]) {
+						$savedata['asset']['id'] = $id_assets;
 					}
-				}
-				if (isset($data['produits'][$id_import])) {
-					foreach ($data['produits'][$id_import] as $id_produits) {
-						$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+					else {
+						$savedata['asset']['id'] = $asset->save($savedata);
 					}
-				}
-				if (isset($data['skus'][$id_import])) {
-					foreach ($data['skus'][$id_import] as $id_sku) {
-						$savedata['asset_links']['sku'][$id_sku]['classement'] = 0;
-					}
-				}
-				if (isset($data['attributs'][$id_import])) {
-					foreach ($data['attributs'][$id_import] as $id_attributs => $options) {
-						foreach ($options as $option) {
-							$savedata['asset_links']['attribut-'.$id_attributs][$option]['classement'] = 0;
+					if (isset($data['gammes'][$id_import])) {
+						foreach ($data['gammes'][$id_import] as $id_gammes) {
+							$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
 						}
 					}
+					if (isset($data['produits'][$id_import])) {
+						foreach ($data['produits'][$id_import] as $id_produits) {
+							$savedata['asset_links']['produit'][$id_produits]['classement'] = 0;
+						}
+					}
+					if (isset($data['skus'][$id_import])) {
+						foreach ($data['skus'][$id_import] as $id_sku) {
+							$savedata['asset_links']['sku'][$id_sku]['classement'] = 0;
+						}
+					}
+					if (isset($data['attributs'][$id_import])) {
+						foreach ($data['attributs'][$id_import] as $id_attributs => $options) {
+							foreach ($options as $option) {
+								$savedata['asset_links']['attribut-'.$id_attributs][$option]['classement'] = 0;
+							}
+						}
+					}
+					if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
+					if (isset($data['langues'][$id_import])) $savedata['langues'] = $data['langues'][$id_import];
+					$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
+					$savedata['path'] =  $config->get("asset_path");
+					$asset->save($savedata);
+					unlink($savedata['file']);
+					$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
 				}
-				if (isset($data['tags'][$id_import])) $savedata['tags'] = $data['tags'][$id_import];
-				if (isset($data['langues'][$id_import])) $savedata['langues'] = $data['langues'][$id_import];
-				$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
-				$savedata['path'] =  $config->get("asset_path");
-				$asset->save($savedata);
-				unlink($savedata['file']);
-				$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
 			}
 			break;
 		case "discard-selected":
-			foreach ($data['assets-import-select'] as $id_import => $delete) {
-				if ($delete) {
-					$asset_to_import = $assets_import->load(array('id' => $id_import));
-					unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
-					$assets_import->save(array('id' => $id_import, 'action' => ""));
+			if (isset($data['assets-import-select'])) {
+				foreach ($data['assets-import-select'] as $id_import => $delete) {
+					if ($delete) {
+						$asset_to_import = $assets_import->load(array('id' => $id_import));
+						unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+						$assets_import->save(array('id' => $id_import, 'action' => ""));
+					}
 				}
 			}
 			break;
@@ -517,6 +521,16 @@ HTML;
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-public", 'name' => "copy-asset-import-public", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Public')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-public", 'checked' => true, 'template' => "#{field}"))}</td>
 		</tr>
+HTML;
+		foreach ($asset->all_targets() as $id_target => $target) {
+			$main .= <<<HTML
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-target-{$id_target}", 'name' => "copy-asset-import-target-{$id_target}", 'template' => "#{field}"))}</td>
+			<td>{$target}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-target-{$id_target}", 'checked' => true, 'template' => "#{field}"))}</td>
+		</tr>
+HTML;
+		}
+		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-copyright", 'name' => "copy-asset-import-copyright", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Copyright')}</td><td>{$form->input(array('class' => "copy-all", 'name' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td>
@@ -543,6 +557,7 @@ HTML;
 			$options_values[$row['fichier']] = $row['id'];
 		}
 		foreach ($assets_import->liste() as $id_import => $asset_to_import) {
+			$targets = $asset->all_targets();
 			if ($asset_to_import['id_assets']) {
 				$asset->load($asset_to_import['id_assets']);
 				$form->default_values['assets'][$id_import] = $asset->values;
@@ -557,6 +572,7 @@ HTML;
 				}
 				$form->default_values['tags'][$id_import] = $asset->tags();
 				$form->default_values['langues'][$id_import] = $asset->langues();
+				$form->default_values['targets'][$id_import] = $asset->selected_targets();
 			}
 			else {
 				$default_values = array(
@@ -569,6 +585,9 @@ HTML;
 				foreach (array('titre', 'copyright', 'actif', 'public', 'infos') as $element) {
 					$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
 					$form->default_values['assets'][$id_import][$element] = $value;
+				}
+				foreach ($targets as $id_target => $target) {
+					$form->default_values['targets'][$id_import][$id_target] = true;
 				}
 			}
 			$dir = $sources[$asset_to_import['source']];
@@ -613,6 +632,13 @@ HTML;
 				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'template' => "#{field}"))}</td></tr>
+HTML;
+				foreach ($targets as $id_target => $target) {
+					$main .= <<<HTML
+				<tr><td>{$target}</td><td>{$form->input(array('type' => "checkbox", 'name' => "targets[$id_import][$id_target]", 'class' => "asset-import-target-{$id_target}", 'template' => "#{field}"))}</td></tr>
+HTML;
+				}
+				$main .= <<<HTML
 				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'template' => "#{field}"))}</td></tr>
 				<tr><td>{$dico->t('Infos')}</td><td>{$form->textarea(array('name' => "assets[$id_import][infos]", 'class' => "asset-import-infos", 'template' => "#{field}"))}</td></tr>
 			</table>
