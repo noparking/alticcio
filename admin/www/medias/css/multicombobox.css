@@ -1,0 +1,30 @@
+.multicombobox {
+position: relative;
+display: inline-block;
+}
+.custom-multicombobox {
+position: relative;
+float: left;
+display: inline-block;
+}
+.custom-multicombobox-selected {
+position: relative;
+float: left;
+clear: both;
+display: inline-block;
+list-style-type: none;
+margin: 0; 
+padding: 0;
+}
+.custom-multicombobox-toggle {
+position: absolute;
+top: 0;
+bottom: 0;
+right: -2px;
+padding: 0;
+}
+.custom-multicombobox-input {
+margin: 0;
+padding: 5px 10px;
+}
+

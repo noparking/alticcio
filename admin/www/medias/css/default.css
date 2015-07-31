@@ -857,9 +857,3 @@ form .little-select {
 /* Message de sauvegarde */
 .saving { border: 5px solid #aa3300; background-color: #ffaaaa; font-size: 24px; position: fixed; padding: 20px; width: 400px; top: 50%; left: 50%; margin-top: -50px; margin-left: -200px; }
 
-.assets-options {
-	max-width: 300px;
-}
-
-.assets-import-infos-switch { cursor: pointer; }
-.assets-import-infos-switch.activated { color: red !important; }

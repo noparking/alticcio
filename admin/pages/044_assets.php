@@ -6,13 +6,15 @@ $config->core_include("produit/asset", "outils/langue", "outils/phrase", "outils
 $config->core_include("outils/filter", "outils/pager", "assets/assets_import");
 
 $page->css[] = $config->media("jquery-ui.min.css");
-$page->css[] = $config->media("ui.multiselect.css");
+$page->css[] = $config->media("autocomplete.min.css");
+$page->css[] = $config->media("multicombobox.css");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
 $page->javascript[] = $config->media("asset.js");
 $page->javascript[] = $config->media("jquery-ui.min.js");
-$page->javascript[] = $config->media("ui.multiselect.js");
+$page->javascript[] = $config->media("autocomplete.min.js");
+$page->javascript[] = $config->media("multicombobox.js");
 
 $page->jsvars[] = array(
 	"edit_url" => $url->make("current", array('action' => 'edit', 'id' => "")),	
@@ -474,7 +476,7 @@ HTML;
 			$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-gammes", 'name' => "copy-asset-import-gammes", 'template' => "#{field}"))}</td>
-			<td>{$dico->t('Gammes')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Gammes')}</td><td><div class="multicombobox copy-all" list="gammes" items="" name="asset-import-gammes"></div></td>
 		</tr>
 HTML;
 		}
@@ -482,7 +484,7 @@ HTML;
 			$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-produits", 'name' => "copy-asset-import-produits", 'template' => "#{field}"))}</td>
-			<td>{$dico->t('Produits')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-produits", 'options' => $all_produits, 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Produits')}</td><td><div class="multicombobox copy-all" list="produits" items="" name="asset-import-produits"></div></td>
 		</tr>
 HTML;
 		}
@@ -490,7 +492,7 @@ HTML;
 			$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-skus", 'name' => "copy-asset-import-skus", 'template' => "#{field}"))}</td>
-			<td>{$dico->t('SKU')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-skus", 'options' => $all_skus, 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$dico->t('SKU')}</td><td><div class="multicombobox copy-all" list="skus" items="" name="asset-import-skus"></div></td>
 		</tr>
 HTML;
 		}
@@ -499,7 +501,7 @@ HTML;
 				$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-attribut-{$id_attributs}", 'name' => "copy-asset-import-attribut-{$id_attributs}", 'template' => "#{field}"))}</td>
-			<td>{$attribut['nom']}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$attribut['nom']}</td><td><div class="multicombobox copy-all" list="attribut-{$id_attributs}" items="" name="asset-import-attribut-{$id_attributs}"></div></td>
 		</tr>
 HTML;
 			}
@@ -507,11 +509,11 @@ HTML;
 		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-tags", 'name' => "copy-asset-import-tags", 'template' => "#{field}"))}</td>
-			<td>{$dico->t('Tags')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-tags", 'options' => $all_tags, 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Tags')}</td><td><div class="multicombobox copy-all" list="tags" items="" name="asset-import-tags"></div></td>
 		</tr>
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-langues", 'name' => "copy-asset-import-langues", 'template' => "#{field}"))}</td>
-			<td>{$dico->t('Langues')}</td><td>{$form->select(array('class' => "copy-all", 'name' => "asset-import-langues", 'options' => $all_langues, 'multiple' => true, 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Langues')}</td><td><div class="multicombobox copy-all" list="langues" items="" name="asset-import-langues"></div></td>
 		</tr>
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-actif", 'name' => "copy-asset-import-actif", 'template' => "#{field}"))}</td>
@@ -521,16 +523,10 @@ HTML;
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-public", 'name' => "copy-asset-import-public", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Public')}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-public", 'checked' => true, 'template' => "#{field}"))}</td>
 		</tr>
-HTML;
-		foreach ($asset->all_targets() as $id_target => $target) {
-			$main .= <<<HTML
 		<tr>
-			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-target-{$id_target}", 'name' => "copy-asset-import-target-{$id_target}", 'template' => "#{field}"))}</td>
-			<td>{$target}</td><td>{$form->input(array('class' => "copy-all", 'type' => "checkbox", 'name' => "asset-import-target-{$id_target}", 'checked' => true, 'template' => "#{field}"))}</td>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-targets", 'name' => "copy-asset-import-targets", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Targets')}</td><td><div class="multicombobox copy-all" list="targets" items="" name="asset-import-targets"></div></td>
 		</tr>
-HTML;
-		}
-		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-copyright", 'name' => "copy-asset-import-copyright", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Copyright')}</td><td>{$form->input(array('class' => "copy-all", 'name' => "asset-import-copyright", 'value' => "Dickson-Constant", 'template' => "#{field}"))}</td>
@@ -550,12 +546,6 @@ HTML;
 </tr>
 HTML;
 		$something_to_import = false;
-		$options = array(0 => "");
-		$options_values = array();
-		foreach ($asset->liste() as $row) {
-			$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
-			$options_values[$row['fichier']] = $row['id'];
-		}
 		foreach ($assets_import->liste() as $id_import => $asset_to_import) {
 			$targets = $asset->all_targets();
 			if ($asset_to_import['id_assets']) {
@@ -598,54 +588,42 @@ HTML;
 	<td><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></td>
 	<td>{$asset_to_import['source']}</td>
 	<td>{$asset_to_import['fichier']}</td>
-	<td>{$form->select(array('name' => "existing-asset[{$asset_to_import['id']}]", 'options' => $options, 'forced_value' => $asset_to_import['id_assets'], 'class' => "assets-options", 'template' => "#{field}"))}</td>
+	<td><div class="multicombobox" list="assets" limit="1" items="" name="existing-asset[{$asset_to_import['id']}]"></td>
 	<td class="assets-import-infos">
-		<div class="assets-import-infos-form" style="display: none;">
-			<a class="assets-import-infos-switch" href="#">Masquer</a>
-			<table>
-				<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'template' => "#{field}"))}</td></tr>
+		<table>
+			<tr><td>{$dico->t('Titre')}</td><td>{$form->input(array('name' => "assets[$id_import][titre]", 'template' => "#{field}"))}</td></tr>
 HTML;
-				if (in_array("gamme", $assets_links)) {
-					$main .= <<<HTML
-				<tr><td>{$dico->t('Gammes')}</td><td>{$form->select(array('name' => "gammes[$id_import][]", 'class' => "asset-import-gammes", 'options' => $all_gammes, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-HTML;
-				}
-				if (in_array("produit", $assets_links)) {
-					$main .= <<<HTML
-				<tr><td>{$dico->t('Produits')}</td><td>{$form->select(array('name' => "produits[$id_import][]", 'class' => "asset-import-produits", 'options' => $all_produits, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-HTML;
-				}
-				if (in_array("sku", $assets_links)) {
-					$main .= <<<HTML
-				<tr><td>{$dico->t('SKU')}</td><td>{$form->select(array('name' => "skus[$id_import][]", 'class' => "asset-import-skus", 'options' => $all_skus, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-HTML;
-				}
-				if ($assets_attributs) {
-					foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
-						$main .= <<<HTML
-					<tr><td>{$attribut['nom']}</td><td>{$form->select(array('name' => "attributs[$id_import][$id_attributs][]", 'class' => "asset-import-attribut-{$id_attributs}", 'options' => $attribut['options'], 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-HTML;
-					}
-				}
+			if (in_array("gamme", $assets_links)) {
 				$main .= <<<HTML
-				<tr><td>{$dico->t('Tags')}</td><td>{$form->select(array('name' => "tags[$id_import][]", 'class' => "asset-import-tags", 'options' => $all_tags, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Langues')}</td><td>{$form->select(array('name' => "langues[$id_import][]", 'class' => "asset-import-langues", 'options' => $all_langues, 'multiple' => "normal", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'template' => "#{field}"))}</td></tr>
+			<tr><td>{$dico->t('Gammes')}</td><td><div class="multicombobox asset-import-gammes" list="gammes" items="" name="gammes[$id_import][]"></div></td></tr>
 HTML;
-				foreach ($targets as $id_target => $target) {
+			}
+			if (in_array("produit", $assets_links)) {
+				$main .= <<<HTML
+			<tr><td>{$dico->t('Produits')}</td><td><div class="multicombobox asset-import-produits" list="produits" items="" name="produits[$id_import][]"></div></td></tr>
+HTML;
+			}
+			if (in_array("sku", $assets_links)) {
+				$main .= <<<HTML
+			<tr><td>{$dico->t('SKU')}</td><td><div class="multicombobox asset-import-skus" list="skus" items="" name="skus[$id_import][]"></div></td></tr>
+HTML;
+			}
+			if ($assets_attributs) {
+				foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
 					$main .= <<<HTML
-				<tr><td>{$target}</td><td>{$form->input(array('type' => "checkbox", 'name' => "targets[$id_import][$id_target]", 'class' => "asset-import-target-{$id_target}", 'template' => "#{field}"))}</td></tr>
+				<tr><td>{$attribut['nom']}</td><td><div class="multicombobox asset-import-attribut-{$id_attributs}" list="attribut-{$id_attributs}" items="" name="attributs[$id_import][$id_attributs][]"></div></td></tr>
 HTML;
 				}
-				$main .= <<<HTML
-				<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'template' => "#{field}"))}</td></tr>
-				<tr><td>{$dico->t('Infos')}</td><td>{$form->textarea(array('name' => "assets[$id_import][infos]", 'class' => "asset-import-infos", 'template' => "#{field}"))}</td></tr>
-			</table>
-		</div>
-		<div class="assets-import-infos-noform">
-			<a class="assets-import-infos-switch" href="#">Afficher</a>
-		</div>
+			}
+			$main .= <<<HTML
+			<tr><td>{$dico->t('Tags')}</td><td><div class="multicombobox asset-import-tags" list="tags" items="" name="tags[$id_import][]"></div></td></tr>
+			<tr><td>{$dico->t('Langues')}</td><td><div class="multicombobox asset-import-langues" list="langues" items="" name="langues[$id_import][]"></div></td></tr>
+			<tr><td>{$dico->t('Actif')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][actif]", 'class' => "asset-import-actif", 'template' => "#{field}"))}</td></tr>
+			<tr><td>{$dico->t('Public')}</td><td>{$form->input(array('type' => "checkbox", 'name' => "assets[$id_import][public]", 'class' => "asset-import-public", 'template' => "#{field}"))}</td></tr>
+			<tr><td>{$dico->t('Targets')}</td><td><div class="multicombobox asset-import-targets" list="targets" items="" name="targets[$id_import][]"></div></td></tr>
+			<tr><td>{$dico->t('Copyright')}</td><td>{$form->input(array('name' => "assets[$id_import][copyright]", 'class' => "asset-import-copyright", 'template' => "#{field}"))}</td></tr>
+			<tr><td>{$dico->t('Infos')}</td><td>{$form->textarea(array('name' => "assets[$id_import][infos]", 'class' => "asset-import-infos", 'template' => "#{field}"))}</td></tr>
+		</table>
 	</td>
 	<td>
 		{$form->input(array('type' => "submit", 'name' => "import[$id_import]", 'value' => "Importer"))}
@@ -658,7 +636,41 @@ HTML;
 		$main .= <<<HTML
 </table>		
 HTML;
-		if (!$something_to_import) {
+		if ($something_to_import) {
+			$all_gammes_json = json_encode($all_gammes);
+			$all_produits_json = json_encode($all_produits);
+			$all_skus_json = json_encode($all_skus);
+			$all_tags_json = json_encode($all_tags);
+			$all_langues_json = json_encode($all_langues);
+			$all_targets_json = json_encode($all_targets);
+			foreach ($asset->liste() as $row) {
+				$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
+			}
+			$all_assets_json = json_encode($options);
+			$javascript = <<<JAVASCRIPT
+var multicombobox_list = [];
+multicombobox_list['gammes'] = {$all_gammes_json};
+multicombobox_list['produits'] = {$all_produits_json};
+multicombobox_list['skus'] = {$all_skus_json};
+multicombobox_list['tags'] = {$all_tags_json};
+multicombobox_list['langues'] = {$all_langues_json};
+multicombobox_list['targets'] = {$all_targets_json};
+multicombobox_list['assets'] = {$all_assets_json};
+JAVASCRIPT;
+			if ($assets_attributs) {
+				foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+					$options = json_encode($attribut['options']);
+					$javascript .= <<<JAVASCRIPT
+multicombobox_list['attribut-' + {$id_attributs}] = {$options};
+JAVASCRIPT;
+				}
+			}
+			$javascript .= <<<JAVASCRIPT
+$(".multicombobox").multicombobox();
+JAVASCRIPT;
+			$page->post_javascript[] = $javascript;
+		}
+		else {
 			$main = <<<HTML
 <p>{$dico->t("RienAImporter")}</p>
 HTML;

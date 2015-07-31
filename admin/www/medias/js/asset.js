@@ -1,26 +1,4 @@
 $(document).ready(function () {
-	$(".multiselect").addClass("multiselect-initialization").multiselect().removeClass("multiselect-initialization");
-	$("th.assets-import-infos-switch").click(function() {
-		if ($(this).hasClass("activated")) {
-			$(this).removeClass("activated");
-			$(".assets-import-infos-form").hide();
-			$(".assets-import-infos-noform").show();
-		}
-		else {
-			$(this).addClass("activated");
-			$(".assets-import-infos-form").show();
-			$(".assets-import-infos-noform").hide();
-		}
-	});
-	$("a.assets-import-infos-switch").click(function() {
-		$(this).parents(".assets-import-infos").find(".assets-import-infos-form,.assets-import-infos-noform").toggle();
-		$(this).parents(".assets-import-infos").find("select").each(function() {
-			if (!$(this).hasClass("multiselect")) {
-				$(this).addClass("multiselect").multiselect();
-			}
-		});
-		return false;
-	});
 	$(".assets-import-select-all").click(function () {
 		if ($(this).prop("checked")) {
 			$(".assets-import-select").prop("checked", true);
@@ -44,10 +22,8 @@ $(document).ready(function () {
 		return false;
 	});
 	$(".copy-all").change(function() {
-		if (!$(this).hasClass("multiselect-initialization")) {
-			var name = $(this).attr('name');
-			$("#copy-" + name).prop("checked", true);
-		}
+		var name = $(this).attr('name');
+		$("#copy-" + name).prop("checked", true);
 	});
 	$(".assets-import-copy-all").click (function() {
 		$(".assets-import-edit-selected-form").find(".copy-all").each(function () {
@@ -55,14 +31,16 @@ $(document).ready(function () {
 			if ($("#copy-" + my_class).prop('checked')) {
 				var my_val = $(this).val();
 				var my_checked = $(this).prop('checked');
+				var my_object = $(this);
 				$(".assets-import-select:checked").parents("tr").each(function () {
 					var object = $(this).find("." + my_class);
 					if (object.attr('type') == 'checkbox') {
 						object.prop('checked', my_checked);
+					} else if (object.hasClass("multicombobox")) {
+						object.multicombobox("values", my_object.multicombobox("values"));
 					} else {
 						object.val(my_val);
 					}
-					$(this).find(".multiselect." + my_class).multiselect("destroy").multiselect();
 				});
 			}
 		});
