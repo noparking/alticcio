@@ -171,6 +171,9 @@
 			if (selected.indexOf(item.index) >= 0) {
 				return;
 			}
+			if (!this.list[item.index]) {
+				return;
+			}
 			var list_element = $('<li>')
 			.css('cursor', "ns-resize")
 			.html(" " + item.value);
