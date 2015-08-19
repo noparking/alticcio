@@ -31,7 +31,7 @@ class Asset extends AbstractObject {
 					break;
 			}
 			$select .= <<<SQL
-, GROUP_CONCAT(t_{$link_type}.{$field} ORDER BY t_{$link_type}.{$field} ASC SEPARATOR ', ') AS links_{$link_type}
+, GROUP_CONCAT(DISTINCT t_{$link_type}.{$field} ORDER BY t_{$link_type}.{$field} ASC SEPARATOR ', ') AS links_{$link_type}
 SQL;
 			$join .= <<<SQL
 LEFT OUTER JOIN dt_assets_links AS al_{$link_type} ON al_{$link_type}.id_assets = a.id AND al_{$link_type}.link_type = '$link_type'
@@ -41,7 +41,7 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT a.id, a.titre, a.fichier, a.actif, a.public,
-GROUP_CONCAT(at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
+GROUP_CONCAT(DISTINCT at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
 {$select}
 FROM dt_assets AS a
 LEFT OUTER JOIN dt_assets_tags_assets AS ata ON ata.id_assets = a.id
