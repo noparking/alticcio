@@ -860,3 +860,8 @@ form .little-select {
 .asset-import-line td {
 	min-width: 220px;
 }
+
+.asset-import-line img {
+	float: left;
+	margin-right: 5px;
+}

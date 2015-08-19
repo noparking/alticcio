@@ -591,6 +591,7 @@ $d['pages'] = array(
 	"aide" => "aide",
 	"degressifs" => "degressifs",
 	"assets" => "assets",
+	"assetthumbnail" => "asset-thumbnail",
 );
 
 $d['hd_extensions'] = array(

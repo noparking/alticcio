@@ -1,4 +1,7 @@
 $(document).ready(function () {
+	$("img[truesrc]").each(function () {
+		$(this).attr("src", $(this).attr("truesrc"));
+	});
 	$(".assets-import-select-all").click(function () {
 		if ($(this).prop("checked")) {
 			$(".assets-import-select").prop("checked", true);

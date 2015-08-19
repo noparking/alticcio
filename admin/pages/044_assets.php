@@ -49,7 +49,7 @@ $filter_assets_schema = array(
 		'type' => 'between',
 		'order' => 'DESC',
 		'field' => 'a.id',
-		'template' => "{id} <img alt=\"\" src=\"{$config->get("asset_url")}{id}?thumb=1\" />",
+		'template' => "{id} <img alt=\"\" src=\"{$config->media("icon-file.png")}\" truesrc=\"{$config->get("asset_url")}{id}?thumb=1\" />",
 	),
 	'titre' => array(
 		'title' => $dico->t('Titre'),
@@ -599,6 +599,7 @@ HTML;
 <tr class="asset-import-line">
 	<th><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></th>
 	<td>
+		<img src="{$config->media("icon-file.png")}" truesrc="{$url->make("assetthumbnail", array('action' => $asset_to_import['source'], 'id' => $asset_to_import['fichier']))}" alt="" />
 		Source : <b>{$asset_to_import['source']}</b><br>
 		Fichier : {$asset_to_import['fichier']}<br>
 		{$dico->t('AssetExistant')} : <div class="multicombobox" list="assets" limit="1" items="{$asset_to_import['id_assets']}" name="existing-asset[{$asset_to_import['id']}]"></div><br>
