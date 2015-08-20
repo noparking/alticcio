@@ -865,3 +865,19 @@ form .little-select {
 	float: left;
 	margin-right: 5px;
 }
+
+.asset-import-line textarea {
+	margin:3px 0;
+	padding:3px;
+	width:90%;
+	height:100px;
+	font-family:Arial;
+	font-size:12px;
+}
+
+.asset-import-line input[type=text] {
+	margin:3px 0;
+	padding:3px;
+	width:90%;
+	font-size:12px;
+}

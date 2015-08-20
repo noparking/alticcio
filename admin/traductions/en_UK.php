@@ -468,6 +468,7 @@ $d['pages'] = array(
 	"aide" => "help",
 	"degressifs" => "degressifs",
 	"assets" => "assets",
+	"assetsimport" => "assets-import",
 	"assetthumbnail" => "asset-thumbnail",
 );
 
