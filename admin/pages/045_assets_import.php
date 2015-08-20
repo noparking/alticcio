@@ -167,7 +167,9 @@ foreach ($asset->all_links_sku() as $key => $value) {
 	$all_skus[$key] = "{$value['nom']} ({$value['ref']})";
 }
 
-$main = <<<HTML
+if ($source = $url->get('action')) {
+	$titre_page .= " (source : {$source})";
+	$main = <<<HTML
 <div>
 Pour la selection :
 {$form->input(array('type' => "submit", 'name' => "import-selected", 'value' => "Importer"))}
@@ -176,41 +178,41 @@ Pour la selection :
 <div class="assets-import-edit-selected-form" style="display: none;">
 	<table>
 HTML;
-if (in_array("gamme", $assets_links)) {
-	$main .= <<<HTML
+	if (in_array("gamme", $assets_links)) {
+		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-gammes", 'name' => "copy-asset-import-gammes", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Gammes')}</td><td><div class="multicombobox copy-all" list="gammes" items="" name="asset-import-gammes"></div></td>
 		</tr>
 HTML;
-}
-if (in_array("produit", $assets_links)) {
-	$main .= <<<HTML
+	}
+	if (in_array("produit", $assets_links)) {
+		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-produits", 'name' => "copy-asset-import-produits", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Produits')}</td><td><div class="multicombobox copy-all" list="produits" items="" name="asset-import-produits"></div></td>
 		</tr>
 HTML;
-}
-if (in_array("sku", $assets_links)) {
-	$main .= <<<HTML
+	}
+	if (in_array("sku", $assets_links)) {
+		$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-skus", 'name' => "copy-asset-import-skus", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('SKU')}</td><td><div class="multicombobox copy-all" list="skus" items="" name="asset-import-skus"></div></td>
 		</tr>
 HTML;
-}
-if ($assets_attributs) {
-	foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
-		$main .= <<<HTML
+	}
+	if ($assets_attributs) {
+		foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+			$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-attribut-{$id_attributs}", 'name' => "copy-asset-import-attribut-{$id_attributs}", 'template' => "#{field}"))}</td>
 			<td>{$attribut['nom']}</td><td><div class="multicombobox copy-all" list="attribut-{$id_attributs}" items="" name="asset-import-attribut-{$id_attributs}"></div></td>
 		</tr>
 HTML;
+		}
 	}
-}
-$main .= <<<HTML
+	$main .= <<<HTML
 		<tr>
 			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-tags", 'name' => "copy-asset-import-tags", 'template' => "#{field}"))}</td>
 			<td>{$dico->t('Tags')}</td><td><div class="multicombobox copy-all" list="tags" items="" name="asset-import-tags"></div></td>
@@ -248,51 +250,51 @@ $main .= <<<HTML
 	<th></th>
 </tr>
 HTML;
-$something_to_import = false;
-foreach ($assets_import->liste() as $id_import => $asset_to_import) {
-	$default_items = array();
-	$targets = $asset->all_targets();
-	if ($asset_to_import['id_assets']) {
-		$asset->load($asset_to_import['id_assets']);
-		$form->default_values['assets'][$id_import] = $asset->values;
-		foreach ($asset->links() as $link_type => $links) {
-			if (strpos($link_type, "attribut") === 0) {
-				$id_attributs = str_replace("attribut-", "", $link_type);
-				$default_items['attributs'][$id_attributs] = implode_keys($links);
+	$something_to_import = false;
+	foreach ($assets_import->liste($source) as $id_import => $asset_to_import) {
+		$default_items = array();
+		$targets = $asset->all_targets();
+		if ($asset_to_import['id_assets']) {
+			$asset->load($asset_to_import['id_assets']);
+			$form->default_values['assets'][$id_import] = $asset->values;
+			foreach ($asset->links() as $link_type => $links) {
+				if (strpos($link_type, "attribut") === 0) {
+					$id_attributs = str_replace("attribut-", "", $link_type);
+					$default_items['attributs'][$id_attributs] = implode_keys($links);
+				}
+				else {
+					$default_items[$link_type."s"] = implode_keys($links);
+				}
 			}
-			else {
-				$default_items[$link_type."s"] = implode_keys($links);
-			}
-		}
-		$default_items['tags'] = implode(",", $asset->tags());
-		$default_items['langues'] = implode(",", $asset->langues());
-		$default_items['targets'] = implode(",", $asset->selected_targets());
-	}
-	else {
-		$default_values = array(
-			'titre' => $asset_to_import['fichier'],
-			'copyright' => "Dickson-Constant",
-			'actif' => true,
-			'public' => true,
-			'infos' => "",
-		);
-		foreach (array('titre', 'copyright', 'actif', 'public', 'infos') as $element) {
-			$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
-			$form->default_values['assets'][$id_import][$element] = $value;
-		}
-		$default_items['tags'] = "";
-		$default_items['langues'] = "";
-		if (isset($asset_to_import['asset_data']['targets'])) {
-			$default_items['targets'] = implode(",", $asset_to_import['asset_data']['targets']);
+			$default_items['tags'] = implode(",", $asset->tags());
+			$default_items['langues'] = implode(",", $asset->langues());
+			$default_items['targets'] = implode(",", $asset->selected_targets());
 		}
 		else {
-			$default_items['targets'] = implode_keys($targets);
+			$default_values = array(
+				'titre' => $asset_to_import['fichier'],
+				'copyright' => "Dickson-Constant",
+				'actif' => true,
+				'public' => true,
+				'infos' => "",
+			);
+			foreach (array('titre', 'copyright', 'actif', 'public', 'infos') as $element) {
+				$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
+				$form->default_values['assets'][$id_import][$element] = $value;
+			}
+			$default_items['tags'] = "";
+			$default_items['langues'] = "";
+			if (isset($asset_to_import['asset_data']['targets'])) {
+				$default_items['targets'] = implode(",", $asset_to_import['asset_data']['targets']);
+			}
+			else {
+				$default_items['targets'] = implode_keys($targets);
+			}
 		}
-	}
-	$dir = $sources[$asset_to_import['source']];
-	if (file_exists($dir.$asset_to_import['fichier'])) {
-		$something_to_import = true;
-		$main .= <<<HTML
+		$dir = $sources[$asset_to_import['source']];
+		if (file_exists($dir.$asset_to_import['fichier'])) {
+			$something_to_import = true;
+			$main .= <<<HTML
 <tr class="asset-import-line">
 	<th><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></th>
 	<td>
@@ -306,33 +308,33 @@ foreach ($assets_import->liste() as $id_import => $asset_to_import) {
 	</td>
 	<td>
 HTML;
-		if (in_array("gamme", $assets_links)) {
-			$items = isset($default_items['gammes']) ? $default_items['gammes'] : "";
-			$main .= <<<HTML
+			if (in_array("gamme", $assets_links)) {
+				$items = isset($default_items['gammes']) ? $default_items['gammes'] : "";
+				$main .= <<<HTML
 		{$dico->t('Gammes')} : <div class="multicombobox asset-import-gammes" list="gammes" items="{$items}" name="gammes[$id_import][]"></div><br>
 HTML;
-		}
-		if (in_array("produit", $assets_links)) {
-			$items = isset($default_items['produits']) ? $default_items['produits'] : "";
-			$main .= <<<HTML
+			}
+			if (in_array("produit", $assets_links)) {
+				$items = isset($default_items['produits']) ? $default_items['produits'] : "";
+				$main .= <<<HTML
 		{$dico->t('Produits')} : <div class="multicombobox asset-import-produits" list="produits" items="{$items}" name="produits[$id_import][]"></div><br>
 HTML;
-		}
-		if (in_array("sku", $assets_links)) {
-			$items = isset($default_items['skus']) ? $default_items['skus'] : "";
-			$main .= <<<HTML
+			}
+			if (in_array("sku", $assets_links)) {
+				$items = isset($default_items['skus']) ? $default_items['skus'] : "";
+				$main .= <<<HTML
 		{$dico->t('SKU')} : <div class="multicombobox asset-import-skus" list="skus" items="{$items}" name="skus[$id_import][]"></div><br>
 HTML;
-		}
-		if ($assets_attributs) {
-			foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
-				$items = isset($default_items['attributs'][$id_attributs]) ? $default_items['attributs'][$id_attributs] : "";
-				$main .= <<<HTML
+			}
+			if ($assets_attributs) {
+				foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+					$items = isset($default_items['attributs'][$id_attributs]) ? $default_items['attributs'][$id_attributs] : "";
+					$main .= <<<HTML
 		{$attribut['nom']} : <div class="multicombobox asset-import-attribut-{$id_attributs}" list="attribut-{$id_attributs}" items="{$items}" name="attributs[$id_import][$id_attributs][]"></div><br>
 HTML;
+				}
 			}
-		}
-		$main .= <<<HTML
+			$main .= <<<HTML
 	</td>
 	<td>
 		{$dico->t('Tags')} : <div class="multicombobox asset-import-tags" list="tags" items="{$default_items['tags']}" name="tags[$id_import][]"></div><br>
@@ -347,23 +349,23 @@ HTML;
 	</td>
 </tr>
 HTML;
+		}
 	}
-}
-$main .= <<<HTML
+	$main .= <<<HTML
 </table>		
 HTML;
-if ($something_to_import) {
-	$all_gammes_json = json_encode($all_gammes);
-	$all_produits_json = json_encode($all_produits);
-	$all_skus_json = json_encode($all_skus);
-	$all_tags_json = json_encode($all_tags);
-	$all_langues_json = json_encode($all_langues);
-	$all_targets_json = json_encode($all_targets);
-	foreach ($asset->liste() as $row) {
-		$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
-	}
-	$all_assets_json = json_encode($options);
-	$javascript = <<<JAVASCRIPT
+	if ($something_to_import) {
+		$all_gammes_json = json_encode($all_gammes);
+		$all_produits_json = json_encode($all_produits);
+		$all_skus_json = json_encode($all_skus);
+		$all_tags_json = json_encode($all_tags);
+		$all_langues_json = json_encode($all_langues);
+		$all_targets_json = json_encode($all_targets);
+		foreach ($asset->liste() as $row) {
+			$options[$row['id']] = "{$row['id']}) {$row['fichier']}";
+		}
+		$all_assets_json = json_encode($options);
+		$javascript = <<<JAVASCRIPT
 var multicombobox_list = [];
 multicombobox_list['gammes'] = {$all_gammes_json};
 multicombobox_list['produits'] = {$all_produits_json};
@@ -373,22 +375,28 @@ multicombobox_list['langues'] = {$all_langues_json};
 multicombobox_list['targets'] = {$all_targets_json};
 multicombobox_list['assets'] = {$all_assets_json};
 JAVASCRIPT;
-	if ($assets_attributs) {
-		foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
-			$options = json_encode($attribut['options']);
-			$javascript .= <<<JAVASCRIPT
+		if ($assets_attributs) {
+			foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+				$options = json_encode($attribut['options']);
+				$javascript .= <<<JAVASCRIPT
 multicombobox_list['attribut-' + {$id_attributs}] = {$options};
 JAVASCRIPT;
+			}
 		}
-	}
-	$javascript .= <<<JAVASCRIPT
+		$javascript .= <<<JAVASCRIPT
 $(".multicombobox").multicombobox();
 JAVASCRIPT;
-	$page->post_javascript[] = $javascript;
+		$page->post_javascript[] = $javascript;
+	}
+	else {
+		$main = <<<HTML
+<p>{$dico->t("RienAImporter")}</p>
+HTML;
+	}
 }
 else {
-	$main = <<<HTML
-<p>{$dico->t("RienAImporter")}</p>
+		$main = <<<HTML
+<p>{$dico->t("ChoisissezSourceImport")}</p>
 HTML;
 }
 

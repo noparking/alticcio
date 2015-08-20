@@ -86,6 +86,7 @@ $t['Changer'] = "Changer";
 $t['Charger'] = "Charger";
 $t['ChiffresCles'] = "Chiffres clés";
 $t['ChoisissezProduit'] = "Choisissez un type de produit.";
+$t['ChoisissezSourceImport'] = "Choisissez une source pour l'import.";
 $t['ChoisissezTypeContenu'] = "Choisissez un type de contenu.";
 $t['Classement'] = "Classement";
 $t['CochezApplications'] = "Cochez les applications correspondantes :";
