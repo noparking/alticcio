@@ -10,6 +10,16 @@ class Pager {
 	private $total = null;
 	
 	public function __construct($sql, $numbers, $name = "pager", $number = 0, $page = 1) {
+		global $config;
+		if (method_exists($config, "get")) {
+			if ($value = $config->get("pager", "numbers")) {
+				$numbers = $value;
+			}
+			if ($value = $config->get("pager", "number")) {
+				$number = $value;
+			}
+		}
+
 		$this->sql = $sql;
 		$this->numbers = $numbers;
 		$this->name = $name;
