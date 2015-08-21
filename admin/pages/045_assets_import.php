@@ -282,8 +282,10 @@ HTML;
 				$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
 				$form->default_values['assets'][$id_import][$element] = $value;
 			}
-			$default_items['tags'] = "";
-			if ($asset_to_import['asset_data']['tags']) {
+			if (isset($asset_to_import['asset_data']['gammes'])) {
+				$default_items['gammes'] = implode(",", $asset_to_import['asset_data']['gammes']);
+			}
+			if (isset($asset_to_import['asset_data']['tags'])) {
 				$default_items['tags'] = implode(",", $asset_to_import['asset_data']['tags']);
 			}
 			$default_items['langues'] = "";
