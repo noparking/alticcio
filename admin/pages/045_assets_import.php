@@ -283,12 +283,20 @@ HTML;
 				$form->default_values['assets'][$id_import][$element] = $value;
 			}
 			$default_items['tags'] = "";
+			if ($asset_to_import['asset_data']['tags']) {
+				$default_items['tags'] = implode(",", $asset_to_import['asset_data']['tags']);
+			}
 			$default_items['langues'] = "";
 			if (isset($asset_to_import['asset_data']['targets'])) {
 				$default_items['targets'] = implode(",", $asset_to_import['asset_data']['targets']);
 			}
 			else {
 				$default_items['targets'] = implode_keys($targets);
+			}
+			if (isset($asset_to_import['asset_data']['attributs'])) {
+				foreach ($asset_to_import['asset_data']['attributs'] as $id_attributs => $values) {
+					$default_items['attributs'][$id_attributs] = implode(",", $values);
+				}
 			}
 		}
 		$dir = $sources[$asset_to_import['source']];
