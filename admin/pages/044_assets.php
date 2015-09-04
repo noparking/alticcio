@@ -85,7 +85,7 @@ foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $att
 		"links_attribut_{$id_attributs}" => array(
 			'title' => $attribut['nom'], 
 			'type' => 'contain',
-			'field' => 't_attribut_'.$id_attributs,
+			'field' => "p_attribut_{$id_attributs}.phrase",
 		),
 	);
 }
@@ -99,7 +99,7 @@ $filter_assets_schema += array(
 	'targets' => array(
 		'title' => $dico->t('CanauxDiffusion'),
 		'type' => 'select',
-		'field' => 'at.id',
+		'field' => 'atg.id',
 		'options' => $all_targets,
 	),
 	'actif' => array(
