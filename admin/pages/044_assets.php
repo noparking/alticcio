@@ -80,6 +80,15 @@ if (in_array('sku', $assets_links)) {
 		),
 	);
 }
+foreach ($asset->all_links_attributs($assets_attributs) as $id_attributs => $attribut) {
+	$filter_assets_schema += array(
+		"links_attribut_{$id_attributs}" => array(
+			'title' => $attribut['nom'], 
+			'type' => 'contain',
+			'field' => 't_attribut_'.$id_attributs,
+		),
+	);
+}
 $filter_assets_schema += array(
 	'tags' => array(
 		'title' => $dico->t('Tags'),
@@ -339,7 +348,7 @@ switch($action) {
 		$titre_page = $dico->t('ListeOfAssets');
 		$filter = $filter_assets;
 		$pager = $pager_assets;
-		$asset->liste($assets_links, $filter);
+		$asset->liste($assets_links, $assets_attributs, $id_langues, $filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }

@@ -12,7 +12,7 @@ class Asset extends AbstractObject {
 		'phrase_description',
 	);
 
-	public function liste($link_types = array(), &$filter = null) {
+	public function liste($link_types = array(), $attributs_refs = array(), $id_langues = 1, &$filter = null) {
 		$select = "";
 		$join = "";
 		foreach ($link_types as $link_type) {
@@ -38,6 +38,22 @@ LEFT OUTER JOIN dt_assets_links AS al_{$link_type} ON al_{$link_type}.id_assets 
 LEFT OUTER JOIN {$table} AS t_{$link_type} ON t_{$link_type}.id = al_{$link_type}.link_id
 
 SQL;
+		}
+		if (count($attributs_refs)) {
+			$attributs = $this->all_links_attributs($attributs_refs);
+			foreach ($attributs as $id_attribut => $attribut) {
+				$link_type = "attribut-{$id_attribut}";
+				$link_name = "attribut_{$id_attribut}";
+				$select .= <<<SQL
+, GROUP_CONCAT(DISTINCT p_{$link_name}.phrase ORDER BY p_{$link_name}.phrase ASC SEPARATOR ', ') AS links_{$link_name}
+SQL;
+				$join .= <<<SQL
+LEFT OUTER JOIN dt_assets_links AS al_{$link_name} ON al_{$link_name}.id_assets = a.id AND al_{$link_name}.link_type = '$link_type'
+LEFT OUTER JOIN dt_options_attributs AS t_{$link_name} ON t_{$link_name}.id = al_{$link_name}.link_id
+LEFT OUTER JOIN dt_phrases AS p_{$link_name} ON p_{$link_name}.id = t_{$link_name}.phrase_option AND  p_{$link_name}.id_langues = $id_langues
+
+SQL;
+			}
 		}
 		$q = <<<SQL
 SELECT a.id, a.titre, a.fichier, a.actif, a.public,
