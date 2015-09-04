@@ -33,18 +33,31 @@ function thumb($file) {
 }
 
 function generic_thumb($file) {
-	$ext = substr(strstr(basename($file), "."), 1);
+	$ext = substr(strrchr($file, "."), 1);
 	$im = new Imagick(dirname(__FILE__)."/../www/medias/images/icon-file.png");
 
-	$color = "#009ADB";
+	if (isset($_GET['tiny']) and $_GET['tiny']) {
+		$im->scaleImage(30, 30, true);
+		$font_size = 8;
+		$left = 4;
+		$top = 20;
+	}
+	else {
+		$font_size = 24;
+		$left = 10;
+		$top = 60;
+	}
+	
+	$color = "#232222";
 	$pixel = new ImagickPixel();
 	$pixel->setColor($color);
 	$draw = new ImagickDraw();
 	$draw->setFillColor($pixel);
-	$draw->setstrokewidth(0);
-	$draw->setStrokeColor($color);
-	$draw->setFontSize(10);
-	$im->annotateImage($draw, 3, 20, 0, $ext);
+	if ($ext) {
+		$draw->setFontSize($font_size);
+		$draw->setFontWeight(600);
+		$im->annotateImage($draw, $left, $top, 0, $ext);
+	}
 
 	$thumb = $im->getImageBlob(); 
 	$im->clear(); 
