@@ -57,11 +57,14 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT a.id, a.titre, a.fichier, a.actif, a.public,
-GROUP_CONCAT(DISTINCT at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags
+GROUP_CONCAT(DISTINCT at.code ORDER BY at.code ASC SEPARATOR ', ') AS tags,
+GROUP_CONCAT(DISTINCT atg.code ORDER BY atg.code ASC SEPARATOR ', ') AS targets
 {$select}
 FROM dt_assets AS a
 LEFT OUTER JOIN dt_assets_tags_assets AS ata ON ata.id_assets = a.id
 LEFT OUTER JOIN dt_assets_tags AS at ON at.id = ata.id_assets_tags
+LEFT OUTER JOIN dt_assets_targets_assets AS atga ON atga.id_assets = a.id
+LEFT OUTER JOIN dt_assets_targets AS atg ON atg.id = atga.id_assets_targets
 {$join}
 WHERE 1
 GROUP BY a.id

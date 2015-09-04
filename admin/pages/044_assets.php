@@ -96,6 +96,12 @@ $filter_assets_schema += array(
 		'field' => 'at.id',
 		'options' => $all_tags,
 	),
+	'targets' => array(
+		'title' => $dico->t('CanauxDiffusion'),
+		'type' => 'select',
+		'field' => 'at.id',
+		'options' => $all_targets,
+	),
 	'actif' => array(
 		'title' => $dico->t('Actif'),
 		'type' => 'select',
