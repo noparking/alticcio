@@ -310,10 +310,10 @@ HTML;
 	<th><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></th>
 	<td>
 		<img src="{$config->media("icon-file.png")}" truesrc="{$url->make("assetthumbnail", array('action' => $asset_to_import['source'], 'id' => $asset_to_import['fichier']))}" alt="" />
-		Source : <b>{$asset_to_import['source']}</b><br><br>
-		Fichier : {$asset_to_import['fichier']}<br><br>
-		{$dico->t('AssetExistant')} : <div class="multicombobox" list="assets" limit="1" items="{$asset_to_import['id_assets']}" name="existing-asset[{$asset_to_import['id']}]"></div><br>
-		{$dico->t('Titre')} : {$form->input(array('name' => "assets[$id_import][titre]", 'template' => "#{field}"))}<br>
+		<p>Source :</p><b>{$asset_to_import['source']}</b><br><br>
+		<p>Fichier :</p>{$asset_to_import['fichier']}<br><br>
+		<p>{$dico->t('AssetExistant')} :</p><div class="multicombobox" list="assets" limit="1" items="{$asset_to_import['id_assets']}" name="existing-asset[{$asset_to_import['id']}]"></div><br>
+		<p>{$dico->t('Titre')} :</p>{$form->input(array('name' => "assets[$id_import][titre]", 'template' => "#{field}"))}<br>
 		<table>
 			<tr>
 				<td>
