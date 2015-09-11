@@ -22,7 +22,7 @@ function print_checkbox_tree($tree, $form, $checked = array(), $name = "tree") {
 	return $html;
 }
 
-function options_select_tree($tree, $form, $name = "tree", $options = array(0 => ""), $i = 0) {
+function options_select_tree($tree, $form = null, $name = "tree", $options = array(0 => ""), $i = 0) {
 	foreach ($tree as $element) {
 		$item = "";
 		for ($j = 0; $j < $i; $j++) {

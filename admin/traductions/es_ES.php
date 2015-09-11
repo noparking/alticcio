@@ -600,6 +600,7 @@ $d['pages'] = array(
 	"assets" => "assets",
 	"assetsimport" => "assets-import",
 	"assetthumbnail" => "asset-thumbnail",
+	"contacts" => "contact",
 );
 
 $d['hd_extensions'] = array(

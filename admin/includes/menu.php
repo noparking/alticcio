@@ -146,6 +146,21 @@ $menus = array(
 						'url' => $url2->make("Blog", array('type' => "blogs", 'action' => "", 'id' => "")),
 						'level' => 90,
 					),
+					'articles' => array(
+						'level' => 50,
+						'label' => $dico->t("BilletBlog"),
+						'url' => $url2->make("Contenu", array('type' => "blogpost", 'action' => "", 'id' => "")),
+					),
+					'rubriques' => array(
+						'label' => "Rubrique",
+						'url' => $url2->make("Blog", array('type' => "themes", 'action' => "", 'id' => "")),
+						'level' => 55,
+					),
+					'guides' => array(
+						'label' => "Blogs",
+						'url' => $url2->make("Blog", array('type' => "blogs", 'action' => "", 'id' => "")),
+						'level' => 90,
+					),
 					'blocs' => array(
 						'label' => "Blocs",
 						'url' => $url0->make("Blocs", array('id' => "")),
@@ -166,6 +181,24 @@ $menus = array(
 						'url' => $url0->make("Assets", array('id' => "")),
 						'level' => 60,
 						'actif' => $config->param('assets') === true,
+					),
+				),
+			),
+
+			'contacts' => array(
+				'label' => $dico->t("Contacts"),
+				//'url' => '';
+				'level' => 99,
+				'items' => array(
+					'organisations' => array(
+						'level' => 99,
+						'label' => $dico->t('Organisations'),
+						'url' => $url2->make("Contacts", array('type' => "organisations", 'action' => "", 'id' => "")),
+					),
+					'correspondants' => array(
+						'level' => 99,
+						'label' => $dico->t('Correspondants'),
+						'url' => $url2->make("Contacts", array('type' => "correspondants", 'action' => "", 'id' => "")),
 					),
 				),
 			),
