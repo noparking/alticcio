@@ -5,15 +5,10 @@ $menu->current('main/contacts/correspondants');
 $config->core_include("outils/form", "outils/mysql", "contacts/correspondants");
 $config->core_include("outils/filter", "outils/pager", "outils/langue");
 
-$page->css[] = $config->media("jquery-ui.min.css");
-$page->css[] = $config->media("autocomplete.min.css");
-$page->css[] = $config->media("multicombobox.css");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
-$page->javascript[] = $config->media("jquery-ui.min.js");
-$page->javascript[] = $config->media("autocomplete.min.js");
-$page->javascript[] = $config->media("multicombobox.js");
+$page->javascript[] = $config->media("dynamicfieldsets.js");
 
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
@@ -27,6 +22,8 @@ $langue = new Langue($sql);
 $id_langues = $langue->id($config->get("langue"));
 
 $correspondant = new Correspondant($sql);
+
+$all_organisations = array_merge( array(0 => ""), $correspondant->all_organisations());
 
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
@@ -119,12 +116,10 @@ if ($action == "create" or $action == "edit") {
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
 }
 
-$organisations = array();
-$all_organisations = $correspondant->all_organisations();
-
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
+		'organisations' => $dico->t('Organisations'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = <<<HTML
@@ -151,16 +146,32 @@ if ($action == "create" or $action == "edit") {
 		3 => "Mlle",
 	);
 
-	$liste_organisations = "";
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
 {$form->select(array('name' => "correspondant[civilite]", 'label' => $dico->t('Civilite'), 'options' => $civilite_options))}
 {$form->input(array('name' => "correspondant[nom]", 'label' => $dico->t('Nom')))}
 {$form->input(array('name' => "correspondant[prenom]", 'label' => $dico->t('Prenom')))}
 {$form->select(array('name' => "correspondant[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
-<p>{$dico->t("Organisations")} :</p><div class="multicombobox" list="organisations" items="{$liste_organisations}" name="asset-import-gammes"></div></td>
+{$form->fieldset_end()}
+
+{$form->fieldset_start(array('legend' => $dico->t('Organisations'), 'class' => "produit-section produit-section-organisations".$hidden['organisations']))}
+<div id="select-organisation">
+	{$form->select(array('id' => "nouvelle-organisation", 'name' => "nouvelle-organisation", 'label' => $dico->t("NouvelleOrganisation"), 'options' => $all_organisations))}
+	<div class="dynamicfieldset" style="display: none;">
+		{$form->fieldset_start(array('legend' => "VALUE", 'class' => "produit-section produit-section-organisations".$hidden['organisations']))}
+		{$form->select(array('name' => "FIELD_NAME[KEY]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
+		<input type="submit" name="" class="delete-fieldset form-edit-input-submit" value="{$dico->t("Supprimer")}" />
+		{$form->fieldset_end()}
+	</div>
+</div>
 {$form->fieldset_end()}
 HTML;
+
+	$page->post_javascript[] = <<<JAVASCRIPT
+$("#select-organisation").dynamicfieldsets("#nouvelle-organisation", {
+	FIELD_NAME: "organisation",
+});
+JAVASCRIPT;
 }
 
 switch($action) {
@@ -202,9 +213,3 @@ switch($action) {
 
 $form_end = $form->form_end();
 
-$liste_organisations = json_encode($all_organisations);
-$page->post_javascript[] = <<<JAVASCRIPT
-var multicombobox_list = [];
-multicombobox_list['organisations'] = {$liste_organisations};
-$(".multicombobox").multicombobox();
-JAVASCRIPT;
