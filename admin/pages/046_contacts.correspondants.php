@@ -38,10 +38,9 @@ $civilite_options = array(
 	2 => "Mme",
 	3 => "Mlle",
 );
-$aucun = " - {$dico->t('Aucun')} -";
-$organisation_options = $correspondant->options("organisations", $aucun);
-$fonction_options = $correspondant->options("fonctions", $aucun);
-$service_options = $correspondant->options("services", $aucun);
+$organisation_options = $correspondant->options("organisations");
+$fonction_options = $correspondant->options("fonctions");
+$service_options = $correspondant->options("services");
 
 $form = new Form(array(
 	'id' => "form-edit-correspondant-$id",
@@ -196,7 +195,7 @@ switch($action) {
 				'options' => $organisation_options,
 			),
 			'statut' => array(
-				'title' => $dico->t('Active'),
+				'title' => $dico->t('Statut'),
 				'type' => 'select',
 				'options' => $statut_options,
 			),

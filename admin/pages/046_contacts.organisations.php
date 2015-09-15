@@ -9,6 +9,7 @@ $config->base_include("functions/tree");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
+$page->javascript[] = $config->media("dynamicfieldsets.js");
 
 $page->jsvars[] = array(
 	"edit_url" => $url2->make("current", array('action' => 'edit', 'id' => "")),	
@@ -21,14 +22,21 @@ $sql = new Mysql($config->db());
 $langue = new Langue($sql);
 $id_langues = $langue->id($config->get("langue"));
 
-$orga = new Organisation($sql, $id_langues);
+$organisation = new Organisation($sql, $id_langues);
 
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
-	$orga->load($id);
+	$organisation->load($id);
 }
 
-$types_organisations = $orga->types();
+$statut_options = array(
+	1 => $dico->t("Active"),
+	0 => $dico->t("Desactive"),
+);
+$type_options = $organisation->types();
+$correspondant_options = $organisation->options("correspondants", "CONCAT(nom, ' ', prenom)");
+$fonction_options = $organisation->options("fonctions");
+$service_options = $organisation->options("services");
 
 $form = new Form(array(
 	'id' => "form-edit-organisation-$id",
@@ -37,10 +45,6 @@ $form = new Form(array(
 		"save",
 		"delete",
 		"reset",
-		"add-compte", // TODO à laisser ?
-		"delete-compte", // TODO à laisser ?
-		"add-adresse", // TODO à laisser ?
-		"delete-adresse", // TODO à laisser ?
 	),
 ));
 
@@ -61,45 +65,27 @@ if ($form->is_submitted() and $form->validate()) {
 			$form->reset();
 			break;
 		case "delete":
-			$orga->delete($data);
+			$organisation->delete($data);
 			$form->reset();
 			$url2->redirect("current", array('action' => "", 'id' => ""));
 			break;
-		case "add-compte" :
-			//TODO
-			break;
-		case "delete-compte" :
-			//TODO
-			break;
-		case "add-adresse" :
-			//TODO
-			break;
-		case "delete-adresse" :
-			//TODO
-			break;
 		default :
 			if ($action == "edit" or $action == "create") {
-				$id = $orga->save($data);
+				$id = $organisation->save($data);
 				$form->reset();
 				if ($action != "edit") {
 					$url2->redirect("current", array('action' => "edit", 'id' => $id));
 				}
-				$orga->load($id);
+				$organisation->load($id);
 			}
 			break;
 	}
 }
 
-$messages = array();
-
-if ($form->changed()) {
-	$messages[] = '<p class="message">'.$dico->t('AttentionNonSauvergarde').'</p>';
-}
-
 if ($action == 'edit') {
-	$form->default_values['organisation'] = $orga->values;
-	$form->default_values['adresses'] = $orga->adresses();
-	$form->default_values['comptes'] = $orga->comptes();
+	$form->default_values['organisation'] = $organisation->values;
+	$form->default_values['adresses'] = $organisation->adresses();
+	$form->default_values['comptes'] = $organisation->comptes();
 }
 
 $form_start = $form->form_start();
@@ -111,7 +97,6 @@ $template_inline = <<<HTML
 HTML;
 
 $main = "";
-$main .= $page->inc("snippets/messages");
 
 $hidden = array('presentation' => "");
 
@@ -129,6 +114,7 @@ if ($action == "create" or $action == "edit") {
 if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
+		'correspondants' => $dico->t('Correspondant'),
 		'adresses' => $dico->t('Adresses'),
 		'comptes' => $dico->t('Comptes'),
 	);
@@ -156,15 +142,10 @@ HTML;
 }
 
 if ($action == "create" or $action == "edit") {
-	$statut_options = array(
-		1 => $dico->t("Active"),
-		0 => $dico->t("Desactive"),
-	);
-
-	$organisations_options = options_select_tree(DBTools::tree($orga->organisations(), $id));
+	$organisations_options = options_select_tree(DBTools::tree($organisation->organisations(), $id));
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
-{$form->select(array('name' => "organisation[id_contacts_organisations_types]", 'label' => $dico->t('TypeOrganisation'), 'options' => $types_organisations))}
+{$form->select(array('name' => "organisation[id_contacts_organisations_types]", 'label' => $dico->t('TypeOrganisation'), 'options' => $type_options))}
 {$form->input(array('name' => "organisation[nom]", 'label' => $dico->t('Nom')))}
 {$form->input(array('name' => "organisation[complement]", 'label' => $dico->t('Complement')))}
 {$form->select(array('name' => "organisation[id_parent]", 'label' => $dico->t('OrganisationParent'), 'options' => $organisations_options))}
@@ -172,7 +153,28 @@ if ($action == "create" or $action == "edit") {
 {$form->input(array('name' => "organisation[www]", 'label' => $dico->t('SiteInternet')))}
 {$form->select(array('name' => "organisation[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
 {$form->fieldset_end()}
+
+{$form->fieldset_start(array('legend' => $dico->t('Correspondants'), 'class' => "produit-section produit-section-correspondants".$hidden['correspondants']))}
+<div id="select-correspondant">
+	{$form->select(array('id' => "nouveau-correspondant", 'name' => "nouveau-correspondant", 'label' => $dico->t("NouveauCorrespondant"), 'options' => $correspondant_options))}
+	<div class="dynamicfieldset" style="display: none;">
+		{$form->fieldset_start(array('legend' => "VALUE", 'class' => "produit-section produit-section-correspondants".$hidden['correspondants']))}
+		{$form->select(array('name' => "FIELD[KEY][id_contacts_fonctions]", 'label' => $dico->t("Fonction"), 'options' => $fonction_options))}
+		{$form->select(array('name' => "FIELD[KEY][id_contacts_services]", 'label' => $dico->t("Service"), 'options' => $service_options))}
+		{$form->select(array('name' => "FIELD[KEY][statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
+		{$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')))}
+		<input type="submit" name="" class="delete-fieldset form-edit-input-submit" value="{$dico->t("Supprimer")}" />
+		{$form->fieldset_end()}
+	</div>
+</div>
+{$form->fieldset_end()}
 HTML;
+
+	$json_correspondants = json_encode($organisation->correspondants());
+	$json_organisations_correspondants = json_encode($organisation->organisations_correspondants());
+	$page->post_javascript[] = <<<JAVASCRIPT
+$("#select-correspondant").dynamicfieldsets("#nouveau-correspondant", "correspondants", {$json_correspondants}, {$json_organisations_correspondants});
+JAVASCRIPT;
 }
 
 switch($action) {
@@ -199,7 +201,7 @@ switch($action) {
 			'id_contacts_organisations_types' => array(
 				'title' => $dico->t('Type'),
 				'type' => 'select',
-				'options' => $types_organisations,
+				'options' => $type_options,
 			),
 			'statut' => array(
 				'title' => $dico->t('Active'),
@@ -207,7 +209,7 @@ switch($action) {
 				'options' => array(1 => $dico->t('Active'), 0 => $dico->t('Desactive')),
 			),
 		), array(), "filter_organisations");
-		$orga->liste($filter);
+		$organisation->liste($filter);
 		$main = $page->inc("snippets/filter");
 		break;
 }
