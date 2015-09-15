@@ -48,6 +48,7 @@ $t['AttentionSuppressionImage'] = "Attention : l'ajout et la suppression d'image
 $t['Attributs'] = "Attributs";
 $t['AttributsManagement'] = "Gestion des attributs";
 $t['Au'] = "au";
+$t['Aucun'] = "Aucun";
 $t['Auteur'] = "Auteur";
 $t['AvantagesProduit'] = "Le + produit";
 $t['BatchCreationSku'] = "Batch pour créer des SKU";
