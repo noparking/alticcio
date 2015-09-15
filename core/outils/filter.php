@@ -250,9 +250,11 @@ HTML;
 				break;
 			case "select" :
 				$options = "";
-				foreach ($element['options'] AS $id => $label) {
-					$selected = ($value !== "" and $value == $id) ? 'selected="selected"' : "";
-					$options .= '<option value="'.$id.'" '.$selected.'>'.$label.'</option>';
+				foreach ($element['options'] as $id => $label) {
+					if ($id or $label) {
+						$selected = ($value !== "" and $value == $id) ? 'selected="selected"' : "";
+						$options .= '<option value="'.$id.'" '.$selected.'>'.$label.'</option>';
+					}
 				}
 				return <<<HTML
 <select name="{$this->name}[values][{$element['id']}]" class="filter-element filter-select">
@@ -434,7 +436,13 @@ HTML;
 					$cond = "";
 					if (!isset($this->elements[$cle]['type']) or in_array($this->elements[$cle]['type'], array('equal', 'select'))) {
 						$valeur = mysql_real_escape_string($valeur);
-						$cond .= " AND {$this->elements[$cle]['field']} = '$valeur'";
+						$field = $this->elements[$cle]['field'];
+						if ($valeur) {
+							$cond .= " AND {$field} = '$valeur'";
+						}
+						else {
+							$cond .= " AND ({$field} = '' OR {$field} = 0 OR {$field} IS NULL)";
+						}
 					}
 					else if ($this->elements[$cle]['type'] == 'contain') {
 						$valeur = mysql_real_escape_string($valeur);
