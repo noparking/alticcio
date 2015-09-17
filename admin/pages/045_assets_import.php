@@ -27,8 +27,6 @@ $assets_import = new AssetsImport($sql, array('sources' => $sources));
 
 $titre_page = $dico->t("ImporterAssets");
 
-$assets_import->import();
-
 $form = new Form(array(
 	'id' => "form-import-assets",
 	'actions' => array(
@@ -95,9 +93,11 @@ if ($form->is_submitted() and $form->validate()) {
 			if (isset($data['assets-import-select'])) {
 				foreach ($data['assets-import-select'] as $id_import => $rien) {
 					$asset_to_import = $assets_import->load(array('id' => $id_import));
-					$savedata['asset'] = $data['assets'][$id_import];
-					if ($id_assets = $data['existing-asset'][$id_import]) {
-						$savedata['asset']['id'] = $id_assets;
+					$savedata = array(
+						'asset' => $data['assets'][$id_import],
+					);
+					if (isset($data['existing-asset'][$id_import]) and $data['existing-asset'][$id_import]) {
+						$savedata['asset']['id'] = $data['existing-asset'][$id_import];
 					}
 					else {
 						$savedata['asset']['id'] = $asset->save($savedata);
@@ -150,6 +150,8 @@ if ($form->is_submitted() and $form->validate()) {
 }
 
 $form->reset();
+
+$assets_import->import();
 
 $form_start = $form->form_start();
 	
