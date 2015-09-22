@@ -15,6 +15,7 @@ class Filter {
 	private $inverted = 0;
 	private $md5 = "";
 	private $inputs = array();
+	public $sort = array();
 
 	public function __construct($sql, $elements, $selected = array(), $name = "filter", $selected_only = null) {
 		$this->sql = $sql;
@@ -531,9 +532,15 @@ HTML;
 		$sort = $this->sort();
 		if ($sort['column'] and $sort['order']) {
 			$elements = $this->elements();
-			$q .= " ORDER BY {$elements[$sort['column']]['field']} {$sort['order']}";
+			$q .= " ORDER BY {$elements[$sort['column']]['field']} {$sort['order']},";
+		} else if (count($this->sort)) {
+			$q .= " ORDER BY ";
 		}
-		
+		foreach ($this->sort as $field => $order) {
+			$q .= "$field $order,";
+		}
+		$q = trim($q, ",");
+
 		if (!preg_match("/^SELECT SQL_CALC_FOUND_ROWS/i", $q)) {
 			$q = preg_replace("/^select/i", "SELECT SQL_CALC_FOUND_ROWS", $q);
 		}
