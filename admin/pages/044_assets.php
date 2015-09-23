@@ -203,9 +203,10 @@ if ($form->changed()) {
 }
 
 if ($action == 'edit') {
+	$asset_links = $asset->links(); // variable réutilisée dans le snippet assets-links
 	$form->default_values['asset'] = $asset->values;
 	$form->default_values['phrases'] = $phrase->get($asset->phrases());
-	$form->default_values['asset_links'] = $asset->links();
+	$form->default_values['asset_links'] = $asset_links;
 	$form->default_values['tags'] = $asset->tags();
 	$form->default_values['targets'] = $asset->selected_targets();
 	$form->default_values['langues'] = $asset->langues();
