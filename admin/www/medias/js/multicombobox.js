@@ -30,6 +30,12 @@
 			.appendTo(this.wrapper)
 			.attr("title", "")
 			.addClass("custom-multicombobox-input ui-widget ui-widget-content ui-state-default ui-corner-all")
+			.keypress(function(e) {
+    			var code = (e.keyCode ? e.keyCode : e.which);
+    			if(code == 13) {
+        			return false;
+    			}
+			})
 			.autocomplete({
 				delay: 0,
 				minLength: 0,
