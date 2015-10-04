@@ -1,0 +1,41 @@
+
+
+Entité générique
+
+$		rien
+.		quelque chose
+*		quelque(s) chose(s)
+
+Operateur logique (par ordre de priorité)
+
+,		et
+|		ou
+
+Modificateurs
+
+~a		pas a
+^a		autre chose que a
+!a		seulement a
+
+~$		*
+~.		$
+~*		$
+^*		*
+^$		*
+!*		*
+!$		$
+
+~~a		a
+^^a		a
+!!a		!a
+~^a		a
+~!a		a,^a
+^~a		a
+^!a		^a
+
+Distribution
+
+~(a,b)	~a|~b
+~(a|b)	~a,~b
+!(a,b)	a,b,~^(a|b)
+!(a|b)	!^a

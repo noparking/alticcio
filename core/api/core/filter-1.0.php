@@ -1,5 +1,12 @@
 <?php
 
+class Api_FilterException extends Exception {
+	public function __construct($key, $condition, $code = 0, Exception $previous = null) {
+		$message = "Invalid filter $key=$condition";
+		parent::__construct($message, $code, $previous);
+	}
+}
+
 class API_Filter {
 	public static function filter($data, $filter) {
 		$filter_tree = self::tree($filter);
@@ -49,113 +56,110 @@ class API_Filter {
 	}
 
 	private static function apply($key, $values, $condition) {
-		$code = $condition;
-		if (!is_array($values)) {
-			$values = array($values);
-		}
-		$values_list = "'".implode("','", array_map("addslashes", $values))."'";
-		$keys_list = "'".implode("','", array_map("addslashes", array_keys($values)))."'";
 		
-		$pattern_key = "/\{[^}]+\}/";
-		$pattern_value = "/[^{}()|,\[\]#$]+/";
-
-		preg_match_all($pattern_key, $code, $matches);
-		if (isset($matches[0])) {
-			foreach ($matches[0] as $expression) {
-				$new_expression = trim($expression, "{}");
-				$new_expression = preg_replace($pattern_value, '{$0}', $new_expression);
-				$code = str_replace($expression, $new_expression, $code);
-			}
-		}
-
-		$cond_keys = array();
-		preg_match_all($pattern_key, $code, $matches);
-		if (isset($matches[0])) {
-			foreach ($matches[0] as $cond_key) {
-				$cond_key = addslashes(trim($cond_key, "{}"));
-				$op = "==";
-				$neg = "";
-				if (strpos($cond_key, "~") === 0) {
-					$cond_key = trim($cond_key, "~");
-					$op = "!=";
-					$neg = "!";
-				}
-				if (strpos($cond_key, "!") === 0) {
-					$cond_key = trim($cond_key, "!");
-					$cond_keys[] = count($values) == 1 ? "'$cond_key' $op $keys_list" : "false";
-				}
-				else {
-					$cond_keys[] = count($values) == 1 ? "'$cond_key' $op $keys_list" : "{$neg}in_array('$cond_key', array($keys_list))";
-				}
-			}
-			$code = preg_replace($pattern_key, "#", $code);
-		}
-
-		$cond_values = array();
-		preg_match_all($pattern_value, $code, $matches);
-		if (isset($matches[0])) {
-			foreach ($matches[0] as $cond_value) {
-				$cond_value = addslashes($cond_value);
-				$op = "==";
-				$neg = "";
-				if (strpos($cond_value, "~") === 0) {
-					$cond_value = trim($cond_value, "~");
-					$op = "!=";
-					$neg = "!";
-				}
-				if (strpos($cond_value, "!") === 0) {
-					$cond_value = trim($cond_value, "!");
-					$cond_values[] = count($values) == 1 ? "'$cond_value' $op $values_list" : "false";
-				}
-				else {
-					$cond_values[] = count($values) == 1 ? "'$cond_value' $op $values_list" : "{$neg}in_array('$cond_value', array($values_list))";
-				}
-			}
-			$code = preg_replace($pattern_value, "$", $code);
-		}
-
-		$code = str_replace(",", " and ", $code);
-		$code = str_replace("|", " or ", $code);
-
-		if (count($cond_keys)) {
-			$code = str_replace("#", "%s", $code);
-			$code = vsprintf($code, $cond_keys);
-		}
-
-		if (count($cond_values)) {
-			$code = str_replace("$", "%s", $code);
-			$code = vsprintf($code, $cond_values);
-		}
-
-		eval("\$return = ({$code});");
-var_dump($code);
-
-		return $return;
-	}
-
-	public static function code_old($key, $value, $condition) {
-		$code = $condition;
-		if (is_array($value)) {
-			$code = preg_replace("/[^{}()!|,\[\]]+/", "in_array('$0', ".print_r.")", $code);
+		if (preg_match("/^([\[\]])([^\]])+,([^\]])([\[\]])$/", $condition, $matches)) {
+			$value = (float)$values;
+			$first = $matches[1];
+			$min = (float)$matches[2];
+			$max = (float)$matches[3];
+			$last = $matches[4];
+			$code = $first == "]" ? "$value > $min" : "$value >= $min";
+			$code .= " and ";
+			$code .= $last == "[" ? "$value < $max" : "$value <= $max";
 		}
 		else {
-			$code = preg_replace("/[^{}()!|,\[\]]+/", "'$value' == '$0'", $code);
-		}
-		$ok = 0;
-		$ko = 0;
-		foreach ($values as $value) {
-			if (self::apply($key, $value, $condition)) {
-				$ok++;
+			$code = $condition;
+			if (!is_array($values)) {
+				$values = array($values);
 			}
-			else {
-				$ko++;
+
+			$values_list = "'".implode("','", array_map("addslashes", $values))."'";
+			$keys_list = "'".implode("','", array_map("addslashes", array_keys($values)))."'";
+
+			$pattern_key = "/\{[^}]+\}/";
+			$pattern_value = "/[^{}()|,\[\]#$]+/";
+	
+			preg_match_all($pattern_key, $code, $matches);
+			if (isset($matches[0])) {
+				foreach ($matches[0] as $expression) {
+					$new_expression = trim($expression, "{}");
+					$new_expression = preg_replace($pattern_value, '{$0}', $new_expression);
+					$code = str_replace($expression, $new_expression, $code);
+				}
 			}
-		}
-		if (!$ok) {
-			return false;
+
+			$cond_keys = array();
+			preg_match_all($pattern_key, $code, $matches);
+			if (isset($matches[0])) {
+				foreach ($matches[0] as $cond_key) {
+					$cond_key = addslashes(trim($cond_key, "{}"));
+					$op = "==";
+					$neg = "";
+					if (strpos($cond_key, "~") === 0) {
+						$cond_key = trim($cond_key, "~");
+						$op = "!=";
+						$neg = "!";
+					}
+					if (strpos($cond_key, "!") === 0) {
+						$cond_key = trim($cond_key, "!");
+						$cond_keys[] = count($values) == 1 ? "'$cond_key' $op $keys_list" : "false";
+					}
+					else {
+						$cond_keys[] = count($values) == 1 ? "'$cond_key' $op $keys_list" : "{$neg}in_array('$cond_key', array($keys_list))";
+					}
+				}
+				$code = preg_replace($pattern_key, "#", $code);
+			}
+
+			$cond_values = array();
+			preg_match_all($pattern_value, $code, $matches);
+			if (isset($matches[0])) {
+				foreach ($matches[0] as $cond_value) {
+					$cond_value = addslashes($cond_value);
+					$op = "==";
+					$neg = "";
+					if (strpos($cond_value, "~") === 0) {
+						$cond_value = trim($cond_value, "~");
+						$op = "!=";
+						$neg = "!";
+					}
+					if (strpos($cond_value, "!") === 0) {
+						$cond_value = trim($cond_value, "!");
+						if ($neg) {
+							$cond_values[] = count($values) == 1 ? "false" : "in_array('$cond_value', array($values_list))";
+						}
+						else {
+							$cond_values[] = count($values) == 1 ? "'$cond_value' $op $values_list" : "false";
+						}
+					}
+					else {
+						$cond_values[] = count($values) == 1 ? "'$cond_value' $op $values_list" : "{$neg}in_array('$cond_value', array($values_list))";
+					}
+				}
+				$code = preg_replace($pattern_value, "@", $code);
+			}
+
+			$code = str_replace(",", " and ", $code);
+			$code = str_replace("|", " or ", $code);
+
+			if (count($cond_keys)) {
+				$code = str_replace("#", "%s", $code);
+				$code = vsprintf($code, $cond_keys);
+			}
+
+			if (count($cond_values)) {
+				$code = str_replace("@", "%s", $code);
+				$code = vsprintf($code, $cond_values);
+			}
 		}
 
-		return $code;
+		ob_start();
+		eval("\$return = ({$code});");
+		if (ob_get_clean()) {
+			throw new API_FilterException($key, $condition);
+		}
+		
+		return $return;
 	}
 
 	public static function show($data, $show) {

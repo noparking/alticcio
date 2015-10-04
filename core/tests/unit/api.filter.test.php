@@ -231,7 +231,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$this->assertEqual(API_Filter::filter($data, $filter), $data);
 	}
 
-	function test_filter_negation() {
+	function test_filter_not() {
 		$data = array(
 			array(
 				'toto' => array('a' => "A"),
@@ -317,7 +317,7 @@ class TestOfApiFilter extends UnitTestCase {
 		);
 		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
 	}
-	function test_filter_unicity() {
+	function test_filter_only() {
 		$data = array(
 			array(
 				'toto' => array('a' => "A"),
@@ -361,7 +361,166 @@ class TestOfApiFilter extends UnitTestCase {
 		);
 		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
 	}
-# todo tester erreur syntax
-# todo min max
+
+	function test_filter_multi() {
+		$data = array(
+			array(
+				'toto' => array('a' => "A"),
+				'titi' => array('b' => "B"),
+			),
+			array(
+				'toto' => array('a' => "A"),
+				'titi' => array('c' => "C"),
+			),
+			array(
+				'toto' => array('a' => "A"),
+				'titi' => array('b' => ""),
+			),
+			array(
+				'toto' => array('b' => "B"),
+				'titi' => array('c' => "C"),
+			),
+		);
+
+		$filter = array(
+			'toto' => "A|B",
+			'titi' => "C"
+		);
+		$filtered = array(
+			1 => array(
+				'toto' => array('a' => "A"),
+				'titi' => array('c' => "C"),
+			),
+			3 => array(
+				'toto' => array('b' => "B"),
+				'titi' => array('c' => "C"),
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+	}
+
+	function test_filter_deep() {
+		$data = array(
+			array(
+				'toto' => array(
+					'titi' => array('a' => "A"),
+				),
+			),
+			array(
+				'toto' => array(
+					'titi' => array('c' => "C"),
+				),
+			),
+			array(
+				'toto' => array(
+					'titi' => array('b' => "B"),
+				),
+			),
+		);
+
+		$filter = array(
+			'toto.titi' => "A|B",
+		);
+		$filtered = array(
+			0 => array(
+				'toto' => array(
+					'titi' => array('a' => "A"),
+				),
+			),
+			2 => array(
+				'toto' => array(
+					'titi' => array('b' => "B"),
+				),
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+	}
+
+	function test_filter_range() {
+		$data = array(
+			array(
+				'toto' => 1,
+			),
+			array(
+				'toto' => 3,
+			),
+			array(
+				'toto' => 4,
+			),
+			array(
+				'toto' => 2,
+			),
+		);
+
+		$filter = array(
+			'toto' => "[1,3]",
+		);
+		$filtered = array(
+			0 => array(
+				'toto' => 1,
+			),
+			1 => array(
+				'toto' => 3,
+			),
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "]1,3[",
+		);
+		$filtered = array(
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "]1,3]",
+		);
+		$filtered = array(
+			1 => array(
+				'toto' => 3,
+			),
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "[1,3[",
+		);
+		$filtered = array(
+			0 => array(
+				'toto' => 1,
+			),
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+	}
+
+	function test_filter_error() {
+		$data = array(
+			array(
+				'toto' => 1,
+			),
+		);
+		$wrong_filter = array(
+			'toto' => "something !} wrong",
+		);
+		try {
+			API_Filter::filter($data, $wrong_filter);
+		} catch (API_FilterException $e) {
+			$this->pass("Caught exception");
+		}
+	}
+# todo show
+# TODO distribuer les modificateur ~ ! ~!
 
 }
