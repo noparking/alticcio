@@ -503,6 +503,16 @@ class TestOfApiFilter extends UnitTestCase {
 			),
 		);
 		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "]1.5,2.5[",
+		);
+		$filtered = array(
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
 	}
 
 	function test_filter_error() {

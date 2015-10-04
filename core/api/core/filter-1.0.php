@@ -57,11 +57,11 @@ class API_Filter {
 
 	private static function apply($key, $values, $condition) {
 		
-		if (preg_match("/^([\[\]])([^\]])+,([^\]])([\[\]])$/", $condition, $matches)) {
-			$value = (float)$values;
+		if (preg_match("/^([\[\]])([^\]]+),([^\]]+)([\[\]])$/", $condition, $matches)) {
+			$value = $values;
 			$first = $matches[1];
-			$min = (float)$matches[2];
-			$max = (float)$matches[3];
+			$min = $matches[2];
+			$max = $matches[3];
 			$last = $matches[4];
 			$code = $first == "]" ? "$value > $min" : "$value >= $min";
 			$code .= " and ";
