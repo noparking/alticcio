@@ -653,6 +653,27 @@ class TestOfApiFilter extends UnitTestCase {
 		$show = "titi,~titi.b";
 		$shown = API_Filter::show($data, $show);
 		$this->assertEqual($shown, $expected);
+
+		$data = array(
+			'toto' => array(
+				'tata' => array(
+					'titi' => array('a' => "A", 'b' => "B"),
+				),
+				'tutu' => "c",
+			),
+		);
+
+		$expected = array(
+			'toto' => array(
+				'tata' => array(
+					'titi' => array('a' => "A"),
+				),
+			),
+		);
+
+		$show = "toto.tata.*,~toto.tata.titi.b";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
 	}
 
 # todo ~! non seulement
