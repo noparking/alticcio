@@ -63,9 +63,9 @@ class API_Filter {
 			$min = $matches[2];
 			$max = $matches[3];
 			$last = $matches[4];
-			$code = $first == "]" ? "$value > $min" : "$value >= $min";
+			$code = $min == "*" ? "true" : ($first == "]" ? "$value > $min" : "$value >= $min");
 			$code .= " and ";
-			$code .= $last == "[" ? "$value < $max" : "$value <= $max";
+			$code .= $max == "*" ? "true" : ($last == "[" ? "$value < $max" : "$value <= $max");
 		}
 		else {
 			$code = $condition;

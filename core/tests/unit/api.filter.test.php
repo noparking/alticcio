@@ -513,6 +513,35 @@ class TestOfApiFilter extends UnitTestCase {
 			),
 		);
 		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "[2,*]",
+		);
+		$filtered = array(
+			1 => array(
+				'toto' => 3,
+			),
+			2 => array(
+				'toto' => 4,
+			),
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+
+		$filter = array(
+			'toto' => "[*,2]",
+		);
+		$filtered = array(
+			0 => array(
+				'toto' => 1,
+			),
+			3 => array(
+				'toto' => 2,
+			),
+		);
+		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
 	}
 
 	function test_filter_error() {
@@ -531,6 +560,7 @@ class TestOfApiFilter extends UnitTestCase {
 		}
 	}
 # todo show
+# todo ~! non seulement
 # TODO distribuer les modificateur ~ ! ~!
 
 }
