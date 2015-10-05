@@ -14,7 +14,7 @@ class TestOfApiFilter extends UnitTestCase {
 			'tata.titi.toto' => "d",
 		);
 
-		$tree = array(
+		$expected = array(
 			'toto' => "a",
 			'titi' => array(
 				'toto' => "b",
@@ -27,7 +27,24 @@ class TestOfApiFilter extends UnitTestCase {
 			),
 		);
 
-		$this->assertEqual(API_Filter::tree($get), $tree);
+		$tree = API_Filter::tree($get);
+		$this->assertEqual($tree, $expected);
+
+		$get = array(
+  			'toto' => true,
+			'toto.titi' => "a", 
+			'toto.tata' => "b",
+		);
+
+		$expected = array(
+			'toto' => array(
+				'titi' => "a",
+				'tata' => "b",
+			),
+		);
+
+		$tree = API_Filter::tree($get);
+		$this->assertEqual($tree, $expected);
 	}
 
 	function test_pass() {
@@ -79,7 +96,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "a",
 		);
-		$filtered = array(
+		$expected = array(
 			array(
 				'toto' => "a",
 			),
@@ -90,22 +107,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array("a", "b"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "a,b",
 		);
-		$filtered = array(
+		$expected = array(
 			2 => array(
 				'toto' => array("a", "b"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "a|b",
 		);
-		$filtered = array(
+		$expected = array(
 			array(
 				'toto' => "a",
 			),
@@ -119,18 +138,20 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array("b"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "a,c",
 		);
-		$filtered = array();
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$expected = array();
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "a|c",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => "a",
 			),
@@ -144,12 +165,13 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array("c"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "(a,b)|c",
 		);
-		$filtered = array(
+		$expected = array(
 			2 => array(
 				'toto' => array("a", "b"),
 			),
@@ -157,13 +179,15 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array("c"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "(a|b),c",
 		);
-		$filtered = array();
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$expected = array();
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_with_key() {
@@ -185,7 +209,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "{a}",
 		);
-		$filtered = array(
+		$expected = array(
 			array(
 				'toto' => array('a' => "A"),
 			),
@@ -193,22 +217,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('a' => "A", 'b' => "B"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "{a,b}",
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => array('a' => "A", 'b' => "B"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "{(a,b|c)}",
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => array('a' => "A", 'b' => "B"),
 			),
@@ -216,7 +242,8 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_with_apostrophe() {
@@ -228,7 +255,8 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "c'est ok",
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $data);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $data);
 	}
 
 	function test_filter_not() {
@@ -250,7 +278,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "~A",
 		);
-		$filtered = array(
+		$expected = array(
 			2 => array(
 				'toto' => array('b' => "B"),
 			),
@@ -258,22 +286,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "~A,B",
 		);
-		$filtered = array(
+		$expected = array(
 			2 => array(
 				'toto' => array('b' => "B"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "~A|B",
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => array('a' => "A", 'b' => "B"),
 			),
@@ -284,22 +314,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "~A,~B",
 		);
-		$filtered = array(
+		$expected = array(
 			3 => array(
 				'toto' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "~A|~B",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => array('a' => "A"),
 			),
@@ -310,12 +342,14 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "{~a|~b}",
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 	function test_filter_only() {
 		$data = array(
@@ -336,22 +370,24 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "!B",
 		);
-		$filtered = array(
+		$expected = array(
 			2 => array(
 				'toto' => array('b' => "B"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "{!b}",
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "{!a|!b}",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => array('a' => "A"),
 			),
@@ -359,7 +395,8 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => array('b' => "B"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_multi() {
@@ -386,7 +423,7 @@ class TestOfApiFilter extends UnitTestCase {
 			'toto' => "A|B",
 			'titi' => "C"
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => array('a' => "A"),
 				'titi' => array('c' => "C"),
@@ -396,7 +433,8 @@ class TestOfApiFilter extends UnitTestCase {
 				'titi' => array('c' => "C"),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_deep() {
@@ -421,7 +459,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto.titi' => "A|B",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => array(
 					'titi' => array('a' => "A"),
@@ -433,7 +471,8 @@ class TestOfApiFilter extends UnitTestCase {
 				),
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_range() {
@@ -455,7 +494,7 @@ class TestOfApiFilter extends UnitTestCase {
 		$filter = array(
 			'toto' => "[1,3]",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => 1,
 			),
@@ -466,22 +505,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "]1,3[",
 		);
-		$filtered = array(
+		$expected = array(
 			3 => array(
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "]1,3]",
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => 3,
 			),
@@ -489,12 +530,13 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "[1,3[",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => 1,
 			),
@@ -502,22 +544,24 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "]1.5,2.5[",
 		);
-		$filtered = array(
+		$expected = array(
 			3 => array(
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "[2,*]",
 		);
-		$filtered = array(
+		$expected = array(
 			1 => array(
 				'toto' => 3,
 			),
@@ -528,12 +572,13 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 
 		$filter = array(
 			'toto' => "[*,2]",
 		);
-		$filtered = array(
+		$expected = array(
 			0 => array(
 				'toto' => 1,
 			),
@@ -541,7 +586,8 @@ class TestOfApiFilter extends UnitTestCase {
 				'toto' => 2,
 			),
 		);
-		$this->assertEqual(API_Filter::filter($data, $filter), $filtered);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
 	}
 
 	function test_filter_error() {
@@ -559,7 +605,56 @@ class TestOfApiFilter extends UnitTestCase {
 			$this->pass("Caught exception");
 		}
 	}
-# todo show
+
+	function test_show() {
+		$data = array(
+			'toto' => 1,
+			'tata' => 11,
+			'titi' => array('a' => "A", 'b' => "B")
+		);
+
+		$expected = $data;
+
+		$show = "";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+
+		$show = "*";
+		$expected = $data;
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+
+		$expected = array(
+			'toto' => 1,
+			'titi' => array('a' => "A")
+		);
+
+		$show = "toto,titi.a";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+
+		$show = "*,~tata,~titi.b";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+
+		$expected = array(
+			'toto' => 1,
+			'tata' => 11,
+		);
+
+		$show = "*,~titi";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+
+		$expected = array(
+			'titi' => array('a' => "A")
+		);
+
+		$show = "titi,~titi.b";
+		$shown = API_Filter::show($data, $show);
+		$this->assertEqual($shown, $expected);
+	}
+
 # todo ~! non seulement
 # TODO distribuer les modificateur ~ ! ~!
 

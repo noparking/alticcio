@@ -26,7 +26,7 @@ class API_Filter {
 			$keys = explode(".", $key, 2);
 			if (isset($keys[1])) {
 				$sub_tree = self::tree(array($keys[1] => $value));
-				$tree[$keys[0]]	= isset($tree[$keys[0]]) ? array_merge_recursive($tree[$keys[0]], $sub_tree) : $sub_tree;
+				$tree[$keys[0]]	= (isset($tree[$keys[0]]) and is_array($tree[$keys[0]])) ? array_merge_recursive($tree[$keys[0]], $sub_tree) : $sub_tree;
 			}
 			else {
 				$tree[$keys[0]] = $value;
@@ -162,6 +162,57 @@ class API_Filter {
 		return $return;
 	}
 
-	public static function show($data, $show) {
+	public static function show($element, $show) {
+		if (!$show) {
+			return $element;
+		}
+
+		$shown_data = array();
+
+		if (is_array($show)) {
+			$show_tree = $show;
+		}
+		else {
+			$filter = array();
+			$show_elements = explode(",", $show);
+			foreach ($show_elements as $key) {
+				if (strpos($key, "~") === 0) {
+					$key = trim($key, "~");
+					$filter[$key] = false;
+				}
+				else {
+					$filter[$key.".*"] = true;
+				}
+			}
+			$show_tree = self::tree($filter);
+		}
+		
+		$show_all = isset($show_tree['*']);
+
+		foreach ($element as $key => $value) {
+			if (isset($show_tree[$key])) {
+				if ($show_tree[$key]) {
+					if (is_array($value) and is_array($show_tree[$key])) {
+						$sub_tree = $show_tree[$key];
+						if ($show_all) {
+							$sub_tree['*'] = true;
+						}
+						$shown_data[$key] = self::show($value, $sub_tree);
+					}
+					else {
+						$shown_data[$key] = $value;
+					}
+				}
+			}
+			else if ($show_all) {
+				$shown_data[$key] = $value;
+			}
+		}
+
+		return $shown_data;
 	}
 }
+
+# TODO Limite actuelle :
+# - cumul des modificateurs ~!
+# - distibutivité des modificatieurs
