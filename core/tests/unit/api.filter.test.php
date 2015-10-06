@@ -606,6 +606,75 @@ class TestOfApiFilter extends UnitTestCase {
 		}
 	}
 
+	function test_show_tree() {
+		$show = "";
+		$expected = array('*' => true);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "*";
+		$expected = array('*' => true);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "toto,titi.a";
+		$expected = array(
+			'toto' => array(
+				'*' => true,
+			),
+			'titi' => array(
+				'a' => array(
+					'*' => true,
+				),
+			),
+		);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "*,~tata,~titi.b";
+		$expected = array(
+			'*' => true,
+			'tata' => false,
+			'titi' => array(
+				'b' => false,
+			),
+		);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "*,~titi";
+		$expected = array(
+			'*' => true,
+			'titi' => false,
+		);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "titi,~titi.b";
+		$expected = array(
+			'titi' => array(
+				'*' => true,
+				'b' => false,
+			),
+		);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+
+		$show = "toto.tata,~toto.tata.titi.b";
+		$expected = array(
+			'toto' => array(
+				'tata' => array(
+					'*' => true,
+					'titi' => array(
+						'b' => false,
+					),
+				),
+			),
+		);
+		$show_tree = API_Filter::show_tree($show);
+		$this->assertEqual($show_tree, $expected);
+	}
+
 	function test_show() {
 		$data = array(
 			'toto' => 1,
@@ -616,12 +685,12 @@ class TestOfApiFilter extends UnitTestCase {
 		$expected = $data;
 
 		$show = "";
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$show = "*";
 		$expected = $data;
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$expected = array(
@@ -630,11 +699,11 @@ class TestOfApiFilter extends UnitTestCase {
 		);
 
 		$show = "toto,titi.a";
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$show = "*,~tata,~titi.b";
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$expected = array(
@@ -643,7 +712,7 @@ class TestOfApiFilter extends UnitTestCase {
 		);
 
 		$show = "*,~titi";
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$expected = array(
@@ -651,7 +720,7 @@ class TestOfApiFilter extends UnitTestCase {
 		);
 
 		$show = "titi,~titi.b";
-		$shown = API_Filter::show($data, $show);
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 
 		$data = array(
@@ -671,8 +740,8 @@ class TestOfApiFilter extends UnitTestCase {
 			),
 		);
 
-		$show = "toto.tata.*,~toto.tata.titi.b";
-		$shown = API_Filter::show($data, $show);
+		$show = "toto.tata,~toto.tata.titi.b";
+		$shown = API_Filter::show($data, API_Filter::show_tree($show));
 		$this->assertEqual($shown, $expected);
 	}
 

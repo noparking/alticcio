@@ -162,33 +162,28 @@ class API_Filter {
 		return $return;
 	}
 
-	public static function show($element, $show) {
+	public static function show_tree($show) {
 		if (!$show) {
-			return $element;
+			return array('*' => true);
 		}
-
-		$shown_data = array();
-
-		if (is_array($show)) {
-			$show_tree = $show;
-		}
-		else {
-			$filter = array();
-			$show_elements = explode(",", $show);
-			foreach ($show_elements as $key) {
-				if (strpos($key, "~") === 0) {
-					$key = trim($key, "~");
-					$filter[$key] = false;
-				}
-				else {
-					$filter[$key.".*"] = true;
-				}
+		$filter = array();
+		$show_elements = explode(",", $show);
+		foreach ($show_elements as $key) {
+			if (strpos($key, "~") === 0) {
+				$key = trim($key, "~");
+				$filter[$key] = false;
 			}
-			$show_tree = self::tree($filter);
+			else {
+				$filter[$key.".*"] = true;
+			}
 		}
-		
-		$show_all = isset($show_tree['*']);
 
+		return self::tree($filter);
+	}
+
+	public static function show($element, $show_tree) {
+		$shown_data = array();
+		$show_all = isset($show_tree['*']);
 		foreach ($element as $key => $value) {
 			if (isset($show_tree[$key])) {
 				if ($show_tree[$key]) {
