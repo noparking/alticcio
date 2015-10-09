@@ -8,6 +8,13 @@ class Correspondant extends AbstractContact {
 	public $types = "correspondants";
 	public $table = "dt_contacts_correspondants";
 	public $id_field = "id_contacts_correspondants";
+	public $links = array(
+		'organisations' => array("organisations", "correspondants"),
+		'comptes' => array("correspondants", "comptes"),
+	);
+	public $table_links_organisations = "dt_contacts_organisations_correspondants";
+	public $table_links_correspondants = null;
+	public $table_links_comptes = "dt_contacts_correspondants_comptes";
 
 	public function liste($filter = null) {
 		if ($filter === null) {
@@ -29,17 +36,6 @@ SQL;
 		}
 
 		return $correspondants;
-	}
-
-	public function save($data) {
-		if (isset($data[$this->type]['id'])) {
-			if (isset($data['organisations'])) {
-				foreach ($data['organisations'] as $id_organisation => $infos) {
-					$data['organisations_correspondants'][$id_organisation][$data[$this->type]['id']] = $infos;
-				}
-			}
-		}
-		return parent::save($data);
 	}
 
 	public function organisations_correspondants() {

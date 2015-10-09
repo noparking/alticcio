@@ -8,6 +8,8 @@ abstract class AbstractContact {
 	public $types;
 	public $table;
 	public $id_field;
+	public $table_links_organisations;
+	public $table_links_correspondants;
 
 	public function __construct($sql, $id_langues = 1) {
 		$this->sql = $sql;
@@ -17,11 +19,11 @@ abstract class AbstractContact {
 	public function save($data) {
 		if (isset($data[$this->type])) {
 			$orga = $data[$this->type];
-			if (isset($orga['id'])) {
-				$id = $orga['id'];
+			if (isset($data[$this->type]['id']) and ($id = $data[$this->type]['id'])) {
+				$id = $data[$this->type]['id'];
 				if (!isset($data['save_again'])) {
 					$sets = array();
-					foreach ($orga as $field => $value) {
+					foreach ($data[$this->type] as $field => $value) {
 						$sets[] = "{$field} = '{$value}'";
 					}
 					$sets_list = implode(",", $sets);
@@ -32,7 +34,7 @@ SQL;
 					$this->sql->query($q);
 				}
 
-				$this->save_organisations_correspondants($data);
+				$this->save_links($data);
 				
 				return $id;
 			}
@@ -49,7 +51,7 @@ SQL;
 INSERT INTO {$this->table} ($fields_list) VALUES ($values_list)
 SQL;
 				$this->sql->query($q);
-				$data[$this->type]['id'] = $this->sql->insert_id();
+				$data[$this->type]['id'] = $this->id = $this->sql->insert_id();
 				$data['save_again'] = true;
 
 				return $this->save($data);
@@ -59,26 +61,38 @@ SQL;
 		return false;
 	}
 
-	public function save_organisations_correspondants($data) {
-		$q = <<<SQL
-DELETE FROM dt_contacts_organisations_correspondants WHERE {$this->id_field} = {$this->id}
+	public function save_links($data) {
+		foreach ($this->links as $link => $elements) {
+			$joined_elements = implode("_", $elements);
+			if (isset($this->id) and $this->id) {
+				$q = <<<SQL
+DELETE FROM dt_contacts_{$joined_elements} WHERE {$this->id_field} = {$this->id}
 SQL;
-		$this->sql->query($q);
-		if (isset($data['organisations_correspondants'])) {
-			foreach ($data['organisations_correspondants'] as $id_organisation => $organisations_correspondants) {
-				foreach ($organisations_correspondants as $id_correspondant => $organisation_correspondant) {
-					$fields = array("id_contacts_organisations", "id_contacts_correspondants");
-					$values = array($id_organisation, $id_correspondant);
-					foreach ($organisation_correspondant as $field => $value) {
-						$fields[] = $field;
-						$values[] = "'$value'";
+				$this->sql->query($q);
+				if (isset($data[$link])) {
+					foreach ($data[$link] as $link_id => $link_data) {
+						$fields = array("id_contacts_".$elements[0], "id_contacts_".$elements[1]);
+						if ($link_id) {
+							$values = null;
+							if ($link == $elements[0]) {
+								$values = array($link_id, $this->id);
+							} else if ($link == $elements[1]) {
+								$values = array($this->id, $link_id);
+							}
+							if ($values) {
+								foreach ($link_data as $k => $v) {
+									$fields[] = $k;
+									$values[] = "'$v'";
+								}
+								$fields_list = implode(",", $fields);
+								$values_list = implode(",", $values);
+								$q = <<<SQL
+INSERT INTO dt_contacts_{$joined_elements} ($fields_list) VALUES ($values_list)
+SQL;
+								$this->sql->query($q);
+							}
+						}
 					}
-					$fields_list = implode(",", $fields);
-					$values_list = implode(",", $values);
-					$q = <<<SQL
-INSERT INTO dt_contacts_organisations_correspondants ($fields_list) VALUES ($values_list)
-SQL;
-					$this->sql->query($q);
 				}
 			}
 		}
@@ -107,57 +121,65 @@ SQL;
 		}
 	}
 
-	public function options($type, $field = "nom") {
+	public function options($type, $field = "nom", $selection = null) {
 		$q = <<<SQL
 SELECT id, $field FROM dt_contacts_{$type} WHERE statut = 1 
 SQL;
 		$res = $this->sql->query($q);
 		$options = array(0 => "--");
 		while ($row = $this->sql->fetch($res)) {
-			$options[$row['id']] = $row[$field];
+			if (!$selection or isset($selection[$row['id']])) {
+				$options[$row['id']] = trim($row[$field]);
+			}
 		}
 
 		return $options;
 	}
 	
 	public function links($table, $key) {
-		$q = <<<SQL
+		$links = array();
+		if (isset($this->id) and $this->id) {
+			$q = <<<SQL
 SELECT * FROM {$table} WHERE {$this->id_field} = {$this->id}
 SQL;
-		$res = $this->sql->query($q);
-		$links = array();
-		while ($row = $this->sql->fetch($res)) {
-			$links[$row[$key]] = $row;
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
+				$links[$row[$key]] = $row;
+			}
 		}
 
 		return $links;
 	}
 
 	public function organisations() {
-		$q = <<<SQL
-SELECT co.id, co.nom FROM dt_contacts_organisations AS co
-INNER JOIN dt_contacts_organisations_correspondants AS cot ON cot.id_contacts_organisations = co.id
-WHERE cot.id_contacts_{$this->types} = {$this->id}
-SQL;
-		$res = $this->sql->query($q);
 		$links = array();
-		while ($row = $this->sql->fetch($res)) {
-			$links[$row['id']] = $row['nom'];
+		if (isset($this->id) and $this->id) {
+			$q = <<<SQL
+SELECT co.id, co.nom FROM dt_contacts_organisations AS co
+INNER JOIN {$this->table_links_organisations} AS tl ON tl.id_contacts_organisations = co.id
+WHERE tl.id_contacts_{$this->types} = {$this->id}
+SQL;
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
+				$links[$row['id']] = $row['nom'];
+			}
 		}
 
 		return $links;
 	}
 
 	public function correspondants() {
-		$q = <<<SQL
-SELECT cc.id, CONCAT(cc.nom, ' ', cc.prenom) AS nom FROM dt_contacts_correspondants AS cc
-INNER JOIN dt_contacts_organisations_correspondants AS cot ON cot.id_contacts_correspondants = cc.id
-WHERE cot.id_contacts_{$this->types} = {$this->id}
-SQL;
-		$res = $this->sql->query($q);
 		$links = array();
-		while ($row = $this->sql->fetch($res)) {
-			$links[$row['id']] = trim($row['nom']);
+		if (isset($this->id) and $this->id) {
+			$q = <<<SQL
+SELECT cc.id, CONCAT(cc.nom, ' ', cc.prenom) AS nom FROM dt_contacts_correspondants AS cc
+INNER JOIN {$this->table_links_correspondants} AS tl ON tl.id_contacts_correspondants = cc.id
+WHERE tl.id_contacts_{$this->types} = {$this->id}
+SQL;
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
+				$links[$row['id']] = trim($row['nom']);
+			}
 		}
 
 		return $links;

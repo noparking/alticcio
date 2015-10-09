@@ -8,6 +8,12 @@ class Organisation extends AbstractContact {
 	public $types = "organisations";
 	public $table = "dt_contacts_organisations";
 	public $id_field = "id_contacts_organisations";
+	public $links = array(
+		'correspondants' => array("organisations", "correspondants"),
+	);
+	public $table_links_organisations = null;
+	public $table_links_correspondants = "dt_contacts_organisations_correspondants";
+	public $table_links_comptes = null;
 
 	public function liste($filter = null) {
 		if ($filter === null) {
@@ -35,17 +41,6 @@ SQL;
 			$organisations[] = $row;
 		}
 		return $organisations;
-	}
-
-	public function save($data) {
-		if (isset($data[$this->type]['id'])) {
-			if (isset($data['correspondants'])) {
-				foreach ($data['correspondants'] as $id_correspondant => $infos) {
-					$data['organisations_correspondants'][$data[$this->type]['id']][$id_correspondant] = $infos;
-				}
-			}
-		}
-		return parent::save($data);
 	}
 
 	public function types() {

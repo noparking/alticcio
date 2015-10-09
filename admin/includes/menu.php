@@ -200,6 +200,11 @@ $menus = array(
 						'label' => $dico->t('Correspondants'),
 						'url' => $url2->make("Contacts", array('type' => "correspondants", 'action' => "", 'id' => "")),
 					),
+					'comptes' => array(
+						'level' => 99,
+						'label' => $dico->t('Comptes'),
+						'url' => $url2->make("Contacts", array('type' => "comptes", 'action' => "", 'id' => "")),
+					),
 				),
 			),
 			

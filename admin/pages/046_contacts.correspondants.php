@@ -89,6 +89,9 @@ if ($form->is_submitted() and $form->validate()) {
 if ($action == 'edit') {
 	$form->default_values['correspondant'] = $correspondant->values;
 }
+else {
+	$form->reset();
+}
 
 $form_start = $form->form_start();
 
@@ -111,9 +114,7 @@ $buttons['new'] = $page->l($dico->t('NouveauCorrespondant'), $url2->make("curren
 if ($action == "create" or $action == "edit") {
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer') ));
 	$buttons['reset'] = $form->input(array('type' => "submit", 'name' => "reset", 'value' => $dico->t('Reinitialiser') ));
-}
 
-if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'organisations' => $dico->t('Organisations'),
@@ -128,10 +129,6 @@ HTML;
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;
 
-	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
-}
-
-if ($action == "create" or $action == "edit") {
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
 {$form->select(array('name' => "correspondant[civilite]", 'label' => $dico->t('Civilite'), 'options' => $civilite_options))}
@@ -161,6 +158,10 @@ HTML;
 	$page->post_javascript[] = <<<JAVASCRIPT
 $("#select-organisation").dynamicfieldsets("#nouvelle-organisation", "organisations", {$json_organisations}, {$json_organisations_correspondants});
 JAVASCRIPT;
+}
+
+if ($action == "edit") {
+	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 }
 
 switch($action) {
