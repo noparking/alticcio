@@ -47,6 +47,59 @@ class TestOfApiFilter extends UnitTestCase {
 		$this->assertEqual($tree, $expected);
 	}
 
+	function test_tokenize_pattern() {
+		$pattern = "(~abc,{toto}|(^abc^toto,!{abc}))";
+		$expected_pattern = "(~#,{##}|(^#^##,!{#}))";
+		$expected_tokens = array(
+			'#' => "abc",
+			'##' => "toto",
+		);
+		list($tokenized_pattern, $tokens) = API_Filter::tokenize_pattern($pattern);
+		$this->assertEqual($tokenized_pattern, $expected_pattern);
+		$this->assertEqual($tokens, $expected_tokens);
+	}
+
+	function test_bracket() {
+		$pattern = "(((#|##),!(~###|#))|(!##,###),(#|##)),##";
+		$expected_brackets = array(
+			'O' => "#|##",
+			'OO' => "~###|#",
+			'OOO' => "O,OO",
+			'OOOO' => "##,###",
+			'OOOOO' => "#|!##",
+			'OOOOOO' => "OOO|OOOO,OOOOO",
+			'OOOOOOO' => "OOOOOO,##",
+		);
+		$brackets = API_Filter::bracket_pattern($pattern);
+		$this->assertEqual($brackets, $expected_brackets);
+
+		$bracketed_pattern = API_Filter::unbracket($brackets);
+		$this->assertEqual($bracketed_pattern, $pattern);
+	}
+
+#TODO à supprimer
+	function test_distribute_bangs() {
+		$pattern = "!OOO|OOOO,!##";
+		$brackets = array(
+			'O' => "#,##",
+			'OO' => "###,^#^##|#",
+			'OOO' => "O,OO,#",
+			'OOOO' => "##,###",
+		);
+		list($pattern, $brackets) = API_Filter::distribute_bangs($pattern, $brackets);
+
+		$expected_pattern = "OOO|OOOO,!##";
+		$this->assertEqual($pattern, $expected_pattern);
+
+		$expected_brackets = array(
+			'O' => "#,##!",
+			'OO' => "###,^#^##|#!",
+			'OOO' => "O,OO,#!",
+			'OOOO' => "##,###",
+		);
+		$this->assertEqual($brackets, $expected_brackets);
+	}
+
 	function test_pass() {
 		$get = array(
 			'toto' => "a",
@@ -747,5 +800,4 @@ class TestOfApiFilter extends UnitTestCase {
 
 # todo ~! non seulement
 # TODO distribuer les modificateur ~ ! ~!
-
 }

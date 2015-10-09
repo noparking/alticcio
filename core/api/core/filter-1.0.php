@@ -1,8 +1,8 @@
 <?php
 
 class Api_FilterException extends Exception {
-	public function __construct($key, $condition, $code = 0, Exception $previous = null) {
-		$message = "Invalid filter $key=$condition";
+	public function __construct($pattern, $code = 0, Exception $previous = null) {
+		$message = "Invalid filter $pattern";
 		parent::__construct($message, $code, $previous);
 	}
 }
@@ -53,6 +53,191 @@ class API_Filter {
 		}
 
 		return true;
+	}
+
+	public static function tokenize_pattern($pattern) {
+		$tokens = array();
+		$atoms = array();
+		$pattern_atom = "/[^{}()|,\[\]~!\^$]+/";
+		preg_match_all($pattern_atom, $pattern, $matches);
+		if (isset($matches[0])) {
+			$token = "";
+			foreach ($matches[0] as $atom) {
+				if (!isset($atoms[$atom])) {
+					$token .= "#";
+					$atoms[$atom] = $token;
+					$tokens[$token] = $atom;
+					$pattern = str_replace($atom, $token, $pattern);
+				}
+			}
+		}
+
+		return array($pattern, $tokens);
+	}
+
+	public static function bracket_pattern($pattern, $key = "", $brackets = array()) {
+		$pattern_bracket = "/\(([^()]+)\)/";
+		preg_match($pattern_bracket, $pattern, $matches);
+		if (isset($matches[1])) {
+			$key .= "O";
+			$brackets[$key] = $matches[1];
+			$bracket = "({$matches[1]})";
+			$pos = strpos($pattern, $bracket);
+			$pattern = substr_replace($pattern, $key, $pos, strlen($bracket));
+
+			return self::bracket_pattern($pattern, $key, $brackets);
+		}
+		$brackets[$key."O"] = $pattern;
+
+		return $brackets;
+	}
+
+	public static function unbracket($brackets) {
+		$pattern = "";
+		if (count($brackets)) {
+			$pattern = array_pop($brackets);
+			foreach (array_reverse($brackets) as $key => $value) {
+				$pattern = str_replace($key, "($value)", $pattern);
+			}
+		}
+
+		return $pattern;
+	}
+
+#TODO à supprimer
+	public static function distribute_bang($brackets, $key) {
+		$brackets[$key] .= "!";
+		$pattern_bracket = "/(O+)/";
+		preg_match_all($pattern_bracket, $brackets[$key], $matches);
+		if (isset($matches[1])) {
+			foreach ($matches[1] as $key) {
+				$brackets = self::distribute_bang($brackets, $key);
+			}
+		}
+		
+		return $brackets;
+	}
+
+#TODO à supprimer
+	public static function distribute_bangs($pattern, $brackets) {
+		$pattern_bang = "/!(O+)/";
+		preg_match_all($pattern_bang, $pattern, $matches);
+		if (isset($matches[1])) {
+			foreach ($matches[1] as $key) {
+				$brackets = self::distribute_bang($brackets, $key);
+			}
+		}
+		$pattern = str_replace("!O", "O", $pattern);
+
+		return array($pattern, $brackets);
+	}
+
+	public static function code_range($value, $pattern) {
+		$conditions = array();
+		$pattern_range = "/^([\[\]])([^\]]+),([^\]]+)([\[\]])$/";
+		if (preg_match($pattern_range, $pattern, $matches)) {
+			$first = $matches[1];
+			$min = $matches[2];
+			$max = $matches[3];
+			$last = $matches[4];
+			if ($min != "*") {
+				$conditions[] = $first == "]" ? "$value > $min" : "$value >= $min";
+			}
+			if ($max != "*") {
+				$conditions[] = $last == "[" ? "$value < $max" : "$value <= $max";
+			}
+		}
+		return '$return = '.implode(" and ", $conditions).';';
+	}
+
+	public static function code_expression($expression) {
+		$only_one = false;
+		if (strpos("!", $expression) !== false) {
+			$expression = str_replace("!", "", $expression);
+			$only_one = true;
+		}
+
+		if (strpos("|", $expression) !== false) {
+			$alternatives = array();
+			foreach (explode("|", $expression) as $alternative_expression) {
+				$alternatives[] = self::code_alternative($alternative_expression);
+			}
+
+			return implode(" or ", $alternatives);
+		}
+		else {
+
+		}
+	}
+
+	public static function simplify_expression($expression) {
+		$simplified_expression = $expression;
+#... simplification de $simplified_expression
+		if ($simplified_expression != $expression) {
+			return self::simplify_expression($simplified_expression);
+		}
+
+		return $simplified_expression;
+	}
+
+	public static function code_disjunction($expression, $only_one = false) {
+		$expression = self::simplify_expression($expression);
+		foreach (explode("|", $expression) as $element) {
+
+		}
+	}
+
+	public static function code_conjunction($expression, $only_one = false) {
+	}
+
+	public static function code_brackets($brackets) {
+		$coded_brackets = array();
+		foreach ($brackets as $key => $value) {
+			$coded_brackets[$key] = self::code_bracket($value);
+		}
+
+		return $coded_brackets;
+	}
+
+	public static function one_or_more($data) {
+		
+	}
+
+	public static function one_value_match($data, $code) {
+		
+	}
+
+	public static function only_one_value_match($data, $code) {
+		
+	}
+
+	public static function apply_pattern($data, $pattern) {
+		if ($code_range = self::code_range($data, $pattern)) {
+			$code = $code_range;
+		}
+		else {
+			list($pattern, $tokens) = self::tokenize_pattern($pattern);
+			$brackets = self::bracket_pattern($pattern);
+			$coded_brackets = array();
+			foreach ($brackets as $key => $value) {
+				$coded_brackets[$key] = self::code_expression($value);
+			}
+
+			$code = '$data=json_decode("'.json_encode($data).'");';
+			$code .= '$return = '.self::unbracket($pattern, $coded_brackets).';';
+
+			foreach ($tokens as $key => $value) {
+				$code = str_replace($key, "'".addslashes($value)."'", $code);
+			}
+		}
+
+		ob_start();
+		eval($code);
+		if (ob_get_clean()) {
+			throw new API_FilterException($condition);
+		}
+		
+		return $return;
 	}
 
 	private static function apply($key, $values, $condition) {
@@ -156,7 +341,7 @@ class API_Filter {
 		ob_start();
 		eval("\$return = ({$code});");
 		if (ob_get_clean()) {
-			throw new API_FilterException($key, $condition);
+			throw new API_FilterException($condition);
 		}
 		
 		return $return;

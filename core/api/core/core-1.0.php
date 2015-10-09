@@ -527,5 +527,8 @@ SQL;
 		return $row['last_call'];
 	}
 
+	public function filter($data, $filter) {
+		return API_Filter::filter($data, API_Filter::tree($filter));
+	}
 }
 

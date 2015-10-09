@@ -1,3 +1,60 @@
+Logique caractéristique
+
+caractéristique : ensemble d'attributs possibles
+(peut-être une liste ouverte ?)
+ex :
+couleur = (rouge, bleu, vert)
+forme = (rond, carré)
+
+valeur caractéristique : sous liste des attributs possibles
+ex :
+ma_couleur = (bleu, vert)
+
+classe : ensemble de caractéristiques possibles
+ex :
+voiture = (couleur, forme)
+
+objet : classe avec valeurs pour les caractéristiques
+ex :
+ma_voiture = {
+	couleur : (bleu, vert),
+	forme : rond
+}
+
+caractéristique composée :
+imbrication :
+visuel : {forme, couleur}
+
+ma_voiture = {
+	visuel : {
+		couleur : (bleu, vert),
+		forme : rond
+	}
+}
+
+on note rond pour (rond), $ pour ()
+
+comparaison de valeurs caractéristique :
+inclusion au sens ensembliste :
+[bleu, vert] <= [bleu, vert, rouge]
+A <= B si tous les éléments de A sont dans B
+
+Patron (pattern) :
+objet génériques :
+- Les , (et) peuvent être remplacées par des | (ou)
+- utilisation de parenthèses
+- utilisation de modificateurs
+- utilisation de 
+ex :
+
+pattern_de_voiture = {
+	(couleur : (!rouge | vert,bleu),
+	forme : .uneforme) |
+	(couleur : (
+}
+
+====
+
 Operateur logique (par ordre de priorité)
 
 ,		et
@@ -5,36 +62,60 @@ Operateur logique (par ordre de priorité)
 
 Modificateurs
 
-~a		pas a				(ne contient pas a dans sa liste de valeurs)
-^a		autre chose que a	(contient au moins une chose différente de a dans sa liste de valeurs)
+~a		pas a				(ne contient pas a dans sa liste de valeurs) ($ matche)
+^a		autre chose que a	(contient au moins une chose différente de a dans sa liste de valeurs) ($ ne mache pas)
 !a		seulement a			(contient uniquement a dans sa liste de valeur)
 
+séquences de modificateurs
 ~~a		a
 ^^a		a
 !!a		!a
-~^a		a
-~!a		a,^a
-^~a		a
-^!a		^a
-!~a
-!^a
+~^a		!a|$
+~!a		(a,^a)|$
+^~a		~a,^a (pas a mais non vide) PAS DE SENS
+^!a		a,^a
+!^a		~a,!
+!~a		$ (vide)
+
+~$		* pas rien (quelque(s) chose(s))
+!$		$
+
 
 Distribution
 
 ~(a,b)	~a|~b
 ~(a|b)	~a,~b
-!(a,b)	a,b,~^(a|b)
-!(a|b)	!^a
+!(a,b)	a,b,~(~a
+!(a|b)	!a|!b
+^(a,b)	a,b,^(a|b)
+^(a|b)
 
 ===
 
-Entité générique
+Entités génériques
 
 $		rien
 .		quelque chose
 *		quelque(s) chose(s)
 
-Pb : libre, lié
+.x		quelque chose nommé x
+*y		quelque(s) chose(s) pas nommé(es) y
+
+.~x		quelque chose pas nommé x
+*~y		quelque(s) chose(s) pas nommé(es) y
+
+~$	*
+~.	$
+~*	$
+!$		$
+!.		juste une chose
+!*		*
+^ pas de sens combiné avec . * $
+parconvention :
+^$		* ou $
+^.		.
+^*		*
+
 .,.
 .,^.
 Quand . représente la même chode ou deux choses différentes ?
@@ -51,4 +132,207 @@ Notion de variable ?
 !*		*
 !$		$
 !.		.,~
+
+======
+
+^ (autre chose que) ne peut préfixer qu'un atome. Modificateur d'atome.
+a	: atome a
+^a	: atome différent de a
+
+a,^a : au moins deux trucs
+a|^a : au moins un trucs
+
+Modificateurs d'expression
+~ non
+! seulement
+
+~a	= ^a|$ (pour info)
+~^a	= !a|$
+!a	= a,~^a
+
+======
+
+Atomes (notés en minuscule) :
+a : contient a
+b : contient b
+
+Modificateurs d'atomes :
+~a : pas a : ne contient pas a
+^a : autrechose que a : contient quelque chose qui n'est pas a
+!a : seulement a : contient a et pas autre chose que a
+
+Combinaisons de modificateurs
+
+Expressions (notée en majuscule) :
+a
+~a
+^a
+!a
+(A,B) : doit matcher A et matcher B
+(A|B) : doit matcher A ou matcher B
+~A	: doit ne pas matcher A
+!B	: doit matcher B 
+
+Seulement 2 modificateurs d'expression : ~ et !
+^ n'a de sens qu'au niveau atomique
+
+Distribution de ~ et !
+
+~(a,b,c,...) : pas toute la liste
+~(a|b|c) : rien de la liste
+!(a,b,c...) : chaque chose de la liste et rien en dehors de la liste
+!(a|b|c...) : quelque chose de la liste et rien en dehors de la liste
+
+~(A,B) = ~A|~B
+~(A|B) = ~A,~B
+!(A,B) = A,B,
+!(A|B) = 
+
+===
+
+a,b	:	a et b
+a|b :	a ou b
+a^b	:	a ou b mais pas les deux
+
+~(a,b) : ~a|~b
+~(a|b) : ~a,~b
+~(a^b) : ~((a|b),~(a,b)) : ~(a|b)|(a,b) : (~a,~b)|(a,b)
+
+!(a,b) : a,b,
+!(a|b) : !a|!b = !a^!b
+!(a^b) : !a^!b = !a|!b
+
+on distribue les !(A|B) en !A|!B
+il reste les !(a,b,c)
+
+===
+
+Des listes de valeurs et des patterns
+Une liste peut matcher un pattern.
+
+Pattern	: condition de match
+$		: la liste est vide
+a		: la liste contient a
+~a		: la liste ne contient pas a
+!a		: la liste contient a uniquement
+^a		: la liste contient quelque chose différent de a
+^a^b	: la liste contient quelque chose différent de a et de b
+a,b		: la liste contient a et la liste contient b
+a|b		: la liste contient a ou la liste contient b (ou les deux)
+
+
+
+priorité : ^ [!~] , |
+
+Si A et B sont des pattern, sont aussi des patterns :
+~A		: la liste ne match pas A
+A,B		: la liste match A et la liste match B
+A|B		: la liste match A ou la liste match B
+
+!A		: dépend des règles si dessous
+!^a^b	: la liste contient un seul élément différent de a et de b
+!(a,b)	= a,b,~^a^b
+!(a|b)	= !a|!b
+
+~(a,b)	= ~a|~b
+~(a|b)	= ~a,~b
+!(a,b)	= a,b,^a^b
+!(a|b)	= !a|!b
+
+===
+
+Note : autre chose que a = qqu chose différent de a (donc pas rien)
+
+Atomes :
+$		: rien (la liste est vide)
+a		: a (la liste contient a)
+^a		: quelque chose différent de a (la liste contient quelque chose qui n'est pas a. Rem : elle peut aussi contenir a)
+^a^b	: quelque chose différents de a et de b
+^a^b^c 	: etc
+
+Modificateurs d'atomes :
+~		: pas
+	~$		: pas rien = quelque chose (la liste n'est pas vide)
+	~a		: pas a (la liste ne contient pas a. Rem : peut-être vide ou non)
+	~^a		: pas qqu chose différent a = rien d'autre que a (la liste contient a ou est vide)
+	~^a^b	: pas qqu chose différent de a et de b = rien d'autre que a ou b (la liste peut contenir a ou b ou les deux ou être vide)
+!		: seulement
+	!$		= $ : seulement rien = rien
+	!a		= a,~^a : seulement a (la liste contient a et rien d'autre)
+	!^a		= x^a,~^a^x : seulement autre chose que a (la liste contient une seule chose différente de a)
+				quelque chose différent de a, nommé x, et pas quelque chose différent de a et x
+	!^a^b	: seulement autre chose que a et que b (la liste contient une seule chose différente de a et de b)
+
+Notons x y z des atomes (on utilisiserait des lettre italiques, ou grecques, ou de couleur)
+
+Agrégateurs d'atomes :
+x,y		: et (conjonction, c'est commutatif)
+	$,$		= $
+	$,a		= Absurde : Aucune liste ne match ça
+	$,^a	= Absurde
+	$,^a^b	= Absurde
+	a,$		= Absurde
+	a,a		= a
+	a,^a	: a et autre chose que a (la liste contient a et autre chose que a, donc au moins deux éléments)
+	a,^b	= a
+	a,^a^b	: a et autre chose que a et que b
+	^a,$	= Absurde
+	^a,a	= a,^a
+	^a,^a	= ^a
+	^a,^b	: (pas pareil que ^a^b car peut contenir uniquement a et b)
+	^a,^a^b	= ^a^b
+x|y		: ou (disjonction, c'est commutatif)
+	$|$		= $
+	$|a		: contient a ou est vide
+	$|^a	: contient qqu chose d'autre que a ou est vide
+	...
+	^a|^b	= ~$
+	...
+
+Agrégats d'atomes modifiés
+
+
+Combinaison de modificateurs d'atomes :
+~~x		= x (x est un atome)
+!!x		= !x
+~!x		: pas uniquement
+	~!$		= ~$
+	~!a		= ^a|$ : pas uniquement a (la liste contient autre chose que a ou est vide)
+	~!^a	= a,^a|$ : pas uniquement autre chose que a (la laiste est vide ou conteint a et autre chose que a)
+	~!^a^b	= 
+!~x		: seulement pas
+	!~$		: seulement pas rien = seulement qqu chose (la liste contient une seule chose)
+	!~a		= !^a seulement pas a = seulement autre chose que a
+	!~^a	= !a : seulement rien d'autre que a (la liste contient a et uniquement a)
+	!~^a^b	= !a|!b : seulement a ou seulement b
+
+Expressions
+Atomes
+Modifications d'atomes
+Agrégats d'atomes (conjonction et disjonctions)
+
+Agrégat d'expressions
+
+Modifications d'expressions
+
+Agrégat d'expressions modifiées
+
+Symplification des conjonctions
+a,a			= a
+a,b,a		= a,b
+a,b,^b,^a	= a,b
+a,b,^a^b	ne se simplifie pas
+^a,^a		= ^a
+^a,^a^b		= ^a^b
+!a,!b		= false
+!a,^a		= false
+
+
+===
+
+Comment traiter un pattern ?
+- exploser les chaines de modificateurs
+- identifier les agrégat d'atomes
+
+
 
