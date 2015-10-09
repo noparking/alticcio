@@ -13,6 +13,7 @@ class DBField {
 	public function __construct($db, $row, $table, $columns) {
 		$this->db = $db;
 		$this->table = $table;
+		$this->prefixe = strstr($table, "_", true);
 		$this->columns = $columns;
 		$this->name = $row['Field'];
 		$this->type = $row['Type'];
@@ -112,7 +113,7 @@ class DBField {
 			$field_label = $this->columns[1];
 		}
 		else {
-			$table_name = "dt_".$keyword;
+			$table_name = $this->prefixe."_".$keyword;
 			$table = $this->db->table($table_name);
 			if (!$table) {
 				return null;

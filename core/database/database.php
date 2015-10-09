@@ -68,7 +68,8 @@ class Database {
 				}
 				else if (preg_match("/^id_(.*)/", $field, $matches)) {
 					$table_jointure = true;
-					$table2 = "dt_".$matches[1];
+					$prefixe = strstr($table, "_", true);
+					$table2 = $prefixe."_".$matches[1];
 					$q = "SELECT * FROM $table2 WHERE id = $value";
 					$res2 = $this->sql->query($q);
 					$row2 = $this->sql->fetch($res2);
