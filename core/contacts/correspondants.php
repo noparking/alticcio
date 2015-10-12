@@ -41,5 +41,76 @@ SQL;
 	public function organisations_correspondants() {
 		return $this->links("dt_contacts_organisations_correspondants", "id_contacts_organisations");
 	}
+
+	public function save($data) {
+		$id = parent::save($data);
+
+		if (isset($data['donnees'])) {
+			foreach ($data['donnees'] as $id_donnee => $donnee) {
+				if ($id_donnee) {
+					if ($donnee['valeur']) {
+						$q = <<<SQL
+UPDATE dt_contacts_correspondants_donnees
+SET id_contacts_correspondants = {$id},
+id_contacts_donnees = {$donnee['id_contacts_donnees']},
+valeur = '{$donnee['valeur']}',
+statut = {$donnee['statut']}
+WHERE id = {$id_donnee}
+SQL;
+					}
+					else {
+						$q = <<<SQL
+DELETE FROM dt_contacts_correspondants_donnees WHERE id = $id_donnee
+SQL;
+					}
+				}
+				else if ($donnee['valeur']) {
+					$q = <<<SQL
+INSERT INTO dt_contacts_correspondants_donnees (id_contacts_correspondants, id_contacts_donnees, valeur, statut)
+VALUES ({$id}, {$donnee['id_contacts_donnees']}, '{$donnee['valeur']}', {$donnee['statut']})
+SQL;
+				}
+				$this->sql->query($q);
+			}
+		}
+
+		return $id;
+	}
+
+	public function donnees($statut = null) {
+		$q = <<<SQL
+SELECT id_contacts_donnees, valeur, COUNT(DISTINCT id_contacts_correspondants) AS nb FROM dt_contacts_correspondants_donnees
+WHERE id_contacts_correspondants <> {$this->id}
+GROUP BY id_contacts_donnees, valeur
+SQL;
+		$doublons = array();
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$doublons[$row['id_contacts_donnees']][$row['valeur']] = $row['nb'];
+		}
+
+		$q = <<<SQL
+SELECT ccd.id, ccd.id_contacts_donnees, ccd.valeur, ccd.statut, cd.nom FROM dt_contacts_correspondants_donnees AS ccd
+INNER JOIN dt_contacts_donnees AS cd ON cd.id = ccd.id_contacts_donnees
+WHERE ccd.id_contacts_correspondants = {$this->id}
+ORDER BY ccd.id ASC
+SQL;
+		if ($statut) {
+			$q .= <<<SQL
+AND cd.statut = 1 AND ccd.statut = 1
+SQL;
+		}
+		$res = $this->sql->query($q);
+		$donnees = array();
+		while ($row = $this->sql->fetch($res)) {
+			$donnees[$row['id']] = $row;
+			$donnees[$row['id']]['doublon'] = 0;
+			if (isset($doublons[$row['id_contacts_donnees']][$row['valeur']])) {
+				$donnees[$row['id']]['doublon'] = $doublons[$row['id_contacts_donnees']][$row['valeur']];
+			}
+		}
+
+		return $donnees;
+	}
 }
 

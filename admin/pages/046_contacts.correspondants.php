@@ -88,6 +88,8 @@ if ($form->is_submitted() and $form->validate()) {
 
 if ($action == 'edit') {
 	$form->default_values['correspondant'] = $correspondant->values;
+	$donnees = $correspondant->donnees();
+	$form->default_values['donnees'] = $donnees;
 }
 else {
 	$form->reset();
@@ -118,6 +120,7 @@ if ($action == "create" or $action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 		'organisations' => $dico->t('Organisations'),
+		'donnees' => $dico->t('Données'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = <<<HTML
@@ -158,6 +161,53 @@ HTML;
 	$page->post_javascript[] = <<<JAVASCRIPT
 $("#select-organisation").dynamicfieldsets("#nouvelle-organisation", "organisations", {$json_organisations}, {$json_organisations_correspondants});
 JAVASCRIPT;
+
+	$donnees_options = $correspondant->options("donnees");
+	unset($donnees_options[0]);
+
+	$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Données'), 'class' => "produit-section produit-section-donnees".$hidden['donnees']))}
+<table>
+<tr>
+	<th>Type</th>
+	<th>Valeur</th>
+	<th>Statut</th>
+</tr>
+HTML;
+	$doublon = false;
+	foreach ($donnees as $id_donnee => $donnee) {
+		$class_doublon = '';
+		if ($donnee['doublon']) {
+			$class_doublon = ' class="doublon"';
+			$doublon = true;
+		}
+		$main .= <<<HTML
+<tr{$class_doublon}>
+	<td>{$form->select(array('name' => "donnees[$id_donnee][id_contacts_donnees]", 'options' => $donnees_options, 'template' => "#{field}"))}</td>
+	<td>{$form->input(array('name' => "donnees[$id_donnee][valeur]", 'template' => "#{field}"))}</td>
+	<td>{$form->select(array('name' => "donnees[$id_donnee][statut]", 'options' => $statut_options, 'template' => "#{field}"))}</td>
+</tr>
+HTML;
+	}
+	$main .= <<<HTML
+<tr>
+	<th colspan="4">Nouvelle donnée</th>
+</tr>
+<tr>
+	<td>{$form->select(array('name' => "donnees[0][id_contacts_donnees]", 'options' => $donnees_options, 'template' => "#{field}"))}</td>
+	<td>{$form->input(array('name' => "donnees[0][valeur]", 'template' => "#{field}"))}</td>
+	<td>{$form->select(array('name' => "donnees[0][statut]", 'options' => $statut_options, 'template' => "#{field}"))}</td>
+</tr>
+</table>
+HTML;
+	if ($doublon) {
+		$main .= <<<HTML
+<p class="message_error">Certaines données sont des doublons avec d'autres correspondants et ne peuvent donc pas servir à l'identification.</p>
+HTML;
+	}
+	$main .= <<<HTML
+{$form->fieldset_end()}
+HTML;
 }
 
 if ($action == "edit") {
