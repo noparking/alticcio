@@ -85,7 +85,6 @@ if ($form->is_submitted() and $form->validate()) {
 if ($action == 'edit') {
 	$form->default_values['organisation'] = $organisation->values;
 	$form->default_values['adresses'] = $organisation->adresses();
-	$form->default_values['comptes'] = $organisation->comptes();
 }
 else {
 	$form->reset();
@@ -119,7 +118,6 @@ if ($action == "create" or $action == "edit") {
 		'presentation' => $dico->t('Presentation'),
 		'correspondants' => $dico->t('Correspondants'),
 		'adresses' => $dico->t('Adresses'),
-		'comptes' => $dico->t('Comptes'),
 	);
 	// variable $hidden mise à jour dans ce snippet
 	$left = <<<HTML
@@ -134,10 +132,6 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => "Adresses", 'class' => "produit-section produit-section-adresses".$hidden['adresses']))}
 Les adresses
-{$form->fieldset_end()}
-
-{$form->fieldset_start(array('legend' => "Adresses", 'class' => "produit-section produit-section-comptes".$hidden['comptes']))}
-Les comptes
 {$form->fieldset_end()}
 HTML;
 

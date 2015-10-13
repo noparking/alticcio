@@ -43,9 +43,18 @@ SQL;
 	}
 
 	public function save($data) {
+		if (isset($data['correspondant']['password'])) {
+			if ($data['correspondant']['password']) {
+				$data['correspondant']['password'] = $this->hash_password($data['correspondant']['password']);
+				$data['correspondant']['date_password'] = time();
+			}
+			else {
+				unset($data['correspondant']['password']);
+			}
+		}
 		$id = parent::save($data);
 
-		if (isset($data['donnees'])) {
+		if (!isset($data['save_again']) and isset($data['donnees'])) {
 			foreach ($data['donnees'] as $id_donnee => $donnee) {
 				if ($id_donnee) {
 					if ($donnee['valeur']) {
@@ -57,11 +66,13 @@ valeur = '{$donnee['valeur']}',
 statut = {$donnee['statut']}
 WHERE id = {$id_donnee}
 SQL;
+						$this->sql->query($q);
 					}
 					else {
 						$q = <<<SQL
 DELETE FROM dt_contacts_correspondants_donnees WHERE id = $id_donnee
 SQL;
+						$this->sql->query($q);
 					}
 				}
 				else if ($donnee['valeur']) {
@@ -69,12 +80,22 @@ SQL;
 INSERT INTO dt_contacts_correspondants_donnees (id_contacts_correspondants, id_contacts_donnees, valeur, statut)
 VALUES ({$id}, {$donnee['id_contacts_donnees']}, '{$donnee['valeur']}', {$donnee['statut']})
 SQL;
+					$this->sql->query($q);
 				}
-				$this->sql->query($q);
 			}
 		}
 
 		return $id;
+	}
+
+	public function delete($data) {
+		if (isset($data[$this->type]['id'])) {
+			$q = <<<SQL
+DELETE FROM dt_contacts_correspondants_donnees WHERE id_contacts_correspondants = {$data[$this->type]['id']}
+SQL;
+			$this->sql->query($q);
+		}
+		parent::delete($data);
 	}
 
 	public function donnees($statut = null) {
@@ -111,6 +132,12 @@ SQL;
 		}
 
 		return $donnees;
+	}
+
+	public function hash_password($password) {
+		$salt = substr(strtr(base64_encode(openssl_random_pseudo_bytes(22)), '+', '.'), 0, 22);
+
+		return crypt($password, '$2y$12$' . $salt);
 	}
 }
 

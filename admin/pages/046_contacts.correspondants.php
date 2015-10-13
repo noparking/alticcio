@@ -92,6 +92,7 @@ if ($action == 'edit') {
 	$form->default_values['donnees'] = $donnees;
 }
 else {
+	$donnees = array();
 	$form->reset();
 }
 
@@ -132,11 +133,19 @@ HTML;
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 HTML;
 
+	$template_password = $form->template;
+	if ($correspondant->values['date_password']) {
+		$date_password = date("d/m/Y à H:i:s", $correspondant->values['date_password']);
+		$template_password = <<<HTML
+<div class="ligne_form">#{label} : #{errors}<br/> #{field} <em>(changé le {$date_password})</em><br/><span class="help_form">#{description}</span></div>
+HTML;
+	}
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
 {$form->select(array('name' => "correspondant[civilite]", 'label' => $dico->t('Civilite'), 'options' => $civilite_options))}
 {$form->input(array('name' => "correspondant[nom]", 'label' => $dico->t('Nom')))}
 {$form->input(array('name' => "correspondant[prenom]", 'label' => $dico->t('Prenom')))}
+{$form->input(array('type' => "password", 'name' => "correspondant[password]", 'label' => $dico->t('Password'), 'template' => $template_password))}
 {$form->select(array('name' => "correspondant[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
 {$form->fieldset_end()}
 
