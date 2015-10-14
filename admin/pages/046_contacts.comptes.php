@@ -134,7 +134,7 @@ HTML;
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
 {$form->input(array('name' => "compte[nom]", 'label' => $dico->t('Nom')))}
 {$form->select(array('name' => "compte[id_contacts_organisations]", 'class' => "organisation",'label' => $dico->t('Organisation'), 'options' => $organisation_options))}
-{$form->select(array('name' => "comtpe[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
+{$form->select(array('name' => "compte[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
 {$form->fieldset_end()}
 HTML;
 }
