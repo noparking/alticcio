@@ -135,9 +135,9 @@ SQL;
 	}
 
 	public function hash_password($password) {
-		$salt = substr(strtr(base64_encode(openssl_random_pseudo_bytes(22)), '+', '.'), 0, 22);
+		$salt = bin2hex(openssl_random_pseudo_bytes(22));
 
-		return crypt($password, '$2y$12$' . $salt);
+		return crypt($password, '$2y$12$'.$salt);
 	}
 }
 
