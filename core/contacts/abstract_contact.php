@@ -41,6 +41,7 @@ SQL;
 			else {
 				$fields = array();
 				$values = array();
+				unset($orga['id']);
 				foreach ($orga as $field => $value) {
 					$fields[] = $field;
 					$values[] = strpos($field, "id") === 0 ? $value : "'{$value}'";
