@@ -48,7 +48,7 @@ SQL;
 				$data['correspondant']['password'] = $this->hash_password($data['correspondant']['password']);
 				$data['correspondant']['date_password'] = time();
 			}
-			else if (!isset($data['correspondant']['id']) or !$data['correspondant']['id']) {
+			else if (isset($data['correspondant']['id']) and $data['correspondant']['id']) {
 				unset($data['correspondant']['password']);
 			}
 		}
