@@ -8,12 +8,13 @@ class Api_FilterException extends Exception {
 }
 
 class API_Filter {
-	public static function filter($data, $filter) {
+	public static function filter($data, $filter, $show = "") {
 		$filter_tree = self::tree($filter);
+		$show_tree = self::show_tree($show);
 		$filtered_data = array();
 		foreach ($data as $id => $element) {
 			if (self::pass($element, $filter_tree)) {
-				$filtered_data[$id] = $element;
+				$filtered_data[$id] = $show ? self::show($element, $show_tree) : $element;
 			}
 		}
 
