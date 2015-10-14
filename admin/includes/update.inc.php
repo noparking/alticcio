@@ -1454,3 +1454,128 @@ CREATE TABLE IF NOT EXISTS `dt_assets_targets_assets` (
 SQL;
 	$update->query($q);
 }
+
+function update_57($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_comptes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(64) NOT NULL,
+  `id_contacts_organisations` int(11) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_contacts_organisations` (`id_contacts_organisations`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_correspondants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `civilite` int(11) NOT NULL,
+  `nom` varchar(128) NOT NULL,
+  `prenom` varchar(128) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `date_password` int(11) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_correspondants_comptes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_contacts_correspondants` int(11) NOT NULL,
+  `id_contacts_comptes` int(11) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_contacts_correspondants` (`id_contacts_correspondants`,`id_contacts_comptes`)
+)
+SQL;
+	$update->query($q);
+
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_correspondants_donnees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_contacts_correspondants` int(11) NOT NULL,
+  `id_contacts_donnees` int(11) NOT NULL,
+  `valeur` varchar(512) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_contacts_correspondants` (`id_contacts_correspondants`,`id_contacts_donnees`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_donnees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(32) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+
+CREATE TABLE IF NOT EXISTS `dt_contacts_fonctions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(64) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_organisations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_contacts_organisations_types` int(11) NOT NULL,
+  `nom` varchar(32) NOT NULL,
+  `complement` varchar(64) NOT NULL,
+  `id_parent` int(11) NOT NULL,
+  `email` varchar(64) NOT NULL,
+  `www` varchar(128) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_organisations_correspondants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_contacts_organisations` int(11) NOT NULL,
+  `id_contacts_correspondants` int(11) NOT NULL,
+  `id_contacts_fonctions` int(11) NOT NULL,
+  `id_contacts_services` int(11) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_contacts_organisations` (`id_contacts_organisations`,`id_contacts_correspondants`,`id_contacts_fonctions`,`id_contacts_services`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_organisations_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(32) NOT NULL,
+  `phrase_nom` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_services` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(64) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+SQL;
+	$update->query($q);
+}
