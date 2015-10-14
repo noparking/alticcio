@@ -6,13 +6,13 @@ class API_Contact {
 		$this->sql = $api->sql;
 	}
 
-	public function check_password($id_correspondant, $hash) {
+	public function check_password($id_correspondant, $password) {
 		$q = <<<SQL
 SELECT `password` FROM dt_contacts_correspondants WHERE id = {$id_correspondant}
 SQL;
 		$res = $this->sql->query($q);
 		if ($row = $this->sql->fetch($res)) {
-			return crypt($password, $hash) == $hash;
+			return crypt($password, $row['password']) == $row['password'];
 		}
 		
 		return $false;
@@ -31,22 +31,24 @@ WHERE cd.nom = '$key' AND ccd.valeur = '$value'
 AND cd.statut = 1 AND cc.statut = 1 AND ccd.statut = 1
 SQL;
 			$res = $this->sql->query($q);
-			while ($row = this->sql->fetch($res)) {
+			while ($row = $this->sql->fetch($res)) {
 				$correspondants[$row['id']] = $row['id'];
 			}
-
-			return $correspondants;
+		}
+		
+		return $correspondants;
 	}
 
 	public function find_account($id_correspondant) {
 		$comptes = array();
 		$q = <<<SQL
-SELECT id_contacts_comptes AS id FROM dt_contacts_correspondants_comptes
-WHERE id_contacts_correspondants = $id_correspondant AND statut = 1
+SELECT cc.id, cc.nom FROM dt_contacts_correspondants_comptes AS ccc
+INNER JOIN dt_contacts_comptes AS cc ON cc.id = ccc.id_contacts_comptes
+WHERE id_contacts_correspondants = $id_correspondant AND cc.statut = 1 AND ccc.statut = 1
 SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
-			$comptes[$row['id']] = $row['id'];
+			$comptes[$row['id']] = $row['nom'];
 		}
 
 		return $comptes;
@@ -54,7 +56,7 @@ SQL;
 
 	public function infos($id_correspondant, $id_compte) {
 		$q = <<<SQL
-SELECT cpt.id, cc.nom, cc.prenom, cpt.nom AS compte, co.nom AS organisation,
+SELECT cpt.id, cc.nom, cc.prenom, cpt.nom AS compte, co.nom AS organisation_nom,
 co.email AS organisation_email, co.www AS organisation_www,
 cd.nom AS donnee_nom, ccd.valeur AS donnee_valeur
 FROM dt_contacts_correspondants_comptes AS ccc
@@ -70,7 +72,7 @@ SQL;
 		$res = $this->sql->query($q);
 		while ($row = $this->sql->fetch($res)) {
 			if (!isset($infos[$row['id']])) {
-				$infos[$row['id']] = array(
+				$infos = array(
 					'organisation' => array(
 						'nom' => $row['organisation_nom'],
 						'email' => $row['organisation_email'],
