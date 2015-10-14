@@ -43,7 +43,7 @@ SQL;
 				$values = array();
 				foreach ($orga as $field => $value) {
 					$fields[] = $field;
-					$values[] = "'{$value}'";
+					$values[] = strpos($field, "id_") === 0 ? "'{$value}'";
 				}
 				$fields_list = implode(",", $fields);
 				$values_list = implode(",", $values);
