@@ -178,6 +178,8 @@ switch($action) {
 		$page->javascript[] = $config->core_media("filter-edit.js");
 		$titre_page = $dico->t('ListeOfComptes');
 		$pager = new Pager($sql, array(20, 30, 50, 100, 200));
+		$correspondants_options = $compte->options("correspondants", "CONCAT(nom, ' ', prenom)");
+		unset($correspondants_options[0]);
 		$filter = new Filter($pager, array(
 			'id' => array(
 				'title' => 'ID',
@@ -198,7 +200,7 @@ switch($action) {
 				'title' => $dico->t('Correspondants'),
 				'type' => 'select',
 				'field' => "cc.id",
-				'options' => $correspondant_options,
+				'options' => $correspondants_options,
 			),
 			'statut' => array(
 				'title' => $dico->t('Active'),
