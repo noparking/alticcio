@@ -185,11 +185,16 @@ $menus = array(
 				),
 			),
 
-			'contacts' => array(
-				'label' => $dico->t("Contacts"),
+			'customers' => array(
+				'label' => $dico->t("Clients"),
 				//'url' => '';
-				'level' => 99,
+				'level' => 30,
 				'items' => array(
+					'commandes' => array(
+						'level' => 30,
+						'label' => $dico->t('Commandes'),
+						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
+					),
 					'organisations' => array(
 						'level' => 99,
 						'label' => $dico->t('Organisations'),
@@ -204,19 +209,6 @@ $menus = array(
 						'level' => 99,
 						'label' => $dico->t('Comptes'),
 						'url' => $url2->make("Contacts", array('type' => "comptes", 'action' => "", 'id' => "")),
-					),
-				),
-			),
-			
-			'customers' => array(
-				'label' => $dico->t("Clients"),
-				//'url' => '';
-				'level' => 30,
-				'items' => array(
-					'commandes' => array(
-						'level' => 30,
-						'label' => $dico->t('Commandes'),
-						'url' => $url->make("Commandes", array('action' => "", 'id' => "")),
 					),
 				),
 			),
