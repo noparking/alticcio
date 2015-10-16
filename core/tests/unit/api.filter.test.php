@@ -45,6 +45,15 @@ class TestOfApiFilter extends UnitTestCase {
 
 		$tree = API_Filter::tree($get);
 		$this->assertEqual($tree, $expected);
+
+		$get = array(
+  			'toto' => true,
+			'toto:titi' => "a", 
+			'toto:tata' => "b",
+		);
+
+		$tree = API_Filter::tree($get);
+		$this->assertEqual($tree, $expected);
 	}
 
 	function test_tokenize_pattern() {
@@ -562,6 +571,37 @@ class TestOfApiFilter extends UnitTestCase {
 					'titi' => array('b' => "B"),
 				),
 			),
+		);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
+
+		$data = array(
+			array(
+				'toto' => array(
+					'titi' => array('a' => "A"),
+				),
+			),
+			array(
+				'toto' => array(
+					'titi' => array('a' => "B"),
+				),
+			),
+		);
+		$filter = array(
+			'toto.titi.a' => "B",
+		);
+		$expected = array(
+			1 => array(
+				'toto' => array(
+					'titi' => array('a' => "B"),
+				),
+			),
+		);
+		$filtered = API_Filter::filter($data, $filter);
+		$this->assertEqual($filtered, $expected);
+
+		$filter = array(
+			'toto.titi' => "B",
 		);
 		$filtered = API_Filter::filter($data, $filter);
 		$this->assertEqual($filtered, $expected);

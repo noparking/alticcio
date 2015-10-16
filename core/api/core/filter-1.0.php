@@ -24,6 +24,7 @@ class API_Filter {
 	public static function tree($filter) {
 		$tree = array();
 		foreach ($filter as $key => $value) {
+			$key = preg_replace("/[.:]+/", ".", $key);
 			$keys = explode(".", $key, 2);
 			if (isset($keys[1])) {
 				$sub_tree = self::tree(array($keys[1] => $value));
@@ -242,7 +243,6 @@ class API_Filter {
 	}
 
 	private static function apply($key, $values, $condition) {
-		
 		if (preg_match("/^([\[\]])([^\]]+),([^\]]+)([\[\]])$/", $condition, $matches)) {
 			$value = $values;
 			$first = $matches[1];
