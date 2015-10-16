@@ -1,6 +1,6 @@
 <?php
 
-$menu->current('main/contacts/comptes');
+$menu->current('main/customers/comptes');
 
 $config->core_include("outils/form", "outils/mysql", "contacts/comptes", "contacts/organisations");
 $config->core_include("outils/filter", "outils/pager", "outils/langue");

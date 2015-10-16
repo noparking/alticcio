@@ -1,6 +1,6 @@
 <?php
 
-$menu->current('main/contacts/correspondants');
+$menu->current('main/customers/correspondants');
 
 $config->core_include("outils/form", "outils/mysql", "contacts/correspondants");
 $config->core_include("outils/filter", "outils/pager", "outils/langue");

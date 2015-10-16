@@ -1,6 +1,6 @@
 <?php
 
-$menu->current('main/contacts/organisations');
+$menu->current('main/customers/organisations');
 
 $config->core_include("outils/form", "outils/mysql", "contacts/organisations");
 $config->core_include("outils/filter", "outils/pager", "outils/langue", "database/tools");
