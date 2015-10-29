@@ -6,6 +6,8 @@ class API_Contact {
 		$this->sql = $api->sql;
 	}
 
+	// TODO ces méthodes sont maintenant dans core/contacts/comptes
+	// Supprimer la dupplication de code en utilisant cet objet
 	public function check_password($id_correspondant, $password) {
 		$q = <<<SQL
 SELECT `password` FROM dt_contacts_correspondants WHERE id = {$id_correspondant}
