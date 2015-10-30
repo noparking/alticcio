@@ -1,6 +1,6 @@
 <?php
 
-class Routing {
+class Router {
 
 	public $routes = array();
 	public $data = array();

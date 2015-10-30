@@ -1,21 +1,32 @@
 <?php
 
-require dirname(__FILE__)."/routing.class.php";
+require dirname(__FILE__)."/router.class.php";
 
 class Http {
-	public $root_dir;
+	public $root_dirs;
 	public $base_url;
 	public $media_url;
 	public $config = array();
 	public $vars = array();
+	public $control_vars = array();
+	public $url_vars = array();
+
 	public $post = array();
 	public $post_session = "";
 
-// TODO : gérer un default_control et un global_control(?), pareil pour les view
-// But : avoir des controler et des vue commun à plusieurs sites
-	function __construct($root_dir = null) {
-		$this->root_dir = $root_dir ? $root_dir : dirname(__FILE__)."/..";
+	function __construct($root_dirs = null) {
+		$this->root_dirs = $root_dirs ? (is_array($root_dirs) ? $root_dirs : array($root_dirs)) : array(dirname(__FILE__)."/..");
 		$this->post = $_POST;
+	}
+
+	public function path($file) {
+		foreach ($this->root_dirs as $root_dir) {
+			if (file_exists($root_dir.$file)) {
+				return $root_dir.$file;
+			}
+		}
+
+		return $file;
 	}
 
 	public function boot($callback = null) {
@@ -23,7 +34,7 @@ class Http {
 		if ($callback) {
 			$this->control_vars = $callback();
 		}
-# TODO faire un routing pour les langues comme pour la config
+# TODO faire un router pour les langues comme pour la config
 		$this->load_control();
 	}
 
@@ -32,16 +43,17 @@ class Http {
 	}
 	
 	public function load_config() {
-		$config_dir = $this->root_dir."/config/";
 		$data = $_SERVER;
-		include $config_dir."routing.php";
-		$routing = new Routing($routes, $data);
-		$config_subdir = $routing->target();
-		$this->load_config_dir($config_dir."default");
-		$this->load_config_dir($config_dir.$config_subdir);
-		$this->load_config_dir($config_dir."global");
+		include $this->path("/config/routes.php");
+		$router = new Router($routes, $data);
+		$config_subdir = $router->target();
+		$this->load_config_dir($this->path("/config/default"));
+		$this->load_config_dir($this->path("/config/".$config_subdir));
+		$this->load_config_dir($this->path("/config/global"));
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "/";
+		$this->base_url = rtrim($this->base_url, "/")."/";
 		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : "/media";
+		$this->media_url = rtrim($this->media_url, "/")."/";
 	}
 
 	public function load_config_dir($config_dir) {
@@ -61,9 +73,8 @@ class Http {
 
 	public function load_control() {
 		$base_url = $this->config('settings', 'base_url');
-		$control_dir = $this->root_dir."/control/";
 		$data = $_SERVER;
-		include $control_dir."routing.php";
+		include $this->path("/control/routes.php");
 
 		// TODO refactoriser client et serveur alias avec une méthode commune
 		if (isset($client_alias)) {
@@ -74,9 +85,9 @@ class Http {
 					'target' => $target,
 				);
 			}
-			$routing = new Routing($routes_alias, $data);
-			$routing->prefixes['REQUEST_URI'] = $base_url;
-			if ($alias = $routing->target()) {
+			$router = new Router($routes_alias, $data);
+			$router->prefixes['REQUEST_URI'] = $base_url;
+			if ($alias = $router->target()) {
 				$this->redirect($alias , 301);
 			}
 		}
@@ -89,18 +100,18 @@ class Http {
 					'target' => $target,
 				);
 			}
-			$routing = new Routing($routes_alias, $data);
-			$routing->prefixes['REQUEST_URI'] = $base_url;
-			if ($alias = $routing->target()) {
-				$data['REQUEST_URI'] = $this->link($alias);
+			$router = new Router($routes_alias, $data);
+			$router->prefixes['REQUEST_URI'] = $base_url;
+			if ($alias = $router->target()) {
+				$data['REQUEST_URI'] = $this->url($alias);
 			}
 		}
 
-		$routing = new Routing($routes, $data);
-		$routing->prefixes['REQUEST_URI'] = $base_url;
+		$router = new Router($routes, $data);
+		$router->prefixes['REQUEST_URI'] = $base_url;
 
-		$file = $routing->target();
-		$url = $routing->vars;
+		$file = $router->target();
+		$this->url_vars = $router->vars;
 	
 		foreach (array('config', 'control_vars') as $var) {
 			if (isset($this->$var) and is_array($this->$var)) {
@@ -110,7 +121,7 @@ class Http {
 			}
 		}
 
-		include $control_dir.$file;
+		include $this->path("/control/".$file);
 	}
 
 	function view($view, $var = null) {
@@ -120,7 +131,8 @@ class Http {
 			}
 		}
 		ob_start();
-		include $this->root_dir."/view/$view";
+		include $this->path("/view/$view");
+		
 		return ob_get_clean();
 	}
 
@@ -133,14 +145,35 @@ class Http {
 		return $display;
 	}
 
-	function vars($key, $view) {
+	function view_vars($key, $view) {
 		$display = "";
 		if (isset($this->vars[$key])) {
-			$method = is_array($this->vars[$key]) ? "view_each" : "view";
-			$display .= $this->$method($view, $this->vars[$key]);
+			$display = $this->view($view, array($key => $this->vars[$key]));
+		}
+		
+		return $display;
+	}
+
+	function view_each_vars($key, $view) {
+		$display = "";
+		if (isset($this->vars[$key])) {
+			if (is_array($this->vars[$key])) {
+				$array = array();
+				foreach (array_unique($this->vars[$key]) as $var) {
+					$array[] = array($key => $var);
+				}
+				$display .= $this->view_each($view, $array);
+			}
+			else {
+				$display .= $this->view($view, array($key => $this->vars[$key]));
+			}
 		}
 
 		return $display;
+	}
+
+	function control($control) {
+		return $this->path("/control/$control");
 	}
 
 	function get_in_array() {
@@ -163,15 +196,30 @@ class Http {
 		
 		return call_user_func_array(array($this, "get_in_array"), $args);
 	}
+	
+	function vars() {
+		$args = array_merge(array($this->vars), func_get_args());
+		
+		return call_user_func_array(array($this, "get_in_array"), $args);
+	}
 
-// TODO function url
+	function from_url($var) {
+		return isset($this->url_vars[$var]) ? $this->url_vars[$var] : null;
+	}
 
-	function link($url) {
+#avoir un url_add
+# et un url_change
+	function url($url = "") {
 		return $this->base_url.$url;
 	}
 
 	function media($url) {
 		return $this->media_url.$url;
+	}
+	
+	function redirect($url = "", $code = null) {
+		header("Location: {$this->url($url)}", true, $code);
+		exit;
 	}
 
 // Ci-dessous : utile ???
@@ -205,11 +253,6 @@ class Http {
 		}
 
 		return $var;
-	}
-
-	function redirect($url = "", $code = null) {
-		header("Location:	{$this->link($url)}", true, $code);
-		exit;
 	}
 
 	function post_session_start($name = "") {
