@@ -19,7 +19,7 @@ class Http {
 		$this->post = $_POST;
 	}
 
-	public function path($file) {
+	function path($file) {
 		foreach ($this->root_dirs as $root_dir) {
 			if (file_exists($root_dir.$file)) {
 				return $root_dir.$file;
@@ -29,22 +29,21 @@ class Http {
 		return $file;
 	}
 
-	public function boot($callback = null) {
+	function load($callback = null) {
 		$this->load_config();
-		if ($callback) {
-			$this->control_vars = $callback();
-		}
 # TODO faire un router pour les langues comme pour la config
 		$this->load_control();
+		$this->execute();
 	}
 
-	public function reboot() {
+	function reload() {
 		$this->load_control();
+		$this->execute();
 	}
-	
-	public function load_config() {
+
+	function load_config() {
 		$data = $_SERVER;
-		include $this->path("/config/routes.php");
+		require $this->path("/config/routes.php");
 		$router = new Router($routes, $data);
 		$config_subdir = $router->target();
 		$this->load_config_dir($this->path("/config/default"));
@@ -56,12 +55,12 @@ class Http {
 		$this->media_url = rtrim($this->media_url, "/")."/";
 	}
 
-	public function load_config_dir($config_dir) {
+	function load_config_dir($config_dir) {
 		if (is_dir($config_dir)) {
 			foreach (scandir($config_dir) as $file) {
 				$config_file = $config_dir."/".$file;
 				if (pathinfo($config_file, PATHINFO_EXTENSION) == "php") {
-					include $config_file;
+					require $config_file;
 					$var = basename($config_file, ".php");
 					if (isset($$var)) {
 						$this->config = array_replace_recursive($this->config, array($var => $$var));
@@ -71,10 +70,10 @@ class Http {
 		}
 	}
 
-	public function load_control() {
+	function load_control() {
 		$base_url = $this->config('settings', 'base_url');
 		$data = $_SERVER;
-		include $this->path("/control/routes.php");
+		require $this->path("/control/routes.php");
 
 		// TODO refactoriser client et serveur alias avec une méthode commune
 		if (isset($client_alias)) {
@@ -110,9 +109,11 @@ class Http {
 		$router = new Router($routes, $data);
 		$router->prefixes['REQUEST_URI'] = $base_url;
 
-		$file = $router->target();
+		$this->main_control = $router->target();
 		$this->url_vars = $router->vars;
-	
+	}
+
+	function execute() {
 		foreach (array('config', 'control_vars') as $var) {
 			if (isset($this->$var) and is_array($this->$var)) {
 				foreach ($this->$var as $key => $value) {
@@ -121,7 +122,25 @@ class Http {
 			}
 		}
 
-		include $this->path("/control/".$file);
+		$start = $this->control("start.php");
+		if (file_exists($start)) {
+			require $start;
+		}
+
+		require $this->control($this->main_control);
+
+		$finish = $this->control("finish.php");
+		if (file_exists($finish)) {
+			require $finish;
+		}
+	}
+
+	function control($control) {
+		return $this->path("/control/$control");
+	}
+
+	function model($model) {
+		return $this->path("/model/$model");
 	}
 
 	function view($view, $var = null) {
@@ -131,7 +150,7 @@ class Http {
 			}
 		}
 		ob_start();
-		include $this->path("/view/$view");
+		require $this->path("/view/$view");
 		
 		return ob_get_clean();
 	}
@@ -172,9 +191,7 @@ class Http {
 		return $display;
 	}
 
-	function control($control) {
-		return $this->path("/control/$control");
-	}
+#Todo parent_control() parent_view() parent_model();
 
 	function get_in_array() {
 		$args = func_get_args();
