@@ -12,6 +12,7 @@ class Http {
 	public $vars = array();
 	public $control_vars = array();
 	public $url_vars = array();
+	public $show_vars = array();
 
 	public $post = array();
 	public $post_session = "";
@@ -55,7 +56,7 @@ class Http {
 		}
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "/";
 		$this->base_url = rtrim($this->base_url, "/")."/";
-		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : "/media";
+		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : $this->base_url."medias";
 		$this->media_url = rtrim($this->media_url, "/")."/";
 	}
 
@@ -151,16 +152,21 @@ class Http {
 		return $this->path("/model/$model");
 	}
 
-	function view($view, $var = null) {
-		if (is_array($var)) {
-			foreach ($var as $subvar => $value) {
-				$$subvar = $value;
-			}
+	function view($view, $vars = array()) {
+		$show_vars = $this->show_vars;
+		$this->show_vars = $vars;
+		foreach ($vars as $subvar => $value) {
+			$$subvar = $value;
 		}
 		ob_start();
 		require $this->path("/view/$view");
+		$this->show_vars = $show_vars;
 		
 		return ob_get_clean();
+	}
+
+	function show($var) {
+		return isset($this->show_vars[$var]) ? $this->show_vars[$var] : "";
 	}
 
 	function view_each($view, $array) {
