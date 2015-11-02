@@ -1,9 +1,11 @@
 <?php
 
 require dirname(__FILE__)."/router.class.php";
+require dirname(__FILE__)."/dispacher.class.php";
 
 class Http {
-	public $root_dirs;
+	public $dispacher;
+	public $empty_file;
 	public $base_url;
 	public $media_url;
 	public $config = array();
@@ -14,20 +16,26 @@ class Http {
 	public $post = array();
 	public $post_session = "";
 
-	function __construct($root_dirs = null) {
-		$this->root_dirs = $root_dirs ? (is_array($root_dirs) ? $root_dirs : array($root_dirs)) : array(dirname(__FILE__)."/..");
+	function __construct($root_dir) {
+		$this->root_dir = $root_dir;
+		$this->empty_file = dirname(__FILE__)."/empty.php";
+		$this->dispacher = new Dispacher($root_dir);
 		$this->post = $_POST;
 	}
 
 	function path($file) {
-		foreach ($this->root_dirs as $root_dir) {
-			if (file_exists($root_dir.$file)) {
-				return $root_dir.$file;
-			}
-		}
-
-		return $file;
+		$files = $this->dispacher->paths($file);
+		return isset($files[0]) ? $files[0] : $this->root_dir.$file;
 	}
+	
+	function reverse_paths($file) {
+		$files = $this->dispacher->paths($file);
+		return isset($files[0]) ? array_reverse($files) : array($this->root_dir.$file);
+	}
+
+#TODO : delegate pour les model, control et view
+# delegate_control()
+# delegate_view()
 
 	function load($callback = null) {
 		$this->load_config();
@@ -42,13 +50,9 @@ class Http {
 	}
 
 	function load_config() {
-		$data = $_SERVER;
-		require $this->path("/config/routes.php");
-		$router = new Router($routes, $data);
-		$config_subdir = $router->target();
-		$this->load_config_dir($this->path("/config/default"));
-		$this->load_config_dir($this->path("/config/".$config_subdir));
-		$this->load_config_dir($this->path("/config/global"));
+		foreach ($this->reverse_paths("/config") as $config_dir) {
+			$this->load_config_dir($config_dir);
+		}
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "/";
 		$this->base_url = rtrim($this->base_url, "/")."/";
 		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : "/media";
@@ -76,6 +80,8 @@ class Http {
 		require $this->path("/control/routes.php");
 
 		// TODO refactoriser client et serveur alias avec une méthode commune
+		// a revoir avec la mthode route au lieu de target
+		/*
 		if (isset($client_alias)) {
 			$routes_alias = array();
 			foreach ($client_alias as $request_uri => $target) {
@@ -105,11 +111,13 @@ class Http {
 				$data['REQUEST_URI'] = $this->url($alias);
 			}
 		}
+		*/
 
 		$router = new Router($routes, $data);
 		$router->prefixes['REQUEST_URI'] = $base_url;
 
-		$this->main_control = $router->target();
+		$route = $router->route();
+		$this->main_control = $route['control'];
 		$this->url_vars = $router->vars;
 	}
 
@@ -224,11 +232,15 @@ class Http {
 		return isset($this->url_vars[$var]) ? $this->url_vars[$var] : null;
 	}
 
-#avoir un url_add
-# et un url_change
 	function url($url = "") {
 		return $this->base_url.$url;
 	}
+
+	function url_add($something) {
+#TODO Quid de la query string ?
+		return $_SERVER['REQUEST_URI']."/".$something;
+	}
+# avoir un url_change ?
 
 	function media($url) {
 		return $this->media_url.$url;

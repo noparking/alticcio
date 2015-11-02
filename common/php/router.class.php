@@ -1,5 +1,7 @@
 <?php
 
+#TODO tests à corriger
+
 class Router {
 
 	public $routes = array();
@@ -12,7 +14,7 @@ class Router {
 		$this->data = $data;
 	}
 
-	function target() {
+	function route() {
 		foreach ($this->routes as $route) {
 			$go = true;
 			$this->vars = array();
@@ -28,11 +30,7 @@ class Router {
 				}
 			}
 			if ($go) {
-				$target = $route['target'];
-				foreach ($this->vars as $key => $value) {
-					$target = str_replace("[$key]", $value, $target);
-				}
-				return $target;
+				return $route;
 			}
 		}
 	}
