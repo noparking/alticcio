@@ -12,6 +12,8 @@ class Http {
 	public $vars = array();
 	public $control_vars = array();
 	public $url_vars = array();
+	public $url_pattern = "";
+	public $view_vars = array();
 	public $show_vars = array();
 
 	public $post = array();
@@ -120,6 +122,18 @@ class Http {
 		$route = $router->route();
 		$this->main_control = $route['control'];
 		$this->url_vars = $router->vars;
+		if (isset($route['REQUEST_URI'])) {
+			$this->url_pattern = $route['REQUEST_URI'];
+		}
+		else {
+			$pos = strpos($_SERVER['REQUEST_URI'], $base_url);
+			if ($pos !== false) {
+				$this->url_pattern = substr_replace($_SERVER['REQUEST_URI'], "", $pos, strlen($base_url));
+			}
+			else {
+				$this->url_pattern = $_SERVER['REQUEST_URI'];
+			}
+		}
 	}
 
 	function execute() {
@@ -152,10 +166,14 @@ class Http {
 		return $this->path("/model/$model");
 	}
 
+	function in_views($vars) {
+		$this->view_vars= array_replace_recursive($this->view_vars, $vars);
+	}
+
 	function view($view, $vars = array()) {
 		$show_vars = $this->show_vars;
 		$this->show_vars = $vars;
-		foreach ($vars as $subvar => $value) {
+		foreach (array_replace_recursive($this->view_vars, $vars) as $subvar => $value) {
 			$$subvar = $value;
 		}
 		ob_start();
@@ -163,10 +181,6 @@ class Http {
 		$this->show_vars = $show_vars;
 		
 		return ob_get_clean();
-	}
-
-	function show($var) {
-		return isset($this->show_vars[$var]) ? $this->show_vars[$var] : "";
 	}
 
 	function view_each($view, $array) {
@@ -222,6 +236,12 @@ class Http {
 		return $var;
 	}
 
+	function show($var) {
+		$args = array_merge(array($this->show_vars), func_get_args());
+
+		return call_user_func_array(array($this, "get_in_array"), $args);
+	}
+
 	function config() {
 		$args = array_merge(array($this->config), func_get_args());
 		
@@ -246,14 +266,23 @@ class Http {
 #TODO Quid de la query string ?
 		return $_SERVER['REQUEST_URI']."/".$something;
 	}
-# avoir un url_change ?
+
+	function url_change($vars) {
+		$url = $this->url_pattern;
+		foreach (array_replace_recursive($this->url_vars, $vars) as $key => $value) {
+			$url = str_replace("{".$key."}", $value, $url);
+		}
+
+		return $url;
+	}
 
 	function media($url) {
 		return $this->media_url.$url;
 	}
 	
-	function redirect($url = "", $code = null) {
-		header("Location: {$this->url($url)}", true, $code);
+	function redirect($param = "", $code = null) {
+		$url = is_array($param) ? $this->url_change($param) : $this->url($param);
+		header("Location: {$url}", true, $code);
 		exit;
 	}
 
