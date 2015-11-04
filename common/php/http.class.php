@@ -4,6 +4,7 @@ require dirname(__FILE__)."/router.class.php";
 require dirname(__FILE__)."/dispacher.class.php";
 
 class Http {
+	public $router;
 	public $dispacher;
 	public $empty_file;
 	public $base_url;
@@ -11,8 +12,6 @@ class Http {
 	public $config = array();
 	public $vars = array();
 	public $control_vars = array();
-	public $url_vars = array();
-	public $url_pattern = "";
 	public $view_vars = array();
 	public $show_vars = array();
 
@@ -79,8 +78,6 @@ class Http {
 
 	function load_control() {
 		$base_url = $this->config('settings', 'base_url');
-		$data = $_SERVER;
-		require $this->path("/control/routes.php");
 
 		// TODO refactoriser client et serveur alias avec une méthode commune
 		// a revoir avec la mthode route au lieu de target
@@ -116,24 +113,15 @@ class Http {
 		}
 		*/
 
-		$router = new Router($routes, $data);
+		$router = new Router();
+		$data = $_SERVER;
+		require $this->path("/control/routes.php");
+		$router->routes = $routes;
+		$router->data = $data;
 		$router->prefixes['REQUEST_URI'] = $base_url;
 
 		$route = $router->route();
 		$this->main_control = $route['control'];
-		$this->url_vars = $router->vars;
-		if (isset($route['REQUEST_URI'])) {
-			$this->url_pattern = $route['REQUEST_URI'];
-		}
-		else {
-			$pos = strpos($_SERVER['REQUEST_URI'], $base_url);
-			if ($pos !== false) {
-				$this->url_pattern = substr_replace($_SERVER['REQUEST_URI'], "", $pos, strlen($base_url));
-			}
-			else {
-				$this->url_pattern = $_SERVER['REQUEST_URI'];
-			}
-		}
 	}
 
 	function execute() {
@@ -255,7 +243,7 @@ class Http {
 	}
 
 	function from_url($var) {
-		return isset($this->url_vars[$var]) ? $this->url_vars[$var] : null;
+		return isset($this->router->vars[$var]) ? $this->router->vars[$var] : null;
 	}
 
 	function url($url = "") {
@@ -268,12 +256,9 @@ class Http {
 	}
 
 	function url_change($vars) {
-		$url = $this->url_pattern;
-		foreach (array_replace_recursive($this->url_vars, $vars) as $key => $value) {
-			$url = str_replace("{".$key."}", $value, $url);
-		}
+		$route = $this->router->apply($vars);
 
-		return $url;
+		return $route['REQUEST_URI'];
 	}
 
 	function media($url) {
