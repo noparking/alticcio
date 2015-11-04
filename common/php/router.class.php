@@ -23,8 +23,9 @@ class Router {
 					if (isset($this->prefixes[$key])) {
 						$pattern = $this->prefixes[$key].$pattern;
 					}
-					list($pattern, $value) = Router::rewrite($pattern, $this->data[$key]);
-					if (preg_match("!^$pattern$!", $value)) {
+					$value = preg_replace("!/+!", "/", $this->data[$key]);
+					$pattern = self::get_pattern($pattern);
+					if (self::match($pattern, $value)) {
 						$patterns[$key] = $pattern;
 						$values[$key] = $value;
 					}
@@ -40,8 +41,8 @@ class Router {
 				$this->route = $route;
 				foreach (array_keys($route) as $key) {
 					if (isset($this->data[$key])) {
-						$this->vars[$key] = Router::get_vars($patterns[$key], $values[$key]);
-						$this->stars[$key] = Router::get_stars($patterns[$key], $values[$key]);
+						$this->vars[$key] = self::get_vars($patterns[$key], $values[$key]);
+						$this->stars[$key] = self::get_stars($patterns[$key], $values[$key]);
 					}
 					else {
 						$this->vars[$key] = array();
@@ -70,38 +71,49 @@ class Router {
 		
 		return $route;
 	}
-
-	static function rewrite($pattern, $value) {
-		$pattern = str_replace(".", "\.", $pattern);
-		$pattern = str_replace("*", ".*", $pattern);
-		$pattern = preg_replace("!\[([^\]]+)\]!", "($1)?", $pattern);
-		$pattern = preg_replace("!\{([^\}=]+)=([^\}=]+)\}!", "$2", $pattern);
-		$pattern = preg_replace("!\{([^\}]+)\}!", "[^/]+", $pattern);
-
-		$value = preg_replace("!/+!", "/", $value);
-
-		return array($pattern, $value);
-	}
 	
-	static function get_vars($value, $pattern) {
-		$vars = array();
-var_dump($value, $pattern, Router::match($value, $pattern));
-		if ($match = Router::match($value, $pattern)) {
-			$value = $match[0];
-			$pattern = $match[1];
-			preg_match_all("!\{([^\}]+)\}!", $pattern, $matches);
-			$vars_names = array();
-			foreach ($matches[1] as $var) {
-				$explode = explode("=", $var, 2);
-				$var_name = $explode[0];
-				$var_value = isset($explode[1]) ? $explode[1] : "[^/]+";
-				$pattern = str_replace("{".$var."}", "($var_value)", $pattern);
+	static function match($pattern, $value) {
+		$pattern = self::clean_pattern($pattern);
+
+		return preg_match("!^$pattern$!", $value);
+	}
+
+	static function clean_pattern($pattern) {
+		$pattern = preg_replace("/:VAR[^:]+:/", "", $pattern);
+		$pattern = str_replace(":STAR:", "", $pattern);
+
+		return $pattern;
+	}
+
+	static function get_pattern($pattern) {
+		$regex = str_replace(".", "\.", $pattern);
+		$regex = str_replace("*", "(:STAR:.*)", $regex);
+		$regex = preg_replace("!\[([^\]]+)\]!", "($1)?", $regex);
+		$regex = preg_replace("!\{([^\}=]+)=([^\}=]+)\}!", "(:VAR$1:$2)", $regex);
+		$regex = preg_replace("!\{([^\}]+)\}!", ":VAR$1:[^/]+", $regex);
+
+		return $regex;
+	}
+
+	static function get_positions($needle, $pattern) {
+
+	}
+
+	static function get_vars($pattern, $value) {
+		$vars_positions = self::get_positions(":VAR", $pattern);
+		$vars_names = array();
+		preg_match_all("!:VAR([^:]+):!", $pattern, $matches);
+		if (isset($matches[1])) {
+			foreach ($matches[1] as $var_name) {
 				$vars_names[] = $var_name;
 			}
-var_dump($value, $pattern);
-			preg_match("!^$pattern$!", $value, $matches);
-			foreach ($vars_names as $index => $var) {
-				$vars[$var] = $matches[$index + 1];
+		}
+		$pattern = preg_replace("/:VAR[^:]+:/", "", $pattern);
+		$pattern = str_replace(":STAR:", "", $pattern);
+		$vars = array();
+		if (preg_match("!^$pattern$!", $value, $matches)) {
+			foreach ($vars_positions as $pos) {
+				$matches[$pos];
 			}
 		}
 

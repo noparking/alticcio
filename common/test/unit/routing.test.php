@@ -5,47 +5,47 @@ require_once('../../php/router.class.php');
 
 class TestRouter extends UnitTestCase {
 	
-	function test_rewrite() {
+	function test_match() {
 		$pattern = "/toto/titi";
 		$value = "/toto/titi";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
-
-		$pattern = "/toto/titi/tata";
-		$value = "/toto///titi//tata";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertTrue(Router::match($pattern, $value));
 
 		$pattern = "/toto/*";
 		$value = "/toto/titi/tata";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertTrue(Router::match($pattern, $value));
 
 		$pattern = "/toto/{titi}/tata";
 		$value = "/toto/TITI/tata";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertTrue(Router::match($pattern, $value));
 
 		$pattern = "/toto/{titi=TITI}/tata";
 		$value = "/toto/TITI/tata";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertTrue(Router::match($pattern, $value));
 
 		$pattern = "/toto/{titi=TOTO}/tata";
 		$value = "/toto/TITI/tata";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertFalse(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertFalse(Router::match($pattern, $value));
 
 		$pattern = "/toto/titi[/tata]";
 		$value = "/toto/titi";
-		list($pattern, $value) = Router::rewrite($pattern, $value);
-		$this->assertTrue(preg_match("!^$pattern$!", $value));
+		$pattern = Router::get_pattern($pattern);
+		$this->assertTrue(Router::match($pattern, $value));
+	}
+
+	function test_get_positions() {
+
 	}
 
 	function test_get_vars() {
 		$pattern = "/toto/{foo}/titi/{bar}/tutu";
 		$value = "/toto/FOO/titi/BAR/tutu";
-		$vars = Router::get_vars($value, $pattern);
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_vars($pattern, $value);
 		$expected = array(
 			'foo' => "FOO",
 			'bar' => "BAR",
