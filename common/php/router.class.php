@@ -1,5 +1,7 @@
 <?php
 
+#TODO : jeter une exception si pattern mal formé ?
+
 class Router {
 
 	public $routes = array();
@@ -141,7 +143,7 @@ class Router {
 			foreach ($vars_positions as $pos) {
 				$var_name = $vars_names[$i];
 				$i++;
-				$vars[$var_name] = $matches[$pos];
+				$vars[$var_name] = isset($matches[$pos]) ? $matches[$pos] : null;
 			}
 		}
 
