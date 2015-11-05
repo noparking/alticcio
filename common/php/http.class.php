@@ -120,9 +120,10 @@ class Http {
 		$this->router->routes = $routes;
 		$this->router->data = $data;
 		$this->router->prefixes['REQUEST_URI'] = $base_url;
-
-		$route = $this->router->route();
+		$this->router->route();
 		$this->url_vars = isset($this->router->vars['REQUEST_URI']) ? $this->router->vars['REQUEST_URI'] : array();
+		$this->router->associate_vars("REQUEST_URI", "control");
+		$route = $this->router->apply();
 		$this->main_control = $route['control'];
 	}
 
