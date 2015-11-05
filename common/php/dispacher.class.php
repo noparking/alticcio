@@ -10,6 +10,9 @@ class Dispacher {
 
 	function add_dir($dir) {
 		$this->dirs[] = $dir;
+		if (is_dir($dir."/default")) {
+			$this->add_dir($dir."/default");
+		}
 		if (is_file($dir."/config/dependencies.php")) {
 			require $dir."/config/dependencies.php";
 			foreach ($dependencies as $dependency) {
