@@ -38,7 +38,19 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_get_positions() {
+		$pattern = "/(toto)/((titi)/(titi))/(tutu)";
 
+		$positions = Router::get_positions("toto", $pattern);
+		$this->assertEqual(array(1), $positions); 
+		
+		$positions = Router::get_positions("titi", $pattern);
+		$this->assertEqual(array(3, 4), $positions); 
+
+		$positions = Router::get_positions("tutu", $pattern);
+		$this->assertEqual(array(5), $positions); 
+
+		$positions = Router::get_positions("tata", $pattern);
+		$this->assertEqual(array(), $positions);
 	}
 
 	function test_get_vars() {
@@ -50,7 +62,74 @@ class TestRouter extends UnitTestCase {
 			'foo' => "FOO",
 			'bar' => "BAR",
 		);
+		$this->assertEqual($expected, $vars);
 
+		$pattern = "/toto/[{foo}/titi]/{bar}/tutu";
+		$value = "/toto//BAR/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_vars($pattern, $value);
+		$expected = array(
+			'foo' => "",
+			'bar' => "BAR",
+		);
+		$this->assertEqual($expected, $vars);
+
+		$pattern = "/toto/{foo=FOO}/titi/{bar}/tutu";
+		$value = "/toto/FOO/titi/BAR/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_vars($pattern, $value);
+		$expected = array(
+			'foo' => "FOO",
+			'bar' => "BAR",
+		);
+		$this->assertEqual($expected, $vars);
+
+		$pattern = "/toto[/titi]/{foo}/*";
+		$value = "/toto/FOO/titi/BAR/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_vars($pattern, $value);
+		$expected = array(
+			'foo' => "FOO",
+		);
+		$this->assertEqual($expected, $vars);
+	}
+
+	function test_get_stars() {
+		$pattern = "/toto/*";
+		$value = "/toto/titi/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_stars($pattern, $value);
+		$expected = array(
+			'titi/tutu',
+		);
+		$this->assertEqual($expected, $vars);
+
+		$pattern = "/toto/*/*";
+		$value = "/toto/titi/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_stars($pattern, $value);
+		$expected = array(
+			'titi',
+			'tutu',
+		);
+		$this->assertEqual($expected, $vars);
+
+		$pattern = "/toto/*/{tutu}";
+		$value = "/toto/titi/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_stars($pattern, $value);
+		$expected = array(
+			'titi',
+		);
+		$this->assertEqual($expected, $vars);
+
+		$pattern = "/toto[/tata]/*/{tutu}";
+		$value = "/toto/titi/tutu";
+		$pattern = Router::get_pattern($pattern);
+		$vars = Router::get_stars($pattern, $value);
+		$expected = array(
+			'titi',
+		);
 		$this->assertEqual($expected, $vars);
 	}
 
@@ -242,7 +321,7 @@ class TestRouter extends UnitTestCase {
 		$this->assertEqual("default_route", $route['target']);
 	}
 
-	function Xtest_route__with_vars() {
+	function test_route__with_vars() {
 		$routes = array(
 			array(
 				'REQUEST_URI' => "/foo/bar",
@@ -261,6 +340,10 @@ class TestRouter extends UnitTestCase {
 				'target' => "route_3"
 			),
 			array(
+				'REQUEST_URI' => "/asuivre/{suite=*}",
+				'target' => "route_4"
+			),
+			array(
 				'REQUEST_URI' => "/special/{action}/{id}",
 				'target' => "special_{action}_{id}"
 			),
@@ -275,26 +358,32 @@ class TestRouter extends UnitTestCase {
 		$router->data['REQUEST_URI'] = "/foo/42";
 		$route = $router->route();
 		$this->assertEqual("route_2", $route['target']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/foo/no";
 		$route = $router->route();
 		$this->assertEqual("route_2", $route['target']);
-		$this->assertEqual("no", $router->vars['id']);
+		$this->assertEqual("no", $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/bar/edit/42";
 		$route = $router->route();
 		$this->assertEqual("route_3", $route['target']);
-		$this->assertEqual("edit", $router->vars['action']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual("edit", $router->vars['REQUEST_URI']['action']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
+
+		$router->data['REQUEST_URI'] = "/asuivre/voici/la/suite";
+		$route = $router->route();
+		$this->assertEqual("route_4", $route['target']);
+		$this->assertEqual("voici/la/suite", $router->vars['REQUEST_URI']['suite']);
 
 		$router->data['REQUEST_URI'] = "/special/edit/42";
 		$route = $router->route();
-		$route = $router->apply($route);
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("special_edit_42", $route['target']);
 	}
 
-	function Xtest_route__with_particular_vars() {
+	function test_route__with_particular_vars() {
 		$routes = array(
 			array(
 				'REQUEST_URI' => "/foo/bar",
@@ -330,27 +419,37 @@ class TestRouter extends UnitTestCase {
 
 		$router->data['REQUEST_URI'] = "/foo/42";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("route_2", $route['target']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/foo/43";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("default_route", $route['target']);
 
 		$router->data['REQUEST_URI'] = "/bar/edit/42";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("route_3", $route['target']);
-		$this->assertEqual("edit", $router->vars['action']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual("edit", $router->vars['REQUEST_URI']['action']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/bar/delete/42";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("route_3", $route['target']);
-		$this->assertEqual("delete", $router->vars['action']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual("delete", $router->vars['REQUEST_URI']['action']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/bar/discard/42";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$route = $router->apply();
 		$this->assertEqual("default_route", $route['target']);
 
 		$router->data['REQUEST_URI'] = "/bar/edit/43";
@@ -359,32 +458,37 @@ class TestRouter extends UnitTestCase {
 
 		$router->data['REQUEST_URI'] = "/etc/blabla";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
 		$route = $router->apply();
 		$this->assertEqual("etc_blabla", $route['target']);
-		$this->assertEqual("blabla", $router->vars['suite']);
+		$this->assertEqual("blabla", $router->vars['target']['suite']);
 
 		$router->data['REQUEST_URI'] = "/etc/bla/bla/bla";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
 		$route = $router->apply();
 		$this->assertEqual("etc_bla/bla/bla", $route['target']);
-		$this->assertEqual("bla/bla/bla", $router->vars['suite']);
+		$this->assertEqual("bla/bla/bla", $router->vars['target']['suite']);
 
 		$router->data['REQUEST_URI'] = "/etc/";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
 		$route = $router->apply();
 		$this->assertEqual("etc_", $route['target']);
-		$this->assertEqual("", $router->vars['suite']);
+		$this->assertEqual("", $router->vars['target']['suite']);
 
 		$router->data['HTTP_HOST'] = "example.com";
 		$router->data['REQUEST_URI'] = "/toto/titi";
 		$route = $router->route();
+		$router->associate_vars("REQUEST_URI", "target");
+		$router->associate_vars("HTTP_HOST", "target");
 		$route = $router->apply();
 		$this->assertEqual("toto_titi_example.com", $route['target']);
-		$this->assertEqual("example.com", $router->vars['host']);
-		$this->assertEqual("titi", $router->vars['suite']);
+		$this->assertEqual("example.com", $router->vars['target']['host']);
+		$this->assertEqual("titi", $router->vars['target']['suite']);
 	}
 
-	function Xtest_route__with_prefix() {
+	function test_route__with_prefix() {
 		$routes = array(
 			array(
 				'REQUEST_URI' => "/foo/{id}",
@@ -402,16 +506,16 @@ class TestRouter extends UnitTestCase {
 		$router->data['REQUEST_URI'] = "/mon/prefix/foo/42";
 		$route = $router->route();
 		$this->assertEqual("route_1", $route['target']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 
 		$router->data['REQUEST_URI'] = "/mon/prefix/bar/edit/42";
 		$route = $router->route();
 		$this->assertEqual("route_2", $route['target']);
-		$this->assertEqual("edit", $router->vars['action']);
-		$this->assertEqual(42, $router->vars['id']);
+		$this->assertEqual("edit", $router->vars['REQUEST_URI']['action']);
+		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
 	}
 
-	function Xtest_route__with_optional_part() {
+	function test_route__with_optional_part() {
 		$routes = array(
 			array(
 				'REQUEST_URI' => "/foo[/bar]",
@@ -475,7 +579,7 @@ class TestRouter extends UnitTestCase {
 		$this->assertEqual("route_1", $route['target']);
 	}
 
-	function Xtest_route__with_vars_substitutions() {
+	function test_route__with_vars_substitutions() {
 		$routes = array(
 			array(
 				'REQUEST_URI' => "/foo/{bar}/{baz}/*",

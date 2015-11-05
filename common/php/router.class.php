@@ -56,17 +56,28 @@ class Router {
 		return $this->route;
 	}
 
+	function associate_vars($src, $dest) {
+		if (isset($this->vars[$src])) {
+			$this->vars[$dest] = isset($this->vars[$dest]) ? array_merge($this->vars[$dest], $this->vars[$src]) : $this->vars[$src];
+		}
+	}
+
 	function apply($vars = array()) {
-		$vars = array_replace_recursive($this->vars, $vars);
 		$route = array();
 		foreach (array_keys($this->route) as $key) {
+			$used_vars = $vars;
+			if (isset($this->vars[$key])) {
+				$used_vars = array_replace_recursive($this->vars[$key], $used_vars);
+			}
 			$route[$key] = $this->route[$key];
 			if (strpos($route[$key], "{")) {
-				foreach ($vars as $var => $var_value) {
-					$route[$key] = str_replace("{".$var."}", $var_value, $route[$key]);
+				foreach ($used_vars as $var => $var_value) {
+					$route[$key] = preg_replace("!\{".$var."(=[^\}]+)?\}!", $var_value, $route[$key]);
 				}
 			}
-			$route[$key] =  vsprintf(str_replace("*", "%s", $route[$key]), $this->stars);
+			if (isset($this->stars[$key])) {
+				$route[$key] =  vsprintf(str_replace("*", "%s", $route[$key]), $this->stars[$key]);
+			}
 		}
 		
 		return $route;
@@ -90,13 +101,28 @@ class Router {
 		$regex = str_replace("*", "(:STAR:.*)", $regex);
 		$regex = preg_replace("!\[([^\]]+)\]!", "($1)?", $regex);
 		$regex = preg_replace("!\{([^\}=]+)=([^\}=]+)\}!", "(:VAR$1:$2)", $regex);
-		$regex = preg_replace("!\{([^\}]+)\}!", ":VAR$1:[^/]+", $regex);
+		$regex = preg_replace("!\{([^\}]+)\}!", "(:VAR$1:[^/]+)", $regex);
 
 		return $regex;
 	}
 
 	static function get_positions($needle, $pattern) {
+		$last_pos = 0;
+		$positions = array();
+		$length = strlen($needle);
+		$i = 1;
+		while (($last_pos = strpos($pattern, "(", $last_pos)) !== false) {
+			if (substr($pattern, $last_pos + 1, $length) == $needle) {
+				$positions[] = $i;
+				$last_pos = $last_pos + $length;
+			}
+			else {
+				$last_pos++;
+			}
+			$i++;
+		}
 
+		return $positions;
 	}
 
 	static function get_vars($pattern, $value) {
@@ -108,63 +134,30 @@ class Router {
 				$vars_names[] = $var_name;
 			}
 		}
-		$pattern = preg_replace("/:VAR[^:]+:/", "", $pattern);
-		$pattern = str_replace(":STAR:", "", $pattern);
+		$pattern = self::clean_pattern($pattern);
 		$vars = array();
 		if (preg_match("!^$pattern$!", $value, $matches)) {
+			$i = 0;
 			foreach ($vars_positions as $pos) {
-				$matches[$pos];
+				$var_name = $vars_names[$i];
+				$i++;
+				$vars[$var_name] = $matches[$pos];
 			}
 		}
 
 		return $vars;
 	}
 
-
-
-	// TODO : à supprimer
-	function old_match() {
-		$pattern = str_replace(".", "\.", $pattern);
-		$pattern = str_replace("*", "({STAR}.*)", $pattern);
-		$pattern = preg_replace("!\[([^\]]+)\]!", "($1)?", $pattern);
-		preg_match_all("!\{([^\}]+)\}!", $pattern, $matches);
-		$vars = array();
-		foreach ($matches[1] as $var) {
-			$explode = explode("=", $var, 2);
-			$var_name = $explode[0];
-			$var_value = isset($explode[1]) ? $explode[1] : "[^/]+";
-			$pattern = str_replace("{".$var."}", "({VAR}$var_value)", $pattern);
-			$vars[] = $var_name;
-		}
-		preg_match_all("!\([^\)]*\)!", $pattern, $matches);
-		$vars_pos = array();
-		$stars_pos = array();
-		if (isset($matches[1])) {
-			$i = 1;
-			foreach ($matches[1] as $bracket) {
-				if (strpos($bracket, "{VAR}") === 0) {
-					$vars_pos[] = $i;
-				}
-				else if (strpos($bracket, "{STAR}") === 0) {
-					$stars_pos[] = $i;
-				}
-				$i++;
-			}
-			$pattern = str_replace("{VAR}", "", $pattern);
-			$pattern = str_replace("{STAR}", "", $pattern);
-		}
-		$value = preg_replace("!/+!", "/", $value);
+	static function get_stars($pattern, $value) {
+		$stars_positions = self::get_positions(":STAR", $pattern);
+		$pattern = self::clean_pattern($pattern);
+		$stars = array();
 		if (preg_match("!^$pattern$!", $value, $matches)) {
-			foreach ($vars as $index => $var) {
-				$this->vars[$var] = $matches[$vars_pos[$index]];
+			foreach ($stars_positions as $pos) {
+				$stars[] = $matches[$pos];
 			}
-			foreach ($stars_pos as $pos) {
-				$this->stars[] = $matches[$pos];
-			}
-			return true;
 		}
 
-		return false;
-
+		return $stars;
 	}
 }
