@@ -11,6 +11,7 @@ class Http {
 	public $media_url;
 	public $config = array();
 	public $vars = array();
+	public $url_vars = array();
 	public $control_vars = array();
 	public $view_vars = array();
 	public $show_vars = array();
@@ -113,14 +114,15 @@ class Http {
 		}
 		*/
 
-		$router = new Router();
+		$this->router = new Router();
 		$data = $_SERVER;
 		require $this->path("/control/routes.php");
-		$router->routes = $routes;
-		$router->data = $data;
-		$router->prefixes['REQUEST_URI'] = $base_url;
+		$this->router->routes = $routes;
+		$this->router->data = $data;
+		$this->router->prefixes['REQUEST_URI'] = $base_url;
 
-		$route = $router->route();
+		$route = $this->router->route();
+		$this->url_vars = isset($this->router->vars['REQUEST_URI']) ? $this->router->vars['REQUEST_URI'] : array();
 		$this->main_control = $route['control'];
 	}
 
@@ -243,22 +245,16 @@ class Http {
 	}
 
 	function from_url($var) {
-		return isset($this->router->vars[$var]) ? $this->router->vars[$var] : null;
+		return $this->get_in_array($this->url_vars, $var);
 	}
 
-	function url($url = "") {
-		return $this->base_url.$url;
-	}
-
-	function url_add($something) {
 #TODO Quid de la query string ?
-		return $_SERVER['REQUEST_URI']."/".$something;
-	}
-
-	function url_change($vars) {
-		$route = $this->router->apply($vars);
-
-		return $route['REQUEST_URI'];
+#TODO ajouter un array en second paramètre pour prendre des valeurs par défaut de variable si elle n'existe pas
+	function url($url = "") {
+		foreach ($this->url_vars as $key => $value) {
+			$url = str_replace("{".$key."}", $value, $url);
+		}
+		return $this->base_url.$url;
 	}
 
 	function media($url) {
