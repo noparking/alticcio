@@ -27,6 +27,9 @@ class Http {
 	}
 
 	function path($file) {
+		if ($file[0] != "/") {
+			$file = "/".$file;
+		}
 		$files = $this->dispatcher->paths($file);
 		return isset($files[0]) ? $files[0] : $this->root_dir.$file;
 	}
@@ -163,6 +166,15 @@ class Http {
 		$this->view_vars= array_replace_recursive($this->view_vars, $vars);
 	}
 
+#TODO plusieurs façon d'urtiliser les variables :
+# array('toto' => "TOTO")  substitution
+# array('$toto' => "TOTO") variable
+# ou alors, second tableau pour les substitutions
+# ou alors, substitution si la vue ne se termine pas par .php
+# si .php => second tableau éventuel pour substitutions
+# si pas .php => second tableau ou premier si pas de second pour substitutions
+# TODO avoir un _view() sans fléxibilité sur les paramètres (usage interne) 
+# view sera la version "smart" qui appelra _view après analyse des paramètres
 	function view($view, $vars = array()) {
 		$show_vars = $this->show_vars;
 		$this->show_vars = $vars;
@@ -247,6 +259,9 @@ class Http {
 		
 		return call_user_func_array(array($this, "get_in_array"), $args);
 	}
+
+# TODO méthode url_vars('titi', 'toto') qui renvoie un tableau
+# but : pouvoir faire : list($toto, $titi) = $this->url_vars('toto', 'titi');
 
 	function from_url($var) {
 		return $this->get_in_array($this->url_vars, $var);
