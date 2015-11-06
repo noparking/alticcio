@@ -19,6 +19,8 @@ class Http {
 	public $post = array();
 	public $post_session = "";
 
+#TODO faire une méthode autoload qui charge les models à travers path
+
 	function __construct($root_dir) {
 		$this->root_dir = $root_dir;
 		$this->empty_file = dirname(__FILE__)."/empty.php";
@@ -59,7 +61,7 @@ class Http {
 		foreach ($this->reverse_paths("/config") as $config_dir) {
 			$this->load_config_dir($config_dir);
 		}
-		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "/";
+		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "";
 		$this->base_url = rtrim($this->base_url, "/")."/";
 		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : $this->base_url."medias";
 		$this->media_url = rtrim($this->media_url, "/")."/";
@@ -117,8 +119,13 @@ class Http {
 		}
 		*/
 
+#TODO : gérer la query string
+#au lieu d'un pattern (string), la route pourrait avoir un array (idée : mettre les trucs de _GET pour la route)
 		$this->router = new Router();
 		$data = $_SERVER;
+#TODO : utiliser 'path' plutôt que 'REQUEST_URI' trafiqué
+# Supprimer le principe des préfixes
+		$data['REQUEST_URI'] = preg_replace("!\?".$data['QUERY_STRING']."$!", "", $data['REQUEST_URI']);
 		require $this->path("/control/routes.php");
 		$this->router->routes = $routes;
 		$this->router->data = $data;
@@ -263,6 +270,7 @@ class Http {
 # TODO méthode url_vars('titi', 'toto') qui renvoie un tableau
 # but : pouvoir faire : list($toto, $titi) = $this->url_vars('toto', 'titi');
 
+# TODO remplacer from_url() par url_var() ?
 	function from_url($var) {
 		return $this->get_in_array($this->url_vars, $var);
 	}
@@ -289,7 +297,7 @@ class Http {
 		foreach ($this->url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
 		}
-		return $this->base_url.$url;
+		return $this->base_url.ltrim($url, "/");
 	}
 
 	function media($url) {
