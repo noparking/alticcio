@@ -21,6 +21,7 @@ class Router {
 			$patterns = array();
 			$values = array();
 			foreach ($route as $key => $pattern) {
+	# TODO : si pattern est un tableau, il faut que l'un des éléments match (OU logique)
 				if (isset($this->data[$key])) {
 					if (isset($this->prefixes[$key])) {
 						$pattern = $this->prefixes[$key].$pattern;
