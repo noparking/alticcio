@@ -1,6 +1,6 @@
 <?php
 
-class Dispacher {
+class Dispatcher {
 	public $dirs = array();
 	public $cached_files = array();
 
@@ -8,6 +8,10 @@ class Dispacher {
 		$this->add_dir($root_dir);
 	}
 
+# TODO tester l'ordre final
+# en particulier, les dépendences du default ne devrait pas passer avant les dépendences de root
+# il faut voir default comme une première dépendance implicite
+# qui passe en premier, après la première dépendance, entre la première dépendance de la première dépendance, et la seconde dépendance ?
 	function add_dir($dir) {
 		$this->dirs[] = $dir;
 		if (is_dir($dir."/default")) {

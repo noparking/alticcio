@@ -1,11 +1,11 @@
 <?php
 
 require dirname(__FILE__)."/router.class.php";
-require dirname(__FILE__)."/dispacher.class.php";
+require dirname(__FILE__)."/dispatcher.class.php";
 
 class Http {
 	public $router;
-	public $dispacher;
+	public $dispatcher;
 	public $empty_file;
 	public $base_url;
 	public $media_url;
@@ -22,17 +22,17 @@ class Http {
 	function __construct($root_dir) {
 		$this->root_dir = $root_dir;
 		$this->empty_file = dirname(__FILE__)."/empty.php";
-		$this->dispacher = new Dispacher($root_dir);
+		$this->dispatcher = new Dispatcher($root_dir);
 		$this->post = $_POST;
 	}
 
 	function path($file) {
-		$files = $this->dispacher->paths($file);
+		$files = $this->dispatcher->paths($file);
 		return isset($files[0]) ? $files[0] : $this->root_dir.$file;
 	}
 	
 	function reverse_paths($file) {
-		$files = $this->dispacher->paths($file);
+		$files = $this->dispatcher->paths($file);
 		return isset($files[0]) ? array_reverse($files) : array($this->root_dir.$file);
 	}
 
@@ -128,6 +128,8 @@ class Http {
 	}
 
 	function execute() {
+# TODO à quoi serve finalement les control_vars ?
+# Cet export de variables est-il justifié ?
 		foreach (array('config', 'control_vars') as $var) {
 			if (isset($this->$var) and is_array($this->$var)) {
 				foreach ($this->$var as $key => $value) {
@@ -211,6 +213,7 @@ class Http {
 	}
 
 #Todo parent_control() parent_view() parent_model();
+# (ou plutôt, delegate)
 
 	function get_in_array() {
 		$args = func_get_args();
@@ -251,6 +254,22 @@ class Http {
 
 #TODO Quid de la query string ?
 #TODO ajouter un array en second paramètre pour prendre des valeurs par défaut de variable si elle n'existe pas
+# Ajouter des noms de routes (en clé des tableau)
+# Supprimer le système de préfixes ? Dans ce cas, on retranche la base URL. On peut ajouter une clé url qui serait REQUEST_URI - base_url
+# Modifier la méthode url pour avoir :
+# url("/mon/url/{id}")  {id} est pris dans les variables d'url courantes
+# url("/mon/url/{id}", array('id' => 42))  {id} est pris dans le second paramètre, sinon dans les variables d'url courantes
+# url(nom_url) url de la route de clé nom_url. Les variables éventuielles sont remplacée par les valeurs des variables url courantes
+# url(nom_url, array('id' => 42)) Les valeurs des variables sont prises d'abord dans le second paramètre
+# url() c'est l'url courante telle quelle
+# url(array('id' => 42)) url courante avec cahngement de variables
+# url("+/qsd") on ajoute à l'url courante
+# url("-/qsd") on enlève le dernier élément et on ajoute à la suite
+# url("--/qsd") on enlève les deux derniers éléments et on ajoute à la suite
+# url("---/qsd") on enlève les trois derniers éléments et on ajoute à la suite
+# Pourvoir passer un second tableau pour les paramètres get ?
+# Gerer les url absolues : url("http://example.com");
+# Faire un objet spécifique ?
 	function url($url = "") {
 		foreach ($this->url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
