@@ -4,6 +4,10 @@ require dirname(__FILE__)."/router.class.php";
 require dirname(__FILE__)."/dispatcher.class.php";
 
 class Http {
+	public $clean_path = true;
+	public $trim_path = true;
+	public $redirect_path = true;
+
 	public $router;
 	public $dispatcher;
 	public $empty_file;
@@ -62,9 +66,7 @@ class Http {
 			$this->load_config_dir($config_dir);
 		}
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "";
-		$this->base_url = rtrim($this->base_url, "/")."/";
 		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : $this->base_url."medias";
-		$this->media_url = rtrim($this->media_url, "/")."/";
 	}
 
 	function load_config_dir($config_dir) {
@@ -83,8 +85,6 @@ class Http {
 	}
 
 	function load_control() {
-		$base_url = $this->config('settings', 'base_url');
-
 		// TODO refactoriser client et serveur alias avec une méthode commune
 		// a revoir avec la mthode route au lieu de target
 		/*
@@ -125,14 +125,24 @@ class Http {
 		$data = $_SERVER;
 #TODO : utiliser 'path' plutôt que 'REQUEST_URI' trafiqué
 # Supprimer le principe des préfixes
-		$data['REQUEST_URI'] = preg_replace("!\?".$data['QUERY_STRING']."$!", "", $data['REQUEST_URI']);
+		$path = preg_replace("!^{$this->base_url}!", "", $data['REQUEST_URI']);
+		$path = preg_replace("!\?{$data['QUERY_STRING']}$!", "", $path);
+		$data['row_path'] = $path;
+		if ($this->clean_path) {
+			$path = preg_replace("!/+!", "/", $path);
+		}
+		if ($this->trim_path) {
+			$path = trim($path, "/");
+		}
+#TODO : redirect si path != row_path et si option redirect_path
+		$data['path'] = $path;
+		$data['GET'] = $_GET;
 		require $this->path("/control/routes.php");
 		$this->router->routes = $routes;
 		$this->router->data = $data;
-		$this->router->prefixes['REQUEST_URI'] = $base_url;
 		$this->router->route();
-		$this->url_vars = isset($this->router->vars['REQUEST_URI']) ? $this->router->vars['REQUEST_URI'] : array();
-		$this->router->associate_vars("REQUEST_URI", "control");
+		$this->url_vars = isset($this->router->vars['path']) ? $this->router->vars['path'] : array();
+		$this->router->associate_vars("path", "control");
 		$route = $this->router->apply();
 		$this->main_control = $route['control'];
 	}
