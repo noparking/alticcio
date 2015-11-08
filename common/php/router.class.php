@@ -6,7 +6,6 @@ class Router {
 
 	public $routes = array();
 	public $data = array();
-	public $prefixes = array();
 
 	public $vars = array();
 	public $stars = array();
@@ -22,12 +21,10 @@ class Router {
 			$values = array();
 			foreach ($route as $key => $pattern) {
 	# TODO : si pattern est un tableau, il faut que l'un des éléments match (OU logique)
+	# Pour le GET...
 				if (isset($this->data[$key])) {
-					if (isset($this->prefixes[$key])) {
-						$pattern = $this->prefixes[$key].$pattern;
-					}
-					$value = preg_replace("!/+!", "/", $this->data[$key]);
 					$pattern = self::get_pattern($pattern);
+					$value = $this->data[$key];
 					if (self::match($pattern, $value)) {
 						$patterns[$key] = $pattern;
 						$values[$key] = $value;
