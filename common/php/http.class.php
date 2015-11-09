@@ -5,7 +5,7 @@ require dirname(__FILE__)."/dispatcher.class.php";
 
 class Http {
 	public $clean_path = true;
-	public $trim_path = true;
+	public $rtrim_path = true;
 	public $redirect_path = true;
 
 	public $router;
@@ -49,11 +49,18 @@ class Http {
 # delegate_control()
 # delegate_view()
 
-	function load($callback = null) {
+	function load() {
 		$this->load_config();
 # TODO faire un router pour les langues comme pour la config
 		$this->load_control();
 		$this->execute();
+	}
+	
+	function testload() {
+		$this->load_config();
+		$this->load_control();
+		header('Content-Type: text/plain; charset=utf-8');
+		die(print_r($this));
 	}
 
 	function reload() {
@@ -131,8 +138,8 @@ class Http {
 		if ($this->clean_path) {
 			$path = preg_replace("!/+!", "/", $path);
 		}
-		if ($this->trim_path) {
-			$path = trim($path, "/");
+		if ($this->rtrim_path) {
+			$path = rtrim($path, "/");
 		}
 #TODO : redirect si path != row_path et si option redirect_path
 		$data['path'] = $path;
