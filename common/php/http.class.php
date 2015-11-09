@@ -140,7 +140,7 @@ class Http {
 		require $this->path("/control/routes.php");
 		$this->router->routes = $this->routes = $routes;
 		$this->router->data = $data;
-		$this->router->route();
+		$this->route = $this->router->route();
 		$this->url_vars = isset($this->router->vars['path']) ? $this->router->vars['path'] : array();
 		$this->router->associate_vars("path", "control");
 		$route = $this->router->apply();
@@ -312,6 +312,9 @@ class Http {
 		if (isset($url->route['path'])) {
 			$url = $url->route['path'];
 		}
+		else if (isset($this->routes[$url]['path'])) {
+			$url = $this->routes[$url]['path'];
+		}
 		$url_vars = array_merge($this->url_vars, $url_vars);
 
 		$first_char = isset($url[0]) ? $url[0] : "";
@@ -321,12 +324,6 @@ class Http {
 			case "-" :
 				break;
 			default :
-				if (isset($this->routes[$url])) {
-					#route noméee
-				}
-				else {
-
-				}
 		}
 
 		foreach ($url_vars as $key => $value) {

@@ -62,4 +62,21 @@ class TestHttpUrl extends UnitTestCase {
 		$expected = "/www/toto/baz";
 		$this->assertEqual($expected, $url);
 	}
+
+	function test_url_named_route() {
+		$http = new Http("");
+		$http->base_url = "/www";
+		$http->url_vars = array('foo' => "bar");
+		$http->routes = array(
+			'url_toto' => array('path' => "/toto/{foo}"),
+		);
+		
+		$url = $http->url("url_toto");
+		$expected = "/www/toto/bar";
+		$this->assertEqual($expected, $url);
+
+		$url = $http->url("url_toto", array('foo' => "baz"));
+		$expected = "/www/toto/baz";
+		$this->assertEqual($expected, $url);
+	}
 }
