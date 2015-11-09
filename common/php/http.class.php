@@ -323,21 +323,20 @@ class Http {
 			$url = $this->routes[$url]['path'];
 		}
 		$url_vars = array_merge($this->url_vars, $url_vars);
-
-		$first_char = isset($url[0]) ? $url[0] : "";
-		switch ($first_char) {
-			case "+" :
-				break;
-			case "-" :
-				break;
-			default :
-		}
-
 		foreach ($url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
 		}
-
-		return $this->base_url.$url;
+		$first_char = isset($url[0]) ? $url[0] : "";
+		switch ($first_char) {
+			case "/" :
+				return $this->base_url.$url;
+			case "+" :
+				return $this->base_url.$url;
+			case "-" :
+				return $this->base_url.$url;
+			default :
+				return $url;
+		}
 	}
 
 	function media($url) {

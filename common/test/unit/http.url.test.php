@@ -32,6 +32,10 @@ class TestHttpUrl extends UnitTestCase {
 		$url = $http->url("/toto/titi");
 		$expected = "/www/toto/titi";
 		$this->assertEqual($expected, $url);
+
+		$url = $http->url("http://example.com/toto");
+		$expected = "http://example.com/toto";
+		$this->assertEqual($expected, $url);
 	}
 
 	function test_url_vars() {
