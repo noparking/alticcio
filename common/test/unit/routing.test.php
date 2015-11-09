@@ -488,33 +488,6 @@ class TestRouter extends UnitTestCase {
 		$this->assertEqual("titi", $router->vars['target']['suite']);
 	}
 
-	function test_route__with_prefix() {
-		$routes = array(
-			array(
-				'REQUEST_URI' => "/foo/{id}",
-				'target' => "route_1"
-			),
-			array(
-				'REQUEST_URI' => "/bar/{action}/{id}",
-				'target' => "route_2"
-			),
-		);
-		$router = new Router();
-		$router->routes = $routes;
-		$router->prefixes['REQUEST_URI'] = "/mon/prefix";
-
-		$router->data['REQUEST_URI'] = "/mon/prefix/foo/42";
-		$route = $router->route();
-		$this->assertEqual("route_1", $route['target']);
-		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
-
-		$router->data['REQUEST_URI'] = "/mon/prefix/bar/edit/42";
-		$route = $router->route();
-		$this->assertEqual("route_2", $route['target']);
-		$this->assertEqual("edit", $router->vars['REQUEST_URI']['action']);
-		$this->assertEqual(42, $router->vars['REQUEST_URI']['id']);
-	}
-
 	function test_route__with_optional_part() {
 		$routes = array(
 			array(
@@ -559,24 +532,6 @@ class TestRouter extends UnitTestCase {
 		$router->data['REQUEST_URI'] = "/foo/baz/bar";
 		$route = $router->route();
 		$this->assertEqual("default_route", $route['target']);
-	}
-
-	function test_route__with_multiple_slashes() {
-		$routes = array(
-			array(
-				'REQUEST_URI' => "/foo/bar/baz",
-				'target' => "route_1"
-			),
-			array(
-				'target' => "default_route"
-			),
-		);
-		$router = new Router();
-		$router->routes = $routes;
-
-		$router->data['REQUEST_URI'] = "/foo//bar///baz";
-		$route = $router->route();
-		$this->assertEqual("route_1", $route['target']);
 	}
 
 	function test_route__with_vars_substitutions() {

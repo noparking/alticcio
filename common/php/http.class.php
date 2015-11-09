@@ -66,7 +66,7 @@ class Http {
 			$this->load_config_dir($config_dir);
 		}
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "";
-		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : $this->base_url."medias";
+		$this->media_url = isset($this->config['settings']['media_url']) ? $this->config['settings']['media_url'] : $this->base_url."/medias";
 	}
 
 	function load_config_dir($config_dir) {
@@ -138,7 +138,7 @@ class Http {
 		$data['path'] = $path;
 		$data['GET'] = $_GET;
 		require $this->path("/control/routes.php");
-		$this->router->routes = $routes;
+		$this->router->routes = $this->routes = $routes;
 		$this->router->data = $data;
 		$this->router->route();
 		$this->url_vars = isset($this->router->vars['path']) ? $this->router->vars['path'] : array();
@@ -285,8 +285,7 @@ class Http {
 		return $this->get_in_array($this->url_vars, $var);
 	}
 
-#TODO Quid de la query string ?
-#TODO ajouter un array en second paramètre pour prendre des valeurs par défaut de variable si elle n'existe pas
+#TODO ajouter un array en second paramètre pour prendre des valeurs par défaut de variable si elle n'existe pas ou si on veut les changer
 # Ajouter des noms de routes (en clé des tableau)
 # Supprimer le système de préfixes ? Dans ce cas, on retranche la base URL. On peut ajouter une clé url qui serait REQUEST_URI - base_url
 # Modifier la méthode url pour avoir :
@@ -294,7 +293,7 @@ class Http {
 # url("/mon/url/{id}", array('id' => 42))  {id} est pris dans le second paramètre, sinon dans les variables d'url courantes
 # url(nom_url) url de la route de clé nom_url. Les variables éventuielles sont remplacée par les valeurs des variables url courantes
 # url(nom_url, array('id' => 42)) Les valeurs des variables sont prises d'abord dans le second paramètre
-# url() c'est l'url courante telle quelle
+# url() c'est l'url courante telle quelle (NON, c'est la racine. url($this) est l'url courante
 # url(array('id' => 42)) url courante avec cahngement de variables
 # url("+/qsd") on ajoute à l'url courante
 # url("-/qsd") on enlève le dernier élément et on ajoute à la suite
@@ -303,11 +302,38 @@ class Http {
 # Pourvoir passer un second tableau pour les paramètres get ?
 # Gerer les url absolues : url("http://example.com");
 # Faire un objet spécifique ?
-	function url($url = "") {
-		foreach ($this->url_vars as $key => $value) {
+
+# url($this, array(variables_url)) # url courante
+# url("", array(variables_url)) # url racine
+#TODO Quid de la query string ?
+# en passant éventuellement un second tableau en paramètre ; en se basant sur http_build_query ?
+
+	function url($url = "", $url_vars = array(), $get_vars = array()) {
+		if (isset($url->route['path'])) {
+			$url = $url->route['path'];
+		}
+		$url_vars = array_merge($this->url_vars, $url_vars);
+
+		$first_char = isset($url[0]) ? $url[0] : "";
+		switch ($first_char) {
+			case "+" :
+				break;
+			case "-" :
+				break;
+			default :
+				if (isset($this->routes[$url])) {
+					#route noméee
+				}
+				else {
+
+				}
+		}
+
+		foreach ($url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
 		}
-		return $this->base_url.ltrim($url, "/");
+
+		return $this->base_url.$url;
 	}
 
 	function media($url) {
@@ -315,7 +341,7 @@ class Http {
 	}
 	
 	function redirect($param = "", $code = null) {
-		$url = is_array($param) ? $this->url_change($param) : $this->url($param);
+		$url = is_array($param) ? $this->url($this, $param) : $this->url($param);
 		header("Location: {$url}", true, $code);
 		exit;
 	}
