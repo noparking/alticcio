@@ -10,13 +10,11 @@ class Http {
 
 	public $router;
 	public $dispatcher;
-	public $empty_file;
 	public $base_url;
 	public $media_url;
 	public $config = array();
 	public $vars = array();
 	public $url_vars = array();
-	public $control_vars = array();
 	public $view_vars = array();
 	public $show_vars = array();
 
@@ -27,7 +25,6 @@ class Http {
 
 	function __construct($root_dir) {
 		$this->root_dir = $root_dir;
-		$this->empty_file = dirname(__FILE__)."/empty.php";
 		$this->dispatcher = new Dispatcher($root_dir);
 		$this->post = $_POST;
 	}
@@ -50,7 +47,7 @@ class Http {
 	function delegate($file) {
 		$delegation_file = $this->dispatcher->delegate($file);
 
-		return $delegation_file ? $delegation_file : $this->empty_file;
+		return $delegation_file ? $delegation_file : false;
 	}
 
 	function load() {
@@ -158,16 +155,6 @@ class Http {
 	}
 
 	function execute() {
-# TODO à quoi serve finalement les control_vars ?
-# Cet export de variables est-il justifié ?
-		foreach (array('config', 'control_vars') as $var) {
-			if (isset($this->$var) and is_array($this->$var)) {
-				foreach ($this->$var as $key => $value) {
-					$$key = $value;
-				}
-			}
-		}
-
 		$start = $this->control("start.php");
 		if (file_exists($start)) {
 			require $start;
@@ -194,8 +181,6 @@ class Http {
 
 		return $class_in_config ? $this->get_class($class_in_config) : $class;
 	}
-#TODO : method get_class qui renvoie le nom d'une classe
-#On regarde dans config/classes.php
 
 	function in_views($vars) {
 		$this->view_vars= array_replace_recursive($this->view_vars, $vars);
