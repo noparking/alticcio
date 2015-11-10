@@ -126,22 +126,21 @@ class Http {
 		}
 		*/
 
-#TODO : gérer la query string
-#au lieu d'un pattern (string), la route pourrait avoir un array (idée : mettre les trucs de _GET pour la route)
+#TODO au lieu d'un pattern (string), la route pourrait avoir un array (idée : mettre les trucs de _GET pour la route)
 		$this->router = new Router();
 		$data = $_SERVER;
-#TODO : utiliser 'path' plutôt que 'REQUEST_URI' trafiqué
-# Supprimer le principe des préfixes
 		$path = preg_replace("!^{$this->base_url}!", "", $data['REQUEST_URI']);
 		$path = preg_replace("!\?{$data['QUERY_STRING']}$!", "", $path);
 		$data['row_path'] = $path;
 		if ($this->clean_path) {
 			$path = preg_replace("!/+!", "/", $path);
 		}
-		if ($this->rtrim_path) {
+		if ($this->rtrim_path and strlen($path) > 1) {
 			$path = rtrim($path, "/");
 		}
-#TODO : redirect si path != row_path et si option redirect_path
+		if ($path != $data['row_path']) {
+			$this->redirect($path, 301);
+		}
 		$data['path'] = $path;
 		$data['GET'] = $_GET;
 		require $this->path("/control/routes.php");
@@ -284,59 +283,62 @@ class Http {
 		return call_user_func_array(array($this, "get_in_array"), $args);
 	}
 
-# TODO méthode url_vars('titi', 'toto') qui renvoie un tableau
-# but : pouvoir faire : list($toto, $titi) = $this->url_vars('toto', 'titi');
-
-# TODO remplacer from_url() par url_var() ?
-	function from_url($var) {
-		return $this->get_in_array($this->url_vars, $var);
-	}
-
-#TODO ajouter un array en second paramètre pour prendre des valeurs par défaut de variable si elle n'existe pas ou si on veut les changer
-# Ajouter des noms de routes (en clé des tableau)
-# Supprimer le système de préfixes ? Dans ce cas, on retranche la base URL. On peut ajouter une clé url qui serait REQUEST_URI - base_url
-# Modifier la méthode url pour avoir :
-# url("/mon/url/{id}")  {id} est pris dans les variables d'url courantes
-# url("/mon/url/{id}", array('id' => 42))  {id} est pris dans le second paramètre, sinon dans les variables d'url courantes
-# url(nom_url) url de la route de clé nom_url. Les variables éventuielles sont remplacée par les valeurs des variables url courantes
-# url(nom_url, array('id' => 42)) Les valeurs des variables sont prises d'abord dans le second paramètre
-# url() c'est l'url courante telle quelle (NON, c'est la racine. url($this) est l'url courante
-# url(array('id' => 42)) url courante avec cahngement de variables
-# url("+/qsd") on ajoute à l'url courante
-# url("-/qsd") on enlève le dernier élément et on ajoute à la suite
-# url("--/qsd") on enlève les deux derniers éléments et on ajoute à la suite
-# url("---/qsd") on enlève les trois derniers éléments et on ajoute à la suite
-# Pourvoir passer un second tableau pour les paramètres get ?
-# Gerer les url absolues : url("http://example.com");
-# Faire un objet spécifique ?
-
-# url($this, array(variables_url)) # url courante
-# url("", array(variables_url)) # url racine
-#TODO Quid de la query string ?
-# en passant éventuellement un second tableau en paramètre ; en se basant sur http_build_query ?
-
-	function url($url = "", $url_vars = array(), $get_vars = array()) {
-		if (isset($url->route['path'])) {
-			$url = $url->route['path'];
+	function url($path = null, $url_vars = array(), $get_vars = array(), $default_get_vars = array()) {
+		$add_get = false;
+		if (is_array($path)) {
+			$default_get_vars = $get_vars;
+			$get_vars = $url_vars;
+			$url_vars = $path;
+			$path = $this->route['path'];
+			$add_get = true;
 		}
-		else if (isset($this->routes[$url]['path'])) {
-			$url = $this->routes[$url]['path'];
+		else if ($path === null) {
+			$path = $this->route['path'];
+			$add_get = true;
+		}
+		else if ($path === "") {
+			$path = $this->route['path'];
+		}
+		else if (isset($this->routes[$path]['path'])) {
+			$path = $this->routes[$path]['path'];
+		}
+		$first_char = isset($path[0]) ? $path[0] : "";
+		switch ($first_char) {
+			case "/" :
+				$url = $this->base_url.$path;
+				break;
+			case "+" :
+				$url = $this->base_url.(isset($this->route['path']) ? $this->route['path'] : "").substr($path, 1);
+				break;
+			default :
+				$url = $path;
 		}
 		$url_vars = array_merge($this->url_vars, $url_vars);
 		foreach ($url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
 		}
-		$first_char = isset($url[0]) ? $url[0] : "";
-		switch ($first_char) {
-			case "/" :
-				return $this->base_url.$url;
-			case "+" :
-				return $this->base_url.$url;
-			case "-" :
-				return $this->base_url.$url;
-			default :
-				return $url;
+		$get_vars += $default_get_vars;
+		if ($add_get) {
+			$get_vars += $_GET;
 		}
+		if (count($get_vars)) {
+			$url .= "?".http_build_query($get_vars);
+		}
+
+		return $url;
+	}
+
+	function url_var($var) {
+		return $this->get_in_array($this->url_vars, $var);
+	}
+
+	function url_vars() {
+		$vars = array();
+		foreach (func_get_args() as $var) {
+			$vars[] = $this->get_in_array($this->url_vars, $var);
+		}
+
+		return $vars;
 	}
 
 	function media($url) {
@@ -347,6 +349,25 @@ class Http {
 		$url = is_array($param) ? $this->url($this, $param) : $this->url($param);
 		header("Location: {$url}", true, $code);
 		exit;
+	}
+
+# TODO à compléter
+	function content_type($file) {
+		preg_match("/\.([^\.]+)$/", $file, $matches);
+		if (isset($matches[1])) {
+			$type = strtolower($matches[1]);
+		}
+		switch ($type) {
+			case 'css':
+				return "text/css";
+			case 'js':
+				return "application/javascript";
+			case 'pdf':
+				return "application/pdf";
+			default:
+				return "image/$type";
+
+		}
 	}
 
 // Ci-dessous : utile ???
