@@ -3,6 +3,7 @@
 class Dispatcher {
 	public $dirs = array();
 	public $cached_files = array();
+	public $delegated_files = array();
 
 	function __construct($root_dir) {
 		$this->add_dir($root_dir);
@@ -27,9 +28,15 @@ class Dispatcher {
 
 	function paths($file) {
 		if (!isset($this->cached_files[$file])) {
+			$previous = null;
 			foreach ($this->dirs as $dir) {
-				if (file_exists($dir.$file)) {
-					$this->cached_files[$file][] = $dir.$file;
+				$real_file = realpath($dir.$file);
+				if (file_exists($real_file)) {
+					$this->cached_files[$file][] = $real_file;
+					if ($previous) {
+						$this->delegated_files[$previous] = $real_file;
+					}
+					$previous = $real_file;
 				}
 			}
 			if (!isset($this->cached_files[$file])) {
@@ -38,5 +45,11 @@ class Dispatcher {
 		}
 
 		return $this->cached_files[$file];
+	}
+
+	function delegate($file) {
+		$file = realpath($file);
+
+		return isset($this->delegated_files[$file]) ? $this->delegated_files[$file] : false;
 	}
 }

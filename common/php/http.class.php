@@ -37,17 +37,21 @@ class Http {
 			$file = "/".$file;
 		}
 		$files = $this->dispatcher->paths($file);
+
 		return isset($files[0]) ? $files[0] : $this->root_dir.$file;
 	}
 	
 	function reverse_paths($file) {
 		$files = $this->dispatcher->paths($file);
+
 		return isset($files[0]) ? array_reverse($files) : array($this->root_dir.$file);
 	}
 
-#TODO : delegate pour les model, control et view
-# delegate_control()
-# delegate_view()
+	function delegate($file) {
+		$delegation_file = $this->dispatcher->delegate($file);
+
+		return $delegation_file ? $delegation_file : $this->empty_file;
+	}
 
 	function load() {
 		$this->load_config();
@@ -138,7 +142,7 @@ class Http {
 		if ($this->rtrim_path and strlen($path) > 1) {
 			$path = rtrim($path, "/");
 		}
-		if ($path != $data['row_path']) {
+		if ($path != $data['row_path'] and $this->redirect) {
 			$this->redirect($path, 301);
 		}
 		$data['path'] = $path;
@@ -184,6 +188,14 @@ class Http {
 	function model($model) {
 		return $this->path("/model/$model");
 	}
+
+	function get_class($class) {
+		$class_in_config = $this->config("classes", $class);
+
+		return $class_in_config ? $this->get_class($class_in_config) : $class;
+	}
+#TODO : method get_class qui renvoie le nom d'une classe
+#On regarde dans config/classes.php
 
 	function in_views($vars) {
 		$this->view_vars= array_replace_recursive($this->view_vars, $vars);
@@ -246,9 +258,6 @@ class Http {
 
 		return $display;
 	}
-
-#Todo parent_control() parent_view() parent_model();
-# (ou plutôt, delegate)
 
 	function get_in_array() {
 		$args = func_get_args();
