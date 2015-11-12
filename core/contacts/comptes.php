@@ -94,6 +94,7 @@ SQL;
 	public function infos($id_correspondant, $id_compte) {
 		$q = <<<SQL
 SELECT cpt.id, cc.nom, cc.prenom, cpt.nom AS compte, co.nom AS organisation_nom,
+cpt.id_contacts_organisations,
 co.email AS organisation_email, co.www AS organisation_www,
 cd.nom AS donnee_nom, ccd.valeur AS donnee_valeur
 FROM dt_contacts_correspondants_comptes AS ccc
@@ -111,6 +112,7 @@ SQL;
 			if (!isset($infos[$row['id']])) {
 				$infos = array(
 					'organisation' => array(
+						'id' => $row['id_contacts_organisations'],
 						'nom' => $row['organisation_nom'],
 						'email' => $row['organisation_email'],
 						'www' => $row['organisation_www'],
