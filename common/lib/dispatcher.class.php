@@ -46,7 +46,7 @@ class Dispatcher {
 
 		return $this->cached_files[$file];
 	}
-
+	
 	function delegate($file) {
 		$file = realpath($file);
 

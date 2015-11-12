@@ -1,7 +1,7 @@
 <?php
 
 require_once('../simpletest/autorun.php');
-require_once('../../php/http.class.php');
+require_once('../../lib/http.class.php');
 
 class TestHttpUrl extends UnitTestCase {
 	function test_url() {

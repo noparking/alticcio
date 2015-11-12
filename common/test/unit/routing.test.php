@@ -1,7 +1,7 @@
 <?php
 
 require_once('../simpletest/autorun.php');
-require_once('../../php/router.class.php');
+require_once('../../lib/router.class.php');
 
 class TestRouter extends UnitTestCase {
 	

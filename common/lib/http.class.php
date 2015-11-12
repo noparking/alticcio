@@ -21,6 +21,8 @@ class Http {
 	public $post = array();
 	public $post_session = "";
 
+	public $current_input = null;
+
 #TODO faire une méthode autoload qui charge les models à travers path
 
 	function __construct($root_dir) {
@@ -37,17 +39,9 @@ class Http {
 
 		return isset($files[0]) ? $files[0] : $this->root_dir.$file;
 	}
-	
-	function reverse_paths($file) {
-		$files = $this->dispatcher->paths($file);
-
-		return isset($files[0]) ? array_reverse($files) : array($this->root_dir.$file);
-	}
 
 	function delegate($file) {
-		$delegation_file = $this->dispatcher->delegate($file);
-
-		return $delegation_file ? $delegation_file : false;
+		return $this->dispatcher->delegate($file);
 	}
 
 	function load() {
@@ -70,7 +64,7 @@ class Http {
 	}
 
 	function load_config() {
-		foreach ($this->reverse_paths("/config") as $config_dir) {
+		foreach (array_reverse($this->dispatcher->paths("/config")) as $config_dir) {
 			$this->load_config_dir($config_dir);
 		}
 		$this->base_url = isset($this->config['settings']['base_url']) ? $this->config['settings']['base_url'] : "";
@@ -364,37 +358,72 @@ class Http {
 		}
 	}
 
+#TODO méthode relatve au POST est aux formulaire
+	function post() {
+		# Récupère une valeur en post
+		# post('toto', 'titi', 'tata') equivaut à post('toto[titi][tata]')
+	}
+
+	function post_value() {
+		# Récupère une valeur en post d'après le nom
+		# post_value('toto[titi][tata]')
+	}
+
+	function post_use($realm) {
+		# utilise un espace de stockage (par défaut $this->url(""))
+	}
+
+	function post_reset() {
+		#réinitialise l'espace à $_POST
+	}
+
+	function post_unset() {
+		#réinitialise l'espace à $_POST
+	}
+
+	function current_input($name) {
+		if ($name) {
+			$this->current_input = $name;
+		}
+	}
+# ou remplaceer current_input par :
+# name doit toujours être appelé pour sélectionner un input
+	function name($name) {
+		return $this->current_input = $name;
+	}
+#	<input name="{$this->name("toto[titi]")}" value="{$this->value()}"
+#	<input name="{$this->name("toto[titi]")}" value="{$this->value}"
+#	<input name="{$this->text("toto[titi]")}" value="{$this->value}"
+#	ou <input name="{$this->name("toto", "titi")}"  
+# méthodes : input, text, radio, submit, textarea, file, hidden, (certaines méthodes peuvent être redondantes)
+# variables positionnée après :
+# name (ce que la méthode renvoi), checked, selected
+
+# ou
+# methode name()
+# methode value() (pour les radios)
+# attributs value, checked, selected
+	function value($name = null) {
+		$this->current_input($name);
+
+		return $this->post_value($this->current_input);
+	}
+
+
 // Ci-dessous : utile ???
+/*
 	function print_r() {
 		$args = func_get_args();
-		$value = call_user_func_array(array($this, "get"), $args);
+		$value = call_user_func_array(array($this, "get_in_array"), $args);
 		
 		return print_r($value, true);
 	}
 
 	function str() {
 		$args = func_get_args();
-		$value = call_user_func_array(array($this, "get"), $args);
+		$value = call_user_func_array(array($this, "get_in_array"), $args);
 		
 		return (string)$value;
-	}
-
-
-	  // Renommer pour ne pas confondre avec les méthode http get post, etc ?
-	//CF get_in_array
-	function get() {
-		$args = func_get_args();
-		$var = array_shift($args);
-		foreach ($args as $arg) {
-			if (isset($var[$arg])) {
-				$var = $var[$arg];
-			}
-			else {
-				return null;
-			}
-		}
-
-		return $var;
 	}
 
 	function post_session_start($name = "") {
@@ -412,7 +441,7 @@ class Http {
 	function post() {
 		$args = array_merge(array($this->post), func_get_args());
 
-		return call_user_func_array(array($this, "get"), $args);
+		return call_user_func_array(array($this, "get_in_array"), $args);
 	}
 
 	function post_unset() {
@@ -430,6 +459,7 @@ class Http {
 	function checked() {
 
 	}
+*/
 
 # TODO à tester
 # Gérer les checkbox
