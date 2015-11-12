@@ -305,6 +305,7 @@ class Http {
 		foreach ($url_vars as $key => $value) {
 			$url = str_replace("{".$key."}", $value, $url);
 		}
+//TODO substitution des partie optionnelles et des *
 		$get_vars += $default_get_vars;
 		if ($add_get) {
 			$get_vars += $_GET;
@@ -333,9 +334,8 @@ class Http {
 		return $this->media_url.$url;
 	}
 	
-	function redirect($param = "", $code = null) {
-		$url = is_array($param) ? $this->url($this, $param) : $this->url($param);
-		header("Location: {$url}", true, $code);
+	function redirect($path = "", $code = null) {
+		header("Location: {$this->url($path)}", true, $code);
 		exit;
 	}
 
