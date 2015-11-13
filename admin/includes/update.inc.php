@@ -1579,3 +1579,17 @@ CREATE TABLE IF NOT EXISTS `dt_contacts_services` (
 SQL;
 	$update->query($q);
 }
+
+function update_58($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_contacts_correspondants` ADD `tiers_id` VARCHAR( 32 ) NOT NULL AFTER `id` ,
+ADD INDEX ( `tiers_id` )
+SQL;
+	$update->query($q);
+
+	$q = <<<SQL
+ALTER TABLE `dt_contacts_organisations` ADD `tiers_id` VARCHAR( 32 ) NOT NULL AFTER `id` ,
+ADD INDEX ( `tiers_id` )
+SQL;
+	$update->query($q);
+}

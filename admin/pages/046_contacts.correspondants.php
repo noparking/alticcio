@@ -147,6 +147,7 @@ HTML;
 {$form->input(array('name' => "correspondant[prenom]", 'label' => $dico->t('Prenom')))}
 {$form->input(array('type' => "password", 'name' => "correspondant[password]", 'label' => $dico->t('Password'), 'template' => $template_password))}
 {$form->select(array('name' => "correspondant[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
+{$form->input(array('name' => "correspondant[tiers_id]", 'label' => $dico->t('IdTiers')))}
 {$form->fieldset_end()}
 
 {$form->fieldset_start(array('legend' => $dico->t('Organisations'), 'class' => "produit-section produit-section-organisations".$hidden['organisations']))}

@@ -145,6 +145,7 @@ HTML;
 {$form->input(array('name' => "organisation[email]", 'label' => $dico->t('Email')))}
 {$form->input(array('name' => "organisation[www]", 'label' => $dico->t('SiteInternet')))}
 {$form->select(array('name' => "organisation[statut]", 'label' => $dico->t("Statut"), 'options' => $statut_options))}
+{$form->input(array('name' => "organisation[tiers_id]", 'label' => $dico->t('IdTiers')))}
 {$form->fieldset_end()}
 
 {$form->fieldset_start(array('legend' => $dico->t('Correspondants'), 'class' => "produit-section produit-section-correspondants".$hidden['correspondants']))}

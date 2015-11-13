@@ -285,6 +285,7 @@ $t['GraphiqueTauxOuverture'] = "Progression des taux d'ouverture";
 $t['GraphiqueTauxReactivite'] = "Progression des taux de réactivité";
 $t['GraphiqueTauxClics'] = "Progression des taux de clics";
 $t['GroupesUsers'] = "Profils";
+$t['IdTiers'] = "ID tiers";
 $t['Image'] = "Image";
 $t['Key'] = "Clé";
 $t['KPI'] = "Indicateur clé";
