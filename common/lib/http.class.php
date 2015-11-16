@@ -133,7 +133,7 @@ class Http {
 		if ($this->rtrim_path and strlen($path) > 1) {
 			$path = rtrim($path, "/");
 		}
-		if ($path != $data['row_path'] and $this->redirect) {
+		if ($path != $data['row_path'] and $this->redirect_path) {
 			$this->redirect($path, 301);
 		}
 		$data['path'] = $path;
