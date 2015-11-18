@@ -28,6 +28,7 @@ class Http {
 	function __construct($root_dir) {
 		$this->root_dir = $root_dir;
 		$this->dispatcher = new Dispatcher($root_dir);
+		$this->dispatcher->add_dir(dirname(__FILE__));
 		$this->post = $_POST;
 	}
 
