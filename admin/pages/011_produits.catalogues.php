@@ -4,7 +4,7 @@ $menu->current('main/products/catalogs');
 
 $config->core_include("database/tools");
 $config->core_include("produit/catalogue", "produit/catalogue_categorie", "outils/form", "outils/mysql");
-$config->core_include("outils/filter", "outils/pager");
+$config->core_include("outils/phrase", "outils/filter", "outils/pager");
 $config->base_include("functions/tree");
 
 $page->javascript[] = $config->core_media("jquery.min.js");
@@ -21,7 +21,16 @@ $page->javascript[] = $config->media("catalogue.js");
 
 $sql = new Mysql($config->db());
 
-$catalogue = new Catalogue($sql);
+$phrase = new Phrase($sql);
+
+$catalogue = new Catalogue($sql, $phrase);
+
+$nom = "nom";
+$field_nom = "c.nom";
+if ($translate = $config->param('translate_catalogues')) {
+	$nom = "phrase_nom";
+	$field_nom = "ph.phrase";
+}
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
 $filter = new Filter($pager, array(
@@ -32,10 +41,10 @@ $filter = new Filter($pager, array(
 		'field' => 'c.id',
 		'group_by' => true,
 	),
-	'nom' => array(
+	$nom => array(
 		'title' => $dico->t('Nom'),
 		'type' => 'contain',
-		'field' => 'c.nom',
+		'field' => $field_nom,
 	),
 	'id_langues' => array(
 		'title' => $dico->t('Langue'),
@@ -73,11 +82,19 @@ $form = new Form(array(
 	'actions' => array("save", "delete", "cancel", "add-categorie", "duplicate"),
 ));
 
+$traduction = $form->value("lang");
+
 if ($form->is_submitted()) {
 	$data = $form->escape_values();
 	switch ($form->action()) {
+		case "translate":
+		case "filter":
+		case "pager":
+		case "reaload":
+			break;
 		case "reset":
 			$form->reset();
+			$traduction = null;
 			break;
 		case "delete":
 			$catalogue->delete($data);
@@ -119,6 +136,8 @@ if ($form->changed()) {
 if ($action == 'edit') {
 	$form->default_values['catalogue'] = $catalogue->values;
 	$form->default_values['export_data'] = $catalogue->values['export_data'];
+	$form->default_values['phrases'] = $phrase->get($catalogue->phrases());
+
 }
 
 $form_start = $form->form_start();
@@ -129,8 +148,15 @@ $template_inline = <<<HTML
 #{label} : #{field} #{description}
 HTML;
 
-$main = $page->inc("snippets/messages");
+$main = "";
 $right = "";
+
+if ($translate) {
+	// variable $displayed_lang définie dans ce snippet
+	$main .= $page->inc("snippets/translate");
+}
+
+$main .= $page->inc("snippets/messages");
 
 if ($action == "edit") {
 	$main .= <<<HTML
@@ -140,7 +166,7 @@ HTML;
 	$url = $url2->make("produits", array('type' => "catalogues_categories", "action" => "edit"));
 	$categories_links = print_link_tree(DBTools::tree($catalogue->categories()), $url, "categories");
 	$right = <<<HTML
-{$form->fieldset_start($dico->t('Categories') )}
+{$form->fieldset_start($dico->t('Categories'))}
 {$categories_links}
 {$form->fieldset_end()}
 {$form->fieldset_start($dico->t("Categories spéciales") )}
@@ -173,6 +199,14 @@ if ($action == "create" or $action == "edit") {
 	);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section", 'id' => "produit-section-informations"))}
+HTML;
+	if ($translate) {
+		$main .= <<<HTML
+{$form->input(array('name' => "catalogue[phrase_nom]", 'type' => "hidden" ))}
+{$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+HTML;
+	}
+	$main .= <<<HTML
 {$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 {$form->select(array('name' => "catalogue[id_langues]", 'label' => $dico->t('Langue'), 'options' => $catalogue->langues()))}
 {$form->select(array('name' => "catalogue[type]", 'label' => $dico->t('Type'), 'options' => array(1 => $dico->t('Online'), 2 => $dico->t('Offline')) ))}

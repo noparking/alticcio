@@ -6,6 +6,9 @@ class Catalogue extends AbstractObject {
 
 	public $type = "catalogue";
 	public $table = "dt_catalogues";
+	public $phrase_fields = array(
+		'phrase_nom',
+	);
 
 	public function load($id) {
 		parent::load($id);
@@ -22,10 +25,11 @@ SQL;
 
 	public function liste(&$filter = null) {
 		$q = <<<SQL
-SELECT c.id, c.nom, c.id_langues, c.type, c.statut, COUNT(DISTINCT(ccp.id_produits)) AS nb_produits
+SELECT c.id, c.nom, ph.phrase AS phrase_nom, c.id_langues, c.type, c.statut, COUNT(DISTINCT(ccp.id_produits)) AS nb_produits
 FROM dt_catalogues AS c
 LEFT OUTER JOIN dt_catalogues_categories AS cc ON cc.id_catalogues = c.id
 LEFT OUTER JOIN dt_catalogues_categories_produits AS ccp ON cc.id = ccp.id_catalogues_categories 
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = c.phrase_nom
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
