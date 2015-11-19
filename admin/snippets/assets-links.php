@@ -1,6 +1,7 @@
 <?php
 global $sql, $page, $dico, $form, $config, $phrase, $id_langues, $pager, $filter,
 	   $asset, $asset_links,
+	   $pager_assets_catalogue_categorie, $filter_assets_catalogue_categorie,
 	   $pager_assets_gamme, $filter_assets_gamme,
 	   $pager_assets_produit, $filter_assets_produit,
 	   $pager_assets_sku, $filter_assets_sku;

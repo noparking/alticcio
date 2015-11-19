@@ -53,6 +53,15 @@ $filter_assets_schema = array(
 		'field' => 'a.titre',
 	),
 );
+if (in_array('catalogue_categorie', $assets_links)) {
+	$filter_assets_schema += array(
+		'links_catalogue_categorie' => array(
+			'title' => $dico->t('Categorie'), 
+			'type' => 'contain',
+			'field' => 't_catalogue_categorie.ref',
+		),
+	);
+}
 if (in_array('gamme', $assets_links)) {
 	$filter_assets_schema += array(
 		'links_gamme' => array(
@@ -161,13 +170,20 @@ if ($form->is_submitted() and $form->validate()) {
 			$traduction = null;
 			break;
 		case "delete":
+			$path =  $config->get("asset_path");
+			$asset->load($asset->values['id']);
+			$data['delete_path'] = $path;
+			$data['delete_file'] = $asset->values['fichier_md5'];
 			$asset->delete($data);
 			$form->reset();
 			$url->redirect("current", array('action' => "", 'id' => ""));
 			break;
 		case "delete-selected":
 			foreach ($filter_assets->selected() as $id_assets) {
+				$path =  $config->get("asset_path");
 				if ($asset->load($id_assets)) {
+					$data['delete_path'] = $path;
+					$data['delete_file'] = $asset->values['fichier_md5'];
 					$asset->delete($data);
 				}
 			}
@@ -175,7 +191,7 @@ if ($form->is_submitted() and $form->validate()) {
 		default :
 			if ($action == "edit" or $action == "create") {
 				if ($action == "edit") {
-					foreach (array("gamme", "produit", "sku") as $link_type) {
+					foreach (array("catalogue_categorie", "gamme", "produit", "sku") as $link_type) {
 						$filter_name = "filter_assets_".$link_type;
 						$page->inc("snippets/assets-links", array('link_type' => $link_type));
 						$$filter_name->clean_data($data['asset_links'], $link_type);
@@ -248,6 +264,9 @@ if ($action == "edit") {
 	$sections = array(
 		'presentation' => $dico->t('Presentation'),
 	);
+	if (in_array('catalogue_categorie', $assets_links)) {
+		$sections['categories'] = $dico->t('Categories');
+	}
 	if (in_array('gamme', $assets_links)) {
 		$sections['gammes'] = $dico->t('Gammes');
 	}
@@ -295,6 +314,13 @@ if ($action == "create" or $action == "edit") {
 HTML;
 }
 if ($action == "edit") {
+	if (in_array('catalogue_categorie', $assets_links)) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Categories'), 'class' => "produit-section produit-section-categories".$hidden['categories'], 'id' => "produit-section-categories"))}
+{$page->inc("snippets/assets-links", array('link_type' => "catalogue_categorie"))}
+{$form->fieldset_end()}
+HTML;
+	}
 	if (in_array('gamme', $assets_links)) {
 		$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Gammes'), 'class' => "produit-section produit-section-gammes".$hidden['gammes'], 'id' => "produit-section-gammes"))}
@@ -322,7 +348,7 @@ HTML;
 HTML;
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer')));
 
-	foreach (array("gamme", "produit") as $link_type) {
+	foreach (array("catalogue_categorie", "gamme", "produit") as $link_type) {
 		$filter_name = "filter_assets_{$link_type}";
 		foreach ($$filter_name->selected() as $selected_attribut) {
 			$main .= $form->hidden(array('name' => "asset_{$link_type}[$selected_attribut][classement]", 'if_not_yet_rendered' => true));

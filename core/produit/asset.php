@@ -17,6 +17,10 @@ class Asset extends AbstractObject {
 		$join = "";
 		foreach ($link_types as $link_type) {
 			switch ($link_type) {
+				case 'catalogue_categorie':
+					$table = "dt_catalogues_categories";
+					$field = "nom";
+					break;
 				case 'gamme':
 					$table = "dt_gammes";
 					$field = "ref";
@@ -235,7 +239,41 @@ DELETE FROM dt_assets_links WHERE id_assets = {$this->id}
 SQL;
 		$this->sql->query($q);
 
-		return parent::delete($data);
+		$return = parent::delete($data);
+		
+		if (isset($data['delete_path']) and isset($data['delete_file'])) {
+#TODO vérifier que le fichier n'est plus utilisé par un autre asset 
+			$q = <<<SQL
+SQL;
+			$file = $data['delete_path']."/".$data['delete_file'];
+			if (file_exists($file)) {
+				unlink($file);
+			}
+		}
+
+		return $return;
+	}
+
+	public function all_links_catalogue_categorie($filter = null) {
+		$liste = array();
+
+		if ($filter === null) {
+			$filter = $this->sql;
+		}
+
+		$asset_id = isset($this->id) ? $this->id : 0;
+		$q = <<<SQL
+SELECT cc.id, cc.nom as ref, cc.nom as nom, al.link_id, al.classement
+FROM dt_catalogues_categories AS cc
+LEFT OUTER JOIN dt_assets_links AS al ON cc.id = al.link_id AND id_assets = $asset_id AND link_type = 'catalogue_categorie'
+SQL;
+		$res = $filter->query($q);
+
+		while ($row = $filter->fetch($res)) {
+			$liste[$row['id']] = $row;
+		}
+		
+		return $liste;
 	}
 
 	public function all_links_gamme($filter = null) {

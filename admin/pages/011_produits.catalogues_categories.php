@@ -26,7 +26,7 @@ $phrase = new Phrase($sql);
 
 $url_redirection = new UrlRedirection($sql);
 
-$categorie = new CatalogueCategorie($sql, $phrase, $id_langues);
+$object = $categorie = new CatalogueCategorie($sql, $phrase, $id_langues);
 $catalogue = new Catalogue($sql);
 
 $action = $url2->get('action');
@@ -80,9 +80,9 @@ $filter_schema_produits = array(
 		),
 	),
 );
-$pager = new Pager($sql, array(10, 30, 50, 100, 200), "pager_produits");
+$pager = new Pager($sql, array(10, 30, 50, 100, 200), "pager_produit");
 $produits = $categorie->produits();
-$filter = new Filter($pager, $filter_schema_produits, array_keys($produits), "filter_produits_$id", true);
+$filter = $filter_catalogue_categorie = new Filter($pager, $filter_schema_produits, array_keys($produits), "filter_produits_$id", true);
 
 if ($form->is_submitted()) {
 	$data = $form->escape_values();
@@ -109,6 +109,9 @@ if ($form->is_submitted()) {
 			break;
 		default :
 			if ($action == "edit") {
+				$page->inc("snippets/assets");
+				$filter_assets->clean_data($data, 'assets');
+
 				if ($form->validate()) {
 					$selected_produits = $filter->selected();
 					if (isset($data['produits'])) {
@@ -138,6 +141,9 @@ if ($form->changed()) {
 if ($action == 'edit') {
 	$form->default_values['catalogue_categorie'] = $categorie->values;
 	$form->default_values['produits'] = $categorie->produits();
+	$categorie_assets = $categorie->assets();
+	$form->default_values['assets'] = $categorie_assets;
+	$assets_selected = array_keys($categorie_assets);
 }
 
 $form_start = $form->form_start();
@@ -160,6 +166,9 @@ if ($action == "edit") {
 		'referencement' => $dico->t('Referencement'),
 		'blocs' => $dico->t('Blocs'),
 	);
+	if ($config->param('assets')) {
+		$sections['assets'] = $dico->t('Assets');
+	}
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 	$categories_options = options_select_tree(DBTools::tree($catalogue->categories(), $id), $form, "categories");
@@ -180,6 +189,7 @@ HTML;
 {$form->fieldset_start(array('legend' => $dico->t('Produits'), 'class' => "produit-section produit-section-produits".$hidden['produits'], 'id' => "produit-section-produits"))}
 <p>{$dico->t('ListeOfProduitsCategories')}</p>
 HTML;
+	$filter = $filter_catalogue_categorie;
 	$categorie->all_produits($filter);
 	$main .= $page->inc("snippets/filter-form");
 	foreach ($filter->selected() as $selected_produit) {
@@ -193,6 +203,16 @@ HTML;
 {$form->textarea(array('name' => "catalogue_categorie[meta_description]", 'label' => $dico->t('MetaDescription'), 'class' => "dteditor"))}
 {$form->fieldset_end()}
 HTML;
+	if ($config->param('assets')) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $dico->t('Assets'), 'class' => "produit-section produit-section-assets".$hidden['assets'], 'id' => "produit-section-assets"))}
+{$page->inc("snippets/assets")}
+{$form->fieldset_end()}
+HTML;
+		foreach (array_intersect($filter_assets->selected(), array_keys($categorie->all_assets())) as $selected_asset) {
+			$main .= $form->hidden(array('name' => "assets[$selected_asset][classement]", 'if_not_yet_rendered' => true));
+		}
+	}
 	$buttons['back'] = $page->l($dico->t('RetourCatalogue'), $url2->make("current", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->id)));
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
