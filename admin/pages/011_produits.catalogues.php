@@ -137,7 +137,6 @@ if ($action == 'edit') {
 	$form->default_values['catalogue'] = $catalogue->values;
 	$form->default_values['export_data'] = $catalogue->values['export_data'];
 	$form->default_values['phrases'] = $phrase->get($catalogue->phrases());
-
 }
 
 $form_start = $form->form_start();
@@ -199,6 +198,7 @@ if ($action == "create" or $action == "edit") {
 	);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section", 'id' => "produit-section-informations"))}
+{$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 HTML;
 	if ($translate) {
 		$main .= <<<HTML
@@ -207,7 +207,6 @@ HTML;
 HTML;
 	}
 	$main .= <<<HTML
-{$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 {$form->select(array('name' => "catalogue[id_langues]", 'label' => $dico->t('Langue'), 'options' => $catalogue->langues()))}
 {$form->select(array('name' => "catalogue[type]", 'label' => $dico->t('Type'), 'options' => array(1 => $dico->t('Online'), 2 => $dico->t('Offline')) ))}
 {$form->select(array('name' => "catalogue[statut]", 'label' => $dico->t('Statut'), 'options' => array($dico->t('Desactive'), $dico->t('Active') )))}

@@ -29,6 +29,8 @@ $url_redirection = new UrlRedirection($sql);
 $object = $categorie = new CatalogueCategorie($sql, $phrase, $id_langues);
 $catalogue = new Catalogue($sql);
 
+$translate = $config->param('translate_catalogues');
+
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
 	$categorie->load($id);
@@ -121,7 +123,12 @@ if ($form->is_submitted()) {
 							}
 						}
 					}
-					$id_saved = $url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
+					if ($translate) {
+						$id_saved = $url_redirection->save_object($categorie, $data, array('phrase_titre_url' => "phrase_nom"));
+					}
+					else {
+						$id_saved = $url_redirection->save_object($categorie, $data, array('titre_url' => "nom"));
+					}
 					if ($id_saved === false) {
 						$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 					}
@@ -144,6 +151,7 @@ if ($action == 'edit') {
 	$categorie_assets = $categorie->assets();
 	$form->default_values['assets'] = $categorie_assets;
 	$assets_selected = array_keys($categorie_assets);
+	$form->default_values['phrases'] = $phrase->get($categorie->phrases());
 }
 
 $form_start = $form->form_start();
@@ -154,8 +162,15 @@ $template_inline = <<<HTML
 #{label} : #{field} #{description}
 HTML;
 
-$main = $page->inc("snippets/messages");
+$main = "";
 $left = "";
+
+if ($translate) {
+	// variable $displayed_lang définie dans ce snippet
+	$main .= $page->inc("snippets/translate");
+}
+
+$main .= $page->inc("snippets/messages");
 
 if ($action == "edit") {
 	$bloc_options = $categorie->bloc_options();
@@ -178,8 +193,20 @@ if ($action == "edit") {
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section produit-section-informations".$hidden['informations'], 'id' => "produit-section-informations"))}
 {$form->input(array('name' => "catalogue_categorie[nom]", 'label' => $dico->t('Nom') ))}
+HTML;
+	if ($translate) {
+		$main .= <<<HTML
+{$form->input(array('name' => "catalogue_categorie[phrase_nom]", 'type' => "hidden" ))}
+{$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+{$form->input(array('name' => "catalogue_categorie[phrase_titre_url]", 'type' => "hidden" ))}
+{$form->input(array('name' => "phrases[phrase_titre_url]", 'label' => "Titre URL", 'items' => $displayed_lang))}
+HTML;
+	}
+	else {
+		$main .= <<<HTML
 {$form->input(array('name' => "catalogue_categorie[titre_url]", 'label' => "Titre URL" ))}
 HTML;
+	}
 //{$form->input(array('name' => "catalogue_categorie[correspondance]", 'label' => $dico->t('CorrespondanceMagento') ))}
 	$main .= <<<HTML
 {$form->select(array('name' => "catalogue_categorie[id_parent]", 'label' => $dico->t('CategorieParent'), 'options' => $categories_options))}
@@ -198,9 +225,25 @@ HTML;
 	$main .= <<<HTML
 {$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Referencement'), 'class' => "produit-section produit-section-referencement".$hidden['referencement'], 'id' => "produit-section-referencement"))}
+HTML;
+	if ($translate) {
+		$main .= <<<HTML
+{$form->input(array('name' => "catalogue_categorie[phrase_meta_title]", 'type' => "hidden" ))}
+{$form->textarea(array('name' => "phrases[phrase_meta_title]", 'label' => $dico->t('MetaTitle'), 'class' => "dteditor", 'items' => $displayed_lang))}
+{$form->input(array('name' => "catalogue_categorie[phrase_meta_keywords]", 'type' => "hidden" ))}
+{$form->textarea(array('name' => "phrases[phrase_meta_keywords]", 'label' => $dico->t('MetaKeywords'), 'class' => "dteditor", 'items' => $displayed_lang))}
+{$form->input(array('name' => "catalogue_categorie[phrase_meta_description]", 'type' => "hidden" ))}
+{$form->textarea(array('name' => "phrases[phrase_meta_description]", 'label' => $dico->t('MetaDescription'), 'class' => "dteditor", 'items' => $displayed_lang))}
+HTML;
+	}
+	else {
+		$main .= <<<HTML
 {$form->textarea(array('name' => "catalogue_categorie[meta_title]", 'label' => $dico->t('MetaTitle'), 'class' => "dteditor"))}
 {$form->textarea(array('name' => "catalogue_categorie[meta_keywords]", 'label' => $dico->t('MetaKeywords'), 'class' => "dteditor"))}
 {$form->textarea(array('name' => "catalogue_categorie[meta_description]", 'label' => $dico->t('MetaDescription'), 'class' => "dteditor"))}
+HTML;
+	}
+	$main .= <<<HTML
 {$form->fieldset_end()}
 HTML;
 	if ($config->param('assets')) {

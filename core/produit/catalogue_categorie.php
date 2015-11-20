@@ -6,6 +6,13 @@ class CatalogueCategorie extends AbstractObject {
 
 	public $type = "catalogue_categorie";
 	public $table = "dt_catalogues_categories";
+	public $phrase_fields = array(
+		'phrase_nom',
+		'phrase_titre_url',
+		'phrase_meta_title',
+		'phrase_meta_description',
+		'phrase_meta_keywords',
+	);
 
 	public function load($id) {
 		$id = parent::load($id);
