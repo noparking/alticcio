@@ -28,8 +28,9 @@ $catalogue = new Catalogue($sql, $phrase);
 $nom = "nom";
 $field_nom = "c.nom";
 if ($translate = $config->param('translate_catalogues')) {
-	$nom = "phrase_nom";
-	$field_nom = "ph.phrase";
+	// TODO : à réactiver quand les champs auront été traduits
+	//$nom = "phrase_nom";
+	//$field_nom = "ph.phrase";
 }
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
