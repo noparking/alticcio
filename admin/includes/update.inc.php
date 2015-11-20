@@ -1605,7 +1605,7 @@ ALTER TABLE `dt_catalogues_categories` ADD `phrase_nom` INT NOT NULL DEFAULT '0'
 ADD `phrase_titre_url` INT NOT NULL DEFAULT '0',
 ADD `phrase_meta_title` INT NOT NULL DEFAULT '0',
 ADD `phrase_meta_description` INT NOT NULL DEFAULT '0',
-ADD `phrase_meta_keywords` INT NOT NULL DEFAULT '0',
+ADD `phrase_meta_keywords` INT NOT NULL DEFAULT '0'
 SQL;
 	$update->query($q);
 }
