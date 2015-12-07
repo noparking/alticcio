@@ -115,7 +115,7 @@ if ($form->is_submitted()) {
 				$filter_assets->clean_data($data, 'assets');
 
 				if ($form->validate()) {
-					$selected_produits = $filter->selected();
+					$selected_produits = $filter_catalogue_categorie->selected();
 					if (isset($data['produits'])) {
 						foreach ($data['produits'] as $id_produits => $p) {
 							if (!in_array($id_produits, $selected_produits)) {
