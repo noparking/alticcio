@@ -16,18 +16,16 @@ $config->core_include("produit/produit");
 
 $sql = new Mysql($config->db());
 
-$langue = new Langue($sql);
-$code_langue = $config->get("langue");
-$id_langues = $langue->id($code_langue);
+$api = new API("api_", $sql);
+$api->config['perso_fichier_path'] = $config->get("medias_path")."files/personnalisations/";
+$api->prepare($config->get("base_url"));
 
+$langue = new Langue($sql);
+$code_langue = $api->info('language');
+$id_langues = $langue->id($code_langue);
 $dico = new Dico($code_langue);
 $dico->add($config->get("base_path")."/core/traductions");
 $dico->add($config->get("base_path")."/traductions");
-
-$api = new API("api_", $sql);
-$api->config['perso_fichier_path'] = $config->get("medias_path")."files/personnalisations/";
-
-$api->prepare($config->get("base_url"));
 
 $api->errors(array(
 	101 => "Clé incorrecte",
