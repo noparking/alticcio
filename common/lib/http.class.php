@@ -192,8 +192,8 @@ class Http {
 # view sera la version "smart" qui appelra _view après analyse des paramètres
 	function view($view, $vars = array()) {
 		$show_vars = $this->show_vars;
-		$this->show_vars = $vars;
-		foreach (array_replace_recursive($this->view_vars, $vars) as $subvar => $value) {
+		$this->show_vars = array_replace_recursive($this->view_vars, $vars);
+		foreach ($this->show_vars as $subvar => $value) {
 			$$subvar = $value;
 		}
 		ob_start();
