@@ -2,7 +2,7 @@
 
 $menu->current('main/customers/organisations');
 
-$config->core_include("outils/form", "outils/mysql", "contacts/organisations");
+$config->core_include("outils/form", "outils/mysql", "contacts/organisations", "outils/pays");
 $config->core_include("outils/filter", "outils/pager", "outils/langue", "database/tools");
 $config->base_include("functions/tree");
 
@@ -21,6 +21,9 @@ $sql = new Mysql($config->db());
 
 $langue = new Langue($sql);
 $id_langues = $langue->id($config->get("langue"));
+
+$pays = new Pays($sql);
+$liste_pays = $pays->liste($id_langues);
 
 $organisation = new Organisation($sql, $id_langues);
 
@@ -69,6 +72,9 @@ if ($form->is_submitted() and $form->validate()) {
 			$form->reset();
 			$url2->redirect("current", array('action' => "", 'id' => ""));
 			break;
+		case "delete-adresse":
+			$organisation->delete_adresse($form->action_arg());
+			break;
 		default :
 			if ($action == "edit" or $action == "create") {
 				$id = $organisation->save($data);
@@ -84,7 +90,7 @@ if ($form->is_submitted() and $form->validate()) {
 
 if ($action == 'edit') {
 	$form->default_values['organisation'] = $organisation->values;
-	$form->default_values['adresses'] = $organisation->adresses();
+	$form->default_values['adresse'] = $organisation->adresses();
 }
 else {
 	$form->reset();
@@ -127,16 +133,48 @@ HTML;
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "organisation[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
+{$form->fieldset_start(array('legend' => "Adresses", 'class' => "produit-section produit-section-adresses".$hidden['adresses']))}
 HTML;
 
-	$main .= <<<HTML
-{$form->fieldset_start(array('legend' => "Adresses", 'class' => "produit-section produit-section-adresses".$hidden['adresses']))}
-Les adresses
+	$adresse_statuts = array(
+		1 => 'actif',
+		0 => 'inactif',
+	);
+	$adresses_ids = array_keys($form->default_values['adresse']);
+	$adresses_ids[] = 0;
+	foreach ($adresses_ids as $i) {
+		$legend = "Nouvelle adresses";
+		$button_delete = "";
+		if ($i) {
+			$legend = $form->default_values['adresse'][$i]['nom'];
+			$button_delete = <<<HTML
+{$form->input(array('type' => "submit", 'class' => "delete", 'name' => "delete-adresse[$i]", 'value' => "Supprimer"))}			
+HTML;
+		}
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => $legend))}
+{$form->input(array('name' => "adresse[$i][nom]", 'label' => "Nom"))}
+{$form->input(array('name' => "adresse[$i][societe]", 'label' => "Raison sociale"))}
+{$form->input(array('name' => "adresse[$i][complement]", 'label' => "Complément"))}
+{$form->input(array('name' => "adresse[$i][adresse_1]", 'label' => "N° et libelle de la voie"))}
+{$form->input(array('name' => "adresse[$i][adresse_2]", 'label' => "Complément géographique"))}
+{$form->input(array('name' => "adresse[$i][adresse_3]", 'label' => "BP / CS / lieu-dit..."))}
+{$form->input(array('name' => "adresse[$i][code_postal]", 'label' => "Code postal"))}
+{$form->input(array('name' => "adresse[$i][ville]", 'label' => "Ville"))}
+{$form->input(array('name' => "adresse[$i][etat]", 'label' => "État"))}
+{$form->select(array('name' => "adresse[$i][id_pays]", 'label' => "Pays", 'options' => $liste_pays))}
+{$form->input(array('name' => "adresse[$i][telephone]", 'label' => "Téléphone"))}
+{$form->input(array('name' => "adresse[$i][fax]", 'label' => "Fax"))}
+{$form->select(array('name' => "adresse[$i][statut]", 'label' => "Statut", 'options' => $adresse_statuts))}
+{$form->input(array('type' => "submit", 'name' => "save", 'value' => $dico->t('Enregistrer')))}
+{$button_delete}
 {$form->fieldset_end()}
 HTML;
+	}
 
 	$organisations_options = options_select_tree(DBTools::tree($organisation->organisations(), $id));
 	$main .= <<<HTML
+{$form->fieldset_end()}
 {$form->fieldset_start(array('legend' => $dico->t('Presentation'), 'class' => "produit-section produit-section-presentation".$hidden['presentation']))}
 {$form->select(array('name' => "organisation[id_contacts_organisations_types]", 'label' => $dico->t('TypeOrganisation'), 'options' => $type_options))}
 {$form->input(array('name' => "organisation[nom]", 'label' => $dico->t('Nom')))}

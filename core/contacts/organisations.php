@@ -63,10 +63,59 @@ SQL;
 	}
 
 	public function adresses() {
-		return array();
+		$adresses = array();
+		$q = <<<SQL
+SELECT * FROM dt_contacts_organisations_adresses WHERE id_contacts_organisations = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$adresses[$row['id']] = $row;
+		}
+
+		return $adresses;
 	}
 
-	public function comptes() {
-		return array();
+	public function save($data) {
+		$id = parent::save($data);
+		if (isset($data['adresse'])) {
+			foreach ($data['adresse'] as $id_adresse => $adresse) {
+				$adresse['id_contacts_organisations'] = $this->id;
+				if ($id_adresse) {
+					$fields_values = array();
+					foreach ($adresse as $field => $value) {
+						$fields_values[] = in_array($field, array('id_pays', 'statut')) ? "$field = $value" : "$field = '$value'"; 
+					}
+					$fields_values_list = implode(",", $fields_values);
+					$q = <<<SQL
+UPDATE dt_contacts_organisations_adresses SET $fields_values_list WHERE id = {$id_adresse}
+SQL;
+					$this->sql->query($q);
+
+				}
+				else {
+					$fields = array();
+					$values = array();
+					foreach ($adresse as $field => $value) {
+						$fields[] = $field;
+						$values[] = in_array($field, array('id_pays', 'statut')) ? $value : "'$value'"; 
+					}
+					$fields_list = implode(",", $fields);
+					$values_list = implode(",", $values);
+					$q = <<<SQL
+INSERT INTO dt_contacts_organisations_adresses ($fields_list) VALUES ($values_list)
+SQL;
+					$this->sql->query($q);
+				}
+			}
+		}
+
+		return $id;
+	}
+
+	public function delete_adresse($id) {
+		$q = <<<SQL
+DELETE FROM dt_contacts_organisations_adresses WHERE id = {$id}
+SQL;
+		$this->sql->query($q);
 	}
 }

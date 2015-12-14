@@ -1609,3 +1609,29 @@ ADD `phrase_meta_keywords` INT NOT NULL DEFAULT '0'
 SQL;
 	$update->query($q);
 }
+
+function update_60($update) {
+	$q = <<<SQL
+CREATE TABLE IF NOT EXISTS `dt_contacts_organisations_adresses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(256) NOT NULL,
+  `id_contacts_organisations` int(11) NOT NULL,
+  `societe` varchar(256) NOT NULL,
+  `complement` varchar(256) NOT NULL,
+  `adresse_1` varchar(256) NOT NULL,
+  `adresse_2` varchar(256) NOT NULL,
+  `adresse_3` varchar(256) NOT NULL,
+  `code_postal` varchar(32) NOT NULL,
+  `ville` varchar(256) NOT NULL,
+  `etat` varchar(256) NOT NULL,
+  `id_pays` int(11) NOT NULL,
+  `telephone` varchar(32) NOT NULL,
+  `fax` varchar(32) NOT NULL,
+  `statut` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_pays` (`id_pays`),
+  KEY `id_contacts_organisations` (`id_contacts_organisations`)
+)
+SQL;
+	$update->query($q);
+}
