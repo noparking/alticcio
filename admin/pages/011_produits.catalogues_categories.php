@@ -198,6 +198,8 @@ HTML;
 		$main .= <<<HTML
 {$form->input(array('name' => "catalogue_categorie[phrase_nom]", 'type' => "hidden" ))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+{$form->input(array('name' => "catalogue_categorie[phrase_description]", 'type' => "hidden" ))}
+{$form->textarea(array('name' => "phrases[phrase_description]", 'label' => $dico->t('Description'), 'items' => $displayed_lang))}
 {$form->input(array('name' => "catalogue_categorie[phrase_titre_url]", 'type' => "hidden" ))}
 {$form->input(array('name' => "phrases[phrase_titre_url]", 'label' => "Titre URL", 'items' => $displayed_lang))}
 HTML;

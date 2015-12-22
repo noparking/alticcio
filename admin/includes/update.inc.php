@@ -1635,3 +1635,10 @@ CREATE TABLE IF NOT EXISTS `dt_contacts_organisations_adresses` (
 SQL;
 	$update->query($q);
 }
+
+function update_61($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_catalogues_categories` ADD `phrase_description` INT NOT NULL AFTER `phrase_nom` ;
+SQL;
+	$update->query($q);
+}

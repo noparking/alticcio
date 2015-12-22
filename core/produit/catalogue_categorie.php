@@ -8,6 +8,7 @@ class CatalogueCategorie extends AbstractObject {
 	public $table = "dt_catalogues_categories";
 	public $phrase_fields = array(
 		'phrase_nom',
+		'phrase_description',
 		'phrase_titre_url',
 		'phrase_meta_title',
 		'phrase_meta_description',
