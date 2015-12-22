@@ -47,6 +47,7 @@ $section = "informations";
 if ($form->value('section')) {
 	$section = $form->value('section');
 }
+$traduction = $form->value("lang");
 
 $filter_schema_produits = array(
 	'id' => array(
