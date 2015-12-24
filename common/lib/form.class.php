@@ -2,24 +2,30 @@
 
 class Form {
 	public $fields;
-	public $checks;
-	public $defaults;
+	//public $checks;
+	public $defaults = array();
+	public $values = array();
 
 	public $name;
 	public $label;
 	public $value;
 	public $checked;
 
-	function __construct() {
+	private $form_id;
 
+	function __construct($form_id) {
+		$this->form_id = $form_id;
+		if (isset($_SESSION['form'][$this->form_id])) {
+			$this->values = $_SESSION['form'][$this->form_id];
+		}
 	}
 
-	function fill() {
-
+	function set($array) {
+		$this->values = $_SESSION['form'][$this->form_id] = array_replace_recursive($this->values, $array);
 	}
 
 	function reset() {
-
+		$this->values = $_SESSION['form'][$this->form_id] = array();
 	}
 
 	function get() {
@@ -35,9 +41,9 @@ class Form {
 	function control($name) {
 		if ($name) {
 			$this->name = $name;
-			$this->label = $this->fields[$name][0];
-			$this->value = ""; #TODO
-			$this->checked = ""; #TODO
+			$this->label = isset($this->fields[$name]) ? (is_array($this->fields[$name]) ? $this->fields[$name][0] : $this->fields[$name]) : "";
+			$this->value = $this->get_value($name);
+			$this->checked = $this->get_value($name) ? "checked" : "";
 		}
 
 		return "";
@@ -49,7 +55,7 @@ class Form {
 		return $this->name;
 	}
 
-	function label($name = null {
+	function label($name = null) {
 		$this->control($name);
 
 		return $this->label;
@@ -105,5 +111,28 @@ class Form {
 		}
 
 		return $report;
+	}
+
+	protected function get_value($name) {
+		$value = $this->get_in_array($name, $this->values);
+		
+		if ($value === null) {
+			$value = $this->get_in_array($name, $this->defaults);
+		}
+
+		return (string)$value;
+	}
+
+	protected function get_in_array($name, $array) {
+		if (preg_match("/([^\[]*)\[([^\]]*)\](.*)/", $name, $matches)) {
+			if (isset($array[$matches[1]])) {
+				return $this->get_in_array($matches[2].$matches[3], $array[$matches[1]]);
+			}
+		}
+		else if (isset($array[$name])) {
+			return $array[$name];
+		}
+
+		return null;
 	}
 }
