@@ -1,17 +1,17 @@
 <?php
 
 class Form {
-	public $fields;
-	//public $checks;
-	public $defaults = array();
-	public $values = array();
-
 	public $name;
 	public $label;
 	public $value;
-	public $checked;
 
 	private $form_id;
+	
+	private $fields = array();
+	private $fields_falses = array();
+	private $defaults = array();
+	private $values = array();
+	private $checks = array();
 
 	function __construct($form_id) {
 		$this->form_id = $form_id;
@@ -29,21 +29,34 @@ class Form {
 	}
 
 	function get() {
-# sans aucun paramètre, retourne tout le tableau des valeurs
-# les checkbox doivent bien être à false
-# on part de $this->fields pour complèter à null les valeurs non settée
+		return array_replace_recursive($this->fields_falses, $this->defaults, $this->values);
+	}
+	
+	function val($name) {
+		return $this->get_in_array($name, $this->get());
 	}
 
-	function key() {
-		#première clé de $this->get(avec les mêmes params)
+	function key($name) {
+		return key($this->val($name));
+	}
+
+	function fields($fields) {
+		foreach ($fields as $field => $data) {
+			$this->fields[$field] = $data;
+			$this->set_in_array($field, false, $this->fields_falses);
+		}
+	}
+
+	function defaults($defaults) {
+		return $this->defaults = array_replace_recursive($this->defaults, $defaults);
 	}
 
 	function control($name) {
 		if ($name) {
 			$this->name = $name;
 			$this->label = isset($this->fields[$name]) ? (is_array($this->fields[$name]) ? $this->fields[$name][0] : $this->fields[$name]) : "";
-			$this->value = $this->get_value($name);
-			$this->checked = $this->get_value($name) ? "checked" : "";
+			$this->value = $this->val($name);
+			$this->checked = $this->value ? "checked" : "";
 		}
 
 		return "";
@@ -72,34 +85,68 @@ class Form {
 
 		return $this->checked;
 	}
+
+	function select($option) {
+		if ($option) {
+			$this->option = $option;
+			$value = $this->val($this->name);
+			if (is_array($value)) {
+				$this->selected = in_array($option, $value) ? "selected" : "";
+			}
+			else {
+				$this->selected = $option == $value ? "selected" : "";
+			}
+		}
+
+		return "";
+	}
 	
-	function selected($value) {
-# TODO à revoir
-		return in_array($this->flat_get($this->name), $value) ? "selected" : "";
+	function selected($option = null) {
+		$this->select($option);
+
+		return $this->selected;
 	}
 
-	function check() {
-		$report = array('ok' => true);
+	function option($option = null) {
+		$this->select($option);
+
+		return $this->option;
+	}
+
+	function checks($checks) {
+		return $this->checks = array_replace_recursive($this->checks, $checks);
+	}
+
+	function validate($data = null) {
+		if ($data === null) {
+			$data = $this->get();
+		}
+		$report = array(
+			'ok' => true,
+			'ok_checks' => array(),
+			'ko_checks' => array(),
+			'ok_fields' => array(),
+			'ko_fields' => array(),
+		);
 		foreach (array_keys($this->checks) as $check) {
 			$report['checks'][$check]['ok'] = true;
 			$report['checks'][$check]['ok_fields'] = array();
 			$report['checks'][$check]['ko_fields'] = array();
 		}
 		foreach ($this->fields as $name => $params) {
-			$this->control($name);
 			$report['fields'][$name]['ok'] = true;
 			$report['fields'][$name]['ok_ckecks'] = array();
 			$report['fields'][$name]['ko_checks'] = array();
-			foreach (array_slice($params, 1) as $ckeck) {
+			foreach (array_slice($params, 1) as $check) {
 				$func = $this->checks[$check];
-				if ($func($this)) {
-					$report['fields'][$name]['checks'][$ckeck] = true;
+				if ($func($this->val($name))) {
+					$report['fields'][$name]['checks'][$check] = true;
 					$report['checks'][$check]['fields'][$name] = true;
 					$report['fields'][$name]['ok_ckecks'][] = $check;
 					$report['checks'][$check]['ok_fields'][] = $name;
 				}
 				else {
-					$report['fields'][$name]['checks'][$ckeck] = false;
+					$report['fields'][$name]['checks'][$check] = false;
 					$report['checks'][$check]['fields'][$name] = false;
 					$report['fields'][$name]['ko_ckecks'][] = $check;
 					$report['checks'][$check]['ko_fields'][] = $name;
@@ -109,18 +156,33 @@ class Form {
 				}
 			}
 		}
+		foreach ($report['checks'] as $check => $check_data) {
+			if ($check_data['ok']) {
+				$report['ok_checks'][] = $check;
+			}
+			else {
+				$report['ko_checks'][] = $check;
+			}
+		}
+		foreach ($report['fields'] as $field => $field_data) {
+			if ($field_data['ok']) {
+				$report['ok_fields'][] = $field;
+			}
+			else {
+				$report['ko_fields'][] = $field;
+			}
+		}
 
 		return $report;
 	}
 
-	protected function get_value($name) {
-		$value = $this->get_in_array($name, $this->values);
-		
-		if ($value === null) {
-			$value = $this->get_in_array($name, $this->defaults);
+	protected function set_in_array($name, $value, &$array) {
+		if (preg_match("/([^\[]*)\[([^\]]*)\](.*)/", $name, $matches)) {
+			$this->set_in_array($matches[2].$matches[3], $value, $array[$matches[1]]);
 		}
-
-		return (string)$value;
+		else {
+			$array[$name] = $value;
+		}
 	}
 
 	protected function get_in_array($name, $array) {

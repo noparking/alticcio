@@ -260,6 +260,25 @@ class Http {
 		return call_user_func_array(array($this, "get_in_array"), $args);
 	}
 
+	function on($condition, $ok, $ko = "") {
+		if (is_array($ok)) {
+			$ret = "";
+			foreach ($ok as $key => $value) {
+				if ($key == $condition) {
+					$ret .= $value;
+				}
+				else if (is_array($ko) and isset($ko[$key])) {
+					$ret .= $ko[$key];
+				}
+			}
+
+			return $ret;
+		}
+		else {
+			return $condition ? $ok : $ko;
+		}
+	}
+
 	function config() {
 		$args = array_merge(array($this->config), func_get_args());
 		
