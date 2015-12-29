@@ -434,14 +434,14 @@ class TestForm extends UnitTestCase {
 		);
 
 		$form->checks(array(
-			'upcase' =>  function($value, $field) {
+			'upcase' =>  function($value, $form) {
 				if ($value == strtoupper($value)) {
-					$field->attr("class", "success");
+					$form->attr("class", "success");
 					return true;
 				}
 				else {
-					$field->attr("class", "failure");
-					$field->attr("error", "Le champs \"{$field->label}\" doit être en majuscules");
+					$form->attr("class", "failure");
+					$form->attr("error", "Le champs \"{$form->label}\" doit être en majuscules");
 
 					return false;
 				}
