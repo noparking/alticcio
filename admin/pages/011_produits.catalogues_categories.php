@@ -193,7 +193,6 @@ if ($action == "edit") {
 {$form->input(array('type' => "hidden", 'name' => "catalogue_categorie[id_catalogues]"))}
 {$form->input(array('type' => "hidden", 'name' => "section", 'value' => $section))}
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section produit-section-informations".$hidden['informations'], 'id' => "produit-section-informations"))}
-{$form->input(array('name' => "catalogue_categorie[nom]", 'label' => $dico->t('Nom') ))}
 HTML;
 	if ($translate) {
 		$main .= <<<HTML
@@ -207,6 +206,7 @@ HTML;
 	}
 	else {
 		$main .= <<<HTML
+{$form->input(array('name' => "catalogue_categorie[nom]", 'label' => $dico->t('Nom') ))}
 {$form->input(array('name' => "catalogue_categorie[titre_url]", 'label' => "Titre URL" ))}
 HTML;
 	}

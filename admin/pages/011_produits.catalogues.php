@@ -28,9 +28,8 @@ $catalogue = new Catalogue($sql, $phrase);
 $nom = "nom";
 $field_nom = "c.nom";
 if ($translate = $config->param('translate_catalogues')) {
-	// TODO : à réactiver quand les champs auront été traduits
-	//$nom = "phrase_nom";
-	//$field_nom = "ph.phrase";
+	$nom = "phrase_nom";
+	$field_nom = "ph.phrase";
 }
 
 $pager = new Pager($sql, array(20, 30, 50, 100, 200));
@@ -199,12 +198,16 @@ if ($action == "create" or $action == "edit") {
 	);
 	$main .= <<<HTML
 {$form->fieldset_start(array('legend' => $dico->t('Informations'), 'class' => "produit-section", 'id' => "produit-section-informations"))}
-{$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 HTML;
 	if ($translate) {
 		$main .= <<<HTML
 {$form->input(array('name' => "catalogue[phrase_nom]", 'type' => "hidden" ))}
 {$form->input(array('name' => "phrases[phrase_nom]", 'label' => $dico->t('Nom'), 'items' => $displayed_lang))}
+HTML;
+	}
+	else {
+		$main .= <<<HTML
+{$form->input(array('name' => "catalogue[nom]", 'label' => $dico->t('Nom') ))}
 HTML;
 	}
 	$main .= <<<HTML
