@@ -32,7 +32,17 @@ SQL;
 
 	public function delete($data) {
 		$q = <<<SQL
-DELETE FROM dt_catalogues_categories_produits WHERE id_catalogues_categories = {$data['catalogue_categorie']['id']}
+SELECT id FROM dt_catalogues_categories WHERE id_parent = {$this->id}
+SQL;
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
+			$sub_categorie = new CatalogueCategorie($this->sql, $this->phrase, $this->langue);
+			$sub_categorie->load($row['id']);
+			$sub_categorie->delete($data);
+		}
+
+		$q = <<<SQL
+DELETE FROM dt_catalogues_categories_produits WHERE id_catalogues_categories = {$this->id}
 SQL;
 		$this->sql->query($q);
 		parent::delete($data);
