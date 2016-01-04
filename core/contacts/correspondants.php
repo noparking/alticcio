@@ -52,6 +52,7 @@ SQL;
 				unset($data['correspondant']['password']);
 			}
 		}
+		$data['keep']['comptes'] = true;
 		$id = parent::save($data);
 
 		if (!isset($data['save_again']) and isset($data['donnees'])) {

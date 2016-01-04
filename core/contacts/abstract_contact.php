@@ -66,10 +66,12 @@ SQL;
 		foreach ($this->links as $link => $elements) {
 			$joined_elements = implode("_", $elements);
 			if (isset($this->id) and $this->id) {
-				$q = <<<SQL
+				if (!isset($data['keep'][$link])) {
+					$q = <<<SQL
 DELETE FROM dt_contacts_{$joined_elements} WHERE {$this->id_field} = {$this->id}
 SQL;
-				$this->sql->query($q);
+					$this->sql->query($q);
+				}
 				if (isset($data[$link])) {
 					foreach ($data[$link] as $link_id => $link_data) {
 						$fields = array("id_contacts_".$elements[0], "id_contacts_".$elements[1]);
