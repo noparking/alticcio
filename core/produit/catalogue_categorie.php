@@ -248,4 +248,22 @@ DELETE FROM dt_catalogues_categories_blocs WHERE id = {$id}
 SQL;
 		$this->sql->query($q);
 	}
+
+	public function active() {
+		if ($id = $this->id) {
+			while ($id) {
+				$q = <<<SQL
+SELECT id_parent, statut FROM dt_catalogues_categories WHERE id = {$id}
+SQL;
+				$res = $this->sql->query($q);
+				$row = $this->sql->fetch($res);
+				if (!$row['statut']) {
+					return false;
+				}
+				$id = $row['id_parent'];
+			}
+			return true;
+		}
+		return false;
+	}
 }
