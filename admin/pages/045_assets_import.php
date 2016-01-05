@@ -51,6 +51,11 @@ if ($form->is_submitted() and $form->validate()) {
 			else {
 				$savedata['asset']['id'] = $asset->save($savedata);
 			}
+			if (isset($data['categories'][$id_import])) {
+				foreach ($data['categories'][$id_import] as $id_categories) {
+					$savedata['asset_links']['categorie'][$id_categories]['classement'] = 0;
+				}
+			}
 			if (isset($data['gammes'][$id_import])) {
 				foreach ($data['gammes'][$id_import] as $id_gammes) {
 					$savedata['asset_links']['gamme'][$id_gammes]['classement'] = 0;
@@ -101,6 +106,11 @@ if ($form->is_submitted() and $form->validate()) {
 					}
 					else {
 						$savedata['asset']['id'] = $asset->save($savedata);
+					}
+					if (isset($data['categories'][$id_import])) {
+						foreach ($data['categories'][$id_import] as $id_categories) {
+							$savedata['asset_links']['catalogue_categorie'][$id_categories]['classement'] = 0;
+						}
 					}
 					if (isset($data['gammes'][$id_import])) {
 						foreach ($data['gammes'][$id_import] as $id_gammes) {
@@ -157,6 +167,12 @@ $form_start = $form->form_start();
 	
 $buttons['listassets'] = $page->l($dico->t('ListeOfAssets'), $url->make("assets", array('action' => "", 'id' => "")));
 
+foreach ($asset->all_links_catalogue_categorie() as $key => $value) {
+	if (isset($value['path'])) {
+		$all_categories[$key] = "{$value['path']}";
+	}
+}
+
 foreach ($asset->all_links_gamme() as $key => $value) {
 	$all_gammes[$key] = "{$value['nom']} ({$value['ref']})";
 }
@@ -180,6 +196,14 @@ Pour la selection :
 <div class="assets-import-edit-selected-form" style="display: none;">
 	<table>
 HTML;
+	if (in_array("catalogue_categorie", $assets_links)) {
+		$main .= <<<HTML
+		<tr>
+			<td>{$form->input(array('type' => "checkbox", 'id' => "copy-asset-import-categories", 'name' => "copy-asset-import-categories", 'template' => "#{field}"))}</td>
+			<td>{$dico->t('Categories')}</td><td><div class="multicombobox copy-all" list="categories" items="" name="asset-import-categories"></div></td>
+		</tr>
+HTML;
+	}
 	if (in_array("gamme", $assets_links)) {
 		$main .= <<<HTML
 		<tr>
@@ -284,9 +308,18 @@ HTML;
 				$value = isset($asset_to_import['asset_data'][$element]) ? $asset_to_import['asset_data'][$element] : $default_values[$element];
 				$form->default_values['assets'][$id_import][$element] = $value;
 			}
-			$default_items = array('gammes' => "", 'tags' => "", 'targets' => "");
+			$default_items = array('categories' => "", 'gammes' => "", 'produits' => "", 'skus' => "", 'tags' => "", 'targets' => "");
+			if (isset($asset_to_import['asset_data']['categories'])) {
+				$default_items['categories'] = implode(",", $asset_to_import['asset_data']['categories']);
+			}
 			if (isset($asset_to_import['asset_data']['gammes'])) {
 				$default_items['gammes'] = implode(",", $asset_to_import['asset_data']['gammes']);
+			}
+			if (isset($asset_to_import['asset_data']['produits'])) {
+				$default_items['produits'] = implode(",", $asset_to_import['asset_data']['produits']);
+			}
+			if (isset($asset_to_import['asset_data']['skus'])) {
+				$default_items['skus'] = implode(",", $asset_to_import['asset_data']['skus']);
 			}
 			if (isset($asset_to_import['asset_data']['tags'])) {
 				$default_items['tags'] = implode(",", $asset_to_import['asset_data']['tags']);
@@ -331,6 +364,12 @@ HTML;
 	</td>
 	<td>
 HTML;
+			if (in_array("catalogue_categorie", $assets_links)) {
+				$items = isset($default_items['categories']) ? $default_items['categories'] : "";
+				$main .= <<<HTML
+		<p>{$dico->t('Categories')} :</p><div class="multicombobox asset-import-categories" list="categories" items="{$items}" name="categories[$id_import][]"></div><br>
+HTML;
+			}
 			if (in_array("gamme", $assets_links)) {
 				$items = isset($default_items['gammes']) ? $default_items['gammes'] : "";
 				$main .= <<<HTML
@@ -376,6 +415,7 @@ HTML;
 </table>		
 HTML;
 	if ($something_to_import) {
+		$all_categories_json = json_encode($all_categories);
 		$all_gammes_json = json_encode($all_gammes);
 		$all_produits_json = json_encode($all_produits);
 		$all_skus_json = json_encode($all_skus);
@@ -388,6 +428,7 @@ HTML;
 		$all_assets_json = json_encode($options);
 		$javascript = <<<JAVASCRIPT
 var multicombobox_list = [];
+multicombobox_list['categories'] = {$all_categories_json};
 multicombobox_list['gammes'] = {$all_gammes_json};
 multicombobox_list['produits'] = {$all_produits_json};
 multicombobox_list['skus'] = {$all_skus_json};

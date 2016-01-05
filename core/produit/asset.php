@@ -263,17 +263,55 @@ SQL;
 
 		$asset_id = isset($this->id) ? $this->id : 0;
 		$q = <<<SQL
-SELECT cc.id, cc.nom as ref, cc.nom as nom, al.link_id, al.classement
+SELECT cc.id_parent, cc.id, cc.nom as ref, p.phrase as nom, al.link_id, al.classement,
+c.nom AS ref_catalogue, p2.phrase as nom_catalogue
 FROM dt_catalogues_categories AS cc
+INNER JOIN dt_catalogues AS c ON cc.id_catalogues = c.id
 LEFT OUTER JOIN dt_assets_links AS al ON cc.id = al.link_id AND id_assets = $asset_id AND link_type = 'catalogue_categorie'
+LEFT OUTER JOIN dt_phrases AS p ON p.id = cc.phrase_nom AND p.id_langues = {$this->langue}
+LEFT OUTER JOIN dt_phrases AS p2 ON p2.id = c.phrase_nom AND p2.id_langues = {$this->langue}
 SQL;
 		$res = $filter->query($q);
 
 		while ($row = $filter->fetch($res)) {
+			if (!$row['nom']) {
+				$row['nom'] = $row['ref'];
+			}
+			if (!$row['nom_catalogue']) {
+				$row['nom_catalogue'] = $row['ref_catalogue'];
+			}
 			$liste[$row['id']] = $row;
 		}
 		
-		return $liste;
+		$paths = array();
+		$try_again = true;
+		while ($try_again) {
+			$try_again = false;
+			foreach ($liste as $id => $row) {
+				if (!isset($paths[$id])) {
+					$try_again = true;
+					if ($row['id_parent']) {
+						if (!isset($liste[$row['id_parent']])) {
+							$try_again = false; // sécurité boucle infinie
+						}
+						else if (isset($paths[$row['id_parent']])) {
+							$paths[$id] = $paths[$row['id_parent']]." > ".$row['nom'];
+						}
+					}
+					else {
+						$paths[$id] = $row['nom_catalogue']." > ".$row['nom'];
+					}
+				}
+			}
+		}
+		asort($paths);
+		$sorted_liste = array();
+		foreach ($paths as $id => $path) {
+			$sorted_liste[$id] = $liste[$id];
+			$sorted_liste[$id]['path'] = $path;
+		}
+		
+		return $sorted_liste;
 	}
 
 	public function all_links_gamme($filter = null) {
