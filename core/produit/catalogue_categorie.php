@@ -81,7 +81,7 @@ SQL;
 		return $gammes;
 	}
 
-	public function produits($nb = 0, $page = 0) {
+	public function produits($nb = 0, $page = 0, $order = "classement") {
 		if (!isset($this->id)) {
 			return array();
 		}
@@ -91,10 +91,18 @@ SQL;
 			$limit = "LIMIT $offset, $nb";
 		}
 		$q = <<<SQL
-SELECT ccp.id_produits, ccp.classement FROM dt_catalogues_categories_produits AS ccp
+SELECT ccp.id_produits, ccp.classement,
+MIN(LEAST(IFNULL(px.montant_ht, 1E99), IFNULL(px2.montant_ht, 1E99))) AS prix_mini
+FROM dt_catalogues_categories_produits AS ccp
 INNER JOIN dt_produits AS p ON p.id = ccp.id_produits AND p.actif = 1
+INNER JOIN dt_catalogues_categories AS cc ON cc.id = ccp.id_catalogues_categories
+LEFT OUTER JOIN dt_sku_variantes AS sv ON sv.id_produits = p.id
+LEFT OUTER JOIN dt_sku AS s ON s.id = sv.id_sku AND s.actif = 1
+LEFT JOIN dt_prix AS px ON px.id_sku = s.id AND px.id_catalogues = cc.id_catalogues
+LEFT JOIN dt_prix AS px2 ON px2.id_sku = s.id AND px2.id_catalogues = 0
 WHERE id_catalogues_categories = {$this->id}
-ORDER BY classement ASC
+GROUP BY ccp.id_produits
+ORDER BY {$order} ASC
 {$limit}
 SQL;
 		$res = $this->sql->query($q);
