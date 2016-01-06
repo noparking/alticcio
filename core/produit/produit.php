@@ -840,12 +840,17 @@ SQL;
 		return $new_id;
 	}
 
-	public function categories($id_catalogues) {
+	public function categories($id_catalogues, $active = null) {
+		$statut_condition = "";
+		if ($active) {
+			$statut_condition = "AND statut <> 0";
+		}
 		$categories = array();
 		$q = <<<SQL
 SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement, cc.statut FROM dt_catalogues_categories AS cc
 INNER JOIN dt_catalogues_categories_produits AS ccp ON ccp.id_catalogues_categories = cc.id AND ccp.id_produits = {$this->id}
 WHERE cc.id_catalogues = {$id_catalogues}
+{$statut_condition}
 ORDER BY id_parent DESC
 SQL;
 		$res = $this->sql->query($q);
@@ -856,6 +861,7 @@ SQL;
 				$q = <<<SQL
 SELECT cc.id, cc.nom, cc.titre_url, cc.id_parent, cc.classement, cc.statut FROM dt_catalogues_categories AS cc
 WHERE cc.id = {$id_categories} 
+{$statut_condition}
 ORDER BY cc.classement ASC
 SQL;
 				$res = $this->sql->query($q);
