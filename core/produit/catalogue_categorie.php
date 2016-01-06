@@ -92,7 +92,8 @@ SQL;
 		}
 		$q = <<<SQL
 SELECT ccp.id_produits, ccp.classement,
-MIN(LEAST(IFNULL(px.montant_ht, 1E99), IFNULL(px2.montant_ht, 1E99))) AS prix_mini
+MIN(COALESCE(px.montant_ht, px2.montant_ht, 1E99)) AS prix_mini,
+IF(MIN(COALESCE(px.montant_ht, px2.montant_ht, 1E99)), MIN(COALESCE(px.montant_ht, px2.montant_ht, 1E99)), 1E99) AS gt0_prix_mini
 FROM dt_catalogues_categories_produits AS ccp
 INNER JOIN dt_produits AS p ON p.id = ccp.id_produits AND p.actif = 1
 INNER JOIN dt_catalogues_categories AS cc ON cc.id = ccp.id_catalogues_categories
