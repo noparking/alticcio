@@ -86,13 +86,13 @@ SQL;
 			return false;
 		}
 		$q = <<<SQL
-SELECT ccp.classement FROM dt_catalogues_categories_produits AS ccp
+SELECT COUNT(ccp.classement) AS nb FROM dt_catalogues_categories_produits AS ccp
 INNER JOIN dt_catalogues_categories AS cc ON cc.id = ccp.id_catalogues_categories
 WHERE id_catalogues_categories = {$this->id} AND ccp.classement = 0
 SQL;
 		$res = $this->sql->query($q);
-		if ($this->sql->fetch($res)) {
-			return false;
+		if ($row = $this->sql->fetch($res)) {
+			return $row['nb'] > 1 ? false : true;
 		}
 
 		return true;
