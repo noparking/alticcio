@@ -1,40 +1,25 @@
 <?php
 
-class Mysql {
+class Mysql extends Mysqli {
 	
-	private $db;
 	private $types;
 	
 	public function __construct($params) {
 		$server = isset($params['server']) ? $params['server'] : "localhost";
 		$user = isset($params['user']) ? $params['user'] : "root";
 		$password = isset($params['password']) ? $params['password'] : "";
-		if (!($this->db = mysql_connect($server, $user, $password, true))) {
-			throw new Exception(mysql_error($this->db));
-		}
-		mysql_set_charset("utf8", $this->db);
-		if (!mysql_select_db ($params['database'], $this->db)) {
-			throw new Exception(mysql_error($this->db));
-		}
-	}
-	
-	public function query($q, $args = array()) {
-		if (!$result = mysql_query($q, $this->db)) {
-			throw new Exception(mysql_error($this->db)." Query: $q");
-		}
 		
-		return $result;
+		parent::__construct($server, $user, $password, $params['database']);
+		
+		$this->set_charset("utf8");
 	}
 	
 	public function fetch($result) {
-		if (!$result) {
-			throw new Exception(mysql_error($this->db));
-		}
-		return mysql_fetch_assoc($result);
+		return $result->fetch_assoc();
 	}
 	
 	public function insert_id() {
-		return mysql_insert_id($this->db);
+		return $this->insert_id;
 	}
 	
 	public function found_rows() {
@@ -67,7 +52,7 @@ class Mysql {
                 $value = 'NULL';
                 break;
             case 'string':
-                $value = "'".mysql_real_escape_string($value)."'";
+                $value = "'".$this->real_escape_string($value)."'";
                 break;
         }
         return $value;
@@ -85,7 +70,7 @@ class Mysql {
 		if (isset($this->types[$table][$field])) {
 			foreach (array('CHAR', 'VARCHAR', 'BINARY', 'VARBINARY', 'BLOB', 'TEXT', 'ENUM', 'SET') as $type) {
 				if (strpos($this->types[$table][$field], $type) === 0) {
-					return "'".($escape ? mysql_real_escape_string($value) : $value)."'";
+					return "'".($escape ? $this->real_escape_string($value) : $value)."'";
 				}
 			}
 		}
