@@ -81,6 +81,23 @@ SQL;
 		return $gammes;
 	}
 
+	public function produits_tous_classes() {
+		if (!isset($this->id)) {
+			return false;
+		}
+		$q = <<<SQL
+SELECT ccp.classement FROM dt_catalogues_categories_produits AS ccp
+INNER JOIN dt_catalogues_categories AS cc ON cc.id = ccp.id_catalogues_categories
+WHERE id_catalogues_categories = {$this->id} AND ccp.classement = 0
+SQL;
+		$res = $this->sql->query($q);
+		if ($this->sql->fetch($res)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public function produits($nb = 0, $page = 0, $order = "classement") {
 		if (!isset($this->id)) {
 			return array();
