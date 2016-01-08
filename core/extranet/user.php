@@ -20,7 +20,7 @@ class User {
 	
 	
 	public function login($data) {
-		$login = mysql_real_escape_string($data['login']);
+		$login = $this->sql->real_escape_string($data['login']);
 		$q = "SELECT * FROM dt_users WHERE login = '$login'";
 		$result = $this->sql->query($q);
 		$user = $this->sql->fetch($result);
@@ -89,7 +89,7 @@ class User {
 	
 	public function reset() {
 		if ($this->is_logged()) {
-			$id = mysql_real_escape_string($_SESSION['extranet']['user']['id']);
+			$id = $this->sql->real_escape_string($_SESSION['extranet']['user']['id']);
 			$q = "SELECT * FROM dt_users WHERE id = $id";
 			$result = $this->sql->query($q);
 			$_SESSION['extranet']['user'] = $this->sql->fetch($result);
@@ -122,7 +122,7 @@ class User {
 	
 	public function create($data) {
 		$data = $this->get_data($data);
-		$q = "SELECT login FROM dt_users WHERE login = '".mysql_real_escape_string($data['login'])."'";
+		$q = "SELECT login FROM dt_users WHERE login = '".$this->sql->real_escape_string($data['login'])."'";
 		$result = $this->sql->query($q);
 		if ($this->sql->fetch($result)) {
 			return self::ALLREADYEXISTS;
@@ -130,7 +130,7 @@ class User {
 		
 		$values = array();
 		foreach ($data as $key => $value) {
-			$value = mysql_real_escape_string($value);
+			$value = $this->sql->real_escape_string($value);
 			if (is_numeric($value)) {
 				$values[] = "$key = $value";
 			}
@@ -145,13 +145,13 @@ class User {
 	
 	
 	public function delete($id_user) {
-		$q = "DELETE FROM dt_users WHERE id = ".mysql_real_escape_string($id_user);
+		$q = "DELETE FROM dt_users WHERE id = ".$this->sql->real_escape_string($id_user);
 		$this->sql->query($q);
 	}
 	
 	
 	public function update($id_user, $form_values) {
-		$id_user = mysql_real_escape_string($id_user);
+		$id_user = $this->sql->real_escape_string($id_user);
 		$data = $this->get_data($form_values);
 		if ($form_values['password'] == "") {
 			unset($data['password']);
@@ -160,7 +160,7 @@ class User {
 			$data['acces'] = 0;
 		}
 		if (isset($data['login'])) {
-			$q = "SELECT id, login FROM dt_users WHERE id <> $id_user AND login = '".mysql_real_escape_string($data['login'])."'";
+			$q = "SELECT id, login FROM dt_users WHERE id <> $id_user AND login = '".$this->sql->real_escape_string($data['login'])."'";
 			$result = $this->sql->query($q);
 			if ($this->sql->fetch($result)) {
 				return self::ALLREADYEXISTS;
@@ -169,7 +169,7 @@ class User {
 		
 		$values = array();
 		foreach ($data as $key => $value) {
-			$value = mysql_real_escape_string($value);
+			$value = $this->sql->real_escape_string($value);
 			if (is_numeric($value)) {
 				$values[] = "$key = $value";
 			}
@@ -219,7 +219,7 @@ class User {
 	public function load($params) {
 		$where = array();
 		foreach ($params as $key => $value) {
-			$value = mysql_real_escape_string($value);
+			$value = $this->sql->real_escape_string($value);
 			if (is_numeric($value)) {
 				$where[] = "$key = $value";
 			}
@@ -386,7 +386,7 @@ SQL;
 	}
 	
 	function reinit_password($code_url, &$id_user) {
-		$code_url = mysql_real_escape_string($code_url);
+		$code_url = $this->sql->real_escape_string($code_url);
 		$q = <<<SQL
 SELECT id_users FROM dt_users_password WHERE `key` = '{$code_url}'
 SQL;
