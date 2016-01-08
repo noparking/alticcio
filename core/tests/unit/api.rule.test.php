@@ -4,10 +4,6 @@ require_once('../simpletest/autorun.php');
 require_once('../../api/admin.php');
 require_once('../../api/api.php');
 
-mysql_connect("localhost", "root", "");
-mysql_set_charset("utf8");
-mysql_select_db("doublet_api_test");
-
 class TestOfApiRule extends UnitTestCase {
 
 	function test_over() {
