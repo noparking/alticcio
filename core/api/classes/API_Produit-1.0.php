@@ -12,8 +12,8 @@ class API_Produit {
 		$this->sql = $api->sql;
 		$this->language = $api->info('language');
 		$q = "SELECT id, id_pays FROM dt_langues WHERE code_langue = '{$this->language}'";
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 		$this->id_langues = $row['id'];
 		$this->id_pays = $row['id_pays'];
 	}
@@ -71,8 +71,8 @@ LEFT OUTER JOIN dt_phrases AS p ON s.phrase_ultralog = p.id AND p.id_langues = {
 LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id
 WHERE s.id IN ($skus) AND s.actif = 1
 SQL;
-			$res = mysql_query($q);
-			while ($row = mysql_fetch_assoc($res)) {
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
 				$infos_skus[$row['id']] = array(
 					'id' => $row['id'],
 					'ref' => $row['ref_ultralog'],
@@ -90,8 +90,8 @@ SELECT id_produits, ref, vignette FROM dt_images_produits
 WHERE id_produits IN ($produits)
 ORDER BY classement ASC
 SQL;
-			$res = mysql_query($q);
-			while ($row = mysql_fetch_assoc($res)) {
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
 				$images_produits[$row['id_produits']]['images'][] = $row['ref'];
 				if ($row['vignette']) {
 					$images_produits[$row['id_produits']]['thumbnail'] = $row['ref'];
@@ -103,8 +103,8 @@ SELECT pr.id, pr.ref, ph.phrase, pr.id_types_produits FROM dt_produits AS pr
 LEFT OUTER JOIN dt_phrases AS ph ON pr.phrase_nom = ph.id AND ph.id_langues = {$this->id_langues}
 WHERE pr.id IN ($produits) AND pr.actif = 1
 SQL;
-			$res = mysql_query($q);
-			while ($row = mysql_fetch_assoc($res)) {
+			$res = $this->sql->query($q);
+			while ($row = $this->sql->fetch($res)) {
 				$infos_produits[$row['id']] = array(
 					'id' => $row['id'],
 					'ref' => $row['ref'],
@@ -187,8 +187,8 @@ LEFT OUTER JOIN dt_phrases AS p ON s.phrase_ultralog = p.id AND p.id_langues = {
 LEFT OUTER JOIN dt_prix AS px ON px.id_sku = s.id
 WHERE s.id = $id_sku
 SQL;
-		$res = mysql_query($q);
-		if ($row = mysql_fetch_assoc($res)) {
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
 			return array(
 				'id' => $row['id'],
 				'ref' => $row['ref_ultralog'],
@@ -221,8 +221,8 @@ SQL;
 SELECT libelle FROM dt_personnalisations_produits
 WHERE `type` = 'texte' AND id_produits = $id_produit
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 
 		return $row['libelle'];
 	}

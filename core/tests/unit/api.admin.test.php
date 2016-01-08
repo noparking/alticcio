@@ -3,9 +3,17 @@
 require_once('../simpletest/autorun.php');
 require_once('../../api/admin.php');
 
-mysql_connect("localhost", "root", "");
-mysql_set_charset("utf8");
-mysql_select_db("doublet_api_test");
+class Mysql extends Mysqli {
+	
+	public function __construct() {
+		parent::__construct("localhost", "root", "", "doublet_api_test");
+		$this->set_charset("utf8");
+	}
+
+	public function fetch($result) {
+		return $result->fetch_assoc();
+	}
+}
 
 class TestOfApi_Admin extends UnitTestCase {
 
@@ -18,20 +26,23 @@ class TestOfApi_Admin extends UnitTestCase {
 			"api_roles_rules",
 			"api_logs",
 		);
+		$sql = new Mysql();
 		foreach ($tables as $table) {
-			mysql_query("TRUNCATE TABLE $table");	
+			$sql->query("TRUNCATE TABLE $table");	
 		}
 	}
 
 	function count_in_table($table) {
+		$sql = new Mysql();
 		$q = "SELECT COUNT(*) AS nb FROM {$table}";
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $sql->query($q);
+		$row = $sql->fetch($res);
 		return $row['nb'];
 	}
 
 	function test_add_key() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -42,7 +53,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_add_key_with_parameters() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 		$time = $_SERVER['REQUEST_TIME'];
 		
 		$key_id = $admin->add_key(array(
@@ -67,7 +79,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_update_key() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 		
 		$key_id = $admin->add_key(array(
 			'name' => 'toto',
@@ -92,7 +105,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_delete_key() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$role_id = $admin->add_role("rôle 1");
@@ -109,7 +123,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_change_key() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -122,7 +137,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_disable_enable_key() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -138,7 +154,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_add_role() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$role_id_1 = $admin->add_role("rôle 1");
@@ -157,7 +174,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_delete_role() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$admin->add_role("rôle 1");
 		$role_id = $admin->add_role("rôle 2");
@@ -181,7 +199,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_assign_role() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$role_id_1 = $admin->add_role("rôle 1");
@@ -201,7 +220,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_unassign_role() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$role_id_1 = $admin->add_role("rôle 1");
@@ -222,7 +242,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_add_key_rules() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id_1 = $admin->add_key();
 		$key_id_2 = $admin->add_key();
@@ -237,7 +258,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_delete_key_rule() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 
@@ -252,7 +274,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_add_role_rules() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$role_id = $admin->add_role("client");
@@ -267,7 +290,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	function test_delete_role_rule() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key = $admin->add_key();
 		$role_id = $admin->add_role("client");
@@ -283,7 +307,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	public function test_roles() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$admin->add_role("rôle 1");
 		$admin->add_role("rôle 2");
@@ -295,7 +320,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 
 	public function test_keys() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key1 = $admin->add_key();
 		$key2 = $admin->add_key();
@@ -306,7 +332,8 @@ class TestOfApi_Admin extends UnitTestCase {
 	}
 	
 	public function test_role_rules() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$id_1 = $admin->add_role("rôle 1");
 		$id_2 = $admin->add_role("rôle 2");

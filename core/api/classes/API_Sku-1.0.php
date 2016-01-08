@@ -1,14 +1,21 @@
 <?php
 
 class API_Sku {
+
+	private $sql;
+
+	function __construct($api) {
+		$this->sql = $api->sql;
+	}
+
 	public function updated_since($date) {
 		$date = (int)$date;
 		$q = <<<SQL
 SELECT * FROM dt_sku WHERE date_modification >= $date
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$skus = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$skus[] = $row;
 		}
 
@@ -19,8 +26,8 @@ SQL;
 		$q = <<<SQL
 SELECT id FROM dt_sku WHERE ref_ultralog = '$ref'
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 
 		return isset($row['id']) ? $row['id'] : false;
 	}
@@ -29,9 +36,9 @@ SQL;
 		$q = <<<SQL
 SELECT id_produits FROM dt_sku_variantes WHERE id_sku = $id_sku
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$ids = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$ids[] = $row['id_produits'];
 		}
 

@@ -5,20 +5,30 @@ $init_dir = dirname(__FILE__)."/init";
 $database = $argv[1];
 $table = $argv[2];
 
-mysql_connect("localhost", "root", "");
-mysql_set_charset("utf8");
-mysql_select_db($database);
+class Mysql extends Mysqli {
+	
+	public function __construct() {
+		parent::__construct("localhost", "root", "", "doublet_api_test");
+		$this->set_charset("utf8");
+	}
 
-$res = mysql_query("SELECT * FROM $table");
+	public function fetch($result) {
+		return $result->fetch_assoc();
+	}
+}
+
+$sql = new Mysql();
+
+$res = $sql->query("SELECT * FROM $table");
 
 $data = array();
-while ($row = mysql_fetch_assoc($res)) {
+while ($row = $sql->fetch($res)) {
 	$record = array();
 	foreach ($row as $field => $value) {
 		if (strpos($field, "phrase_") === 0) {
-			$res2 = mysql_query("SELECT phrase, id_langues FROM dt_phrases WHERE id = $value");
+			$res2 = $sql->query("SELECT phrase, id_langues FROM dt_phrases WHERE id = $value");
 			$phrases = array();
-			while ($row2 = mysql_fetch_assoc($res2)) {
+			while ($row2 = $sql->fetch($res2)) {
 				if ($row2['phrase']) {
 					$phrases[$row2['id_langues']] = $row2['phrase'];
 				}

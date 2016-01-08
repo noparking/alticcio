@@ -4,8 +4,9 @@ class API_Admin {
 	
 	private $table_prefix;
 
-	public function __construct($table_prefix = "") {
+	public function __construct($table_prefix = "", $sql = null) {
 		$this->table_prefix = $table_prefix;
+		$this->sql = $sql;
 	}
 
 	private function table($name) {
@@ -41,9 +42,9 @@ class API_Admin {
 		$q = <<<SQL
 INSERT INTO {$this->table('keys')} ($fields_list) VALUES ($values_list)
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
-		return mysql_insert_id();
+		return $this->sql->insert_id;
 	}
 
 	public function update_key($key_id, $params = array()) {
@@ -70,7 +71,7 @@ SQL;
 			}
 		}
 		$q = "UPDATE {$this->table('keys')} SET ".implode(",", $set)." WHERE `id` = '$key_id'";
-		mysql_query($q);
+		$this->sql->query($q);
 
 		return $key_id;
 	}
@@ -80,7 +81,7 @@ SQL;
 		$q = <<<SQL
 UPDATE {$this->table('keys')} SET `key` = '$new_key', `date_creation` = {$_SERVER['REQUEST_TIME']} WHERE `id` = '$key_id';
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
 		return $new_key;
 	}
@@ -89,27 +90,27 @@ SQL;
 		$q = <<<SQL
 UPDATE {$this->table('keys')} SET active = FALSE WHERE `id` = $key_id
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 	}
 
 	public function enable_key($key_id) {
 		$q = <<<SQL
 UPDATE {$this->table('keys')} SET active = TRUE WHERE `id` = $key_id
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 	}
 
 	public function delete_key($key_id) {
 		$q = <<<SQL
 DELETE FROM {$this->table('keys')} WHERE `id` = '$key_id';
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
 		foreach (array('keys_roles', 'keys_rules', 'logs') as $table) {
 			$q = <<<SQL
 DELETE FROM {$this->table($table)} WHERE `id_key` = '$key_id';
 SQL;
-			mysql_query($q);
+			$this->sql->query($q);
 		}
 	}
 
@@ -117,8 +118,8 @@ SQL;
 		$q = <<<SQL
 SELECT * FROM {$this->table('keys')} WHERE `id` = '$key_id'
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 	
 		return $row;
 	}
@@ -127,9 +128,9 @@ SQL;
 		$q = <<<SQL
 SELECT * FROM {$this->table('keys')} ORDER BY name ASC 
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$keys = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$keys[$row['id']] = $row;
 		}
 		return $keys;
@@ -140,22 +141,22 @@ SQL;
 INSERT INTO {$this->table('keys_rules')} (`method`, `uri`, `type`, `id_key`, `log`)
 VALUES ('$method', '$uri', '$type', $key_id, $log)
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
-		return mysql_insert_id();
+		return $this->sql->insert_id;
 	}
 
 	public function delete_key_rule($id) {
 		$q = <<<SQL
 SELECT id_key FROM {$this->table('keys_rules')} WHERE id = $id
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 		$id_key = $row['id_key'];
 		$q = <<<SQL
 DELETE FROM {$this->table('keys_rules')} WHERE id = $id
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
 		return $id_key;
 	}
@@ -164,9 +165,9 @@ SQL;
 		$q = <<<SQL
 SELECT * FROM {$this->table('keys_rules')} WHERE id_key = $key_id ORDER BY method ASC, uri ASC
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$rules = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$rules[$row['id']] = $row;
 		}
 		return $rules;
@@ -178,9 +179,9 @@ SELECT * FROM {$this->table('roles')} AS r
 INNER JOIN {$this->table('keys_roles')} AS kr ON kr.id_role = r.id 
 WHERE kr.id_key = $key_id
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$roles = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$roles[$row['id']] = $row['name'];
 		}
 		return $roles;
@@ -190,16 +191,16 @@ SQL;
 		$q = <<<SQL
 SELECT id FROM {$this->table('roles')} WHERE `name` = '$name'
 SQL;
-		$res = mysql_query($q);
-		if ($row = mysql_fetch_assoc($res)) {
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
 			return $row['id'];
 		}
 		else {
 			$q = <<<SQL
 INSERT INTO {$this->table('roles')} (`name`) VALUES ('$name');
 SQL;
-			mysql_query($q);
-			return mysql_insert_id();
+			$this->sql->query($q);
+			return $this->sql->insert_id;
 		}
 	}
 
@@ -207,13 +208,13 @@ SQL;
 		$q = <<<SQL
 DELETE FROM {$this->table('roles')} WHERE id = $role_id;
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
 		foreach (array('keys_roles', 'roles_rules') as $table) {
 			$q = <<<SQL
 DELETE FROM {$this->table($table)} WHERE `id_role` = '$role_id';
 SQL;
-			mysql_query($q);
+			$this->sql->query($q);
 		}
 	}
 
@@ -222,8 +223,8 @@ SQL;
 		$q = <<<SQL
 SELECT id, name FROM {$this->table('roles')} ORDER BY name ASC
 SQL;
-		$res = mysql_query($q);
-		while ($row = mysql_fetch_assoc($res)) {
+		$res = $this->sql->query($q);
+		while ($row = $this->sql->fetch($res)) {
 			$roles[$row['id']] = $row['name'];
 		}
 
@@ -234,12 +235,12 @@ SQL;
 		$q = <<<SQL
 SELECT * FROM {$this->table('keys_roles')} WHERE id_key = $key_id AND id_role = $role_id
 SQL;
-		$res = mysql_query($q);
-		if (!mysql_fetch_assoc($res)) {
+		$res = $this->sql->query($q);
+		if (!$this->sql->fetch($res)) {
 			$q = <<<SQL
 INSERT INTO {$this->table('keys_roles')} (id_key, id_role) VALUES ($key_id, $role_id)
 SQL;
-			mysql_query($q);
+			$this->sql->query($q);
 		}
 	}
 
@@ -247,7 +248,7 @@ SQL;
 		$q = <<<SQL
 DELETE FROM {$this->table('keys_roles')} WHERE id_key = '$key_id' AND id_role = '$role_id'
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 	}
 
 	public function role_rules($role_id) {
@@ -257,9 +258,9 @@ FROM {$this->table('roles_rules')}
 WHERE id_role = $role_id 
 ORDER BY method ASC, uri ASC
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		$rules = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$rules[] = $row;
 		}
 		return $rules;
@@ -272,9 +273,9 @@ SQL;
 INSERT INTO {$this->table('roles_rules')} (`method`, `uri`, `type`, `id_role`, `log`)
 VALUES ('$method', '$uri', '$type', $role_id, $log)
 SQL;
-			mysql_query($q);
+			$this->sql->query($q);
 
-			return mysql_insert_id();
+			return $this->sql->insert_id;
 		}
 		else {
 			return null;
@@ -285,13 +286,13 @@ SQL;
 		$q = <<<SQL
 SELECT id_role FROM {$this->table('roles_rules')} WHERE id = $id
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 		$id_role = $row['id_role'];
 		$q = <<<SQL
 DELETE FROM {$this->table('roles_rules')} WHERE id = $id
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 
 		return $id_role;
 	}
@@ -302,10 +303,10 @@ SELECT k.key, l.method, l.uri, l.status, l.date FROM {$this->table('logs')} AS l
 INNER JOIN {$this->table('keys')} as k ON k.id = l.id_key
 ORDER BY l.id
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 		
 		$logs = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$logs[] = $row;
 		}
 

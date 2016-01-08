@@ -106,9 +106,9 @@ class API {
 			$q = <<<SQL
 SELECT * FROM {$this->table('keys')} WHERE `key` = '{$this->key}'
 SQL;
-			$res = mysql_query($q);
+			$res = $this->sql->query($q);
 
-			if ($row = mysql_fetch_assoc($res)) {
+			if ($row = $this->sql->fetch($res)) {
 					$this->key_infos = $row;
 				$this->key_id = $row['id'];
 				if ($row['active']) {
@@ -125,9 +125,9 @@ SELECT ar.id, ar.name FROM {$this->table('roles')} as ar
 INNER JOIN {$this->table('keys_roles')} AS akr ON akr.id_role = ar.id
 WHERE akr.id_key = {$this->key_id}
 SQL;
-				$res = mysql_query($q);
+				$res = $this->sql->query($q);
 
-				while ($row = mysql_fetch_assoc($res)) {
+				while ($row = $this->sql->fetch($res)) {
 					$this->key_roles[$row['id']] = $row['name'];
 				}
 			}
@@ -150,10 +150,10 @@ SQL;
 		$q = <<<SQL
 SELECT term_key, term_value FROM {$this->table('keys_vocabulary')} WHERE id_key = {$this->key_id}
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 
 		$voca = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$voca[$row['term_key']] = $row['term_value'];
 		}
 		
@@ -164,10 +164,10 @@ SQL;
 		$q = <<<SQL
 SELECT data_key, data_value FROM {$this->table('keys_data')} WHERE id_key = {$this->key_id}
 SQL;
-		$res = mysql_query($q);
+		$res = $this->sql->query($q);
 
 		$data = array();
-		while ($row = mysql_fetch_assoc($res)) {
+		while ($row = $this->sql->fetch($res)) {
 			$data[$row['data_key']] = $row['data_value'];
 		}
 		
@@ -228,7 +228,7 @@ SQL;
 						$q = <<<SQL
 UPDATE {$this->table('keys')} SET ip = '$ip' WHERE `key` = '{$this->key}'
 SQL;
-						mysql_query($q);
+						$this->sql->query($q);
 						$this->key_infos['ip'] = $ip;
 						return true;
 					}
@@ -328,8 +328,8 @@ SQL;
 			$q = <<<SQL
 SELECT id FROM {$this->table('keys')} WHERE `key` = '$key'
 SQL;
-			$res = mysql_query($q);
-			if ($row = mysql_fetch_assoc($res)) {
+			$res = $this->sql->query($q);
+			if ($row = $this->sql->fetch($res)) {
 				return $row['id'];
 			}
 		}
@@ -347,9 +347,9 @@ SQL;
 			$q = <<<SQL
 SELECT * FROM {$this->table('keys_rules')} WHERE id_key = $key_id
 SQL;
-			$res = mysql_query($q);
+			$res = $this->sql->query($q);
 
-			while ($row = mysql_fetch_assoc($res)) {
+			while ($row = $this->sql->fetch($res)) {
 				$rules[$row['id']] = $row;
 			}
 		}
@@ -365,8 +365,8 @@ SQL;
 		$q = <<<SQL
 SELECT id FROM {$this->table('roles')} WHERE `name` = '$role'
 SQL;
-		$res = mysql_query($q);
-		if ($row = mysql_fetch_assoc($res)) {
+		$res = $this->sql->query($q);
+		if ($row = $this->sql->fetch($res)) {
 			return $row['id'];
 		}
 
@@ -380,9 +380,9 @@ SQL;
 			$q = <<<SQL
 SELECT * FROM {$this->table('roles_rules')} WHERE id_role = $role_id
 SQL;
-			$res = mysql_query($q);
+			$res = $this->sql->query($q);
 
-			while ($row = mysql_fetch_assoc($res)) {
+			while ($row = $this->sql->fetch($res)) {
 				$rules[$row['id']] = $row;
 			}
 		}
@@ -493,7 +493,7 @@ SQL;
 INSERT INTO {$this->table('tracker')} (`id_widgets`, `id_keys`, `tracked`, `action`, `item`, `date`)
 VALUES ($id_widgets, {$this->key_id}, '{$this->tracked}', '$action', $item, $date)
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 	}
 
 	private function log($status) {
@@ -502,7 +502,7 @@ SQL;
 INSERT INTO {$this->table('logs')} (`id_key`, `method`, `uri`, `status`, `date`)
 VALUES ({$this->key_id}, '{$this->method}', '{$this->request}', '$status', $date)
 SQL;
-		mysql_query($q);
+		$this->sql->query($q);
 	}
 
 	public function last_access() {
@@ -510,8 +510,8 @@ SQL;
 SELECT MAX(`date`) AS last_access FROM {$this->table('logs')}
 WHERE status = 0 AND id_key = {$this->key_id}
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 		
 		return $row['last_access'];
 	}
@@ -521,8 +521,8 @@ SQL;
 SELECT MAX(`date`) AS last_call FROM {$this->table('logs')}
 WHERE status = 0 AND id_key = {$this->key_id} AND method = '{$this->method}' AND uri = '{$this->request}'
 SQL;
-		$res = mysql_query($q);
-		$row = mysql_fetch_assoc($res);
+		$res = $this->sql->query($q);
+		$row = $this->sql->fetch($res);
 		
 		return $row['last_call'];
 	}

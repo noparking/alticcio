@@ -9,7 +9,7 @@ $page->javascript[] = $config->core_media("confirm.js");
 $page->jsdico[] = array('ConfirmerChangement');
 
 $sql = new Mysql($config->db());
-$admin = new API_Admin("api_");
+$admin = new API_Admin("api_", $sql);
 
 $action = $url->get("action");
 

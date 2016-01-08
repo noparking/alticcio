@@ -4,9 +4,17 @@ require_once('../simpletest/autorun.php');
 require_once('../../api/admin.php');
 require_once('../../api/api.php');
 
-mysql_connect("localhost", "root", "");
-mysql_set_charset("utf8");
-mysql_select_db("doublet_api_test");
+class Mysql extends Mysqli {
+	
+	public function __construct() {
+		parent::__construct("localhost", "root", "", "doublet_api_test");
+		$this->set_charset("utf8");
+	}
+
+	public function fetch($result) {
+		return $result->fetch_assoc();
+	}
+}
 
 class TestOfApi extends UnitTestCase {
 
@@ -19,8 +27,9 @@ class TestOfApi extends UnitTestCase {
 			"api_roles_rules",
 			"api_logs",
 		);
+		$sql = new Mysql();
 		foreach ($tables as $table) {
-			mysql_query("TRUNCATE TABLE $table");	
+			$sql->query("TRUNCATE TABLE $table");	
 		}
 		$_GET = array();
 		$_POST = array();
@@ -30,7 +39,8 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_errors() {
-		$api = new API("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
 		$api->errors(array(
 			1 => "error 1",
 			2 => "error 2",
@@ -75,8 +85,9 @@ class TestOfApi extends UnitTestCase {
 			return "titi";
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$api->prepare();
 		$response = $api->execute();
@@ -146,8 +157,9 @@ class TestOfApi extends UnitTestCase {
 			return "foo and bar";
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -181,8 +193,9 @@ class TestOfApi extends UnitTestCase {
 			return $a + $b;
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -204,8 +217,9 @@ class TestOfApi extends UnitTestCase {
 		function get_testapi_justforlog($api) {
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$logs = $admin->watch();
 		$this->assertEqual(count($logs), 0);
@@ -231,8 +245,9 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_role_permission() {
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -300,8 +315,9 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_key_permission() {
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -365,8 +381,9 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_role_and_key_permission() {
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -408,8 +425,9 @@ class TestOfApi extends UnitTestCase {
 
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -438,8 +456,9 @@ class TestOfApi extends UnitTestCase {
 
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -481,8 +500,9 @@ class TestOfApi extends UnitTestCase {
 			return $api->last_access();
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -523,8 +543,9 @@ class TestOfApi extends UnitTestCase {
 			return 42;
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -563,8 +584,9 @@ class TestOfApi extends UnitTestCase {
 			return $post[$key];
 		}
 
-		$api = new API("api_");
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$api = new API("api_", $sql);
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
@@ -585,14 +607,16 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_post_with_php() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
 		$key = $data['key'];
 		$admin->add_key_rule($key_id, "POST", "*", "allow");
 
-		$api = new API("api_", array('key' => $key));
+		$sql = new Mysql();
+		$api = new API("api_", $sql, array('key' => $key));
 		$uri = "testapi/post/titi";
 		$post = array('toto' => "TOTO", 'titi' => "TITI");
 		$response = $api->post($uri, $post);
@@ -605,14 +629,16 @@ class TestOfApi extends UnitTestCase {
 	}
 
 	function test_get_with_php() {
-		$admin = new API_Admin("api_");
+		$sql = new Mysql();
+		$admin = new API_Admin("api_", $sql);
 
 		$key_id = $admin->add_key();
 		$data = $admin->key_data($key_id);
 		$key = $data['key'];
 		$admin->add_key_rule($key_id, "GET", "*", "allow");
 
-		$api = new API("api_", array('key' => $key));
+		$sql = new Mysql();
+		$api = new API("api_", $sql, array('key' => $key));
 		$uri = "testapi";
 		$response = $api->get($uri);
 
