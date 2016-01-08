@@ -33,6 +33,10 @@ class Mysql extends Mysqli {
 	public function insert_id() {
 		return $this->insert_id;
 	}
+
+	public function num_rows($result) {
+		return $result->num_rows();
+	}
 	
 	public function found_rows() {
 		$res = $this->query("SELECT FOUND_ROWS() AS total");
