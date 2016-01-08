@@ -135,7 +135,7 @@ SQL;
 				$tab_ids = array_merge($tab_ids, $this->get_ids($id));
 			}
 		}
-		else {
+		else if ($ids) {
 			$tab_ids[$ids] = $ids;
 		}
 		return $tab_ids;
