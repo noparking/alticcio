@@ -25,6 +25,10 @@ class Mysql extends Mysqli {
 	public function fetch($result) {
 		return $result->fetch_assoc();
 	}
+
+	public function fetch_row($result) {
+		return $result->fetch_row();
+	}
 	
 	public function insert_id() {
 		return $this->insert_id;

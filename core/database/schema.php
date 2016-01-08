@@ -15,7 +15,7 @@ class Schema {
 		$q = "SHOW TABLES FROM $this->basename";
 		$res = $this->sql->query($q);
 		$tables = array();
-		while ($row = mysql_fetch_row($res)) {
+		while ($row = $this->sql->fetch_row($res)) {
 		   $tables[]['name'] = $row[0];
 		}
 		return $tables;
@@ -28,7 +28,7 @@ class Schema {
 			if ($table['name'] != "update") {
 				$q = "SHOW COLUMNS FROM `".$table['name']."`";
 				$res = $this->sql->query($q);
-				while ($row = mysql_fetch_assoc($res)) {
+				while ($row = $this->sql->fetch($res)) {
 					$tables[$key]['champs'][] = array($row['Field'], $row['Type']);
 				}
 			}

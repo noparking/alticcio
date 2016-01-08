@@ -55,6 +55,10 @@ class Pager {
 	public function fetch($res) {
 		return $this->sql->fetch($res);
 	}
+
+	public function real_escape_string($res) {
+		return $this->sql->real_escape_string($res);
+	}
 	
 	public function found_rows() {
 		return $this->total;

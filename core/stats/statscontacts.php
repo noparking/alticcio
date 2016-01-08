@@ -79,7 +79,7 @@ class StatsContacts {
 		$total_per_month = array();
 		$previous_month = "";
 		$annee = 0;
-		while($row = mysql_fetch_array($rs)) {
+		while($row = $this->sql->fetch($rs)) {
 			$mois_message = date("m", $row['date_envoi']);
 			$annee_message = date("Y", $row['date_envoi']);
 			if ($mois_message != $previous_month) {

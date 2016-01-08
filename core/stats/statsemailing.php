@@ -17,7 +17,7 @@ class StatsEmailing {
 	public function edit($data, $action_form) {
 		if ($action_form == "create") {
 	 		$data = $this->get_data($data);
-			$q = "SELECT emailing FROM dt_stats_emailing WHERE emailing = '".mysql_real_escape_string($data['emailing'])."'";
+			$q = "SELECT emailing FROM dt_stats_emailing WHERE emailing = '".$this->sql->real_escape_string($data['emailing'])."'";
 			$result = $this->sql->query($q);
 			if ($this->sql->fetch($result)) {
 				return self::ALLREADYEXISTS;
@@ -28,7 +28,7 @@ class StatsEmailing {
 		}
 		$values = array();
 		foreach ($data as $key => $value) {
-			$value = mysql_real_escape_string($value);
+			$value = $this->sql->real_escape_string($value);
 			if (is_numeric($value)) {
 				$values[] = "$key = $value";
 			}
@@ -52,7 +52,7 @@ class StatsEmailing {
 	public function load($params) {
 		$where = array();
 		foreach ($params as $key => $value) {
-			$value = mysql_real_escape_string($value);
+			$value = $this->sql->real_escape_string($value);
 			if (is_numeric($value)) {
 				$where[] = "$key = $value";
 			}

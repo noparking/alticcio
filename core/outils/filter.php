@@ -436,7 +436,7 @@ HTML;
 				if ($valeur !== "") {
 					$cond = "";
 					if (!isset($this->elements[$cle]['type']) or in_array($this->elements[$cle]['type'], array('equal', 'select'))) {
-						$valeur = mysql_real_escape_string($valeur);
+						$valeur = $this->sql->real_escape_string($valeur);
 						$field = $this->elements[$cle]['field'];
 						if ($valeur) {
 							$cond .= " AND {$field} = '$valeur'";
@@ -446,38 +446,38 @@ HTML;
 						}
 					}
 					else if ($this->elements[$cle]['type'] == 'contain') {
-						$valeur = mysql_real_escape_string($valeur);
+						$valeur = $this->sql->real_escape_string($valeur);
 						$cond .= " AND {$this->elements[$cle]['field']} LIKE '%$valeur%'";
 					}
 					else if ($this->elements[$cle]['type'] == 'between') {
 						if ($valeur['start']) {
-							$start = mysql_real_escape_string($valeur['start']);
+							$start = $this->sql->real_escape_string($valeur['start']);
 							$cond .= " AND {$this->elements[$cle]['field']} >= '{$start}'";
 						}
 						if ($valeur['end']) {
-							$end = mysql_real_escape_string($valeur['end']);
+							$end = $this->sql->real_escape_string($valeur['end']);
 							$cond .= " AND {$this->elements[$cle]['field']} <= '{$end}'";
 						}
 					}
 					else if ($this->elements[$cle]['type'] == 'date') {
-						$valeur = mysql_real_escape_string($valeur);
+						$valeur = $this->sql->real_escape_string($valeur);
 						$cond .= " AND {$this->elements[$cle]['field']} = {$valeur}";
 					}
 					else if ($this->elements[$cle]['type'] == 'date_from') {
-						$valeur = mysql_real_escape_string($valeur);
+						$valeur = $this->sql->real_escape_string($valeur);
 						$cond .= " AND {$this->elements[$cle]['field']} >= {$valeur}";
 					}
 					else if ($this->elements[$cle]['type'] == 'date_to') {
-						$valeur = mysql_real_escape_string($valeur);
+						$valeur = $this->sql->real_escape_string($valeur);
 						$cond .= " AND {$this->elements[$cle]['field']} <= {$valeur}";
 					}
 					else if($this->elements[$cle]['type'] == 'date_between') {
 						if ($valeur['start']) {
-							$start = mysql_real_escape_string($valeur['start']);
+							$start = $this->sql->real_escape_string($valeur['start']);
 							$cond .= " AND {$this->elements[$cle]['field']} >= {$start}";
 						}
 						if ($valeur['end']) {
-							$end = mysql_real_escape_string($valeur['end']);
+							$end = $this->sql->real_escape_string($valeur['end']);
 							$cond .= " AND {$this->elements[$cle]['field']} <= {$end}";
 						}
 					}

@@ -17,7 +17,7 @@ class Facture extends AbstractObject {
 			return parent::load($var);
 		} else if ($type == self::LOAD_NUMBER or $type == self::LOAD_CMD_ID) {
 			if ($type == self::LOAD_NUMBER) {
-				$var = mysql_real_escape_string($var);
+				$var = $this->sql->real_escape_string($var);
 				$q = "SELECT * FROM {$this->table} WHERE number = '{$var}'";
 			} else {
 				$var = (int) $var;
