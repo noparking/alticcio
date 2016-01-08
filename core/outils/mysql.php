@@ -13,6 +13,14 @@ class Mysql extends Mysqli {
 		
 		$this->set_charset("utf8");
 	}
+
+	public function query($q) {
+		if (!$result = parent::query($q)) {
+			throw new Exception($this->error." Query: $q");
+		}
+		
+		return $result;
+	}
 	
 	public function fetch($result) {
 		return $result->fetch_assoc();
