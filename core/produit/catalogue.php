@@ -33,9 +33,7 @@ LEFT OUTER JOIN dt_phrases AS ph ON ph.id = c.phrase_nom
 SQL;
 		if ($filter === null) {
 			$filter = $this->sql;
-			$q .= <<<SQL
-GROUP BY c.id
-SQL;
+			$q .= " GROUP BY c.id";
 		}
 		$res = $filter->query($q);
 

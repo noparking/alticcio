@@ -134,7 +134,7 @@ if ($form->is_submitted()) {
                                             WHERE id_sku = ".$id_sku."
                                             AND id_catalogues = ".intval($data['catalogues'])." ";
                                     $rs1 = $sql->query($q1);
-                                    if (mysql_num_rows($rs1) > 0) { 
+                                    if ($sql->num_rows($rs1) > 0) { 
                                         $q2 = "UPDATE dt_prix SET montant_ht = '".nettoyage(prix($liste_prix[3]))."'
                                                 WHERE id_sku = ".$id_sku."
                                                 AND id_catalogues = ".intval($data['catalogues'])." ";
