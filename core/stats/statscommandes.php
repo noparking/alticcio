@@ -6,10 +6,11 @@
 
 class StatsCommandes {
 	
-	public function __construct($sql = null, $dico = null, $shop = 0) {
+	public function __construct($sql = null, $dico = null, $shop = 3) {
 		$this->sql = $sql;
 		$this->dico = $dico;
 		$this->shop = (int)$shop;
+		die($this->shop);
 	}
 	
 	public function nombre_commandes_par_mois() {
