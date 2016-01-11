@@ -978,7 +978,7 @@ HTML;
 		if ($values === null) {
 			$values = $this->values;
 		}
-		$function = @mysql_ping() ? "mysql_real_escape_string" : "addslashes";
+		$function = @mysqli_ping() ? "mysqli_real_escape_string" : "addslashes";
 		array_walk_recursive($values, array(__CLASS__, $function));
 		
 		return $values;
@@ -988,8 +988,8 @@ HTML;
 		$item = addslashes($item);
 	}
 
-	static function mysql_real_escape_string(&$item) {
-		$item = mysql_real_escape_string($item);
+	static function mysqli_real_escape_string(&$item) {
+		$item = mysqli_real_escape_string($item);
 	}
 
 	public function escaped_values() {
