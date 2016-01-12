@@ -7,9 +7,9 @@ class Stats {
 		$this->sql = $sql;
 	}
 
-	function log($from, $type, $item) {
+	function log($from, $type, $item, $ip = "") {
 		$date = time();
-		$ip = $_SERVER['REMOTE_ADDR'];
+		$ip = $ip ? $ip : $_SERVER['REMOTE_ADDR'];
 		$q = <<<SQL
 INSERT INTO dt_statistiques (`from`, `type`, item, date_requete, ip)
 VALUES ('$from', '$type', $item, $date, '$ip')

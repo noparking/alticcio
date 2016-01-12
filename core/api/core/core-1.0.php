@@ -89,8 +89,7 @@ class API {
 			$func = implode("_", $elements);
 		}
 		$this->func = function_exists($func) ? $func : null;
-
-		$this->ip = $_SERVER['REMOTE_ADDR'];
+		$this->ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR'] and $_SERVER['REMOTE_ADDR'] == "127.0.0.1") ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
 		$this->tracked = $this->param('track');
 		

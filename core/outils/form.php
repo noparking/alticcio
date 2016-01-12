@@ -1179,7 +1179,8 @@ HTML;
 		}
 		require_once dirname(__FILE__)."/exterieurs/recaptcha/recaptchalib.php";
 		$result = true;
-		$resp = recaptcha_check_answer($this->recaptcha_private, $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
+		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR'] and $_SERVER['REMOTE_ADDR'] == "127.0.0.1") ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+		$resp = recaptcha_check_answer($this->recaptcha_private, $ip, $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 		if (!$resp->is_valid) {
 			$this->errors[] = $this->error_message_captcha;
 			$this->fields_errors['recaptcha_response_field'][] = $this->error_message_captcha;

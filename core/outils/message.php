@@ -63,7 +63,7 @@ class Message {
 		}
 		$type = $this->type;
 		$date_envoi = time();
-		$ip = $_SERVER['REMOTE_ADDR'];
+		$ip = isset($data['ip']) ? $data['ip'] : $_SERVER['REMOTE_ADDR'];
 		$version = $this->version;
 		$profil = isset($data['profil']) ? $data['profil'] : 0;
 		$siret = isset($data['siret']) ? $data['siret'] : "";
