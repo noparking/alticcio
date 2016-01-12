@@ -41,16 +41,16 @@ class TestRouter extends UnitTestCase {
 		$pattern = "/(toto)/((titi)/(titi))/(tutu)";
 
 		$positions = Router::get_positions("toto", $pattern);
-		$this->assertEqual(array(1), $positions); 
+		$this->assertEqual([1], $positions); 
 		
 		$positions = Router::get_positions("titi", $pattern);
-		$this->assertEqual(array(3, 4), $positions); 
+		$this->assertEqual([3, 4], $positions); 
 
 		$positions = Router::get_positions("tutu", $pattern);
-		$this->assertEqual(array(5), $positions); 
+		$this->assertEqual([5], $positions); 
 
 		$positions = Router::get_positions("tata", $pattern);
-		$this->assertEqual(array(), $positions);
+		$this->assertEqual([], $positions);
 	}
 
 	function test_get_vars() {
@@ -58,39 +58,39 @@ class TestRouter extends UnitTestCase {
 		$value = "/toto/FOO/titi/BAR/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_vars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'foo' => "FOO",
 			'bar' => "BAR",
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto/[{foo}/titi]/{bar}/tutu";
 		$value = "/toto//BAR/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_vars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'foo' => "",
 			'bar' => "BAR",
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto/{foo=FOO}/titi/{bar}/tutu";
 		$value = "/toto/FOO/titi/BAR/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_vars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'foo' => "FOO",
 			'bar' => "BAR",
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto[/titi]/{foo}/*";
 		$value = "/toto/FOO/titi/BAR/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_vars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'foo' => "FOO",
-		);
+		];
 		$this->assertEqual($expected, $vars);
 	}
 
@@ -99,58 +99,58 @@ class TestRouter extends UnitTestCase {
 		$value = "/toto/titi/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_stars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'titi/tutu',
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto/*/*";
 		$value = "/toto/titi/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_stars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'titi',
 			'tutu',
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto/*/{tutu}";
 		$value = "/toto/titi/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_stars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'titi',
-		);
+		];
 		$this->assertEqual($expected, $vars);
 
 		$pattern = "/toto[/tata]/*/{tutu}";
 		$value = "/toto/titi/tutu";
 		$pattern = Router::get_pattern($pattern);
 		$vars = Router::get_stars($pattern, $value);
-		$expected = array(
+		$expected = [
 			'titi',
-		);
+		];
 		$this->assertEqual($expected, $vars);
 	}
 
 	function test_route() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/bar",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo/bar",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -172,23 +172,23 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_wildchars() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo/*",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo*",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/bar.html",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 #TODO wildchar au milieu
 		$router = new Router();
 		$router->routes = $routes;
@@ -211,15 +211,15 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_alternatives() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo|bar/plop",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -237,19 +237,19 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__home_page() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/",
 				'target' => "home_page"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -267,31 +267,31 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_multiple_criteria() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'HTTP_HOST' => "example.com",
 				'REQUEST_URI' => "/foo",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'HTTP_HOST' => "example.com",
 				'REQUEST_URI' => "/bar",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'HTTP_HOST' => "other.example.com",
 				'REQUEST_URI' => "/foo",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'HTTP_HOST' => "other.example.com",
 				'REQUEST_URI' => "/bar",
 				'target' => "route_4"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -322,32 +322,32 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_vars() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo/bar",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo/{id}",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo/no",
 				'target' => "no_route"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/bar/{action}/{id}",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/asuivre/{suite=*}",
 				'target' => "route_4"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/special/{action}/{id}",
 				'target' => "special_{action}_{id}"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -384,32 +384,32 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_particular_vars() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo/bar",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo/{id=42}",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/bar/{action=edit|delete}/{id=42}",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/etc/{suite=*}",
 				'target' => "etc_{suite}"
-			),
-			array(
+			],
+			[
 				'HTTP_HOST' => "{host}",
 				'REQUEST_URI' => "/toto/{suite=*}",
 				'target' => "toto_{suite}_{host}"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -489,23 +489,23 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_optional_part() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo[/bar]",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo[/{bar}]",
 				'target' => "route_2"
-			),
-			array(
+			],
+			[
 				'REQUEST_URI' => "/foo[/bar][/bar]",
 				'target' => "route_3"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -535,15 +535,15 @@ class TestRouter extends UnitTestCase {
 	}
 
 	function test_route__with_vars_substitutions() {
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'REQUEST_URI' => "/foo/{bar}/{baz}/*",
 				'target' => "route_1"
-			),
-			array(
+			],
+			[
 				'target' => "default_route"
-			),
-		);
+			],
+		];
 		$router = new Router();
 		$router->routes = $routes;
 
@@ -552,10 +552,10 @@ class TestRouter extends UnitTestCase {
 		$route = $router->apply();
 		$this->assertEqual("/foo/toto/titi/etc/etc", $route['REQUEST_URI']);
 
-		$route = $router->apply(array('bar' => 'tata'));
+		$route = $router->apply(['bar' => 'tata']);
 		$this->assertEqual("/foo/tata/titi/etc/etc", $route['REQUEST_URI']);
 
-		$route = $router->apply(array('bar' => 'tata', 'baz' => "tutu"));
+		$route = $router->apply(['bar' => 'tata', 'baz' => "tutu"]);
 		$this->assertEqual("/foo/tata/tutu/etc/etc", $route['REQUEST_URI']);
 	}
 }

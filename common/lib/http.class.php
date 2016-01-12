@@ -1,7 +1,7 @@
 <?php
 
-require dirname(__FILE__)."/router.class.php";
-require dirname(__FILE__)."/dispatcher.class.php";
+require __DIR__."/router.class.php";
+require __DIR__."/dispatcher.class.php";
 
 class Http {
 	public $clean_path = true;
@@ -12,13 +12,13 @@ class Http {
 	public $dispatcher;
 	public $base_url;
 	public $media_url;
-	public $config = array();
-	public $vars = array();
-	public $url_vars = array();
-	public $view_vars = array();
-	public $show_vars = array();
+	public $config = [];
+	public $vars = [];
+	public $url_vars = [];
+	public $view_vars = [];
+	public $show_vars = [];
 
-	public $post = array();
+	public $post = [];
 	public $post_session = "";
 
 	public $current_input = null;
@@ -28,7 +28,7 @@ class Http {
 	function __construct($root_dir) {
 		$this->root_dir = $root_dir;
 		$this->dispatcher = new Dispatcher($root_dir);
-		$this->dispatcher->dirs[] = dirname(__FILE__);
+		$this->dispatcher->dirs[] = __DIR__;
 		$this->post = $_POST;
 	}
 
@@ -80,7 +80,7 @@ class Http {
 					require $config_file;
 					$var = basename($config_file, ".php");
 					if (isset($$var)) {
-						$this->config = array_replace_recursive($this->config, array($var => $$var));
+						$this->config = array_replace_recursive($this->config, [$var => $$var]);
 					}
 				}
 			}
@@ -92,12 +92,12 @@ class Http {
 		// a revoir avec la mthode route au lieu de target
 		/*
 		if (isset($client_alias)) {
-			$routes_alias = array();
+			$routes_alias = [];
 			foreach ($client_alias as $request_uri => $target) {
-				$routes_alias[] = array(
+				$routes_alias[] = [
 					'REQUEST_URI' => $request_uri,
 					'target' => $target,
-				);
+				];
 			}
 			$router = new Router($routes_alias, $data);
 			$router->prefixes['REQUEST_URI'] = $base_url;
@@ -107,12 +107,12 @@ class Http {
 		}
 
 		if (isset($server_alias)) {
-			$routes_alias = array();
+			$routes_alias = [];
 			foreach ($server_alias as $request_uri => $target) {
-				$routes_alias[] = array(
+				$routes_alias[] = [
 					'REQUEST_URI' => $request_uri,
 					'target' => $target,
-				);
+				];
 			}
 			$router = new Router($routes_alias, $data);
 			$router->prefixes['REQUEST_URI'] = $base_url;
@@ -143,7 +143,7 @@ class Http {
 		$this->router->routes = $this->routes = $routes;
 		$this->router->data = $data;
 		$this->route = $this->router->route();
-		$this->url_vars = isset($this->router->vars['path']) ? $this->router->vars['path'] : array();
+		$this->url_vars = isset($this->router->vars['path']) ? $this->router->vars['path'] : [];
 		$this->router->associate_vars("path", "control");
 		$route = $this->router->apply();
 		$this->main_control = $route['control'];
@@ -182,15 +182,15 @@ class Http {
 	}
 
 #TODO plusieurs façon d'urtiliser les variables :
-# array('toto' => "TOTO")  substitution
-# array('$toto' => "TOTO") variable
+# ['toto' => "TOTO"]  substitution
+# ['$toto' => "TOTO"] variable
 # ou alors, second tableau pour les substitutions
 # ou alors, substitution si la vue ne se termine pas par .php
 # si .php => second tableau éventuel pour substitutions
 # si pas .php => second tableau ou premier si pas de second pour substitutions
 # TODO avoir un _view() sans fléxibilité sur les paramètres (usage interne) 
 # view sera la version "smart" qui appelra _view après analyse des paramètres
-	function view($view, $vars = array()) {
+	function view($view, $vars = []) {
 		$show_vars = $this->show_vars;
 		$this->show_vars = array_replace_recursive($this->view_vars, $vars);
 		foreach ($this->show_vars as $subvar => $value) {
@@ -215,7 +215,7 @@ class Http {
 	function view_vars($key, $view) {
 		$display = "";
 		if (isset($this->vars[$key])) {
-			$display = $this->view($view, array($key => $this->vars[$key]));
+			$display = $this->view($view, [$key => $this->vars[$key]]);
 		}
 		
 		return $display;
@@ -225,14 +225,14 @@ class Http {
 		$display = "";
 		if (isset($this->vars[$key])) {
 			if (is_array($this->vars[$key])) {
-				$array = array();
+				$array = [];
 				foreach (array_unique($this->vars[$key]) as $var) {
-					$array[] = array($key => $var);
+					$array[] = [$key => $var];
 				}
 				$display .= $this->view_each($view, $array);
 			}
 			else {
-				$display .= $this->view($view, array($key => $this->vars[$key]));
+				$display .= $this->view($view, [$key => $this->vars[$key]]);
 			}
 		}
 
@@ -255,9 +255,9 @@ class Http {
 	}
 
 	function show($var) {
-		$args = array_merge(array($this->show_vars), func_get_args());
+		$args = array_merge([$this->show_vars], func_get_args());
 
-		return call_user_func_array(array($this, "get_in_array"), $args);
+		return call_user_func_array([$this, "get_in_array"], $args);
 	}
 
 	function on($condition, $ok, $ko = "") {
@@ -280,18 +280,18 @@ class Http {
 	}
 
 	function config() {
-		$args = array_merge(array($this->config), func_get_args());
+		$args = array_merge([$this->config], func_get_args());
 		
-		return call_user_func_array(array($this, "get_in_array"), $args);
+		return call_user_func_array([$this, "get_in_array"], $args);
 	}
 	
 	function vars() {
-		$args = array_merge(array($this->vars), func_get_args());
+		$args = array_merge([$this->vars], func_get_args());
 		
-		return call_user_func_array(array($this, "get_in_array"), $args);
+		return call_user_func_array([$this, "get_in_array"], $args);
 	}
 
-	function url($path = null, $url_vars = array(), $get_vars = array(), $default_get_vars = array()) {
+	function url($path = null, $url_vars = [], $get_vars = [], $default_get_vars = []) {
 		$add_get = false;
 		if (is_array($path)) {
 			$default_get_vars = $get_vars;
@@ -342,7 +342,7 @@ class Http {
 	}
 
 	function url_vars() {
-		$vars = array();
+		$vars = [];
 		foreach (func_get_args() as $var) {
 			$vars[] = $this->get_in_array($this->url_vars, $var);
 		}
@@ -434,14 +434,14 @@ class Http {
 /*
 	function print_r() {
 		$args = func_get_args();
-		$value = call_user_func_array(array($this, "get_in_array"), $args);
+		$value = call_user_func_array([$this, "get_in_array"], $args);
 		
 		return print_r($value, true);
 	}
 
 	function str() {
 		$args = func_get_args();
-		$value = call_user_func_array(array($this, "get_in_array"), $args);
+		$value = call_user_func_array([$this, "get_in_array"], $args);
 		
 		return (string)$value;
 	}
@@ -459,19 +459,19 @@ class Http {
 	}
 
 	function post() {
-		$args = array_merge(array($this->post), func_get_args());
+		$args = array_merge([$this->post], func_get_args());
 
-		return call_user_func_array(array($this, "get_in_array"), $args);
+		return call_user_func_array([$this, "get_in_array"], $args);
 	}
 
 	function post_unset() {
-		$this->post = array();
+		$this->post = [];
 	}
 
 	function value() {
 		$args = func_get_args();
 		$default_value = count($args) ? array_pop($args) : "";
-		$value = call_user_func_array(array($this, "post"), $args);
+		$value = call_user_func_array([$this, "post"], $args);
 		
 		return $value === null ? $default_value : $value;
 	}

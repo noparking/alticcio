@@ -1,9 +1,9 @@
 <?php
 
 class Dispatcher {
-	public $dirs = array();
-	public $cached_files = array();
-	public $delegated_files = array();
+	public $dirs = [];
+	public $cached_files = [];
+	public $delegated_files = [];
 
 	function __construct($root_dir) {
 		$this->add_dir($root_dir);
@@ -40,7 +40,7 @@ class Dispatcher {
 				}
 			}
 			if (!isset($this->cached_files[$file])) {
-				$this->cached_files[$file] = array();
+				$this->cached_files[$file] = [];
 			}
 		}
 

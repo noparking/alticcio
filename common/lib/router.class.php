@@ -4,21 +4,21 @@
 
 class Router {
 
-	public $routes = array();
-	public $data = array();
+	public $routes = [];
+	public $data = [];
 
-	public $vars = array();
-	public $stars = array();
-	public $route = array();
+	public $vars = [];
+	public $stars = [];
+	public $route = [];
 
 	function route() {
-		$this->route = array();
-		$this->vars = array();
-		$this->stars = array();
+		$this->route = [];
+		$this->vars = [];
+		$this->stars = [];
 		foreach ($this->routes as $route) {
 			$go = true;
-			$patterns = array();
-			$values = array();
+			$patterns = [];
+			$values = [];
 			foreach ($route as $key => $pattern) {
 	# TODO : si pattern est un tableau, il faut que l'un des éléments match (OU logique)
 	# Pour le GET...
@@ -30,8 +30,8 @@ class Router {
 						$values[$key] = $value;
 					}
 					else {
-						$patterns = array();
-						$values = array();
+						$patterns = [];
+						$values = [];
 						$go = false;
 						break;
 					}
@@ -45,8 +45,8 @@ class Router {
 						$this->stars[$key] = self::get_stars($patterns[$key], $values[$key]);
 					}
 					else {
-						$this->vars[$key] = array();
-						$this->stars[$key] = array();
+						$this->vars[$key] = [];
+						$this->stars[$key] = [];
 					}
 				}
 				break;
@@ -62,8 +62,8 @@ class Router {
 		}
 	}
 
-	function apply($vars = array()) {
-		$route = array();
+	function apply($vars = []) {
+		$route = [];
 		foreach (array_keys($this->route) as $key) {
 			$used_vars = $vars;
 			if (isset($this->vars[$key])) {
@@ -108,7 +108,7 @@ class Router {
 
 	static function get_positions($needle, $pattern) {
 		$last_pos = 0;
-		$positions = array();
+		$positions = [];
 		$length = strlen($needle);
 		$i = 1;
 		while (($last_pos = strpos($pattern, "(", $last_pos)) !== false) {
@@ -127,7 +127,7 @@ class Router {
 
 	static function get_vars($pattern, $value) {
 		$vars_positions = self::get_positions(":VAR", $pattern);
-		$vars_names = array();
+		$vars_names = [];
 		preg_match_all("!:VAR([^:]+):!", $pattern, $matches);
 		if (isset($matches[1])) {
 			foreach ($matches[1] as $var_name) {
@@ -135,7 +135,7 @@ class Router {
 			}
 		}
 		$pattern = self::clean_pattern($pattern);
-		$vars = array();
+		$vars = [];
 		if (preg_match("!^$pattern$!", $value, $matches)) {
 			$i = 0;
 			foreach ($vars_positions as $pos) {
@@ -151,7 +151,7 @@ class Router {
 	static function get_stars($pattern, $value) {
 		$stars_positions = self::get_positions(":STAR", $pattern);
 		$pattern = self::clean_pattern($pattern);
-		$stars = array();
+		$stars = [];
 		if (preg_match("!^$pattern$!", $value, $matches)) {
 			foreach ($stars_positions as $pos) {
 				$stars[] = $matches[$pos];

@@ -7,12 +7,12 @@ class Form {
 	public $label;
 	public $value;
 	
-	private $fields = array();
-	private $fields_falses = array();
-	private $defaults = array();
-	private $values = array();
-	private $checks = array();
-	private $attributes = array();
+	private $fields = [];
+	private $fields_falses = [];
+	private $defaults = [];
+	private $values = [];
+	private $checks = [];
+	private $attributes = [];
 
 	function __construct($id) {
 		$this->id = $id;
@@ -26,7 +26,7 @@ class Form {
 	}
 
 	function reset() {
-		$this->values = $_SESSION['form'][$this->id] = array();
+		$this->values = $_SESSION['form'][$this->id] = [];
 	}
 
 	function get() {
@@ -130,25 +130,25 @@ class Form {
 		if ($data === null) {
 			$data = $this->get();
 		}
-		$report = array(
+		$report = [
 			'ok' => true,
-			'ok_checks' => array(),
-			'ko_checks' => array(),
-			'ok_fields' => array(),
-			'ko_fields' => array(),
-		);
+			'ok_checks' => [],
+			'ko_checks' => [],
+			'ok_fields' => [],
+			'ko_fields' => [],
+		];
 		foreach (array_keys($this->checks) as $check) {
 			$report['checks'][$check]['ok'] = true;
-			$report['checks'][$check]['fields'] = array();
-			$report['checks'][$check]['ok_fields'] = array();
-			$report['checks'][$check]['ko_fields'] = array();
+			$report['checks'][$check]['fields'] = [];
+			$report['checks'][$check]['ok_fields'] = [];
+			$report['checks'][$check]['ko_fields'] = [];
 		}
 		foreach ($this->fields as $name => $params) {
 			$this->control($name);
 			$report['fields'][$name]['ok'] = true;
-			$report['fields'][$name]['checks'] = array();
-			$report['fields'][$name]['ok_checks'] = array();
-			$report['fields'][$name]['ko_checks'] = array();
+			$report['fields'][$name]['checks'] = [];
+			$report['fields'][$name]['ok_checks'] = [];
+			$report['fields'][$name]['ko_checks'] = [];
 			if (is_array($params)) {
 				$report['fields'][$name]['label'] = $params[0];
 				foreach (array_slice($params, 1) as $check) {
