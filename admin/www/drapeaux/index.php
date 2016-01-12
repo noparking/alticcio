@@ -24,14 +24,15 @@ function lister_drapeau($id_drapeau=0) {
     return $html;
 }
 function lister_pays($id_pays=0) {
+	global $sql;
     $q = "SELECT p.id, p.code_iso, ph.phrase
     FROM dt_pays AS p
     INNER JOIN dt_phrases AS ph
     ON ph.id = p.phrase_nom_courant AND ph.id_langues = 1
     AND p.id NOT IN ('3','247','243','235','226','217','185','191','194','195','198','153','163','165','179','143','140','95','97','101','103','86','87','81','73','33','46','48','10','83')";
-    $rs = mysql_query($q);
+    $rs = $sql->query($q);
     $html = '<option value="0">...</option>';
-    while($row = mysql_fetch_array($rs)) {
+    while($row = $sql->fetch($rs)) {
         $html .= '<option value="'.$row['id'].'" ';
         if ($id_pays > 0 AND $row['id'] == $id_pays) {
             $html .= ' selected="selected" ';
@@ -41,6 +42,7 @@ function lister_pays($id_pays=0) {
     return $html;
 }
 function lister_region($id_region=0) {
+	global $sql;
     $q = "SELECT r.id, ph.phrase, ph1.phrase AS administration, p.code_iso
         FROM dt_regions AS r
         INNER JOIN dt_phrases AS ph
@@ -53,9 +55,9 @@ function lister_region($id_region=0) {
         INNER JOIN dt_pays AS p
         ON p.id = r.id_pays
         ORDER BY p.code_iso, r.id_administrations";
-    $rs = mysql_query($q);
+    $rs = $sql->query($q);
     $html = '<option value="0">...</option>';
-    while($row = mysql_fetch_array($rs)) {
+    while($row = $sql->fetch($rs)) {
         $html .= '<option value="'.$row['id'].'" ';
         if ($id_region > 0 AND $row['id'] == $id_region) {
             $html .= ' selected="selected" ';
@@ -231,15 +233,15 @@ else {
                 <?php
                     if (!empty($query)) {
                         $rs = $sql->query($query);
-                        if (mysql_num_rows($rs) > 1) {
-                            echo '<p>'.mysql_num_rows($rs).' résultats</p>';
+                        if ($sql->num_rows($rs) > 1) {
+                            echo '<p>'.$sql->num_rows($rs).' résultats</p>';
                             echo '<ul>';
                             while($row = $sql->fetch($rs)) {
                                 echo '<li>'.bloc_ref($row['numart'],$row['designation_nouvelle'],$row['prix_unitaire']).'</li>';
                             }
                             echo '</ul>';
                         }
-                        else if (mysql_num_rows($rs) == 1) {
+                        else if ($sql->num_rows($rs) == 1) {
                             $row = $sql->fetch($rs);
                             echo '<p>1 résultat</p>';
                             echo bloc_ref($row['numart'],$row['designation_nouvelle'],$row['prix_unitaire']);
