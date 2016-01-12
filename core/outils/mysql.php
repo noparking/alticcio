@@ -35,7 +35,7 @@ class Mysql extends Mysqli {
 	}
 
 	public function num_rows($result) {
-		return $result->num_rows();
+		return $result->num_rows;
 	}
 	
 	public function found_rows() {
