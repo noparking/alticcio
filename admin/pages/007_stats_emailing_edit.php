@@ -105,9 +105,9 @@ if (!isset($message)) {
  * On récupère les codes des filiales
  */
 $query = "SELECT id, code_version FROM dt_filiales ORDER BY code_version";
-$res = mysql_query($query);
+$res = $sql->query($query);
 $liste_filiales = array(0 => "...");
-while($row = mysql_fetch_array($res)) {
+while($row = $sql->fetch($res)) {
 	$liste_filiales[$row['id']] = $row['code_version'];
 }
 
