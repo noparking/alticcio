@@ -638,8 +638,10 @@ SQL;
 
 	private function all_associated_produits($table, $id_field, &$filter = null) {
 		$q = <<<SQL
-SELECT pr.id, pr.ref, ph.phrase AS nom, link.classement FROM dt_produits AS pr
+SELECT pr.id, pr.ref, ph.phrase AS nom, phg.phrase AS gamme, link.classement FROM dt_produits AS pr
+LEFT OUTER JOIN dt_gammes AS g ON g.id = pr.id_gammes
 LEFT OUTER JOIN dt_phrases AS ph ON ph.id = pr.phrase_nom AND ph.id_langues = {$this->langue}
+LEFT OUTER JOIN dt_phrases AS phg ON phg.id = g.phrase_nom AND phg.id_langues = {$this->langue}
 LEFT OUTER JOIN {$table} AS link ON link.{$id_field} = pr.id AND link.id_produits = {$this->id}
 SQL;
 		if ($filter === null) {
