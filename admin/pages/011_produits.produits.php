@@ -115,6 +115,8 @@ $filter_schema_produits = array(
 	),
 	'ref' => array(
 		'title' => $dico->t('Reference'),
+		'type' => 'contain',
+		'field' => 'pr.ref',
 	),
 	'nom' => array(
 		'title' => $dico->t('Nom'),
