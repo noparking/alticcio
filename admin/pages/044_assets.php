@@ -45,7 +45,7 @@ $filter_assets_schema = array(
 		'type' => 'between',
 		'order' => 'DESC',
 		'field' => 'a.id',
-		'template' => "{id} <img alt=\"\" src=\"{$config->media("icon-file-tiny.png")}\" truesrc=\"{$config->get("asset_url")}{id}?thumb=1&tiny=1\" />",
+		'template' => "{id} <img alt=\"\" src=\"{$config->media("icon-file-tiny.png")}\" truesrc=\"{$config->get("asset_url")}{$config->get("asset_key")}/{id}?thumb=1&tiny=1\" />",
 	),
 	'titre' => array(
 		'title' => $dico->t('Titre'),
@@ -282,8 +282,8 @@ if ($action == "edit") {
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
 
-	$href = $config->get("asset_url").$asset->id."?dl=1";
-	$src = $config->get("asset_url").$asset->id."?thumb=1";
+	$href = $config->get("asset_url").$config->get("asset_key")."/".$asset->id."?dl=1";
+	$src = $config->get("asset_url").$config->get("asset_key")."/".$asset->id."?thumb=1";
 	if ($asset->values['actif']) {
 		$apercu = <<<HTML
 <a href="{$href}">
