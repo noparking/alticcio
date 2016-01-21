@@ -85,13 +85,17 @@ if ($form->is_submitted() and $form->validate()) {
 			$savedata['path'] =  $config->get("asset_path");
 			$asset->save($savedata);
 			$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
-			unlink($savedata['file']);
+			if ($asset_to_import['source'] != "ft") {
+				unlink($savedata['file']);
+			}
 			$url->redirect("current", array('action' => "edit", 'id' => $asset->id));
 			break;
 		case "discard":
 			$id_import = $form->action_arg();
 			$asset_to_import = $assets_import->load(array('id' => $id_import));
-			unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+			if ($asset_to_import['source'] != "ft") {
+				unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+			}
 			$assets_import->save(array('id' => $id_import, 'action' => ""));
 			break;
 		case "import-selected":
@@ -140,7 +144,9 @@ if ($form->is_submitted() and $form->validate()) {
 					$savedata['file'] = $sources[$asset_to_import['source']].$asset_to_import['fichier'];
 					$savedata['path'] =  $config->get("asset_path");
 					$asset->save($savedata);
-					unlink($savedata['file']);
+					if ($asset_to_import['source'] != "ft") {
+						unlink($savedata['file']);
+					}
 					$assets_import->save(array('id' => $id_import, 'action' => "", 'id_assets' => $asset->id));
 				}
 			}
@@ -150,7 +156,9 @@ if ($form->is_submitted() and $form->validate()) {
 				foreach ($data['assets-import-select'] as $id_import => $delete) {
 					if ($delete) {
 						$asset_to_import = $assets_import->load(array('id' => $id_import));
-						unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+						if ($asset_to_import['source'] != "ft") {
+							unlink($sources[$asset_to_import['source']].$asset_to_import['fichier']);
+						}
 						$assets_import->save(array('id' => $id_import, 'action' => ""));
 					}
 				}
@@ -294,7 +302,13 @@ HTML;
 			}
 			$default_items['tags'] = implode(",", $asset->tags());
 			$default_items['langues'] = implode(",", $asset->langues());
-			$default_items['targets'] = implode(",", $asset->selected_targets());
+			$targets = array();
+			foreach ($asset->selected_targets() as $id_target => $bool) {
+				if ($bool) {
+					$targets[] = $id_target;
+				}
+			}
+			$default_items['targets'] = implode(",", $targets);
 		}
 		else {
 			$default_values = array(
@@ -325,6 +339,9 @@ HTML;
 				$default_items['tags'] = implode(",", $asset_to_import['asset_data']['tags']);
 			}
 			$default_items['langues'] = "";
+			if (isset($asset_to_import['asset_data']['langues'])) {
+				$default_items['langues'] = implode(",", $asset_to_import['asset_data']['langues']);
+			}
 			if (isset($asset_to_import['asset_data']['targets'])) {
 				$default_items['targets'] = implode(",", $asset_to_import['asset_data']['targets']);
 			}
