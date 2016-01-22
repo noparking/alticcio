@@ -194,6 +194,7 @@ foreach ($asset->all_links_sku() as $key => $value) {
 }
 
 if ($source = $url->get('action')) {
+	$subsource = $url->get('id');
 	$titre_page .= " (source : {$source})";
 	$main = <<<HTML
 <div>
@@ -286,6 +287,9 @@ HTML;
 HTML;
 	$something_to_import = false;
 	foreach ($assets_import->liste($source) as $id_import => $asset_to_import) {
+		if ($subsource and ($asset_to_import['source_data']['subsource'] != $subsource or $subsource == "-")) {
+			continue;
+		}
 		$default_items = array();
 		$targets = $asset->all_targets();
 		if ($asset_to_import['id_assets']) {
