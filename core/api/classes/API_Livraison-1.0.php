@@ -88,8 +88,6 @@ WHERE id_langues = {$id_langues} AND id_pays = {$id_pays} AND id_boutiques = $id
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
-var_dump($row);
-die('toto');
 		if (!$row) {
 			return false;
 		} else {
