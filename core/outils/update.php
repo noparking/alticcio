@@ -17,7 +17,7 @@ SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
 
-		if ($row === false) {
+		if (!$row) {
 			$q = <<<SQL
 INSERT INTO dt_infos (champ, valeur) VALUES ('version', '0')
 SQL;

@@ -87,7 +87,7 @@ WHERE id_langues = {$this->id_langues} AND id_pays = {$id_pays} AND id_boutiques
 SQL;
 		$res = $this->sql->query($q);
 		$row = $this->sql->fetch($res);
-		if ($row === false) {
+		if (!$row) {
 			return false;
 		} else {
 			switch ($row['methode']) {

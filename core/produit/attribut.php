@@ -241,7 +241,7 @@ SQL;
 		
 		$row = $this->sql->fetch($res);
 
-		return $row === false ? array() : $row;
+		return $row ? $row : array();
 	}
 
 	public function reference_options($id_langues = 1) {
@@ -283,7 +283,7 @@ SQL;
 		
 		$row = $this->sql->fetch($res);
 
-		return $row === false ? array('phrase_valeur' => 0, 'valeur_numerique' => 0, 'valeur_libre' => 0) : $row;
+		return $row ? $row : array('phrase_valeur' => 0, 'valeur_numerique' => 0, 'valeur_libre' => 0);
 	}
 
 	public function phrases() {
