@@ -755,6 +755,27 @@ HTML;
 		
 		return $this->render_element($params);
 	}
+
+	public function recaptcha2($params) {
+		if ($this->in_form && $this->form_count != $this->step) return "";
+
+		$params['name'] = $params['id'] = "recaptcha2_response_field";
+		
+		$this->check_invalid($params);
+
+		$class = $this->form_class."-recaptcha";
+		if (isset($params['class'])) {
+			$class .= " ".$params['class'];
+		}
+		$params['class'] = $class;
+
+		$recaptcha = <<<HTML
+<div class="g-recaptcha" data-sitekey="{$this->recaptcha_public}"></div>
+HTML;
+		$params['field'] = $recaptcha;
+		
+		return $this->render_element($params);
+	}
 	
 	public function date($params) {
 		if ($this->in_form && $this->form_count != $this->step) return "";
@@ -1174,12 +1195,44 @@ HTML;
 	}
 
 	private function validate_recaptcha() {
+		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR'] and $_SERVER['REMOTE_ADDR'] == "127.0.0.1") ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+
+		if (isset($_POST['g-recaptcha-response'])) { // API v2
+			$url = 'https://www.google.com/recaptcha/api/siteverify';
+			$data = array(
+				'secret' => $this->recaptcha_private,
+				'response' => $_POST['g-recaptcha-response'],
+				'remoteip' => "",
+			);
+			$options = array(
+				'http' => array(
+					'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+					'method'  => 'POST',
+					'content' => http_build_query($data),
+				),
+			);
+			$context  = stream_context_create($options);
+			$result = file_get_contents($url, false, $context);
+			if ($result === FALSE) {
+				return false;
+			}
+			$res = json_decode($result);
+			
+			$result = true;
+			if (!$res->success) {
+				$this->errors[] = $this->error_message_captcha;
+				$this->fields_errors['recaptcha2_response_field'][] = $this->error_message_captcha;
+				$result = false;
+			}
+			return $result;
+		}
+
+		// API v1
 		if (!isset($_POST["recaptcha_challenge_field"]) and !isset($_POST["recaptcha_response_field"])) {
 			return true;
 		}
 		require_once dirname(__FILE__)."/exterieurs/recaptcha/recaptchalib.php";
 		$result = true;
-		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR'] and $_SERVER['REMOTE_ADDR'] == "127.0.0.1") ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 		$resp = recaptcha_check_answer($this->recaptcha_private, $ip, $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 		if (!$resp->is_valid) {
 			$this->errors[] = $this->error_message_captcha;
