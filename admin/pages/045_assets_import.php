@@ -286,7 +286,11 @@ HTML;
 </tr>
 HTML;
 	$something_to_import = false;
-	foreach ($assets_import->liste($source) as $id_import => $asset_to_import) {
+	$count = 0;
+	$max = $config->param("assets_import_max");
+	$remain = 0;
+	$assets_import_liste = $assets_import->liste($source);
+	foreach ($assets_import_liste as $id_import => $asset_to_import) {
 		if ($subsource and ($asset_to_import['source_data']['subsource'] != $subsource or $subsource == "-")) {
 			continue;
 		}
@@ -361,6 +365,11 @@ HTML;
 		$dir = $sources[$asset_to_import['source']];
 		if (file_exists($dir.$asset_to_import['fichier'])) {
 			$something_to_import = true;
+			$count++;
+			if ($max and $count > $max) {
+				$remain = count($assets_import_liste) - $count;
+				break;
+			}
 			$main .= <<<HTML
 <tr class="asset-import-line">
 	<th><input type="checkbox" name="assets-import-select[{$asset_to_import['id']}]" class="assets-import-select" /></th>
@@ -446,6 +455,10 @@ HTML;
 </table>		
 HTML;
 	if ($something_to_import) {
+		if ($remain) {
+			$messages = array('<p class="message">'.$remain.' asset(s) restant(s)</p>');
+			$main .= $page->inc("snippets/messages");
+		}
 		$all_categories_json = json_encode($all_categories);
 		$all_gammes_json = json_encode($all_gammes);
 		$all_produits_json = json_encode($all_produits);
