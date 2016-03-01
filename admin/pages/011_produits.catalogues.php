@@ -27,7 +27,7 @@ $catalogue = new Catalogue($sql, $phrase);
 
 $nom = "nom";
 $field_nom = "c.nom";
-if ($translate = $config->param('translate_catalogues')) {
+if ($translate = $config->param('catalogues_translate')) {
 	$nom = "phrase_nom";
 	$field_nom = "ph.phrase";
 }

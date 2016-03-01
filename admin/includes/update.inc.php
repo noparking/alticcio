@@ -1642,3 +1642,10 @@ ALTER TABLE `dt_catalogues_categories` ADD `phrase_description` INT NOT NULL AFT
 SQL;
 	$update->query($q);
 }
+
+function update_62($update) {
+	$q = <<<SQL
+ALTER TABLE `dt_catalogues_categories` ADD `id_symlink` INT NOT NULL DEFAULT '0';
+SQL;
+	$update->query($q);
+}

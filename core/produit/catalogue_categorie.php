@@ -17,6 +17,16 @@ class CatalogueCategorie extends AbstractObject {
 
 	public function load($id) {
 		$id = parent::load($id);
+		$this->original_id_catalogues = $this->values['id_catalogues'];
+		$this->original_id_parent = $this->values['id_parent'];
+		$this->original_id = $this->id;
+		$this->is_symlink = false;
+		if ($this->values['id_symlink']) {
+			$this->is_symlink = true;
+			if ($this->values['id_symlink']) {
+				$id = parent::load($this->values['id_symlink']);
+			}
+		}
 		if ($id) {
 			$q = <<<SQL
 SELECT id_langues FROM dt_catalogues WHERE id =	{$this->values['id_catalogues']}
@@ -151,6 +161,22 @@ SQL;
 	}
 
 	public function save($data) {
+		if ($this->id != $this->original_id) {
+			if (isset($data[$this->type]['id_symlink']) and $data[$this->type]['id_symlink'] != $this->id) {
+				$data = array($this->type => array(
+					'id' => $this->original_id,
+					'id_symlink' => $data[$this->type]['id_symlink'],
+					'id_parent' => $data[$this->type]['id_parent']
+				));
+				$id = parent::save($data);
+				$this->load($id);
+
+				return $id;
+			}
+			unset($data[$this->type]['id_symlink']);
+			unset($data[$this->type]['id_parent']);
+		}
+
 		$data['catalogue_categorie']['date_modification'] = $_SERVER['REQUEST_TIME'];
 		$id = parent::save($data);
 
@@ -291,5 +317,33 @@ SQL;
 			return true;
 		}
 		return false;
+	}
+
+	public function catalogues() {
+		$q = <<<SQL
+SELECT c.id, c.nom, ph.phrase AS phrase_nom FROM dt_catalogues AS c
+LEFT OUTER JOIN dt_phrases AS ph ON ph.id = c.phrase_nom
+SQL;
+		$res = $this->sql->query($q);
+		$catalogues = array(0 => "");
+		while ($row = $this->sql->fetch($res)) {
+			$catalogues[$row['id']] = $row['phrase_nom'] ? $row['phrase_nom'] : $row['nom'];
+		}
+		
+		return $catalogues;
+	}
+
+	public function categories_by_catalogues() {
+		$categories = array();
+		$q = <<<SQL
+SELECT id, id_catalogues, nom, id_parent, statut FROM dt_catalogues_categories
+ORDER BY classement ASC
+SQL;
+		$res = $this->sql->query($q);
+		while($row = $this->sql->fetch($res)) {
+			$categories[$row['id_catalogues']][] = $row;
+		}
+
+		return $categories;
 	}
 }

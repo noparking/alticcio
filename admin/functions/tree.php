@@ -13,7 +13,7 @@ function print_checkbox_tree($tree, $form, $checked = array(), $name = "tree") {
 			'value' => 1,
 			'checked' => in_array($element['id'], $checked),
 		));
-		if (count($element['children'])) {
+		if (isset($element['children']) and count($element['children'])) {
 			$html .= print_checkbox_tree($element['children'], $form, $checked, $name);
 		}
 		$html .= '</li>';
@@ -30,7 +30,7 @@ function options_select_tree($tree, $form = null, $name = "tree", $options = arr
 		}
 		$item .= $element['nom'];
 		$options[$element['id']] = $item;
-		if (count($element['children'])) {
+		if (isset($element['children']) and count($element['children'])) {
 			$options = options_select_tree($element['children'], $form,  $name, $options, $i + 1);
 		}
 	}
@@ -41,7 +41,7 @@ function print_link_tree($tree, $url, $name = "tree") {
 	$links = "<ul class='$name'>";
 	foreach ($tree as $element) {
 		$links .= "<li class='$name'>";
-		if (count($element['children'])) {
+		if (isset($element['children']) and count($element['children'])) {
 			$links .= '<span class="with-children">+</span>';
 		}
 		else {
@@ -53,7 +53,7 @@ function print_link_tree($tree, $url, $name = "tree") {
 		}
 		$links .= "<a href='$url/{$element['id']}'>{$nom}</a>";
 
-		if (count($element['children'])) {
+		if (isset($element['children']) and count($element['children'])) {
 			$links .= print_link_tree($element['children'], $url,  $name);
 		}
 		$links .= "</li>";
@@ -68,7 +68,7 @@ function print_callback_tree($tree, $callback, $name = "tree") {
 	foreach ($tree as $element) {
 		$links .= "<li class='$name'>";
 		$links .= $callback($element);
-		if (count($element['children'])) {
+		if (isset($element['children']) and count($element['children'])) {
 			$links .= print_callback_tree($element['children'], $callback,  $name);
 		}
 		$links .= "</li>";

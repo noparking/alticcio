@@ -10,6 +10,7 @@ $config->base_include("functions/tree");
 $page->javascript[] = $config->core_media("jquery.min.js");
 $page->javascript[] = $config->core_media("jquery.tablednd.js");
 $page->javascript[] = $config->media("produit.js");
+$page->javascript[] = $config->media("catalogue.js");
 $page->javascript[] = $config->core_media("jquery.form.js");
 $page->javascript[] = $config->core_media("jquery.dteditor.js");
 $page->javascript[] = $url->make("DTEditor");
@@ -29,12 +30,13 @@ $url_redirection = new UrlRedirection($sql);
 $object = $categorie = new CatalogueCategorie($sql, $phrase, $id_langues);
 $catalogue = new Catalogue($sql);
 
-$translate = $config->param('translate_catalogues');
+$translate = $config->param('catalogues_translate');
+$symlink = $config->param('catalogues_symlink');
 
 $action = $url2->get('action');
 if ($id = $url2->get('id')) {
 	$categorie->load($id);
-	$catalogue->load($categorie->values['id_catalogues']);
+	$catalogue->load($categorie->original_id_catalogues);
 }
 
 $form = new Form(array(
@@ -134,6 +136,7 @@ if ($form->is_submitted()) {
 						$messages[] = '<p class="message">'."Le code URL est déjà utilisé !".'</p>';
 					}
 					else if ($id_saved > 0) {
+						$categorie->load($id);
 						$form->reset();
 					}
 				}
@@ -153,6 +156,12 @@ if ($action == 'edit') {
 	$form->default_values['assets'] = $categorie_assets;
 	$assets_selected = array_keys($categorie_assets);
 	$form->default_values['phrases'] = $phrase->get($categorie->phrases());
+	if ($categorie->is_symlink) {
+		$messages[] = '<p class="message">'."Cette catégorie est un lien symbolique.".'</p>';
+		$form->default_values['symlink']['catalogue'] = $categorie->values['id_catalogues'];
+		$form->default_values['catalogue_categorie']['id_symlink'] = $categorie->id;
+		$form->default_values['catalogue_categorie']['id_parent'] = $categorie->original_id_parent;
+	}
 }
 
 $form_start = $form->form_start();
@@ -175,7 +184,7 @@ $main .= $page->inc("snippets/messages");
 
 if ($action == "edit") {
 	$bloc_options = $categorie->bloc_options();
-	$titre_page = $dico->t('EditerCategorie')." # ID : ".$id;
+	$titre_page = $dico->t('EditerCategorie')." # ID : ".($categorie->is_symlink ? $categorie->original_id." -&gt; " : "").$categorie->id;
 	$sections = array(
 		'informations' => $dico->t('Informations'),
 		'produits' => $dico->t('Produits'),
@@ -185,9 +194,12 @@ if ($action == "edit") {
 	if ($config->param('assets')) {
 		$sections['assets'] = $dico->t('Assets');
 	}
+	if ($symlink) {
+		$sections['symlink'] = $dico->t('Lien symbolique');
+	}
 	// variable $hidden mise à jour dans ce snippet
 	$left = $page->inc("snippets/produits-sections");
-	$categories_options = options_select_tree(DBTools::tree($catalogue->categories(), $id), $form, "categories");
+	$categories_options = options_select_tree(DBTools::tree($catalogue->categories(), $categorie->original_id), $form, "categories");
 	$main .= <<<HTML
 {$form->input(array('type' => "hidden", 'name' => "catalogue_categorie[id]"))}
 {$form->input(array('type' => "hidden", 'name' => "catalogue_categorie[id_catalogues]"))}
@@ -259,6 +271,24 @@ HTML;
 			$main .= $form->hidden(array('name' => "assets[$selected_asset][classement]", 'if_not_yet_rendered' => true));
 		}
 	}
+	if ($symlink) {
+		$main .= <<<HTML
+{$form->fieldset_start(array('legend' => "Lien symbolique", 'class' => "produit-section produit-section-symlink".$hidden['symlink'], 'id' => "produit-section-assets"))}
+{$form->select(array('class' => "symlink-catalogue", 'name' => "symlink[catalogue]", 'label' => "Catalogue", 'options' => $categorie->catalogues()))}</td>
+<div id="categories-for-catalogue">
+HTML;
+		$categories_by_catalogues = $categorie->categories_by_catalogues();
+		if ($categorie->is_symlink) {
+			$categories_options = options_select_tree(DBTools::tree($categories_by_catalogues[$categorie->values['id_catalogues']]), $form, "categories");
+			$main .= <<<HTML
+{$form->select(array('name' => "catalogue_categorie[id_symlink]", 'label' => "Catégorie", 'options' => $categories_options))}</td>
+HTML;
+		}
+		$main .= <<<HTML
+</div>
+{$form->fieldset_end()}
+HTML;
+	}
 	$buttons['back'] = $page->l($dico->t('RetourCatalogue'), $url2->make("current", array('type' => "catalogues", 'action' => "edit", 'id' => $catalogue->id)));
 	$buttons['delete'] = $form->input(array('type' => "submit", 'name' => "delete", 'class' => "delete", 'value' => $dico->t('Supprimer') ));
 	$buttons['save'] = $form->input(array('type' => "submit", 'name' => "create", 'value' => $dico->t('Enregistrer') ));
@@ -303,3 +333,13 @@ HTML;
 
 $form_end = $form->form_end();
 
+if ($symlink) {
+	foreach ($categories_by_catalogues as $id_catalogues => $categories) {
+		$categories_options = options_select_tree(DBTools::tree($categories), $form, "categories");
+		$form_end .= <<<HTML
+<div id="categories-for-catalogue-{$id_catalogues}" style="display: none;">
+{$form->select(array('name' => "catalogue_categorie[id_symlink]", 'label' => "Catégorie", 'options' => $categories_options))}</td>
+</div>
+HTML;
+	}
+}
