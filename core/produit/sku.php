@@ -133,7 +133,7 @@ SQL;
 
 	public function prix_catalogue($id_catalogues) {
 		$prix = $this->prix(null, $id_catalogues);
-		if ($prix === false) {
+		if (!$prix) {
 			return $this->prix();
 		}
 		else {
